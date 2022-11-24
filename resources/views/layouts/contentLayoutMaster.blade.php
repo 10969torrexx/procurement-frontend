@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<!--
+Template Name: Frest HTML Admin Template
+Author: :Pixinvent
+Website: http://www.pixinvent.com/
+Contact: hello@pixinvent.com
+Follow: www.twitter.com/pixinvents
+Like: www.facebook.com/pixinvents
+Purchase: https://1.envato.market/pixinvent_portfolio
+Renew Support: https://1.envato.market/pixinvent_portfolio
+License: You must have a valid license purchased only from themeforest(the above link) in order to legally use the theme for your project.
+
+-->
+{{-- pageConfigs variable pass to Helper's updatePageConfig function to update page configuration  --}}
+@isset($pageConfigs)
+  {!! Helper::updatePageConfig($pageConfigs) !!}
+@endisset
+@php
+// confiData variable layoutClasses array in Helper.php file.
+  $configData = Helper::applClasses();
+@endphp
+
+<html class="loading" lang="@if(session()->has('locale')){{session()->get('locale')}}@else{{$configData['defaultLanguage']}}@endif"
+ data-textdirection="{{$configData['direction'] == 'rtl' ? 'rtl' : 'ltr' }}">
+  <!-- BEGIN: Head-->
+
+    <head>
+    <meta  charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <title>@yield('title') - PMIS</title>
+    <link rel="apple-touch-icon" href="{{asset('images/ico/apple-icon-120.png')}}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{asset('images/ico/favicon.ico')}}">
+    
+    <!--Jerald fontawesomeicon cdn-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css" integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+{{-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" /> --}}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" integrity="sha512-nMNlpuaDPrqlEls3IX/Q56H36qvBASwb3ipuo3MxeWbsQB1881ox0cRv7UPTgBlriqoynt35KjEwgGUeUXIPnw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+<!-- Or for RTL support -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.rtl.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <!--Jerald Sweetstyle cdn-->
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    {{-- Include core + vendor Styles --}}
+    @include('panels.styles')
+    </head>
+    <!-- END: Head-->
+
+     @if(!empty($configData['mainLayoutType']) && isset($configData['mainLayoutType']))
+     @include(($configData['mainLayoutType'] === 'horizontal-menu') ? 'layouts.horizontalLayoutMaster':'layouts.verticalLayoutMaster')
+     @else
+     {{-- if mainLaoutType is empty or not set then its print below line --}}
+     <h1>{{'mainLayoutType Option is empty in config custom.php file.'}}</h1>
+     @endif
+
+
+     {{-- Torrexx Additionals --}}
+        <!-- This will add | enable jqueery library using CDN -->
+        <!-- This will style.css file from the public directory -->
+        <link rel="stylesheet" href="{{ url('css/style.css') }}">
+        <!-- This is for the js code in main.js -->
+        <script src="{{ url('js/main.js') }}"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+         <!-- Scripts -->
+    {{-- <script src="{{ asset('frontend/js/jquery-3.6.0.min.js') }}"></script>
+    <script src="{{ asset('frontend/js/bootstrap5.bundle.min.js') }}"></script> --}}
+    @yield('scripts')
+</html>

@@ -1,0 +1,44 @@
+{
+  "menu": [
+    {
+      "url": "/",
+      "name": "Dashboard",
+      "i18n": "Dashboard",
+      "slug": "dashboard",
+      "icon": "desktop"
+    },
+    {
+      "navheader": "budgetofficer"
+    },
+    {
+      "url": "budgetofficer/ppmp_deadline",
+      "name": "PPMP Deadline",
+      "i18n": "User",
+      "icon": "calendar"
+    },
+    {
+      "url": "budgetofficer/mandatory_expenditures",
+      "name": "Expenditures",
+      "i18n": "User",
+      "icon": "shoppingcart"
+    },
+    {
+      "url": "budgetofficer/allocate_budget",
+      "name": "Allocate Budget",
+      "i18n": "User",
+      "icon": "credit-card-in"
+    },
+    {
+      "url": "budgetofficer/view_ppmp",
+      "name": "Pending PPMPs",
+      "i18n": "User",
+      "icon": "list"
+    } ,
+    {
+      "url": "budgetofficer/view_signed_ppmp",
+      "name": "View Signed PPMP",
+      "i18n": "User",
+      "icon": "search"
+    } 
+  ]
+}
