@@ -8,6 +8,21 @@
       "icon": "desktop"
     },
     {
+      "navheader": "My Property"
+    },
+    {
+      "url": "department/my_par",
+      "name": "PAR",
+      "i18n": "User",
+      "icon": "list"
+    },
+    {
+      "url": "department/my_ics",
+      "name": "ICS",
+      "i18n": "User",
+      "icon": "gears"
+    },
+    {
       "navheader": "budgetofficer"
     },
     {

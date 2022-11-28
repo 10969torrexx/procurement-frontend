@@ -8,6 +8,7 @@ use App\Http\Controllers\GlobalDeclare;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class CategoryController extends Controller
 {
@@ -17,72 +18,83 @@ class CategoryController extends Controller
           ["link" => "/", "name" => "Home"],["name" => "Category"]
         ];
         
-        $category =  Http::withToken(session('token'))->get(env('APP_API'). "/api/category/index")->json();
-        // dd($category);
-        return view('pages.bac.add-category',['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs],
-        [
-          // // 'data' => $unitofmeasurement['data'],
-          // 'data' => $unitofmeasurement['data'],
-          'data' => $category['data'],
-        ] 
-        );
+        // $category =  Http::withToken(session('token'))->post(env('APP_API'). "/api/category/index",[
+        //   'campus' => session('campus')
+        // ])->json();
+        // dd(session('campus'));
+        $category = DB::table("categories")
+                  ->where("campus", session('campus'))
+                  ->whereNull("deleted_at")
+                  ->get();
+        // if(empty($category)){
+        //   return view('pages.bac.add-category',['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs]
+        //   // [
+        //   //   // // 'data' => $unitofmeasurement['data'],
+        //   //   // 'data' => $unitofmeasurement['data'],
+        //   //   'data' => 
+        //   // ] 
+        //   );
+        // }
+        // else{
+          return view('pages.bac.add-category',['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs],
+          [
+            // // 'data' => $unitofmeasurement['data'],
+            // 'data' => $unitofmeasurement['data'],
+            'data' => $category,
+          ] 
+          );
+        // }
+        
       }
     
       public function store(Request $request){
         // dd( $request -> all()); 
-        $aes = new AESCipher();
-        $global = new GlobalDeclare();
+        // $aes = new AESCipher();
+        // $global = new GlobalDeclare();
         // $item_id = $aes->decrypt($request->item_id);
-        $category = $request->category;
-        //change campus later
-        
-      //   $response = DB::table("categories")
-      //         ->where('category',$category)
-      //         ->whereNull("deleted_at")
-      //         ->where("campus", 1)
-      //         ->first();
+        // $category = $request->category;
 
-      //   $item_a = Category::where('category',$category)->get();
-      //   if(count($item_a) > 0)
-      //   {
-      //       return response()->json([
-      //           'status' => 400, 
-      //           'message' => 'Item Already Exist!.',
-      //       ]);    
-      //   }
-      //   else{
-      //       Category::create([
-      //       'category'=> $category,
-      //       'campus'=> $campus,
-      //       'name'=> $name
-      //   ]);
-      //       return response()->json([
-      //       'status' => 200, 
-      //       'message' => 'Save Succesfully!.',
-      //   ]); 
-      // }
-      $response = Http::withToken(session('token'))->post(env('APP_API'). "/api/category/store",[
-        'campus'=> 1,
-        'name'=> "admin",
-        'category' => $category,
-        ])->json();
-        // dd( $response); 
-      if($response) 
-      {
-        if($response['status'] == 200){
-        // return redirect('/superadmin/items')->with('success', 'Added Successfully!!');
-        return response()->json([
-          'status' => 200, 
-        ]);    
+        $category = $request->category;
+        // $campus = $request->campus;
+        $name = $request->name;
+
+        // $item_a = Category::where('category',$category)->get();
+        
+        $item_a = DB::table("categories")
+                ->where("category",$category)
+                ->where("campus",session('campus'))
+                ->whereNull('deleted_at')
+                ->get();
+        if(count($item_a) > 0)
+        {
+            return response()->json([
+                'status' => 400, 
+                'message' => 'Item Already Exist!.',
+            ]);    
         }
-    
-        if($response['status'] == 400){
-          return response()->json([
-          'status' => 400, 
+        else{
+          
+        $response = DB::table("categories")
+                  ->insert([
+                    'category'=> $category,
+                    'campus'=> session('campus'),
+                    'name'=> session('name'),
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                  ]);
+
+            return response()->json([
+            'status' => 200, 
+            'message' => 'Save Succesfully!.',
         ]); 
-          // return redirect('/superadmin/items')->with('error', 'Item Already Exist!');
-          }
-      }
+        }
+      // $response = Http::withToken(session('token'))->post(env('APP_API'). "/api/category/store",[
+      //   'campus'=> session('campus'),
+      //   'name'=> "admin",
+      //   'category' => $category,
+      //   ])->json();
+        // dd( $response); 
+      
       }
     
       public function show(Request $request){
@@ -90,6 +102,8 @@ class CategoryController extends Controller
         $aes = new AESCipher();
         $global = new GlobalDeclare();
         $id1 = $aes->decrypt($id);
+
+        
         $response = Http::withToken(session('token'))->get(env('APP_API'). "/api/category/show/".$id1,[
         'id' => $id1,
       ])->json();

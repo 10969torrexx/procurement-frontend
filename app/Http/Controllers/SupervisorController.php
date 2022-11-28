@@ -23,7 +23,8 @@ class SupervisorController extends Controller
               ->join('allocated__budgets as ab','pt.allocated_budget','=','ab.id')
               ->join('fund_sources as fs','fs.id','=','ab.fund_source_id')
               ->whereNull("pt.deleted_at")
-              ->where("pt.status","!=", 0)  
+              ->where("pt.status","!=", 0)
+              ->where("pt.campus",session('campus'))
               ->where("pt.department_id","=", session("department_id"))  
               // ->orwhere("pt.status","=", 2)  
               // ->orwhere("pt.status","=", 6)  
@@ -37,11 +38,12 @@ class SupervisorController extends Controller
               ->select("pt.project_code as code","pt.id as pt_id","pt.project_title as title","p.*")
               ->join('project_titles as pt','pt.id','=','p.project_code')
               ->whereNull("p.deleted_at")
+              ->where("pt.campus",session('campus'))
               ->where("p.is_supplemental","=", 0)
               -> get();
 
         // $ppmp =  Http::withToken(session('token'))->get(env('APP_API'). "/api/supervisor/index")->json();
-        // dd(session("department_id"));
+        // dd($ppmp);
         return view('pages.supervisor.ppmp', compact('ppmp','item'),
         [
           'pageConfigs'=>$pageConfigs,
@@ -70,38 +72,60 @@ class SupervisorController extends Controller
         $breadcrumbs = [
           ["link" => "/", "name" => "Home"],["link" => "/bac/supervisor","name" =>"Supervisor"],["name" =>"PPMP"]
         ];
-            return view('pages.supervisor.supervisor_check_ppmp',compact('data'),
-            [
-              'pageConfigs'=>$pageConfigs,
-              'breadcrumbs'=>$breadcrumbs
-            ]);
-          }
+        return view('pages.supervisor.supervisor_check_ppmp',compact('data'),
+        [
+          'pageConfigs'=>$pageConfigs,
+          'breadcrumbs'=>$breadcrumbs
+        ]);
+      }
+
       public function status(Request $request){
         
-        // dd($request->all());  
-        $aes = new AESCipher();
+        //  dd('sds');
+       // $aes = new AESCipher();
         $item_id = $request->item_id;
         $project_code = $request->project_code;
         $status = $request->status;
         $remarks = $request->remarks;
+
+        $response = DB::table("ppmps")
+                ->where("id", $item_id)
+                ->update([
+                    'status' => $status,
+                    'remarks' => $remarks
+                ]);
+
+        if( $response)
+        {
+            return response()->json([
+            'status' => 200, 
+            // 'message' => $timeline,
+        ]);    
+        }
+        else{
+            return response()->json([
+            'status' => 400, 
+            // 'message' => 'error',
+            ]); 
+        }
         // $employee_id = $aes->decrypt($request->employee_id);
         // $department_id = $aes->decrypt($request->department_id);
-        $response = Http::withToken(session('token'))->get(env('APP_API'). "/api/supervisor-ppmp-approved",[
-          'item_id' => $item_id,
-          'status' => $status,
-          'project_code' => $project_code,
-          'remarks' => $remarks,
-          // 'employee'=> session('employee_id'),
-          // 'role'=> session('role'),
-          // 'department'=> session('department_id'),
-          // 'campus'=>session('campus'),
-        ])->json();
-      // dd($response); 
-            return $response; 
+        // $response = Http::withToken(session('token'))->post(env('APP_API'). "/api/supervisor-ppmp-approved",[
+        //   'item_id' => $item_id,
+        //   'status' => $status,
+        //   'project_code' => $project_code,
+        //   'remarks' => $remarks,
+        //   // 'employee'=> session('employee_id'),
+        //   // 'role'=> session('role'),
+        //   // 'department'=> session('department_id'),
+        //   // 'campus'=>session('campus'),
+        // ])->json();
+      //  dd($response); 
+            // return $response; 
       }
 
       public function done(Request $request){
-        // dd($request->all());  
+       // dd($request->all());  
         
         $status = DB::table("project_titles")
                 ->where("status",2)
@@ -135,7 +159,7 @@ class SupervisorController extends Controller
           'department_id'=>session('department_id'),
           'role'=>session('role'),
           'project_id'=>$request->project_id,
-          'status'=>3,
+          'status'=>2,
           'campus'=>session('campus'),
           'remarks'=>"Your PPMP has been approved by the Immediate Supervisor",
           'created_at' => Carbon::now()

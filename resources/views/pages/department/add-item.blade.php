@@ -49,7 +49,7 @@
                                             <div class="col-sm-8 row">
                                                 <table class="table border-zero">
                                                     <tr class="border-zero">
-                                                        <th>Project Code</th>
+                                                       
                                                         <th>Project Title</th>
                                                         <th>Project Type</th>
                                                         <th>Immediate Supervisor</th>
@@ -62,7 +62,7 @@
                                                             @for ($i = 0; $i < count($ProjectTitleResponse); $i++)
                                                                 <tr class="border-zero">
                                                                     @php  $project_title_id = $ProjectTitleResponse[$i]['id']; @endphp
-                                                                    <td class="border-zero">{{ $current_project_code = $ProjectTitleResponse[$i]['year_created'] }}-{{ ($i) + 1}}</td>
+                                                                    <!-- <td class="border-zero">{{ $current_project_code = $ProjectTitleResponse[$i]['year_created'] }}-{{ ($i) + 1}}</td> -->
                                                                     <td>{{ $ProjectTitleResponse[$i]['project_title'] }}</td>
                                                                     <td>{{ $ProjectTitleResponse[$i]['project_type'] }}</td>
                                                                     <td>{{ $ProjectTitleResponse[$i]['immediate_supervisor'] }}</td>

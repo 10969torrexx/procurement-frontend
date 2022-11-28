@@ -40,7 +40,7 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Project Code</th>
+                                    <!-- <th>Project Code</th> -->
                                     <th>Project Title</th>
                                     <th>Year</th>
                                     <th>IMmEDIATE SUPERVISOR</th>
@@ -56,7 +56,7 @@
                                     @for ($i = 0; $i < count(json_decode($project_titles)); $i++)
                                         <tr>
                                             <td>{{ ($i) + 1 }}</td>
-                                            <td>{{ json_decode($project_titles)[$i]->project_code }}</td>
+                                            <!-- <td>{{ json_decode($project_titles)[$i]->project_code }}</td> -->
                                             <td>{{ json_decode($project_titles)[$i]->project_title }}</td>
                                             <td>{{ json_decode($project_titles)[$i]->project_year }}</td>
                                             <td>{{ json_decode($project_titles)[$i]->immediate_supervisor }}</td>

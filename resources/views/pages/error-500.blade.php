@@ -16,7 +16,7 @@
             Restart the browser after clearing the cache and deleting the cookies. <br> Issues triggered by wrong file
             and directory permissions.
           </p>
-        <a href="{{ asset('/dashboard') }}" class="btn btn-primary round glow">BACK TO HOME</a>
+        <a href="{{ asset('/') }}" class="btn btn-primary round glow">BACK TO HOME</a>
         </div>
       </div>
     </div>

@@ -332,13 +332,14 @@
                                     <thead>
                                         <tr>
                                             <th>#</th>
-                                            <th>Project Code</th>
+                                            <!-- <th>Project Code</th> -->
                                             <th>Project Title</th>
                                             <th>Year</th>
                                             <th>Status</th>
                                             <th>IMmEDIATE SUPERVISOR</th>
                                             <th>Project Type</th>
                                             <th>Fund Source</th>
+                                            <!-- <th>Remarks</th> -->
                                             <th>Date Added</th>
                                             <th>Action</th>
                                         </tr>
@@ -348,13 +349,14 @@
                                             @foreach ($pt_show_disapproved as $item)
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
-                                                    <td>{{ $item->year_created }}-{{ $loop->iteration }}</td>
+                                                    <!-- <td>{{ $item->year_created }}-{{ $loop->iteration }}</td> -->
                                                     <td>{{ $item->project_title }}</td>
                                                     <td>{{ $item->year_created }}</td>
                                                     <td>{{ Str::ucfirst((new GlobalDeclare)->status($item->status)) }}</td>
                                                     <td>{{ $item->immediate_supervisor }}</td>
                                                     <td>{{ $item->project_type }}</td>
                                                     <td>{{ $item->fund_source }}</td>
+                                                    <!-- <td>{{ $item->remark }}</td> -->
                                                     <td>{{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0]  }}</td>
                                                     <td>
                                                         <div class="dropdown">

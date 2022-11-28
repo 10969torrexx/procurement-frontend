@@ -18,13 +18,23 @@ class ProjectsController extends Controller
     public function index()
     {
         //
-        $response = Project_Titles::
-        where('department_id', session('department_id'))
-        ->where('employee_id', session('employee_id'))
-        ->where('campus', session('campus'))
-        ->where('status', '!=', 0)
-        ->whereNull('deleted_at')
-        ->get();
+        // $response = Project_Titles::
+        // where('department_id', session('department_id'))
+        // ->where('employee_id', session('employee_id'))
+        // ->where('campus', session('campus'))
+        // ->where('status', '!=', 0)
+        // ->whereNull('deleted_at')
+        // ->get();
+        $response = Project_Titles::join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
+        ->where('project_titles.department_id', session('department_id'))
+        ->where('project_titles.employee_id', session('employee_id'))
+        ->where('project_titles.campus', session('campus'))
+        ->where('project_titles.status', '!=', 0)
+        ->whereNull('project_titles.deleted_at')
+        ->get([
+            'project_titles.*',
+            'fund_sources.fund_source'
+        ]);
         return ([
             'status'   => 200,
             'data'  => $response
@@ -34,13 +44,24 @@ class ProjectsController extends Controller
     public function showAllDraft()
     {
         //
-        $response = Project_Titles::
-        where('department_id', session('department_id'))
+        // $response = Project_Titles::
+        // where('department_id', session('department_id'))
+        // ->where('employee_id', session('employee_id'))
+        // ->where('campus', session('campus'))
+        // ->where('status', 0)
+        // ->whereNull('deleted_at')
+        // ->get();
+
+        $response = Project_Titles::join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
+        ->where('department_id', session('department_id'))
         ->where('employee_id', session('employee_id'))
         ->where('campus', session('campus'))
         ->where('status', 0)
-        ->whereNull('deleted_at')
-        ->get();
+        ->whereNull('project_titles.deleted_at')
+        ->get([
+           'project_titles.*',
+           'fund_sources.fund_source'
+        ]);
         return ([
             'status'   => 200,
             'data'  => $response
@@ -141,11 +162,20 @@ class ProjectsController extends Controller
      */
     public function show(Request $request)
     {
-        $response = Project_Titles::
-        where('id', intval((new AESCipher)->decrypt($request->id)))
-        ->where('status', '!=', 0)
-        ->whereNull('deleted_at')
-        ->get();
+        // $response = Project_Titles::
+        // where('id', intval((new AESCipher)->decrypt($request->id)))
+        // ->where('status', '!=', 0)
+        // ->whereNull('deleted_at')
+        // ->get();
+
+        $response = Project_Titles::join('fund_sources', 'project_titles.fund_source', 'fund_sources.id')
+        ->where('project_titles.id', intval((new AESCipher)->decrypt($request->id)))
+        ->where('status', '!=', '0')
+        ->whereNull('project_titles.deleted_at')
+        ->get([
+            'project_titles.*',
+            'fund_sources.fund_source'
+        ]);
         return ([
             'status'   => 200,
             'data'  => $response

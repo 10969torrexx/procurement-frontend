@@ -63,7 +63,7 @@ class APPNONCSEController extends Controller
             ->where("p.is_supplemental", 0)
             ->where("p.status", "=", 4)
             ->where("pt.status", "=", 4)
-            ->where("p.campus", "=", 1)
+            ->where("p.campus", session('campus'))
             // ->groupBy("p.campus")
             ->groupBy("p.item_category")
             ->orderBy("p.campus","ASC")
@@ -94,7 +94,7 @@ class APPNONCSEController extends Controller
               ->where("p.is_supplemental", "=", 0)
               ->where("p.status", "=", 4)
               ->where("pt.status", "=", 4)
-              ->where("p.campus", "=", 1)
+              ->where("p.campus", session('campus'))
               ->orderBy("p.department_id", "ASC")
               ->orderBy("p.project_code", "ASC")
               ->get();

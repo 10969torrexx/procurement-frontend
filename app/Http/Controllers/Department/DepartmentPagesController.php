@@ -109,12 +109,19 @@ class DepartmentPagesController extends Controller
             $id = $this->aes->decrypt($request->id);
             try {
                 # this will grab the specific title based department id, employee id, campus, project year
-                    $ProjectTitleResponse = Http::withToken(session('token'))->post(env('APP_API'). "/api/deparment/ProjectTitles/data", [
-                        'department_id' =>   $this->aes->encrypt(session('department_id')),
-                        'employee_id'   =>  $this->aes->encrypt(session('employee_id')),
-                        'campus'    =>   $this->aes->encrypt(session('campus')),
-                        'id'  =>  $request->id
-                    ])->json();
+                    // $ProjectTitleResponse = Http::withToken(session('token'))->post(env('APP_API'). "/api/deparment/ProjectTitles/data", [
+                    //     'department_id' =>   $this->aes->encrypt(session('department_id')),
+                    //     'employee_id'   =>  $this->aes->encrypt(session('employee_id')),
+                    //     'campus'    =>   $this->aes->encrypt(session('campus')),
+                    //     'id'  =>  $request->id
+                    // ])->json();
+
+                    $ProjectTitleResponse = Project_Titles::join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
+                    ->where('project_titles.id', $id)
+                    ->get([
+                        'project_titles.*',
+                        'fund_sources.fund_source'
+                    ]);
                 # end
                 # this will get the item based on the project code, department id, employee id 
                     $ppmp_response =  Http::withToken(session('token'))->post(env('APP_API'). "/api/department/ppmp/data", [
@@ -131,6 +138,10 @@ class DepartmentPagesController extends Controller
                     $items = (new ItemsController)->index();
                 # end
                 # this will determine if the required data are not null
+                    if($allocated_budgets['status'] == 400) {
+                        \Session::put('error', $allocated_budgets['message']);
+                        return view('pages.page-maintenance');
+                    }
                     # this will display if there are no retrieved mode of procurements
                     if($mode_of_procurements['status'] == 400) {
                         # if there are null data this will retur na page maintenance page
@@ -168,7 +179,7 @@ class DepartmentPagesController extends Controller
                         # this will attache the data to view
                         [
                             'id' => $id,
-                            'ProjectTitleResponse'    => $ProjectTitleResponse['data'],
+                            'ProjectTitleResponse'    => $ProjectTitleResponse,
                             'items' =>  $items['data'],
                             'mode_of_procurements'  =>  $mode_of_procurements['data'],
                             'unit_of_measurements'  =>  $unit_of_measurement['data'],

@@ -50,21 +50,23 @@
                             </tr>
                         </thead>
                         <tbody>
+
+                        @if (!empty($data))
                         @foreach($data as $data)
                             <tr>
-                            <td>{{ $data['category'] }}</td>
-                            {{-- <td>{{ (new GlobalDeclare)->Campus(IntVal($data1['campus'])) }}</td> --}}
-                            <td>{{ $data['name'] }}</td>
-                            <td>{{ explode('-', date('j F, Y- g:i a', strtotime($data['created_at'])))[0] }}</td>
-                            <td>{{ explode('-', date('j F, Y- g:i a', strtotime($data['updated_at'])))[0] }}</td>
+                            <td>{{ $data->category }}</td>
+                            {{-- <td>{{ (new GlobalDeclare)->Campus(IntVal($data1->campus)) }}</td> --}}
+                            <td>{{ $data->name }}</td>
+                            <td>{{ explode('-', date('j F, Y- g:i a', strtotime($data->created_at)))[0] }}</td>
+                            <td>{{ explode('-', date('j F, Y- g:i a', strtotime($data->updated_at)))[0] }}</td>
                             <td>
                                 <div class="dropdown">
                                 <span
                                     class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu"></span>
                                 <div class="dropdown-menu dropdown-menu-left">
-                                    <a class="dropdown-item edit" data-id = "<?=$aes->encrypt($data['id'])?>" data-toggle = "modal" id="editModal" href = "{{ $aes->encrypt($data['id']) }}"><i class="bx bx-edit-alt mr-1"></i> edit</a>
-                                    <a class="dropdown-item delete-category " href = "{{ $aes->encrypt($data['id']) }}">
+                                    <a class="dropdown-item edit" data-id = "<?=$aes->encrypt($data->id)?>" data-toggle = "modal" id="editModal" href = "{{ $aes->encrypt($data->id) }}"><i class="bx bx-edit-alt mr-1"></i> edit</a>
+                                    <a class="dropdown-item delete-category " href = "{{ $aes->encrypt($data->id) }}">
                                         <i class="bx bx-trash mr-1"></i> delete
                                     </a>
                                 </div>
@@ -72,6 +74,7 @@
                             </td> 
                             </tr>
                         @endforeach
+                        @endif
                         </tbody>
                         <tfoot>
                         

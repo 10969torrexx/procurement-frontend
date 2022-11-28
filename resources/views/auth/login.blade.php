@@ -16,76 +16,34 @@
         <div class="col-md-6 col-12 px-0">
           <div class="card disable-rounded-right mb-0 p-2 h-100 d-flex justify-content-center">
             <div class="card-header pb-1">
-              <div class="card-title">
-                <h4 class="text-center mb-2">Welcome Back</h4>
+              <div class="card-title text-center">
+              <img src="{{asset('images/logo/logo.png')}}" alt="SLSU Logo" width="170"><br><br>
+                <h4 class="text-center mb-2">Procurement Management Information System</h4>
               </div>
             </div>
             <div class="card-content">
               <div class="card-body">
+             
+                @if (!empty(session("globalerror")))
+                <div class="alert alert-danger" role="alert">
+                    {{session("globalerror")}}
+                </div>
+                <?php Session::forget('globalerror')?>
+                @endif
                 <div class="d-flex flex-md-row flex-column justify-content-around">
-                  <a href="/auth/google" class="btn btn-social btn-google btn-block font-small-3 mr-md-1 mb-md-0 mb-1">
+                  <!-- <a href="/auth/google" class="btn btn-social btn-google btn-block font-small-3 mr-md-1 mb-md-0 mb-1">
                     <i class="bx bxl-google font-medium-3"></i>
                     <span class="pl-50 d-block text-center">Google</span>
-                  </a>
-                  {{-- <a href="#" class="btn btn-social btn-block mt-0 btn-facebook font-small-3">
-                    <i class="bx bxl-facebook-square font-medium-3"></i>
-                    <span class="pl-50 d-block text-center">Facebook</span>
-                  </a> --}}
+                  </a> -->
+                  <a href="/auth/google" class="btn btn-outline-primary glow w-100 position-relative"> <img src="https://hrmis.southernleytestateu.edu.ph/images/logo/google.png" alt="Sign In" width="20"> Sign-in with Google
+                </a>
                 </div>
-                {{-- <div class="divider">
-                  <div class="divider-text text-uppercase text-muted">
-                    <small>or login with email</small>
-                  </div>
-                </div> --}}
-                {{-- form  --}}
-                {{-- <form method="POST" action="{{ route('login') }}">
-                  @csrf
-                  <div class="form-group mb-50">
-                    <label class="text-bold-600" for="email">Email address</label>
-                    <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}"  autocomplete="email" autofocus placeholder="Email">
-                    @error('email')
-                      <span class="invalid-feedback" role="alert">
-                        <strong>{{ $message }}</strong>
-                      </span>
-                    @enderror
-                  </div>
-                  <div class="form-group">
-                    <label class="text-bold-600" for="password">Password</label>
-                    <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password"  autocomplete="current-password" placeholder="Password">
-                    @error('password')
-                      <span class="invalid-feedback" role="alert">
-                        <strong>{{ $message }}</strong>
-                      </span>
-                     @enderror
-                  </div>
-                  <div class="form-group d-flex flex-md-row flex-column justify-content-between align-items-center">
-                    <div class="text-left">
-                      <div class="checkbox checkbox-sm">
-                        <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-                        <label class="form-check-label" for="remember">
-                          <small>Keep me logged in</small>
-                        </label>
-                      </div>
-                    </div>
-                    <div class="text-right">
-                      <a href="{{ route('password.request') }}" class="card-link"><small>Forgot Password?</small></a>
-                    </div>
-                  </div>
-                  <button type="submit" class="btn btn-primary glow w-100 position-relative">Login
-                    <i id="icon-arrow" class="bx bx-right-arrow-alt"></i>
-                  </button>
-                </form> --}}
-                {{-- <hr>
-                <div class="text-center">
-                  <small class="mr-25">Don't have an account?</small>
-                  <a href="{{route('register')}}"><small>Sign up</small></a>
-                </div> --}}
               </div>
             </div>
           </div>
         </div>
         <!-- right section image -->
-        <div class="col-md-6 d-md-block d-none text-center align-self-center p-3">
+        <div class="col-md-6 d-md-block text-center align-self-center p-3">
           <div class="card-content">
             <img class="img-fluid" src="{{asset('images/pages/login.png')}}" alt="branding logo">
           </div>

@@ -38,7 +38,6 @@
                                 <option value="{{$aes->encrypt(5)}}">San Juan</option>
                                 <option value="{{$aes->encrypt(6)}}">Hinunangan</option>
                             </select>
-                            
                         </fieldset>
                     </div>
                 </div>
@@ -60,6 +59,18 @@
                                 <option value="{{$aes->encrypt(9)}}">Supplier</option>
                                 <option value="{{$aes->encrypt(10)}}">BAC Secretariat</option>
                                 <option value="{{$aes->encrypt(11)}}">Immediate Supervisor</option>
+                            </select>
+                            
+                        </fieldset>
+                    </div>
+                </div>
+                <div class="row" >
+                    <div class="col-md-12">
+                        <fieldset class="form-group">
+                            <label for="SelectDepartment" >Select Department</label>
+                
+                            <select id="updatedepartment" class="updatedepartment form-control" required>
+                                <option value="" selected disabled>-- Select Department --</option>
                             </select>
                             
                         </fieldset>

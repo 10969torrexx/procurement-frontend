@@ -1,9 +1,10 @@
 <?php
-  use App\Http\Controllers\AESCipher;
+    use App\Http\Controllers\AESCipher;
     use App\Http\Controllers\GlobalDeclare;
 
     $aes = new AESCipher();
     $global = new GlobalDeclare();
+
 ?>
 
 @extends('layouts.contentLayoutMaster')
@@ -49,6 +50,7 @@
                                         <th>Action</th>
                                         <th>Name</th>
                                         <th>Email</th>
+                                        <th>Department</th>
                                         <th>Account Type</th>
                                         <th>Campus</th>
                                     </tr>
@@ -58,7 +60,7 @@
                                     <tr><td class="text-center" colspan="4"><span class="text-danger">{{ $error}}</span></td></tr>
                                     @else
                                         <?php $ctr=1; ?>
-                                        @foreach($users['data'] as $data)
+                                        @foreach($users as $data)
                                             <tr id = "{{$ctr}}">
                                                 <td>
                                                     <div class="dropdown">
@@ -66,25 +68,27 @@
                                                             class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
                                                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu"></span>
                                                         <div class="dropdown-menu dropdown-menu-left">
-                                                            <a class="dropdown-item editbutton" ctr = "<?=$ctr?>" href = "<?=$aes->encrypt($data['id'])?>" >
+                                                            <a class="dropdown-item editbutton" ctr = "<?=$ctr?>" href = "<?=$aes->encrypt($data->id)?>" >
                                                                 <i class="bx bx-edit-alt mr-1"></i> edit</a>
-                                                            <a class="dropdown-item hrefdelete" ctr = "<?=$ctr?>" href = "<?=$aes->encrypt($data['id'])?>">
+                                                            <a class="dropdown-item hrefdelete" ctr = "<?=$ctr?>" href = "<?=$aes->encrypt($data->id)?>">
                                                                 <i class="bx bx-trash mr-1"></i> delete </a>
                                                         </div>
                                                     </div>   
                                                 </td>
-                                                <td>{{$data['name']}}</td>
-                                                <td>{{$data['email']}}</td>
-                                                <td>{{ (new GlobalDeclare)->Account_Type($data['role']) }}</td>
-                                                <td>{{ (new GlobalDeclare)->Campus( $data['campus']) }}</td>
+                                                <td>{{$data->name}}</td>
+                                                <td>{{$data->email}}</td>
+                                                <td>{{$data->department_name}}</td>
+                                                <td>{{ (new GlobalDeclare)->Account_Type($data->role) }}</td>
+                                                <td>{{ (new GlobalDeclare)->Campus( $data->campus) }}</td>
                                             </tr>
                                             <?php $ctr = $ctr + 1 ?>
                                         @endforeach
                                         {{-- @foreach($data as $data)
                                     <tr>
-                                        <td>{{$data['name']}}</td>
-                                        <td>{{$data['email']}}</td>
-                                        <td>{{$data['account_type']}}</td>
+                                        <td>{{$data->name}}</td>
+                                        <td>{{$data->email}}</td>
+                                        <td>{{$data->department_name}}</td>
+                                        <td>{{$data->account_type}}</td>
                                     </tr>
                                     @endforeach --}}
                                    @endif
@@ -109,7 +113,7 @@
 <!--/ Scroll - horizontal and vertical table -->
 @endsection
 {{-- vendor scripts --}}
-@section('vendor-scripts')
+@section('vendor-scripts')fgfgf
 <script src="{{asset('vendors/js/tables/datatable/datatables.min.js')}}"></script>
 <script src="{{asset('vendors/js/tables/datatable/dataTables.bootstrap4.min.js')}}"></script>
 <script src="{{asset('vendors/js/tables/datatable/dataTables.buttons.min.js')}}"></script>
@@ -124,7 +128,7 @@
 
 <script src="{{asset('vendors/js/extensions/toastr.min.js')}}"></script>
 {{-- employee JS --}}
-<script src="{{asset('js/superadmin/account.js')}}"></script>
+<script src="{{asset('js/superadmin/account.js?id=158')}}"></script>
 
 @endsection
 {{-- page scripts --}}

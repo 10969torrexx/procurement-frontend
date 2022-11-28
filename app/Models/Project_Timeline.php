@@ -17,5 +17,6 @@ class Project_Timeline extends Model
         'campus',
         'project_id',
         'status',
+        'remarks'
     ];
 }

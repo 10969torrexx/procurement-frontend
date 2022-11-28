@@ -337,7 +337,7 @@
 <script src="{{asset('vendors/js/tables/datatable/dataTables.bootstrap4.min.js')}}"></script>
 <script src="{{asset('vendors/js/tables/datatable/dataTables.buttons.min.js')}}"></script>
 
-<script src="{{asset('js/bac/supervisor.js?id=7')}}"></script>
+<script src="{{asset('js/bac/supervisor.js?id=2')}}"></script>
 @endsection
 
 @section('page-scripts')

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\AESCipher;
 use App\Http\Controllers\GlobalDeclare;
 use DB;
+use Carbon\Carbon;
 
 class AdminController extends Controller
 {
@@ -20,17 +21,18 @@ class AdminController extends Controller
             $breadcrumbs = [
               ["link" => "/", "name" => "Home"],["name" => "Add User"]
             ];
-            $users =  Http::withToken(session('token'))->get(env('APP_API'). "/api/users/index")->json();
+            $users = DB::table('users as u')
+            ->select('u.*','d.department_name')
+            ->join('departments as d', 'd.id', '=', 'u.department_id')
+            ->whereNotNull('u.email')
+            ->whereNull('u.deleted_at')
+            ->get();
             // dd($users);
-            $error="";
-            if($users['status']==400){
-                $error=$users['message'];
-            }
-
+            
             return view('pages.superadmin.index',compact('users'), [
                 'pageConfigs'=>$pageConfigs,
                 'breadcrumbs'=>$breadcrumbs,
-                'error' => $error,
+                // 'error' => $error,
             ]);
     }
 
@@ -53,6 +55,19 @@ class AdminController extends Controller
                 'error' => $error,
             ]);
 
+    }
+    public function getDepartmentsByCampus(Request $request)
+    {
+        // dd($request->campus);
+        try {
+            $campus = (new AESCipher())->decrypt($request->campus);
+            $departments =  DB::table('departments')->where('campus',$campus)->whereNull('deleted_at')->get();
+            // dd($departments);
+            return $departments;
+            
+        } catch (\Throwable $th) {
+            dd($th);
+        }
     }
     public function departments()
     {
@@ -531,16 +546,27 @@ class AdminController extends Controller
     #THIS WILL PASS THE CAMPUS VALUE TO HRMIS API TO GET THE EMPLOYEE LIST BELONG TO THAT CAMPUS
     public function pass(Request $request)
     {
-        try {
-            $campus = $request->campus;
-        $response = Http::withToken(env('Auth_HRMIS_Token'))->post(env('APP_HRMIS_API'). "/api/auth/employeelist", [
-            'campus' => $campus,
-          ])->json();
-        //   dd($response);
-          return $response;
-        } catch (\Throwable $th) {
-            dd($th);
-        }
+        // try {
+        //     $campus = $request->campus;
+        // $response = Http::withToken(env('Auth_HRMIS_Token'))->post(env('APP_HRMIS_API'). "/api/auth/employeelist", [
+        //     'campus' => $campus,
+        //   ])->json();
+        // //   dd($response);
+        //   return $response;
+        // } catch (\Throwable $th) {
+        //     dd($th);
+        // }
+
+        $campus = (new AESCipher)->decrypt($request->campus);
+        $response = DB::connection("hrmis")
+            ->table("employee")
+            ->whereNull("deleted_at")
+            ->where("Campus", $campus)
+            ->orderBy("LastName")
+            ->orderBy("FirstName")
+            ->get();
+       
+        return response()->json(["data"=>$response]);
         
     }
 
@@ -629,25 +655,45 @@ class AdminController extends Controller
     }
 
     public function delete(Request $request){
-        $id = $request->id;
-        $aes = new AESCipher();
-        $global = new GlobalDeclare();
-        $id1 = $aes->decrypt($id);
-        $response = Http::withToken(session('token'))->delete(env('APP_API'). "/api/users/delete/".$id1,[
-            'id' => $id1,
-        ])->json();
-        // dd($response);
-        if($response){
-            if($response['status'] == 200){
+        try {
+            // dd($request->all());
+            $id = (new AESCipher())->decrypt($request->id);
+            $user = DB::table('users')->where('id',$id)->delete();
+            // dd($user);
+            if($user)
+            {
                 return response()->json([
-                'status' => 200, 
-                ]);    
-            }elseif($response['status'] == 404){
-                return response()->json([
-                    'status' => 404, 
-                ]);  
+                    'status'=>200,
+                    'message'=>'Account Deleted Successfully.'
+                ]);
             }
+            else
+            {
+                return response()->json([
+                    'status'=>404,
+                    'message'=>'No Account Found.'
+                ]);
+            }
+        } catch (\Throwable $th) {
+            dd('AdminContoller '.$th);
         }
+       
+
+        // $response = Http::withToken(session('token'))->delete(env('APP_API'). "/api/users/delete/".$id1,[
+        //     'id' => $id1,
+        // ])->json();
+        // // dd($response);
+        // if($response){
+        //     if($response['status'] == 200){
+        //         return response()->json([
+        //         'status' => 200, 
+        //         ]);    
+        //     }elseif($response['status'] == 404){
+        //         return response()->json([
+        //             'status' => 404, 
+        //         ]);  
+        //     }
+        // }
     }
     public function deleteDepartment(Request $request){
         $id = $request->id;
@@ -669,49 +715,83 @@ class AdminController extends Controller
     }
     public function edit(Request $request)
     {
-        $id = $request->id;
-        $aes = new AESCipher();
-        $global = new GlobalDeclare();
-        $id1 = $aes->decrypt($id);
+        $id = (new AESCipher())->decrypt($request->id);
 
-        $response = Http::withToken(session('token'))->get(env('APP_API'). "/api/users/edit/".$id1,[
-            'id' => $id1,
-        ])->json();
-        return $response;
+        $user = DB::table('users')->where('id', $id)->get();
+        // dd($user);
+        return response()->json([
+            'status'=>200,
+            'user'=> $user, 
+            'id'=> $request->id, 
+        ]);
     }
     public function editDepartment(Request $request)
     {
-        $id = $request->id;
-        $id1 = (new AESCipher())->decrypt($id);
+        // dd($request->all());
+        $id = (new AESCipher())->decrypt($request->id);
 
-        $response = Http::withToken(session('token'))->get(env('APP_API'). "/api/department/editDepartment/".$id1,[
-            'id' => $id1,
-        ])->json();
-        // dd($response);
-        return $response;
+        $department = DB::table('departments')->where('id', $id)->get();
+        // dd($campus);
+        return response()->json([
+            'status'=>200,
+            'department'=> $department, 
+            'id'=> $request->id, 
+        ]);
+
+        // $id = $request->id;
+        // $id1 = (new AESCipher())->decrypt($id);
+
+        // $response = Http::withToken(session('token'))->get(env('APP_API'). "/api/department/editDepartment/".$id1,[
+        //     'id' => $id1,
+        // ])->json();
+        // // dd($response);
+        // return $response;
     }
 
     public function update(Request $request)
     {
         // dd($request->all());
             $updatename = $request->updatename;
+            $updatedepartment = $request->updatedepartment;
             $updateselectcampus = (new AESCipher())->decrypt($request->updateselectcampus);
             $updateselectrole = (new AESCipher())->decrypt($request->updateselectrole);
-            // $updateemail = $request->updateemail;
             $updateid = $request->updateid;
-            $aes = new AESCipher();
-            $global = new GlobalDeclare();
-            $id = $aes->decrypt($updateid);
+
+            $id = (new AESCipher())->decrypt($updateid);
             
-            $response = Http::withToken(session('token'))->put(env('APP_API'). "/api/users/update/".$id,[
-            'updateid' => $id,
-            'updatename' => $updatename,
-            'updateselectcampus' => $updateselectcampus,
-            'updateselectrole' => $updateselectrole,
-            // 'updateemail' => $updateemail,
-            ])->json();
-            // dd($response);
-            return $response;
+            $response = DB::table('users')
+                        ->where('id',$id)
+                        ->update([
+                            'name' => $updatename,
+                            'campus' => $updateselectcampus,
+                            'role' => $updateselectrole,
+                            'department_id' => $updatedepartment,
+                            'updated_at' =>  Carbon::now()
+                            ]
+                        );
+
+                if($response){
+                return response()->json([
+                        'status' => 200, 
+                        'message' => 'User Updated Successfully!',
+
+                    ]);    
+                } else{
+                return response()->json([
+                        'status' => 400, 
+                        'message' => 'failed',
+                    ]);    
+                }
+
+            // $response = Http::withToken(session('token'))->put(env('APP_API'). "/api/users/update/".$id,[
+            // 'updateid' => $id,
+            // 'updatename' => $updatename,
+            // 'updateselectcampus' => $updateselectcampus,
+            // 'updateselectrole' => $updateselectrole,
+            // // 'updateemail' => $updateemail,
+            // ])->json();
+            // // dd($response);
+            // return $response;
     }
 
     public function updateDepartment(Request $request)

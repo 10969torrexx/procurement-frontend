@@ -17,13 +17,45 @@
                 @csrf
                
                 <div class="row">
-                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                  <div class="col-md-12">
                       <fieldset class="form-group">
-                          <label for="Expenditure">Expenditure</label>
-                          <input type="text" id="update_expenditure" class="update_expenditure form-control" placeholder="Enter Expenditure" value ="" required>
+                          <label for="Department" >Select Department</label>
+                          <select id="update_department" class="update_department form-control" required>
+                              <option value="" selected disabled>-- Select Department --</option>
+                          </select>
                       </fieldset>
-                    </div>
                   </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                    <fieldset class="form-group">
+                        <label for="Fundsource" >Select Fund Source</label>
+                        <select id="update_fund_source" class="update_fund_source form-control" required>
+                            <option value="" selected disabled>-- Select Fund Source --</option>
+                        </select>
+                    </fieldset>
+                </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                  <fieldset class="form-group">
+                      <label for="Year" >Select Year</label>
+                      <select id="update_year" class="update_year form-control" required>
+                          <option value="" selected disabled>-- Select Year --</option>
+                      </select>
+                  </fieldset>
+              </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+                <fieldset class="form-group">
+                    <label for="Expenditure" >Select Expenditure</label>
+                    <select id="update_expenditure" class="update_expenditure form-control" required>
+                        <option value="" selected disabled>-- Select Expenditure --</option>
+                    </select>
+                </fieldset>
+            </div>
+        </div>
                 <div class="row">
                   <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <fieldset class="form-group">

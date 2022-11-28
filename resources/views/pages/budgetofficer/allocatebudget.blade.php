@@ -40,6 +40,12 @@
                         {{-- <a href = "#" class = "btn btn-success round mr-1 mb-1" data-flag = "{{ $aes->encrypt('accounts')}}" data-button = "{{ $aes->encrypt('add')}}" data-id = "{{ $aes->encrypt('0')}}" data-toggle = "modal" data-target = "#allModal"><i class="bx bx-plus"></i> New Account</a> --}}
                         {{-- <a href = "#" class = "AllocateBudget btn btn-success round mr-1 mb-1" data-toggle = "modal" data-target = "#AllocateBudgetModal"><i class="bx bx-plus"></i>Allocate Budget</a> --}}
                         <a href = "#" class = "AllocateBudget btn btn-success round mr-1 mb-1"><i class="bx bx-plus"></i>Allocate Budget</a>
+                        @if (!empty(session("globalerror")))
+                        <div class="alert alert-danger" role="alert">
+                            {{session("globalerror")}}
+                        </div>
+                        <?php Session::forget('globalerror')?>
+                        @endif
                         {{-- <a href = "allocate_budget1" class = "AllocateBudget1 btn btn-success round mr-1 mb-1"><i class="bx bx-plus"></i>Allocate Budget 1</a> --}}
                         
 
@@ -131,7 +137,7 @@
 <script src="{{asset('vendors/js/extensions/toastr.min.js')}}"></script>
 {{-- employee JS --}}
 
-<script src="{{asset('js/budgetofficer/allocatebudget.js?id=1')}}"></script>
+<script src="{{asset('js/budgetofficer/allocatebudget.js?id=2')}}"></script>
 
 @endsection
 {{-- page scripts --}}

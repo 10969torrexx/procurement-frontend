@@ -55,6 +55,7 @@ class AuthenticationController extends Controller
           ]);
           return redirect('/');
         }
+        
         if($login['status'] == 400){
           $error = $login['message'];
          // return redirect()->route('admin.login')->with( ['error' => $error ] );
@@ -65,13 +66,16 @@ class AuthenticationController extends Controller
   //frontend
   public function logout(){
    
-    $logout = Http::withToken(session('token'))->post(env('APP_API') . "/api/logout")->json();
-    if (!empty($logout)) {
-      if ($logout['status'] == 200) {
-        session()->flush();
-        return redirect('/login');
-      }
+    try{
+      $logout = Http::withToken(session('token'))->post(env('APP_API') . "/api/logout")->json();
+      session()->flush();
+      return redirect('/login');
+    }catch(Exception $user){
+      session()->flush();
+      return redirect('/login');
     }
+    
+
   }
   
   public function loginPage()
@@ -108,34 +112,27 @@ class AuthenticationController extends Controller
                   ->whereNull("deleted_at")
                   ->first();
       
-      //   $login = Http::post(env('APP_API'). "/api/loginbygoogle",[
-      //     'name' => $name,
-      //     'email' => $email,
-      //     'photo' => $photo
-      //     ])->json();
-		  
-      //  dd('login:',$checkEmail);
-      
         if(!empty($checkEmail)){
 
          // if($checkEmail){
           //  if($checkEmail['status'] == 200){
                 $employee_id = $checkEmail->id;
                
-                 $middle_name = $checkEmail->MiddleName;
+                $middle_name = $checkEmail->MiddleName;
                 $middle_initial = substr($middle_name, 0, 1).'.';
                 $name = ucfirst(strtolower($checkEmail->FirstName)).' '.$middle_initial.' '.ucfirst(strtolower($checkEmail->LastName));
                 $data = array();
 
-                  $login = Http::post(env('APP_API'). "/api/loginusinggoogle",[
+                $login = Http::post(env('APP_API'). "/api/loginusinggoogle",[
                   'name' => $name,
                   'email' => $email,
                   'photo' => $photo,
-                  'employee_id' =>$employee_id
+                  'employee_id' =>$employee_id,
+                  'campus' => $checkEmail->Campus
                   ])->json();
                  // dd('23',$login);
 
-                 if($login['status'] == 200){
+                if($login['status'] == 200){
                     $login = $login['data'];
                     session([
                       'token' => $login['token'] ,
@@ -153,26 +150,15 @@ class AuthenticationController extends Controller
                   return redirect('/');
                  }
                 
-                 return (new MiscellaneousController)->error500Page();
-               // return response()->json([ 'status' => 500, 'data' => $data, 'message' => 'erro',]);
+                 session(['globalerror' => "Please try again"]);
+                return redirect("/login");
             }
-            // else if($checkEmail['status'] == 400){
-            //     return response()->json(['status' => 400, 'message' => 'Email is not yet register in HRMIS.']);
-            // }
-     //   }
-
-
-         
-            
-       // }
+            session(['globalerror' => "User not found. Kindly visit HRM Office for registration"]);
+            return redirect("/login");
       }
     } catch (\Throwable $th) {
-
-      dd('err:',$th);
-      /* Torrexx Additionals */  
-        // this will return error 404 page from Miscellaneous Controller
-        return (new MiscellaneousController)->error500Page();
-        // throw $th;
+        session(['globalerror' => "Please try again"]);
+        return redirect("/login");
     }
    } 
 }

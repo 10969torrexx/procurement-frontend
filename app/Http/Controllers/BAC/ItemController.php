@@ -15,7 +15,9 @@ class ItemController extends Controller
         $breadcrumbs = [
           ["link" => "/", "name" => "Home"],["name" => "Items"]
         ];
-        $item =  Http::withToken(session('token'))->get(env('APP_API'). "/api/item/index")->json();
+        $item =  Http::withToken(session('token'))->post(env('APP_API'). "/api/item/index",[
+          'campus' => session('campus')
+        ])->json();
           
         // dd( $item);
         $items = $item['data'];

@@ -1,4 +1,5 @@
  // START -- This will get the campus and pass it to HRMIS API
+ alert("FF");
   $(function(){$(".campus").change(function(){
     
         var campus = $(".campus option:selected").val();
@@ -195,7 +196,7 @@
     $(document).on('click', '.hrefdelete', function (e) {
       e.preventDefault();
       var id = $(this).attr("href");
-      // alert(id);
+      alert(id);
 
       Swal.fire({
               title: 'Are you sure?',

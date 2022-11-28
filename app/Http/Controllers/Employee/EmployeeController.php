@@ -30,4 +30,10 @@ class EmployeeController extends Controller
     //     return view('pages.employee-dashboard');
     //   }
     }
+    public function my_par(){
+        return view('pages.page-maintenance');
+    }
+    public function my_ics(){
+        return view('pages.page-maintenance');
+    }
 }

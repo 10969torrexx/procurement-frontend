@@ -123,7 +123,7 @@
 
 <script src="{{asset('vendors/js/extensions/toastr.min.js')}}"></script>
 {{-- employee JS --}}
-<script src="{{asset('js/budgetofficer/mandatory-expenditure.js?id=1')}}"></script>
+<script src="{{asset('js/budgetofficer/mandatory-expenditure.js?id=2')}}"></script>
 
 @endsection
 {{-- page scripts --}}

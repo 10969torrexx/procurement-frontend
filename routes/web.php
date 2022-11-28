@@ -43,6 +43,8 @@ Route::group(['prefix' => 'users','middleware' => ['authuser']], function() {
 
 Route::group(['prefix' => 'employee','middleware' => ['authuser']], function() {
     Route::get('/user','Employee\EmployeeController@index');
+    Route::get('/my_par','Employee\EmployeeController@my_par');
+    Route::get('/my_ics','Employee\EmployeeController@my_ics');
 });
 
 #Romar
@@ -55,7 +57,7 @@ Route::group(['prefix' => 'superadmin','middleware' => ['authuser']], function()
     Route::get('/users', 'SuperAdmin\AdminController@index');
     Route::post('/save', 'SuperAdmin\AdminController@store')->name('save');
     Route::post('/pass', 'SuperAdmin\AdminController@pass')->name('pass');
-    Route::post('/delete', 'SuperAdmin\AdminController@delete')->name('delete');
+    Route::post('/delete_user', 'SuperAdmin\AdminController@delete')->name('delete');
     Route::post('/edit', 'SuperAdmin\AdminController@edit')->name('edit');
     Route::post('/update', 'SuperAdmin\AdminController@update')->name('update');
 
@@ -65,6 +67,8 @@ Route::group(['prefix' => 'superadmin','middleware' => ['authuser']], function()
     Route::post('/getUsers', 'SuperAdmin\AdminController@getUsers');
 
     
+    Route::get('/getDepartmentsByCampus', 'SuperAdmin\AdminController@getDepartmentsByCampus')->name('getDepartmentsByCampus');
+
     Route::get('/getDepartments', 'BudgetOfficer\BudgetOfficerController@getDepartments')->name('getDepartments');
     Route::get('/getFundSources', 'BudgetOfficer\BudgetOfficerController@getFundSources')->name('getFundSources');
     Route::get('/getMandatoryExpenditures', 'BudgetOfficer\BudgetOfficerController@getMandatoryExpenditures')->name('getMandatoryExpenditures');
@@ -625,6 +629,8 @@ Route::group(['prefix' => 'bac','middleware' => ['authuser']], function() {
     Route::post('/update-campuslogo', 'BAC\APPNONCSEController@update_campuslogo')->name('update-campuslogo');
     Route::post('/update-logo', 'BAC\APPNONCSEController@update_logo')->name('update-logo');
 
+    // Route::post('/supervisor-ppmp-done', 'SupervisorController@done')->name('supervisor-ppmp-done');
+
     
     Route::group(['prefix' => 'supervisor','middleware' => ['authuser']], function() {
         //Supervisor Side
@@ -632,6 +638,7 @@ Route::group(['prefix' => 'bac','middleware' => ['authuser']], function() {
         Route::post('/show-ppmp', 'SupervisorController@show')->name('show-ppmp');
         Route::post('/supervisor-ppmp-approved', 'SupervisorController@status')->name('supervisor-ppmp-approved');
         Route::post('/supervisor-ppmp-disapproved', 'SupervisorController@status')->name('supervisor-ppmp-disapproved');
+        Route::post('/supervisor-ppmp-done', 'SupervisorController@done')->name('supervisor-ppmp-done');
     });
     
     //Ammendments
@@ -647,6 +654,10 @@ Route::group(['prefix' => 'bac','middleware' => ['authuser']], function() {
 # route for department-group
 Route::group(['prefix' => 'department','middleware' => ['authuser']], function() {
     
+    //MY PROPERTY MENU ROUTES
+    Route::get('/my_par','Employee\EmployeeController@my_par');
+    Route::get('/my_ics','Employee\EmployeeController@my_ics');
+
     //PURCHASE REQUEST ROUTES
     Route::get('/purchaseRequest', 'Department\PurchaseRequestController@PurchaseRequestIndex');
     Route::post('/purchaseRequest/add_Items_To_PR', 'Department\PurchaseRequestController@add_Items_To_PR');

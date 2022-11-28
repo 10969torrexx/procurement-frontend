@@ -8,13 +8,19 @@
       "icon": "desktop"
     },
     {
-      "navheader": "Employee"
+      "navheader": "My Property"
     },
     {
-      "url": "employee/user",
-      "name": "User",
+      "url": "employee/my_par",
+      "name": "PAR",
       "i18n": "User",
-      "icon": "users"
+      "icon": "list"
+    },
+    {
+      "url": "employee/my_ics",
+      "name": "ICS",
+      "i18n": "User",
+      "icon": "gears"
     }
   ]
 }

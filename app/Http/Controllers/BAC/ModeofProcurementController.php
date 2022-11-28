@@ -16,7 +16,9 @@ class ModeofProcurementController extends Controller
       ["link" => "/", "name" => "Home"],["name" => "Mode of Procurement"]
     ];
     
-    $modeofprocurement =  Http::withToken(session('token'))->get(env('APP_API'). "/api/mode-of-procurement/index")->json();
+    $modeofprocurement =  Http::withToken(session('token'))->post(env('APP_API'). "/api/mode-of-procurement/index",[
+      'campus' => session('campus')
+    ])->json();
     // dd($modeofprocurement);
     return view('pages.bac.add-mode-of-procurement',['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs],
     [

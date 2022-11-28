@@ -22,7 +22,7 @@ class BudgetOfficerController extends Controller
         ];
         // return view('pages.budgetofficer.index',['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs]);
 
-        $ppmp_deadlines = DB::table('ppmp_deadline')->where('campus',session('campus'))->whereNull('deleted_at')->get();
+        $ppmp_deadlines = DB::table('ppmp_deadline')->whereNull('deleted_at')->get();
 
             return view('pages.budgetofficer.ppmp_deadline_index',compact('ppmp_deadlines'), [
                 'pageConfigs'=>$pageConfigs,
@@ -76,7 +76,6 @@ class BudgetOfficerController extends Controller
                   ->join('project_titles as pt','pt.id','=','p.project_code')
                   ->whereNull("p.deleted_at")
                   ->where("p.is_supplemental","=", 0) 
-                  ->where('p.campus',session('campus'))
                   ->where('p.project_code','=',$id,'and', "p.status","=", 2 ,"or", 4,"or", 5)  
                   -> get();
         $pageConfigs = ['pageHeader' => true];
@@ -198,7 +197,6 @@ class BudgetOfficerController extends Controller
                             ->where('department_id',$department)
                             ->where('expenditure_id',$expenditure)
                             ->where('fund_source_id',$fund_source)
-                            ->where('campus',session('campus'))
                             ->where('year',$year)
                             ->get();
         if(count($expenditure_checker)>0){
@@ -214,8 +212,8 @@ class BudgetOfficerController extends Controller
                         'year'=>  $year,
                         'expenditure_id'=>  $expenditure,
                         'price'=>  $price,
-                        'campus' => session('campus'),
                         'created_at' => Carbon::now()
+
                     ]);
             if($expenditure){
                 return response()->json([
@@ -235,65 +233,34 @@ class BudgetOfficerController extends Controller
         // dd($request->all());
         $id = (new AESCipher())->decrypt($request->id);
 
-        $department_ids = DB::table('departments')->select('id')->where('campus',session('campus'))->whereNull('deleted_at')->get();
-        $fund_source_ids = DB::table('fund_sources')->select('id')->whereNull('deleted_at')->get();
-        $years = DB::table('ppmp_deadline')->select('year','id')->where('campus',session('campus'))->whereNull('deleted_at')->get();
-        $expenditure_ids = DB::table('mandatory_expenditures_list')->select('id')->whereNull('deleted_at')->get();
-
         $response = DB::table("mandatory_expenditures as me")
-                        ->select("me.department_id","me.fund_source_id","me.expenditure_id","me.price","me.year","mel.expenditure")
+                        ->select("me.price","mel.expenditure")
                         ->join('mandatory_expenditures_list as mel','mel.id','=','me.expenditure_id')
                         ->where('me.id', $id)
-                        ->where('campus',session('campus'))
                         ->whereNull('me.deleted_at')
                         ->get();
                 //         $data = DB::
-// dd($expenditure_ids);
+
             return response()->json([
                 'status'=>200,
                 'data'=> $response, 
-                'department_ids'=> $department_ids,
-                'fund_source_ids'=> $fund_source_ids,
-                'years'=> $years,
-                'expenditure_ids'=> $expenditure_ids,
                 'id'=> (new AESCipher())->encrypt($id), 
             ]);
     }
     public function updateMandatoryExpenditure(Request $request)
     {
         // dd($request->all());
-            $department = $request->department;
-            $fund_source = $request->fund_source;
-            $year = $request->year;
             $expenditure = $request->expenditure;
             $price = $request->price;
             $id = (new AESCipher())->decrypt($request->id);
             // dd($id);
-            $response = DB::table('mandatory_expenditures')
-                            ->where('id',$id)
-                            ->update([
-                                'department_id' => $department,
-                                'fund_source_id' => $fund_source,
-                                'expenditure_id' => $expenditure,
-                                'year' => $year,
-                                'price' => $price,
-                                'updated_at' =>  Carbon::now()
-                                ]
-                            );
-
-            if($response){
-                return response()->json([
-                        'status' => 200, 
-                        'data' => $request->all(), 
-                        'message' => 'Mandatory Expenditure Updated Successfully!',
-
-                    ]);    
-            } else{
-                return response()->json([
-                        'status' => 400, 
-                        'message' => 'failed',
-                    ]);    
-            }
+            $response = Http::withToken(session('token'))->put(env('APP_API'). "/api/expenditure/updateMandatoryExpenditure/".$id,[
+            'expenditure' => $expenditure,
+            'price' => $price,
+            'id' => $id,
+            ])->json();
+            // dd($response);
+            return $response;
     }
     
     public function deleteMandatoryExpenditure(Request $request){
@@ -332,7 +299,6 @@ class BudgetOfficerController extends Controller
                             ->join('departments as d', 'd.id', '=', 'mandatory_expenditures.department_id')
                             ->join('fund_sources as fs', 'fs.id', '=', 'mandatory_expenditures.fund_source_id')
                             ->join('mandatory_expenditures_list as me', 'me.id', '=', 'mandatory_expenditures.expenditure_id')
-                            ->where('mandatory_expenditures.campus',session('campus'))
                             ->whereNull('mandatory_expenditures.deleted_at')
                             ->get();
         
@@ -345,7 +311,7 @@ class BudgetOfficerController extends Controller
     public function getDepartments(Request $request)
     {
         try {
-            $departments =  DB::table('departments')->where('campus',session('campus'))->whereNull('deleted_at')->get();
+            $departments =  DB::table('departments')->get();
           return $departments;
         } catch (\Throwable $th) {
             dd($th);
@@ -354,7 +320,7 @@ class BudgetOfficerController extends Controller
     public function getFundSources(Request $request)
     {
         try {
-            $fundsources =  DB::table('fund_sources')->whereNull('deleted_at')->get();
+            $fundsources =  DB::table('fund_sources')->get();
         //   dd($departments);
           return $fundsources;
         } catch (\Throwable $th) {
@@ -364,7 +330,7 @@ class BudgetOfficerController extends Controller
     public function getMandatoryExpenditures(Request $request)
     {
         try {
-            $expenditures =  DB::table('mandatory_expenditures_list')->where('campus',session('campus'))->whereNull('deleted_at')->get();
+            $expenditures =  DB::table('mandatory_expenditures_list')->get();
         //   dd($expenditures);
           return $expenditures;
         } catch (\Throwable $th) {
@@ -376,7 +342,6 @@ class BudgetOfficerController extends Controller
         try {
           $years = DB::table('ppmp_deadline')
                     ->select('year')
-                    ->where('campus',session('campus'))
                     ->whereNull('deleted_at')
                     ->get();
 
@@ -396,13 +361,9 @@ class BudgetOfficerController extends Controller
                                     ->join('departments', 'departments.id', '=', 'allocated__budgets.department_id')
                                     ->join('fund_sources', 'fund_sources.id', '=', 'allocated__budgets.fund_source_id')
                                     ->whereNull('allocated__budgets.deleted_at')
-                                    ->where("allocated__budgets.campus", session("campus"))
                                     ->get();
-        $ppmp_deadline = DB::table('ppmp_deadline')->where('year',$date+1)->whereNull('deleted_at')->get();
-        // dd($ppmp_deadline);
-        if(count($ppmp_deadline)==0){
-            session(['globalerror' => "Please set a deadline first!"]);
-        }
+        $ppmp_deadline = DB::table('ppmp_deadline')->where('year',$date+1)->get();
+
             return view('pages.budgetofficer.allocatebudget',compact('ppmp_deadline','allocate_budget'), [
                 'pageConfigs'=>$pageConfigs,
                 'breadcrumbs'=>$breadcrumbs,
@@ -446,7 +407,6 @@ class BudgetOfficerController extends Controller
                     'deadline_of_submission' => $deadline_of_submission,
                     'allocated_budget' => $allocated_budget,
                     'remaining_balance' => $remaining_balance,
-                    'campus' => session("campus"),
                     'created_at' => Carbon::now()
                 ]);
                 if($allocate_budget){
@@ -483,8 +443,8 @@ class BudgetOfficerController extends Controller
                         ->whereNull("ab.deleted_at") 
                         ->where("ab.id","=", $id)
                         ->get();
-        $department_ids = DB::table('departments')->select('id')->whereNull('deleted_at')->get();
-        $fund_source_ids = DB::table('fund_sources')->select('id')->whereNull('deleted_at')->get();
+        $department_ids = DB::table('departments')->select('id')->get();
+        $fund_source_ids = DB::table('fund_sources')->select('id')->get();
         $years = DB::table('ppmp_deadline')->select('year','id')->whereNull('deleted_at')->get();
         // $type = DB::table('ppmp_deadline')->select('year','id')->whereNull('deleted_at')->get();
         // dd($response);
@@ -523,7 +483,6 @@ class BudgetOfficerController extends Controller
             // return $Year;
             $deadlinechecker = DB::table('ppmp_deadline')
                                 ->where('year',$Year)
-                                ->where('campus',session('campus'))
                                 ->whereNull('deleted_at')
                                 ->get();
             if(count($deadlinechecker) == 1){
@@ -535,7 +494,6 @@ class BudgetOfficerController extends Controller
                 $deadline= DB::table('ppmp_deadline')
                                     ->insert([
                                         'year'=>  $Year,
-                                        'campus'=>  session('campus'),
                                         'start_date'=>  $StartDate,
                                         'end_date'=>  $EndDate,
                                         'created_at' => Carbon::now()
