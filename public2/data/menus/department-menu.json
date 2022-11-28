@@ -1,0 +1,44 @@
+{
+    "menu": [
+      {
+        "url": "dashboard",
+        "name": "Dashboard",
+        "i18n": "Dashboard",
+        "slug": "dashboard",
+        "icon": "desktop"
+      },
+      {
+        "navheader": "Department"
+      },
+      {
+        "url": "department/announcements",
+        "name": "Announcement",
+        "i18n": "Calendar",
+        "icon": "calendar"
+      },
+      {
+        "url": "department/submitPPMP",
+        "name": "Submit PPMP",
+        "i18n": "User",
+        "icon": "users"
+      },
+      {
+        "url": "department/submit-suplemental-ppmp",
+        "name": "Supplemental PPMP",
+        "i18n": "User",
+        "icon": "users"
+      },
+      {
+        "url": "department/approved-supplemental",
+        "name": "Approved Supplemental",
+        "i18n": "User",
+        "icon": "check"
+      },
+      {
+        "url": "department/upload-signed-ppmp",
+        "name": "Upload Signed PPMP",
+        "i18n": "User",
+        "icon": "file-export"
+      }
+    ]
+  }
