@@ -107,55 +107,63 @@
                         {{-- Creat PPMP Tab --}}
                         <div class="tab-pane active" id="create-ppmp-div" aria-labelledby="create-ppmp-div-tab" role="tabpanel">
                             <div class="row justify-content-center mb-2">
-                                <form class="col-10 row" action="{{ route('department-createProjectTitle') }}" method="post">@csrf @method('POST')
-                                    <input type="text" name="project_category" value="{{ $project_category }}" class="form-control d-none">
-                                    <div class="col-sm-3">
-                                        <div class="form-group">
-                                            <label for=""> Project Title</label>
-                                            <input type="text" class="form-control @error('project_title') is-invalid @enderror"
-                                             name="project_title" autocomplete="project_title" autofocus required>
-                                                @error('project_title')
-                                                    <span class="invalid-feedback" role="alert">
-                                                        <strong>{{ $message }}</strong>
-                                                    </span>
-                                                @enderror
+                                @if (count($fund_sources) > 0)
+                                    <form class="col-10 row" action="{{ route('department-createProjectTitle') }}" method="post">@csrf @method('POST')
+                                        <input type="text" name="project_category" value="{{ $project_category }}" class="form-control d-none">
+                                        <div class="col-sm-3">
+                                            <div class="form-group">
+                                                <label for=""> Project Title</label>
+                                                <input type="text" class="form-control @error('project_title') is-invalid @enderror"
+                                                name="project_title" autocomplete="project_title" autofocus required>
+                                                    @error('project_title')
+                                                        <span class="invalid-feedback" role="alert">
+                                                            <strong>{{ $message }}</strong>
+                                                        </span>
+                                                    @enderror
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <label for="">Budget Allocation</label>
-                                            <select name="fund_source" id="" class="form-control">
-                                                <option value="">-- Choose Option --</option>
-                                                @foreach ($fund_sources as $item)
-                                                    <option value="{{ (new AESCipher)->encrypt($item->fund_source_id) }}**{{ (new AESCipher)->encrypt($item->year) }}**{{ (new AESCipher)->encrypt($item->allocated_id) }}"> {{ $item->year }} | {{ $item->fund_source }} </option>
-                                                @endforeach
-                                            </select>
+                                        <div class="col-sm-4">
+                                            <div class="form-group">
+                                                <label for="">Budget Allocation</label>
+                                                <select name="fund_source" id="" class="form-control">
+                                                    <option value="">-- Choose Option --</option>
+                                                    @foreach ($fund_sources as $item)
+                                                        <option value="{{ (new AESCipher)->encrypt($item->fund_source_id) }}**{{ (new AESCipher)->encrypt($item->year) }}**{{ (new AESCipher)->encrypt($item->allocated_id) }}"> {{ $item->year }} | {{ $item->fund_source }} </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div class="col-sm-2">
-                                        <div class="form-group">
-                                            <label for="" class="">Project Type</label>
-                                            <select name="project_type" id="" class="form-control" required>
-                                                <option value="">-- Choose Option --</option>
-                                                @foreach ($categories as $item)
-                                                    <option value="{{ $item->category }}"> {{ $item->category }}</option>
-                                                @endforeach
-                                            </select>
+                                        <div class="col-sm-2">
+                                            <div class="form-group">
+                                                <label for="" class="">Project Type</label>
+                                                <select name="project_type" id="" class="form-control" required>
+                                                    <option value="">-- Choose Option --</option>
+                                                    @foreach ($categories as $item)
+                                                        <option value="{{ $item->category }}"> {{ $item->category }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div class="col-sm-2">
-                                        <button class="btn btn-primary mt-2" type="submit" >
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" 
-                                                class="bi bi-plus-circle" viewBox="0 0 16 16">
-                                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-                                            </svg>
-                                             Create
-                                        </button>
-                                    </div>
-                                </form>
+                                        <div class="col-sm-2">
+                                            <button class="btn btn-primary mt-2" type="submit" >
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" 
+                                                    class="bi bi-plus-circle" viewBox="0 0 16 16">
+                                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                                                </svg>
+                                                Create
+                                            </button>
+                                        </div>
+                                    </form>
+                                @else
+                                   <div class="container">
+                                        <div class="alert alert-danger alert-dismissible fade show col-12" role="alert">
+                                            <strong>Failed!</strong> No allocated budget. Please contact campus budget officer!
+                                        </div>
+                                   </div>
+                                @endif
                             </div>
 
                             <div class="row justify-content-center form-group">

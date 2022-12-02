@@ -163,13 +163,13 @@ class DepartmentController extends Controller
                     'employee_id' => session('employee_id'),
                     'department_id' => session('department_id'),
                     'campus' => session('campus'),
-                    'project_code'  =>  explode('**', $request->item_name)[2],
+                    'project_code'  =>  explode('**', $request->item_name)[3],
                     'item_name' => (new AESCipher)->decrypt(explode('**', $request->item_name)[0]),
                     'unit_price'    =>  $request->unit_price,
                     'app_type'  => (new AESCipher)->decrypt(explode('**', $request->item_name)[1]),
                     'estimated_price'  => $request->estimated_price,
                     'item_description' =>  $request->item_description,
-                    'item_category'     =>  $request->item_category,
+                    'item_category'     =>  (new AESCipher)->decrypt(explode('**', $request->item_name)[2]),
                     'quantity'  => $request->quantity,
                     'unit_of_measurement'   =>  $request->unit_of_measurement,
                     'mode_of_procurement'   =>  $request->mode_of_procurement,
@@ -385,10 +385,10 @@ class DepartmentController extends Controller
                 ]);
             }
            if($has_project_items['status'] == 200) {
-                    # this will submit ppmp 
-                    $request->merge([
-                        'remaining_balance' => $request->remaining_balance
-                    ]);
+                # this will submit ppmp 
+                $request->merge([
+                    'remaining_balance' => ( doubleval($request->remaining_balance) - doubleval($total_estimated_price) )
+                ]);
                 $response = (new PPMPController)->submitPPMP($request);
                 return redirect(route('department-showCreatetPPMP'))->with([
                     'success' => $response['message']
@@ -397,6 +397,43 @@ class DepartmentController extends Controller
     }
 
     # get ppmps for edit
-
+    public function resubmitPPMP(Request $request)
+    {
+        $_deadline_of_submission = Carbon::parse($request->deadline_of_submission)->format('Y-m-d');
+        $current_date = Carbon::now()->format('Y-m-d');
+        # comparing dates if current date exceeds the allotted deadline of submission
+            if($current_date > $_deadline_of_submission) {
+                return back()->with([
+                    'failed'    => 'You\'ve exceeded the alloted deadline of submission'
+                ]);
+            } 
+        $total_estimated_price = 0.0;
+        # this will determine if the project title has items,
+            $has_project_items = (new PPMPController)->show($request->current_project_code);
+            if($has_project_items['status'] == 400) {
+                return back()->with([
+                    'failed' => 'The submitted PPMP doesn\'t contains any item(s).'
+                ]);
+            }
+            foreach ($has_project_items['data'] as $item) {
+                $total_estimated_price += $item->estimated_price;
+            }
+            # this will determine the allocated budget
+            if($total_estimated_price > doubleval($request->remaining_balance)) {
+                return back()->with([
+                    'failed' => 'You\'ve exceeded the allocated budget for your department'
+                ]);
+            }
+           if($has_project_items['status'] == 200) {
+                $request->merge([
+                    'remaining_balance' => ( doubleval($request->remaining_balance) - doubleval($total_estimated_price) )
+                ]);
+                # this will submit ppmp 
+                    $response = (new PPMPController)->re_submitPPMP($request);
+                return redirect(route('department-showCreatetPPMP'))->with([
+                    'success' => $response['message']
+                ]);
+           } 
+    }
 
 }

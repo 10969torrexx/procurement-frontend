@@ -62,23 +62,19 @@
                                                     </tr>
                                                     <tbody>
                                                         <tr class="border-zero">
-                                                            @for ($i = 0; $i < count($ProjectTitleResponse); $i++)
-                                                                <tr class="border-zero">
-                                                                    @php  $project_title_id = $ProjectTitleResponse[$i]['id']; @endphp
-                                                                    <!-- <td class="border-zero">{{ $current_project_code = $ProjectTitleResponse[$i]['year_created'] }}-{{ ($i) + 1}}</td> -->
-                                                                    <td>{{ $ProjectTitleResponse[$i]['project_title'] }}</td>
-                                                                    <td>{{ $ProjectTitleResponse[$i]['project_type'] }}</td>
-                                                                    <td>{{ $ProjectTitleResponse[$i]['immediate_supervisor'] }}</td>
-                                                                    <td>{{ $ProjectTitleResponse[$i]['fund_source'] }}</td>
-                                                                    <td>{{ $ProjectTitleResponse[$i]['project_year'] }}</td>
-                                                                        @if( Str::ucfirst((new GlobalDeclare)->status($ProjectTitleResponse[$i]['status'])) == 'approved' )
-                                                                            <td class="text-success">{{ Str::ucfirst((new GlobalDeclare)->status($ProjectTitleResponse[$i]['status'])) }}</td>
-                                                                        @else
-                                                                            <td class="text-danger">{{ Str::ucfirst((new GlobalDeclare)->status($ProjectTitleResponse[$i]['status'])) }}</td>
-                                                                        @endif
-                                                                    <!-- <td>{{ $ProjectTitleResponse[$i]->remark }}</td> -->
-                                                                </tr>
-                                                            @endfor
+                                                            @foreach ($ProjectTitleResponse as $item)
+                                                                @php  $project_title_id = $item->id; @endphp
+                                                                <td>{{ $item->project_title }}</td>
+                                                                <td>{{ $item->project_type }}</td>
+                                                                <td>{{ $item->immediate_supervisor }}</td>
+                                                                <td>{{ $item->fund_source }}</td>
+                                                                <td>{{ $item->project_year }}</td>
+                                                                    @if( Str::ucfirst((new GlobalDeclare)->status($item->status)) == 'approved' )
+                                                                        <td class="text-success">{{ Str::ucfirst((new GlobalDeclare)->status($item->status)) }}</td>
+                                                                    @else
+                                                                        <td class="text-danger">{{ Str::ucfirst((new GlobalDeclare)->status($item->status)) }}</td>
+                                                                    @endif
+                                                            @endforeach
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -159,7 +155,7 @@
                                                         <select name="item_name" id="item-name-select" class="form-control" required>
                                                             <option value="">-- Choose Item --</option>
                                                             @foreach ($items as $item)
-                                                                <option data-name="{{ (new AESCipher)->encrypt($item->item_name) }}" value="{{ (new AESCipher)->encrypt($item->item_name) }}**{{ (new AESCipher)->encrypt($item->app_type) }}**{{ $ProjectTitleResponse[0]['id'] }}">{{ $item->item_name }}</option>
+                                                                <option data-name="{{ (new AESCipher)->encrypt($item->item_name) }}" value="{{ (new AESCipher)->encrypt($item->item_name) }}**{{ (new AESCipher)->encrypt($item->app_type) }}**{{ $ProjectTitleResponse[0]->id }}">{{ $item->item_name }}</option>
                                                             @endforeach
                                                         </select>
                                                     </div>
@@ -293,26 +289,32 @@
                 </div>
             </div>
     </div>
-    @for ($i = 0; $i < count($ppmp_response); $i++)
+    @php
+         $total_estimated_price = 0.0;
+    @endphp
+    @foreach ($ppmp_response as $item)
         @php
-            $total_estimated_price += doubleVal($ppmp_response[$i]['estimated_price']);
-            $remaining_balance = $remaining_balance - $total_estimated_price;
-            if($remaining_balance <= 0) {
-                $remaining_balance = 0.0;
-            }
+            //number_format($total_estimated_price,2,'.',','
+            $total_estimated_price += doubleVal($item->estimated_price);
         @endphp
-    @endfor
+    @endforeach
+    @php
+        $remaining_balance = $remaining_balance - $total_estimated_price;
+        if($remaining_balance <= 0) {
+            $remaining_balance = 0.0;
+        }
+    @endphp
     <div class="row">
         <div class="col-12 ">
             <div class="card p-1">
                 <div class="row p-1 bg-secondary">
-                    <div class="col-4 text-center">
+                    {{-- <div class="col-4 text-center">
                         <h5 class="text-success"><strong>Allocated Budget:</strong>&nbsp; ₱ {{ number_format($allocated_budget,2,'.',',') }}</h5>
-                    </div>
-                    <div class="col-4 text-center">
+                    </div> --}}
+                    <div class="col-6 text-center">
                         <h5 class="text-white"><strong>Total Estimated Price:</strong>&nbsp; ₱ {{ number_format($total_estimated_price,2,'.',',') }}</h5>
                     </div>
-                    <div class="col-4 text-center">
+                    <div class="col-6 text-center">
                         <h5 class="text-warning"><strong>Remaining Balance:</strong>&nbsp; ₱ {{ number_format($remaining_balance,2,'.',',') }}</h5>
                     </div>
                 </div>
@@ -412,7 +414,7 @@
                                                                 <select name="item_name" id="default-item-name-select" class="form-control">
                                                                     <option value="" id="default-item-name" selected>  {{-- default selected item name --}}</option>
                                                                         @foreach ($items as $item)
-                                                                            <option data-name="{{ (new AESCipher)->encrypt($item->item_name) }}" value="{{ (new AESCipher)->encrypt($item->item_name) }}**{{ (new AESCipher)->encrypt($item->app_type) }}**{{ $ProjectTitleResponse[0]['id'] }}">{{ $item->item_name }}</option>
+                                                                            <option data-name="{{ (new AESCipher)->encrypt($item->item_name) }}" value="{{ (new AESCipher)->encrypt($item->item_name) }}**{{ (new AESCipher)->encrypt($item->app_type) }}**{{ $ProjectTitleResponse[0]->id }}">{{ $item->item_name }}</option>
                                                                         @endforeach
                                                                 </select>
                                                             </div>
@@ -566,7 +568,8 @@
                         <div class="form-group col-6">
                             <form action="{{ route('department-re_submit-ppmp') }}" method="post">@csrf @method('POST')
                                 <input type="text" value="{{ (new AESCipher)->encrypt($project_title_id) }}" class="form-control d-none" name="current_project_code">
-                                <input type="text" class="form-control d-none" name="remaining_balance" value="{{ $remaining_balance }}">
+                                <input type="text" class="form-control d-none" name="remaining_balance" value="{{ $allocated_budgets[0]->remaining_balance }}">
+                                <input type="text" class="form-control d-none" name="total_estimated_price" value="{{ $total_estimated_price }}">
                                 <input type="text" class="form-control d-none" name="allocated_budget" value="{{ $allocated_budgets[0]->id }}">
                                 <input type="text" class="form-control d-none" name="deadline_of_submission" value="{{ $allocated_budgets[0]->deadline_of_submission }}">
                                 <button type="submit" class="btn btn-success form-control">Re-submit PPMP</button>
