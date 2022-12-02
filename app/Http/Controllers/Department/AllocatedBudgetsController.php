@@ -19,12 +19,12 @@ class AllocatedBudgetsController extends Controller
     public function index()
     {
         $current_date = Carbon::now()->addYears(1)->format('Y');
-        $response = Allocated_Budgets::
-        join('fund_sources', 'allocated__budgets.fund_source_id', '=', 'fund_sources.id')
-        // ->where('year', $current_date)
-        ->where('department_id', session('department_id'))
-        ->whereNull('allocated__budgets.deleted_at')
-        ->get(['allocated__budgets.*', 'fund_sources.fund_source']);
+        $response = Allocated_Budgets::join('fund_sources', 'allocated__budgets.fund_source_id', '=', 'fund_sources.id')
+            ->where('department_id', session('department_id'))
+            ->where('')
+            ->whereNull('allocated__budgets.deleted_at')
+            ->get(['allocated__budgets.*', 'fund_sources.fund_source']);
+
         return ([
             'status'    => 200,
             'data'  =>  json_decode($response)

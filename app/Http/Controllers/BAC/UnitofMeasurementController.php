@@ -25,7 +25,7 @@ class UnitofMeasurementController extends Controller
           ["link" => "/", "name" => "Home"],["name" => "Unit of Measurement"]
         ];
         
-        $unitofmeasurement =  Http::withToken(session('token'))->post(env('APP_API'). "/api/unit-of-measurement/index"[
+        $unitofmeasurement =  Http::withToken(session('token'))->post(env('APP_API'). "/api/unit-of-measurement/index",[
           'campus' => session('campus')
         ])->json();
         // dd($unitofmeasurement);
