@@ -5,7 +5,7 @@
     use Carbon\Carbon;
     $aes = new AESCipher();
     $immediate_supervisor = '';
-    $current_year = Carbon::now()
+    $current_year = Carbon::now();
 @endphp
 @extends('layouts.contentLayoutMaster')
 {{-- title --}}
@@ -63,9 +63,6 @@
                                                     <label for="">For what year</label>
                                                     <select id="" class="form-control" name="project_year">
                                                         <option value="" id="default-year" selected></option>
-                                                        @for ($i = 0; $i < 5; $i++)
-                                                            <option value="{{ (new AESCipher)->encrypt(Carbon::now()->addYears($i)->format('Y')) }}">{{ Carbon::now()->addYears($i)->format('Y') }}</option>
-                                                        @endfor
                                                     </select>
                                                 </div>
                                             </div>
@@ -88,7 +85,7 @@
                                                     <select id="" class="form-control" name="fund_source">
                                                         <option value="" id="default-fund-source" selected></option>
                                                     @foreach ($fund_sources as $item)
-                                                        <option value="{{ (new AESCipher)->encrypt($item->fund_source) }}">{{ $item->fund_source }}</option>
+                                                        <option value="{{ $item->id }}**{{ $item->fund_source_id }}">{{ $item->fund_source }}</option>
                                                     @endforeach
                                                     </select>
                                                 </div>
@@ -124,54 +121,19 @@
                                                 @enderror
                                         </div>
                                     </div>
-                                    <div class="col-sm-2">
+                                    <div class="col-sm-4">
                                         <div class="form-group">
-                                            <label for=""> For What Year</label>
-                                            <select name="project_year" id="" class="form-control" @error('project_year') is-invalid @enderror 
-                                                autocomplete="project_title" autofocus required>
-                                                <option value="">-- Choose Option --</option>
-                                                @for ($i = 0; $i < 5; $i++)
-                                                    <option value="{{ (new AESCipher)->encrypt(Carbon::now()->addYears($i)->format('Y')) }}">{{ Carbon::now()->addYears($i)->format('Y') }}</option>
-                                                @endfor
-                                            </select>
-                                                @error('project_year')
-                                                        <span class="invalid-feedback" role="alert">
-                                                            <strong>{{ $message }}</strong>
-                                                        </span>
-                                                @enderror
-                                        </div>
-                                    </div>
-                                   
-                                    <div class="col-sm-2">
-                                        <div class="form-group">
-                                            <label for="">Fund Sources </label>
-                                            <select name="fund_source" id="" class="form-control" @error('fund_source') is-invalid @enderror 
-                                                autocomplete="fund_source" autofocus required>
+                                            <label for="">Budget Allocation</label>
+                                            <select name="fund_source" id="" class="form-control">
                                                 <option value="">-- Choose Option --</option>
                                                 @foreach ($fund_sources as $item)
-                                                    <option value="{{ (new AESCipher)->encrypt($item->id) }}">{{ $item->fund_source }}</option>
+                                                    <option value="{{ (new AESCipher)->encrypt($item->fund_source_id) }}**{{ (new AESCipher)->encrypt($item->year) }}**{{ (new AESCipher)->encrypt($item->allocated_id) }}"> {{ $item->year }} | {{ $item->fund_source }} </option>
                                                 @endforeach
                                             </select>
-                                                @error('fund_source_id')
-                                                        <span class="invalid-feedback" role="alert">
-                                                            <strong>{{ $message }}</strong>
-                                                        </span>
-                                                @enderror
                                         </div>
                                     </div>
 
                                     <div class="col-sm-2">
-                                        <div class="form-group d-none">
-                                            <label for="" class="">Immediate Supervisor</label>
-                                            <input type="text" class="form-control @error('immediate_supervisor') is-invalid @enderror"
-                                            name="immediate_supervisor" autocomplete="immediate_supervisor" autofocus value="{{ $departments[0]->immediate_supervisor }}">
-                                            @error('immediate_supervisor')
-                                                <span class="invalid-feedback" role="alert">
-                                                    <strong>{{ $message }}</strong>
-                                                </span>
-                                            @enderror
-                                        </div>
-
                                         <div class="form-group">
                                             <label for="" class="">Project Type</label>
                                             <select name="project_type" id="" class="form-control" required>
@@ -190,7 +152,7 @@
                                                 <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
                                                 <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
                                             </svg>
-                                             Create Project Title
+                                             Create
                                         </button>
                                     </div>
                                 </form>
@@ -257,16 +219,16 @@
                             </div>
 
                             {{-- creating data tables for the list of project titles --}}
-                                <div class="table-responsiv col-10 container">
+                                <div class="table-responsive col-10 container">
                                     <table class="table zero-configuration item-table" id="item-table">
                                         <thead>
                                             <tr>
                                                 <th>#</th>
                                                 {{-- <th>Project Code</th> --}}
                                                 <th>Project Title</th>
-                                                <th>Year</th>
+                                                <th>Project Year</th>
                                                 <th>Status</th>
-                                                <th>IMmEDIATE SUPERVISOR</th>
+                                                <th>Immediate SUPERVISOR</th>
                                                 <th>Project Type</th>
                                                 <th>Fund Source</th>
                                                 <th>Date Added</th>
@@ -275,21 +237,16 @@
                                         </thead>
                                         <tbody>
                                             {{-- showing ppmp data based on department and user --}}
-                                                @for ($i = 0; $i < count($ProjectTitleResponse); $i++)
+                                                @foreach ($project_titles as $item)
                                                     <tr>
-                                                        <td>{{ ($i) + 1 }}</td>
-                                                        {{-- <td>{{ $ProjectTitleResponse[$i]['year_created'] }}-{{ ($i) + 1 }}</td> --}}
-                                                        <td>{{ $ProjectTitleResponse[$i]['project_title'] }}</td>
-                                                        <td>{{ $ProjectTitleResponse[$i]['project_year'] }}</td>
-                                                         @if (Str::ucfirst((new GlobalDeclare)->status($ProjectTitleResponse[$i]['status'])) == 'Approved')
-                                                            <td class="text-success">{{ Str::ucfirst((new GlobalDeclare)->status($ProjectTitleResponse[$i]['status'])) }}</td>
-                                                         @else
-                                                            <td class="text-danger">{{ Str::ucfirst((new GlobalDeclare)->status($ProjectTitleResponse[$i]['status'])) }}</td>
-                                                         @endif
-                                                        <td>{{ $ProjectTitleResponse[$i]['immediate_supervisor'] }}</td>
-                                                        <td>{{ $ProjectTitleResponse[$i]['project_type'] }}</td>
-                                                        <td>{{ $ProjectTitleResponse[$i]['fund_source'] }}</td>
-                                                        <td>{{ explode('-', date('j F, Y-', strtotime($ProjectTitleResponse[$i]['updated_at'])))[0] }}</td>
+                                                        <td>{{ $loop->iteration }}</td>
+                                                        <td>{{ $item->project_title }}</td>
+                                                        <td>{{ $item->project_year }}</td>
+                                                        <td>{{ Str::ucfirst((new GlobalDeclare)->status($item->status)) }}</td>
+                                                        <td>{{ $item->immediate_supervisor }}</td>
+                                                        <td>{{ $item->project_type }}</td>
+                                                        <td>{{ $item->fund_source }}</td>
+                                                        <td>{{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0]  }}</td>
                                                         <td>
                                                             <div class="dropdown">
                                                                 <span
@@ -298,25 +255,25 @@
                                                                 </span>
                                                                 <div class="btn dropdown-menu dropdown-menu-left">
                                                                     {{-- edit button --}}
-                                                                        <a href = "" data-id="{{ $aes->encrypt($ProjectTitleResponse[$i]['id']) }}" id="edit-title-btn" class="dropdown-item">
+                                                                        <a href = "" data-id="{{ $aes->encrypt($item->id) }}" id="edit-title-btn" class="dropdown-item">
                                                                             <i class="bx bx-edit-alt mr-1"></i>Edit
                                                                         </a>
                                                                     {{-- END --}}
                                                                     {{-- delete title --}}
-                                                                        <a href = "{{ route('department-destroy-project', ['id' => $aes->encrypt($ProjectTitleResponse[$i]['id']) ]) }}" class="dropdown-item">
+                                                                        <a href = "{{ route('department-destroy-project', ['id' => $aes->encrypt($item->id) ]) }}" class="dropdown-item">
                                                                             <i class="bx bx-trash mr-1"></i> delete
                                                                         </a>
                                                                     {{-- END --}}
                                                                     {{-- add item form --}}
-                                                                        <a href = "{{ route('department-addItem', ['id' => $aes->encrypt($ProjectTitleResponse[$i]['id']), 'allocated_budget' => $aes->encrypt($ProjectTitleResponse[$i]['allocated_budget']) ]) }}" class="dropdown-item">
-                                                                            <i class = "fa fa-plus mr-2"></i>Add Item
+                                                                        <a href = "{{ route('department-addItem', ['id' => $aes->encrypt($item->id), 'allocated_budget' => $aes->encrypt($item->allocated_budget) ]) }}" class="dropdown-item">
+                                                                            <i class="fa-regular fa-plus mr-1"></i>Add Item
                                                                         </a>
                                                                     {{-- end add item form --}}
                                                                 </div>
                                                             </div> 
                                                         </td>
                                                     </tr>
-                                                @endfor
+                                                @endforeach
                                             {{-- showing ppmp data based on department and user --}}
                                         </tbody>
                                     </table>
@@ -332,14 +289,12 @@
                                     <thead>
                                         <tr>
                                             <th>#</th>
-                                            <!-- <th>Project Code</th> -->
                                             <th>Project Title</th>
                                             <th>Year</th>
                                             <th>Status</th>
                                             <th>IMmEDIATE SUPERVISOR</th>
                                             <th>Project Type</th>
                                             <th>Fund Source</th>
-                                            <!-- <th>Remarks</th> -->
                                             <th>Date Added</th>
                                             <th>Action</th>
                                         </tr>
@@ -349,14 +304,12 @@
                                             @foreach ($pt_show_disapproved as $item)
                                                 <tr>
                                                     <td>{{ $loop->iteration }}</td>
-                                                    <!-- <td>{{ $item->year_created }}-{{ $loop->iteration }}</td> -->
                                                     <td>{{ $item->project_title }}</td>
                                                     <td>{{ $item->year_created }}</td>
                                                     <td>{{ Str::ucfirst((new GlobalDeclare)->status($item->status)) }}</td>
                                                     <td>{{ $item->immediate_supervisor }}</td>
                                                     <td>{{ $item->project_type }}</td>
                                                     <td>{{ $item->fund_source }}</td>
-                                                    <!-- <td>{{ $item->remark }}</td> -->
                                                     <td>{{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0]  }}</td>
                                                     <td>
                                                         <div class="dropdown">
@@ -365,21 +318,15 @@
                                                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu">
                                                             </span>
                                                             <div class="btn dropdown-menu dropdown-menu-left">
-                                                                {{-- edit button --}}
-                                                                    <a href = "" data-id="{{ $aes->encrypt($item->id) }}" id="edit-title-btn" class="dropdown-item">
-                                                                        <i class="bx bx-edit-alt mr-1"></i>Edit
-                                                                    </a>
-                                                                {{-- END --}}
-                                                                {{-- delete title --}}
-                                                                    <a href = "{{ route('department-destroy-project', ['id' => $aes->encrypt($item->id) ]) }}" class="dropdown-item">
-                                                                        <i class="bx bx-trash mr-1"></i> delete
-                                                                    </a>
-                                                                {{-- END --}}
-                                                                {{-- add item form --}}
-                                                                    <a href = "{{ route('dept_disapproved-items', ['id' => $aes->encrypt($item->id), 'allocated_budget' => $aes->encrypt($item->allocated_budget) ]) }}" class="dropdown-item">
-                                                                        <i class="fa-regular fa-eye mr-1"></i>View Item
-                                                                    </a>
-                                                                {{-- end add item form --}}
+                                                                <a href = "" data-id="{{ $aes->encrypt($item->id) }}" id="edit-title-btn" class="dropdown-item">
+                                                                    <i class="bx bx-edit-alt mr-1"></i>Edit
+                                                                </a>
+                                                                <a href = "{{ route('department-destroy-project', ['id' => $aes->encrypt($item->id) ]) }}" class="dropdown-item">
+                                                                    <i class="bx bx-trash mr-1"></i> delete
+                                                                </a>
+                                                                <a href = "{{ route('dept_disapproved-items', ['id' => $aes->encrypt($item->id), 'allocated_budget' => $aes->encrypt($item->allocated_budget) ]) }}" class="dropdown-item">
+                                                                    <i class="fa-regular fa-eye mr-1"></i>View Item
+                                                                </a>
                                                             </div>
                                                         </div> 
                                                     </td>
@@ -394,7 +341,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div>\
     </strong>
 </section>
 {{-- Torrexx | Code not mine --}}
@@ -424,16 +371,17 @@
             data: {
                 'id' : $(this).attr('data-id')
             }, success: function(response) { 
+                // console.log(response[0]['id']);
                 console.log(response);
-                $('#project-id').val(response['data'][0]['id']);
-                $('#modal-header').text('Edit - ' + response['data'][0][['project_title']]);
-                $('#project-title').val(response['data'][0]['project_title']);
-                $('#default-project-type').val(response['data'][0]['project_type']);
-                $('#default-project-type').text(response['data'][0]['project_type']);
-                $('#default-year').val(response['data'][0]['project_year']);
-                $('#default-year').text(response['data'][0]['project_year']);
-                $('#default-fund-source').val(response['data'][0]['fund_source']);
-                $('#default-fund-source').text(response['data'][0]['fund_source']);
+                $('#project-id').val(response[0]['id']);
+                $('#modal-header').text('Edit - ' + response[0][['project_title']]);
+                $('#project-title').val(response[0]['project_title']);
+                $('#default-project-type').val(response[0]['project_type']);
+                $('#default-project-type').text(response[0]['project_type']);
+                $('#default-year').val(response[0]['project_year']);
+                $('#default-year').text(response[0]['project_year']);
+                $('#default-fund-source').val(response[0]['allocated_budget']+'**'+response[0]['fund_source_id']);
+                $('#default-fund-source').text(response[0]['fund_source']);
             } 
         });
     });

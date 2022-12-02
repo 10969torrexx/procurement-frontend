@@ -31,18 +31,42 @@ class DepartmentPagesController extends Controller
         # end
         # this function will show the dashboard for the department users
             public function showAnnouncementPage(){
-            //   return view('pages.page-coming-soon');
-                # this will get all data from the fund sources table
-                $allocated_budgets = (new AllocatedBudgetsController)->index();
-                $pageConfigs = ['pageHeader' => true];
-                $breadcrumbs = [
-                ["link" => "/", "name" => "Home"],["name" => "Announcements"]
-                ];
-                return view('pages.department.announcements',
-                    ['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs],
-                    [
-                        'allocated_budgets'   =>  $allocated_budgets['data'],
-                    ]);
+                /** This will join the allocated__budgets table and fundsources table
+                 * - this will be displayed on the users dashboard page
+                 * - table joined [ alocated_budgets, fundsources, mandatory_expenditures, mandatory_expenditures_list ]
+                */
+                    $departmentID = \session('department_id');
+                    $array_fund_id = [];
+                    $mandatory_expeditures = [];
+                    $allocated_budgets = \DB::table('allocated__budgets')
+                        ->join('fund_sources', 'allocated__budgets.fund_source_id', 'fund_sources.id')
+                        ->where('allocated__budgets.department_id', $departmentID)
+                        ->where('allocated__budgets.campus', session('campus'))
+                        ->groupBy('fund_sources.fund_source', 'allocated__budgets.year')
+                        ->orderBy('allocated__budgets.year')
+                        ->get([
+                            'fund_sources.id', 'allocated__budgets.*', 'fund_sources.fund_source', \DB::raw('sum(allocated__budgets.remaining_balance) as SumBudget')
+                        ]); 
+                    
+                    $mandatory_expeditures = \DB::table("mandatory_expenditures as me")
+                        ->select("me.year", "me.fund_source_id", \DB::raw('sum(me.price) as SumMandatory'))
+                        ->where("me.department_id", $departmentID)
+                        ->where("me.campus", session('campus'))
+                        ->groupBy("me.year")
+                        ->groupBy("me.fund_source_id")
+                        ->get();
+
+                /** This will return table and page configs */
+                    $pageConfigs = ['pageHeader' => true];
+                    $breadcrumbs = [
+                    ["link" => "/", "name" => "Home"],["name" => "Announcements"]
+                    ];
+                    return view('pages.department.announcements',
+                        ['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs],
+                        [
+                            'mandatory_expeditures'   =>  $mandatory_expeditures,
+                            'allocated_budgets'   =>  $allocated_budgets,
+                        ]);
             }
         # end
         # this will show the create project year 
@@ -62,44 +86,100 @@ class DepartmentPagesController extends Controller
         # this function will show Projec Titles that are status = 0
             public function showCreatePPMP(Request $request){
                 # this will get data from database
-                    // from ppmp response table
-                    $project_titles = (new ProjectsController)->showAllDraft();
-                    $pt_show_disapproved = (new ProjectsController)->show_disapproved();
-                    // from departments | this query grabs 
-                    $departments = Departments::where('id', session('department_id'))->get();
-                    // from categories table
-                    $categories_response = (new CategoriesController)->index();
-                    // from fund so\urces table
-                    $fund_sources = (new FundSourcesController)->index();
-                    
-                # this will check if all required data from database are not null
-                    # this will display if fund sources returns null
-                    if($fund_sources['status'] == 400) {
-                        return view('pages.page-maintenance', [
-                            'error' => $fund_sources['message']
-                        ]);
-                    }
-                # end
-                # this will return the department.submit-PPMP
+                    # from project_titles table
+                        /** DOCUMENTATION
+                         * This will get all the draft project titles
+                         * Based on
+                         * 1. Campus
+                         * 2. Employee ID
+                         * 3. Department ID
+                         * ------------------------------------
+                         * project titles inner join with fund sources
+                         */
+                        $project_titles = \DB::table('project_titles')
+                            ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
+                            ->where('project_titles.campus', session('campus'))
+                            ->where('project_titles.department_id', session('department_id'))
+                            ->where('project_titles.employee_id', session('employee_id'))
+                            ->where('project_titles.status', 0) //status draft
+                            ->whereNull('project_titles.deleted_at')
+                            ->get([
+                                'project_titles.*',
+                                'fund_sources.fund_source'
+                            ]);
+                    # from project titles table
+                        /** DOCUMENTATION
+                         * This will get all the disapproved project titles
+                         * - Disapproved by Immediate Supervisor 
+                         * - Disapproved by Budget Officer
+                         * Based on
+                         * 1. Campus
+                         * 2. Employee ID
+                         * 3. Department ID
+                         * ------------------------------------
+                         * project titles inner join with fund sources
+                         */
+                        $pt_show_disapproved = \DB::table('project_titles')
+                            ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
+                            ->where('project_titles.campus', session('campus'))
+                            ->where('project_titles.department_id', session('department_id'))
+                            ->where('project_titles.employee_id', session('employee_id'))
+                            ->where('project_titles.status', 3) //disapproved by Immediate Supervisor
+                            ->whereNull('project_titles.deleted_at')
+                            ->get([
+                                'project_titles.*',
+                                'fund_sources.fund_source'
+                            ]);
+                    # from departments table
+                        /** DOCUMENTATION
+                         * This will get all the department data
+                         * Based on
+                         * 1. Department ID
+                         */
+                        $departments = \DB::table('departments')->where('id', session('department_id'))->get();
+                    # from categories table
+                        /** DOCUMENTATION
+                         * This will get all the categories data
+                         * Based on
+                         * 1. Campus
+                         */
+                        $categories = \DB::table('categories')->where('campus', session('campus'))->whereNull('deleted_at')->get();
+                    # from fund sources table
+                        /** DOCUMENTATION
+                         * This will get all the allocated budgets data
+                         * Based on
+                         * 1. Campus
+                         * 2. Employee ID
+                         * 3. Department ID
+                         * -------------------------------------
+                         * allocated budget | procurement type is PPMP
+                         * total of remaining balance
+                         */
+                        $fund_sources = \DB::table('allocated__budgets')
+                            ->join('fund_sources', 'fund_sources.id', 'allocated__budgets.fund_source_id')
+                            ->where('allocated__budgets.campus', session('campus'))
+                            ->where('allocated__budgets.department_id', session('department_id'))
+                            ->where('allocated__budgets.procurement_type', 'PPMP') // make this dynamic
+                            ->whereNull('allocated__budgets.deleted_at')
+                            ->get(['allocated__budgets.*', 'allocated__budgets.id as allocated_id','fund_sources.fund_source']);
+                # end 
+                # this will return the page
                     $pageConfigs = ['pageHeader' => true];
                     $breadcrumbs = [
                         ["link" => "/", "name" => "Home"],
                         ["link" => "/department/project-category", "name" => "PROJECT CATEGORY"],
                         ["name" => "PROJECT TITLES"],
                     ];
-                # end
-                # this will return the page
                     return view('pages.department.create-ppmp',
                     ['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs], 
                     # this will attache the data to view
                     [
-                        'ProjectTitleResponse' => $project_titles['data'],
-                        // 'AllocatedBudget' => $allocated_budgets['data'],
-                        'fund_sources'   => $fund_sources['data'],
+                        'project_titles' => $project_titles,
+                        'fund_sources'   => \json_decode($fund_sources),
                         'departments'   =>  $departments,
-                        'categories'    => json_decode($categories_response['data']),
+                        'categories'    => $categories,
                         'project_category' => $request->project_category,
-                        'pt_show_disapproved'   => $pt_show_disapproved['data']
+                        'pt_show_disapproved'   => $pt_show_disapproved
                     ]);
                 # end
             }
@@ -109,62 +189,75 @@ class DepartmentPagesController extends Controller
             $id = $this->aes->decrypt($request->id);
             try {
                 # this will grab the specific title based department id, employee id, campus, project year
-                    // $ProjectTitleResponse = Http::withToken(session('token'))->post(env('APP_API'). "/api/deparment/ProjectTitles/data", [
-                    //     'department_id' =>   $this->aes->encrypt(session('department_id')),
-                    //     'employee_id'   =>  $this->aes->encrypt(session('employee_id')),
-                    //     'campus'    =>   $this->aes->encrypt(session('campus')),
-                    //     'id'  =>  $request->id
-                    // ])->json();
-
                     $ProjectTitleResponse = Project_Titles::join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
-                    ->where('project_titles.id', $id)
-                    ->get([
-                        'project_titles.*',
-                        'fund_sources.fund_source'
-                    ]);
+                        ->where('project_titles.id', $id)
+                        ->where('project_titles.campus', session('campus'))
+                        ->where('project_titles.department_id', session('department_id'))
+                        ->where('project_titles.employee_id', session('employee_id'))
+                        ->whereNull('project_titles.deleted_at')
+                        ->get([
+                            'project_titles.*',
+                            'fund_sources.fund_source'
+                        ]);
                 # end
                 # this will get the item based on the project code, department id, employee id 
-                    $ppmp_response =  Http::withToken(session('token'))->post(env('APP_API'). "/api/department/ppmp/data", [
-                        'department_id' =>   $this->aes->encrypt(session('department_id')),
-                        'employee_id'   =>  $this->aes->encrypt(session('employee_id')),
-                        'campus'    =>   $this->aes->encrypt(session('campus')),
-                        'project_code'  =>  $request->id
-                    ])->json();
+                    $ppmp_response = \DB::table('ppmps')
+                        ->where('project_code', $id)
+                        ->where('campus', session('campus'))
+                        ->where('department_id', session('department_id'))
+                        ->where('employee_id', session('employee_id'))
+                        ->whereNull('deleted_at')
+                        ->get();
                 # end
                 # this will get data from database
-                    $allocated_budgets = (new AllocatedBudgetsController)->show((new AESCipher)->decrypt($request->allocated_budget));
-                    $mode_of_procurements = Http::withToken(session('token'))->get(env('APP_API'). "/api/department/ModeOfProcurements/data")->json();
-                    $unit_of_measurement = Http::withToken(session('token'))->get(env('APP_API'). "/api/department/UnitOfMeasurement/data")->json();
-                    $items = (new ItemsController)->index();
+                    # for allocated budgets table
+                        $allocated_budgets = \DB::table('allocated__budgets')
+                            ->where('id', (new AESCipher)->decrypt($request->allocated_budget))
+                            ->where('campus', session('campus'))
+                            ->where('department_id', session('department_id'))
+                            ->whereNull('deleted_at')
+                            ->get();
+                        # return if allocated budget is null
+                            if((count($allocated_budgets) <= 0) || $allocated_budgets == null) {
+                                return back()->with([
+                                    'error' => 'You\'ve zero (0) allocated budget. Contact your campus budget officer'
+                                ]);
+                            }
+                    # for mode of procurement
+                        $mode_of_procurements = \DB::table('mode_of_procurement')
+                            ->where('campus', session('campus'))
+                            ->whereNull('deleted_at')
+                            ->get();
+                        # return if null
+                        if((count($mode_of_procurements) <= 0) || $mode_of_procurements == null) {
+                                return back()->with([
+                                    'error' => 'You\'ve no mode of procurment. Contact your campus BAC Secretariat'
+                                ]);
+                            }
+                    # for unit of measure
+                        $unit_of_measurement = \DB::table('unit_of_measurements')
+                            ->where('campus', session('campus'))
+                            ->whereNull('deleted_at')
+                            ->get();
+                        # return if null
+                            if((count($unit_of_measurement) <= 0) || $unit_of_measurement == null) {
+                                return back()->with([
+                                    'error' => 'You\'ve no unit of measurement. Contact your campus BAC Secretariat'
+                                ]);
+                            }
+                    # for items
+                        $items = \DB::table('items')
+                            ->where('campus', session('campus'))
+                            ->whereNull('deleted_at')
+                            ->get();
+                        # return if null
+                            if((count($items) <= 0) || $items == null) {
+                                return back()->with([
+                                    'error' => 'You\'ve no items. Contact your campus BAC Secretariat'
+                                ]);
+                            }
                 # end
-                # this will determine if the required data are not null
-                    if($allocated_budgets['status'] == 400) {
-                        \Session::put('error', $allocated_budgets['message']);
-                        return view('pages.page-maintenance');
-                    }
-                    # this will display if there are no retrieved mode of procurements
-                    if($mode_of_procurements['status'] == 400) {
-                        # if there are null data this will retur na page maintenance page
-                        // return view('pages.page-maintenance')->with(['error' => $mode_of_procurments['message']]);
-                        \Session::put('error', $mode_of_procurements['message']);
-                        return view('pages.page-maintenance');
-                    }
-                    # this will display if there are no retrieved unit of measurements
-                    if($unit_of_measurement['status'] == 400) {
-                        # if there are null data this will retur na page maintenance page
-                        // return view('pages.page-maintenance')->with(['error' => $mode_of_procurments['message']]);
-                        \Session::put('error', $unit_of_measurement['message']);
-                        return view('pages.page-maintenance');
-                    }
-                    # this will display if there are no retrieved items
-                    if($items['status'] == 400) {
-                        # if there are null data this will retur na page maintenance page
-                        // return view('pages.page-maintenance')->with(['error' => $mode_of_procurments['message']]);
-                        \Session::put('error', $items['message']);
-                        return view('pages.page-maintenance');
-                    }
-                # end
-                # this is for affixing header links above the card directoryyy
+                # this will return the department.my-PPMP
                     $pageConfigs = ['pageHeader' => true];
                     $breadcrumbs = [
                         ["link" => "/", "name" => "Home"],
@@ -172,19 +265,17 @@ class DepartmentPagesController extends Controller
                         ["link" => "/department/createPPMP", "name" => "PROJECT TITLES"],
                         ["name" => "ADD ITEM"]
                     ];
-                # end
-                # this will return the department.my-PPMP
                     return view('pages.department.add-item',
                         ['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs], 
                         # this will attache the data to view
                         [
                             'id' => $id,
                             'ProjectTitleResponse'    => $ProjectTitleResponse,
-                            'items' =>  $items['data'],
-                            'mode_of_procurements'  =>  $mode_of_procurements['data'],
-                            'unit_of_measurements'  =>  $unit_of_measurement['data'],
-                            'ppmp_response' => $ppmp_response['data'],
-                           'allocated_budgets' => $allocated_budgets['data']
+                            'items' => \json_decode($items),
+                            'mode_of_procurements'  =>  $mode_of_procurements,
+                            'unit_of_measurements'  =>  $unit_of_measurement,
+                            'ppmp_response' => $ppmp_response,
+                            'allocated_budgets' => $allocated_budgets
                         ]
                     );
                 # end

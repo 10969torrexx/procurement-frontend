@@ -21,11 +21,19 @@ class DepartmentController extends Controller
      */
     public function getProjectTitle(Request $request)
     {
-        // 
-        $response = (new ProjectsController)->showDraft($request);
+        $response = \DB::table('project_titles')
+            ->join('fund_sources', 'project_titles.fund_source', 'fund_sources.id')
+            ->where('project_titles.id', intval((new AESCipher)->decrypt($request->id)))
+            ->where('project_titles.department_id', session('department_id'))
+            ->where('project_titles.campus', session('campus'))
+            ->whereNull('project_titles.deleted_at')
+            ->get([
+                'project_titles.*',
+                'fund_sources.fund_source',
+                'fund_sources.id as fund_source_id',
+            ]);
         return $response;
     }
-
     /**
      * Store a newly created resource in storage for the Project Titles Table.
      *
@@ -34,48 +42,44 @@ class DepartmentController extends Controller
      */
     public function createProjectTitle(Request $request)
     {
-    
         # form fields validation
         $this->validate($request, [
             # field validation | disabled
                 'project_title'     =>  'required',
-                'project_year'     =>  'required',
                 'fund_source'  =>  'required',
                 'project_type'  =>  'required',
-                'immediate_supervisor' => 'required'
         ]); 
-         # determine if allocated budget exists
-            $allocated_budget = DB::table('allocated__budgets')
-            ->where('year','=',(new AESCipher)->decrypt($request->project_year))
-            ->where('fund_source_id','=',(new AESCipher)->decrypt($request->fund_source))
-            ->get();
-            // dd($allocated_budget);
-            // $allocated_budget = (new AllocatedBudgetsController)->find($request);
-            if(count($allocated_budget) <= 0) {
-                return back()->with([
-                    'error' => 'No allocated budget/Fund source for that year'
-                ]);
-            }
-            # this will add the allocated budget id to the request
-            $request->merge([
-                'allocated_budget' => (new AESCipher)->encrypt($allocated_budget[0]->id)
-            ]);
-         # end
-        // this will send data to project titles table using api
-            $project_titles = (new ProjectsController)->store($request);
+        $request->merge([
+            'project_year'  => explode('**',$request->fund_source)[1],
+            'allocated_budget' => explode('**', $request->fund_source)[2]
+        ]);
+        // this will create data to project titles table
+           $project_titles = \DB::table('project_titles')
+           ->insert([
+                'employee_id'   => session('employee_id'),
+                'project_title' => $request->project_title,
+                'department_id' => session('department_id'),
+                'campus'    =>  session('campus'),
+                'project_year'  =>  (new AESCipher)->decrypt($request->project_year),
+                'fund_source'   => (new AESCipher)->decrypt(explode('**',$request->fund_source)[0]),
+                'allocated_budget' => (new AESCipher)->decrypt($request->allocated_budget),
+                'immediate_supervisor' => session('immediate_supervisor'),
+                'project_category'  =>  1, // soon to be dynamic
+                'project_type'  => $request->project_type,
+                'status'    => 0,
+                'year_created'  => Carbon::now()->format('Y'),
+                'created_at'    => Carbon::now(),
+                'updated_at'    => Carbon::now()
+           ]);
         // this will be returned if status was successful
-            if($project_titles['status'] == 200) {
+            if($project_titles == true) {
                 return back()->with([
-                    'success'   => $project_titles['message']
+                    'success'   => 'Project Title Created Succesfully!'
                 ]);
             } 
-        # this will be returned if not successful
-            if($project_titles['status'] == 400) {
-                # if there are null data this will retur na page maintenance page
-                // return view('pages.page-maintenance')->with(['error' => $mode_of_procurments['message']]);
-                Session::put('error', $project_titles['message']);
-                return view('pages.error-500');
-            }
+              return back()->with([
+                'error'   => 'Project Title Created Failed'
+            ]);
     }
 
     /* Store a newly created resource in storage for the Project Titles Table.
@@ -85,21 +89,25 @@ class DepartmentController extends Controller
     */
    public function destoryProjectTitle(Request $request)
    {
-        # this will send data to project titles table using api
-          $project_titles = (new ProjectsController)->destroy((new AESCipher)->decrypt($request->id));
-        # end
-        # this will be returned if status was successful
-           if($project_titles['status'] == 200) {
-               return back()->with([
-                   'success'   => $project_titles['message']
-               ]);
-           } 
-        # this will be returned if not successful
-           if($project_titles['status'] == 400) {
-                return back()->with([
-                    'error'   => $project_titles['message']
-                ]);
-           }
+        $project_titles = \DB::table('project_titles')
+            ->where('id', (new AESCipher)->decrypt($request->id))
+            ->where('campus', session('campus'))
+            ->where('employee_id', session('employee_id'))
+            ->where('department_id', session('department_id'))
+            ->update([
+                'deleted_at' => Carbon::now()
+            ]);
+        $ppmps = \DB::table('ppmps')
+            ->where('project_code', (new AESCipher)->decrypt($request->id))
+            ->where('campus', session('campus'))
+            ->where('employee_id', session('employee_id'))
+            ->where('department_id', session('department_id'))
+            ->update([
+                'deleted_at' => Carbon::now()
+            ]);
+        return back()->with([
+            'success'   => 'Project Successfully deleted!'
+        ]);
    }
 
    /* Updates a resource in storage for the Project Titles Table.
@@ -109,35 +117,24 @@ class DepartmentController extends Controller
     */
     public function updateProjectTitle(Request $request)
     {
-        $project_year = $request->project_year;
-        $fund_source = $request->fund_source;
-        $request->merge([
-            'project_year'  => (new AESCipher)->encrypt($project_year),
-            'fund_source'   =>  (new AESCipher)->encrypt($fund_source)
-        ]);
-        $allocated_budget = (new AllocatedBudgetsController)->find($request);
-        if(count($allocated_budget['data']) <= 0) {
+        # Updating project title details
+            $project_titles = \DB::table('project_titles')
+                ->where('id', $request->id)
+                ->where('campus', session('campus'))
+                ->where('employee_id', session('employee_id'))
+                ->where('department_id', session('department_id'))
+                ->whereNull('deleted_at')
+                ->update([
+                    'project_title' => $request->project_title,
+                    'project_type' => $request->project_type,
+                    'project_year' => $request->project_year,
+                    'fund_source' => explode('**', $request->fund_source)[1],
+                    'allocated_budget' => explode('**', $request->fund_source)[0],
+                ]);
+        # return positive response
             return back()->with([
-                'error' => 'No allocated budget/Fund source for that year'
+                'success'   => 'Project Updated Successfully!'
             ]);
-        }
-        # this will add the allocated budget id to the request
-        $request->merge([
-            'allocated_budget' => (new AESCipher)->encrypt($allocated_budget['data'][0]->id)
-        ]);
-        $project_titles = (new ProjectsController)->update($request, $request->id);
-        // this will be returned if status was successful
-            if($project_titles['status'] == 200) {
-                return back()->with([
-                    'success'   => $project_titles['message']
-                ]);
-            } 
-        # this will be returned if not successful
-            if($project_titles['status'] == 400) {
-                return back()->with([
-                    'error' => $project_titles['message']
-                ]);
-            }
     }
      /**
      * Store a newly created resource in storage for the Project Titles Table.
@@ -160,37 +157,29 @@ class DepartmentController extends Controller
                 'expected_month'    =>  'required',
                 'unit_of_measurement'  =>  'required',
         ]); 
-        // calculating estimated price
         // this will send data to project titles table using api
-            $create_items =  Http::withToken(session('token'))->post(env('APP_API'). "/api/department/create-pppms", [
-                'employee_id'   => (new AESCipher)->encrypt(session('employee_id')), 
-                'department_id'   => (new AESCipher)->encrypt(session('department_id')), 
-                'project_code'  =>  (new AESCipher)->encrypt(explode('**', $request->item_name)[2]),
-                'campus'   => (new AESCipher)->encrypt(session('campus')), 
-                'item_name' => explode('**', $request->item_name)[0],
-                'unit_price'    =>  $request->unit_price,
-                'app_type'  => explode('**', $request->item_name)[1],
-                'estimated_price'  => (new AESCipher)->encrypt($request->estimated_price),
-                'item_description' =>  $request->item_description,
-                'item_category'     =>  $request->item_category,
-                'quantity'  => (new AESCipher)->encrypt($request->quantity),
-                'unit_of_measurement'   =>  (new AESCipher)->encrypt($request->unit_of_measurement),
-                'mode_of_procurement'   =>  (new AESCipher)->encrypt($request->mode_of_procurement),
-                'expected_month'    => $request->expected_month
-            ])->json();
-           
-        // this will be returned if status was successful
-            if($create_items['status'] == 200) {
-                return back()->with([
-                    'success'   => $create_items['message']
+            $create_items = \DB::table('ppmps')
+                ->insert([
+                    'employee_id' => session('employee_id'),
+                    'department_id' => session('department_id'),
+                    'campus' => session('campus'),
+                    'project_code'  =>  explode('**', $request->item_name)[2],
+                    'item_name' => (new AESCipher)->decrypt(explode('**', $request->item_name)[0]),
+                    'unit_price'    =>  $request->unit_price,
+                    'app_type'  => (new AESCipher)->decrypt(explode('**', $request->item_name)[1]),
+                    'estimated_price'  => $request->estimated_price,
+                    'item_description' =>  $request->item_description,
+                    'item_category'     =>  $request->item_category,
+                    'quantity'  => $request->quantity,
+                    'unit_of_measurement'   =>  $request->unit_of_measurement,
+                    'mode_of_procurement'   =>  $request->mode_of_procurement,
+                    'expected_month'    => (new AESCipher)->decrypt($request->expected_month),
+                    'created_at'    =>  Carbon::now(),
+                    'updated_at'    =>  Carbon::now(),
                 ]);
-            } 
-        # this will be returned if not successful
-            if($create_items['status'] == 400) {
-                return back()->with([
-                    'failed'   => $create_items['message']
-                ]);
-            }
+            return back()->with([
+                'success'   => 'Item added as Draft!'
+            ]);
     }
     /**
      * 
@@ -342,13 +331,22 @@ class DepartmentController extends Controller
     public function deletePPMPS(Request $request)
     {
        try {
-            $response = (new PPMPController)->destroy($request);
+            $response = \DB::table('ppmps')
+                ->where('id', intval((new AESCipher)->decrypt($request->id)))
+                ->where('employee_id', session('employee_id'))
+                ->where('department_id', session('department_id'))
+                ->where('campus', session('campus'))
+                ->update([
+                    'deleted_at' => Carbon::now()
+                ]);
+
             return back()->with([
-                'success' => $response['message']
+                'success' => 'Item deleted successfully!'
             ]);
-            // return $request; 
        } catch (\Throwable $th) {
-            throw $th;
+           return back()->with([
+            'failed'    =>  'Failed to delete Item. Contact System Admin'
+           ]);
        }
     }
 
@@ -396,7 +394,9 @@ class DepartmentController extends Controller
                     'success' => $response['message']
                 ]);
            } 
-
-          
     }
+
+    # get ppmps for edit
+
+
 }

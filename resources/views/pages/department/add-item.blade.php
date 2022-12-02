@@ -196,9 +196,9 @@
                                                         <label for="">Unit of Measure</label>
                                                         <select name="unit_of_measurement" id="" class="form-control" required>
                                                             <option value="">-- Choose Option --</option>
-                                                            @for ($i = 0; $i < count($unit_of_measurements); $i++)
-                                                                <option value="{{ $unit_of_measurements[$i]['unit_of_measurement'] }}">{{ $unit_of_measurements[$i]['unit_of_measurement'] }}</option>
-                                                            @endfor
+                                                            @foreach ($unit_of_measurements as $item)
+                                                                <option value="{{ $item->unit_of_measurement }}">{{ $item->unit_of_measurement }}</option>
+                                                            @endforeach
                                                         </select>
                                                     </div>
                                                     <div class="form-group">
@@ -217,13 +217,8 @@
                                                     <div class="form-group">
                                                         <label for="">Item Description</label>
                                                         <textarea id="item-description-textarea" class="form-control @error('item_description') is-invalid @enderror" 
-                                                            name="item_description" id="" cols="15" rows="5" autofocus required>
+                                                            name="item_description" id="" cols="15" rows="5" required>
                                                         </textarea>
-                                                            @error('item_description')
-                                                                <span class="invalid-feedback" role="alert">
-                                                                    <strong>{{ $message }}</strong>
-                                                                </span>
-                                                            @enderror
                                                     </div>
                                                    {{-- view templates modal --}}
                                                         <div class="modal fade" id="templates-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -257,14 +252,14 @@
                                                         <p class="form-control" id="mode-procurement-p" style="display: none"></p>
                                                         <select name="mode_of_procurement" id="mode-procurement-select" class="form-control">
                                                             <option value="">-- Choose Option --</option>
-                                                            @for ($i = 0; $i < count($mode_of_procurements); $i++)
-                                                                <option value="{{ $mode_of_procurements[$i]['mode_of_procurement'] }}">{{ $mode_of_procurements[$i]['mode_of_procurement'] }}</option>
-                                                            @endfor
+                                                            @foreach ($mode_of_procurements as $item)
+                                                                <option value="{{  $item->mode_of_procurement }}">{{ $item->mode_of_procurement }}</option>
+                                                            @endforeach
                                                         </select>
                                                     </div>
 
                                                     <label for="">Expected Month</label>
-                                                        <select name="expected_month" id="" class="form-control">
+                                                        <select name="expected_month" id="" class="form-control" required>
                                                             <option value="">-- Choose Option --</option>
                                                             @for ($i = 0; $i < 12; $i++)
                                                                 <option value="{{ (new AESCipher)->encrypt(($i) + 1) }}">{{ (new GlobalDeclare)->Month(($i) + 1) }}</option>
@@ -289,27 +284,27 @@
                 </div>
             </div>
     </div>
-    @for ($i = 0; $i < count($ppmp_response); $i++)
-      @php
-        //number_format($total_estimated_price,2,'.',','
-          $total_estimated_price += doubleVal($ppmp_response[$i]['estimated_price']);
-          $remaining_balance = $allocated_budget - $total_estimated_price;
-          if($remaining_balance <= 0) {
-            $remaining_balance = 0.0;
-          }
-      @endphp
-    @endfor
+    @foreach ($ppmp_response as $item)
+        @php
+            //number_format($total_estimated_price,2,'.',','
+            $total_estimated_price += doubleVal($item->estimated_price);
+            $remaining_balance = $remaining_balance - $total_estimated_price;
+            if($remaining_balance <= 0) {
+                $remaining_balance = 0.0;
+            }
+        @endphp
+    @endforeach
     <div class="row">
         <div class="col-12 ">
             <div class="card p-1">
                 <div class="row p-1 bg-secondary">
-                    <div class="col-4 text-center">
+                    {{-- <div class="col-4 text-center">
                         <h5 class="text-success"><strong>Allocated Budget:</strong>&nbsp; ₱ {{ number_format($allocated_budget,2,'.',',') }}</h5>
-                    </div>
-                    <div class="col-4 text-center">
+                    </div> --}}
+                    <div class="col-6 text-center">
                         <h5 class="text-white"><strong>Total Estimated Price:</strong>&nbsp; ₱ {{ number_format($total_estimated_price,2,'.',',') }}</h5>
                     </div>
-                    <div class="col-4 text-center">
+                    <div class="col-6 text-center">
                         <h5 class="text-warning"><strong>Remaining Balance:</strong>&nbsp; ₱ {{ number_format($remaining_balance,2,'.',',') }}</h5>
                     </div>
                 </div>
@@ -335,59 +330,54 @@
                        </thead>
                        <tbody>
                             {{-- showing ppmp data based on department and user --}}
-                                @for ($i = 0; $i < count($ppmp_response); $i++)
-                                   <tr>
-                                   
-                                       <td>{{ ($i) + 1 }}</td>
-                                       <td>{{ $ppmp_response[$i]['item_name'] }}</td>
-                                       <td>{{ $ppmp_response[$i]['app_type'] }}</td>
-                                       <td>₱{{ number_format($ppmp_response[$i]['estimated_price'],2,'.',',')  }}</td>
-                                       <td class="">{{ $ppmp_response[$i]['item_description'] }}</td>
-                                       <td>{{ $ppmp_response[$i]['quantity'] }}</td>
-                                       <td>{{ $ppmp_response[$i]['unit_of_measurement'] }}</td>
-                                       <td>{{ $ppmp_response[$i]['mode_of_procurement'] }}</td>
-                                       <td>{{  (new GlobalDeclare)->Month($ppmp_response[$i]['expected_month']) }}</td>
-                                        @if (Str::ucfirst((new GlobalDeclare)->status($ppmp_response[$i]['status'])) == 'approved')
-                                            <td class="text-success">{{ Str::ucfirst((new GlobalDeclare)->status($ppmp_response[$i]['status']))  }}</td>
-                                        @else
-                                            <td class="text-danger">{{ Str::ucfirst((new GlobalDeclare)->status($ppmp_response[$i]['status'])) }}</td>
-                                        @endif
-                                       <td>{{ explode('-', date('j F, Y-', strtotime($ppmp_response[$i]['updated_at'])))[0] }}</td>
-                                       <td>
-                                           <div class="dropdown">
-                                               <span
-                                                   class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
-                                                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu">
-                                               </span>
-                                               <div class="dropdown-menu dropdown-menu-left">
-                                                {{-- edit --}}
-                                                    <input type="text" class="form-control d-none" id="edit-item-name-{{ $ppmp_response[$i]['id'] }}" value="{{ $ppmp_response[$i]['item_name'] }}">
-                                                    <input type="text" class="form-control d-none" id="edit-item-name-{{ $ppmp_response[$i]['id'] }}" value="{{ $ppmp_response[$i]['item_name'] }}">
-                                                    <input type="text" class="form-control d-none" id="edit-quantity-{{ $ppmp_response[$i]['id'] }}" value="{{ $ppmp_response[$i]['quantity'] }}">
-                                                    <input type="text" class="form-control d-none" id="edit-unit-price-{{ $ppmp_response[$i]['id'] }}" value="{{ $ppmp_response[$i]['unit_price'] }}">
-                                                    <input type="text" class="form-control d-none" id="edit-item-category-{{ $ppmp_response[$i]['id']}}" value="{{ $ppmp_response[$i]['item_category'] }}">
-                                                    <input type="text" class="form-control d-none" id="edit-estimated-price-{{ $ppmp_response[$i]['id']}}" value="{{ $ppmp_response[$i]['estimated_price'] }}">
-                                                    <input type="text" class="form-control d-none" id="edit-unit-of-measurement-{{ $ppmp_response[$i]['id'] }}" value="{{ $ppmp_response[$i]['unit_of_measurement'] }}">
-                                                    <input type="text" class="form-control d-none" id="edit-item-description-{{ $ppmp_response[$i]['id'] }}" value="{{ $ppmp_response[$i]['item_description'] }}">
-                                                    <input type="text" class="form-control d-none" id="edit-mode-of-procurement-{{ $ppmp_response[$i]['id'] }}" value="{{ $ppmp_response[$i]['mode_of_procurement'] }}">
-                                                    <input type="text" class="form-control d-none" data-value="{{ (new GlobalDeclare)->Month($ppmp_response[$i]['expected_month']) }}" id="edit-expected-month-{{ $ppmp_response[$i]['id'] }}" value="{{ $ppmp_response[$i]['expected_month'] }}">
-                                                {{-- edit --}}
-                                                    <a class="dropdown-item" data-id = "{{ $ppmp_response[$i]['id'] }}" data-date = "{{ $ppmp_response[$i]['expected_month'] }}" data-toggle = "modal" id="edit-item-btn" href = ""
+                                @foreach ($ppmp_response as $item)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>{{ $item->item_name }}</td>
+                                        <td>{{ $item->app_type }}</td>
+                                        <td>₱{{ number_format($item->estimated_price,2,'.',',')  }}</td>
+                                        <td>{{ $item->item_description }}</td>
+                                        <td>{{ $item->quantity }}</td>
+                                        <td>{{ $item->unit_of_measurement }}</td>
+                                        <td>{{ $item->mode_of_procurement }}</td>
+                                        <td>{{  (new GlobalDeclare)->Month( $item->expected_month) }}</td>
+                                            @if (Str::ucfirst((new GlobalDeclare)->status($item->status)) == 'approved')
+                                                <td class="text-success">{{ Str::ucfirst((new GlobalDeclare)->status($item->status))  }}</td>
+                                            @else
+                                                <td class="text-danger">{{ Str::ucfirst((new GlobalDeclare)->status($item->status)) }}</td>
+                                            @endif
+                                        <td>{{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0] }}</td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <span
+                                                    class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
+                                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu">
+                                                </span>
+                                                <div class="dropdown-menu dropdown-menu-left">
+                                                 {{-- edit --}}
+                                                     <input type="text" class="form-control d-none" id="edit-item-name-{{ $item->id }}" value="{{ $item->item_name }}">
+                                                     <input type="text" class="form-control d-none" id="edit-item-name-{{ $item->id }}" value="{{ $item->item_name }}">
+                                                     <input type="text" class="form-control d-none" id="edit-quantity-{{ $item->id }}" value="{{ $item->quantity }}">
+                                                     <input type="text" class="form-control d-none" id="edit-unit-price-{{ $item->id }}" value="{{ $item->unit_price }}">
+                                                     <input type="text" class="form-control d-none" id="edit-item-category-{{ $item->id}}" value="{{ $item->item_category }}">
+                                                     <input type="text" class="form-control d-none" id="edit-estimated-price-{{ $item->id }}" value="{{ $item->estimated_price }}">
+                                                     <input type="text" class="form-control d-none" id="edit-unit-of-measurement-{{ $item->id }}" value="{{ $item->unit_of_measurement }}">
+                                                     <input type="text" class="form-control d-none" id="edit-item-description-{{ $item->id }}" value="{{ $item->item_description }}">
+                                                     <input type="text" class="form-control d-none" id="edit-mode-of-procurement-{{ $item->id }}" value="{{ $item->mode_of_procurement }}">
+                                                     <input type="text" class="form-control d-none" data-value="{{ (new GlobalDeclare)->Month($item->expected_month) }}" id="edit-expected-month-{{ $item->id }}" value="{{ $item->expected_month }}">
+                                                 {{-- edit --}}
+                                                    <a class="dropdown-item" data-id = "{{ $item->id }}" data-date = "{{ $item->expected_month }}" data-toggle = "modal" id="edit-item-btn" href = ""
                                                         id="edit-title-btn">
                                                         <i class="bx bx-edit-alt mr-1"></i> edit
                                                     </a>
-                                                    <form action="{{ route('department-delete-item') }}" method="post"> @csrf @method('POST')
-                                                        <input type="text" class="form-control d-none" value="{{ (new AESCipher)->encrypt($ppmp_response[$i]['id']) }}" name="id">
-                                                        <button class="dropdown-item" id="delete-item-btn" type = "submit">
-                                                            <i class="bx bx-trash mr-1"></i> delete
-                                                        </button>
-                                                    </form>
-                                               </div>
-                                           </div> 
-                                       </td>
-                                   </tr>
-                                    
-                                @endfor
+                                                    <a href="{{ route('department-delete-item', ['id'=> (new AESCipher)->encrypt($item->id)]) }}" class="dropdown-item" id="delete-item-btn">
+                                                        <i class="bx bx-trash mr-1"></i> delete
+                                                    </a>
+                                                </div>
+                                            </div> 
+                                        </td>
+                                    </tr>
+                                @endforeach
                                 {{-- edit item modal --}}
                                     <div class="modal fade" id="edit-item-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                                         <div class="modal-xl modal-dialog" role="document">
@@ -449,9 +439,9 @@
                                                                 <label for="">Unit of Measure</label>
                                                                 <select name="unit_of_measurement" id="" class="form-control">
                                                                     <option value="" id="default-unit-of-measurement">-- Choose Option --</option>
-                                                                    @for ($i = 0; $i < count($unit_of_measurements); $i++)
-                                                                        <option value="{{ $unit_of_measurements[$i]['unit_of_measurement'] }}">{{ $unit_of_measurements[$i]['unit_of_measurement'] }}</option>
-                                                                    @endfor
+                                                                    @foreach ($unit_of_measurements as $item)
+                                                                        <option value="{{ $item->unit_of_measurement }}">{{ $item->unit_of_measurement }}</option>
+                                                                    @endforeach
                                                                 </select>
                                                             </div>
                                                             <div class="form-group">
@@ -509,9 +499,9 @@
                                                                 <label for="">Mode of Procurement</label>
                                                                 <select name="mode_of_procurement" class="form-control">
                                                                     <option value="" id="default-mode-of-procurement"></option>
-                                                                    @for ($i = 0; $i < count($mode_of_procurements); $i++)
-                                                                        <option value="{{ $mode_of_procurements[$i]['mode_of_procurement'] }}">{{ $mode_of_procurements[$i]['mode_of_procurement'] }}</option>
-                                                                    @endfor
+                                                                    @foreach ($mode_of_procurements as $item)
+                                                                        <option value="{{ $item->mode_of_procurement }}" >{{ $item->mode_of_procurement }}</option>
+                                                                    @endforeach
                                                                 </select>
                                                             </div>
         
