@@ -333,22 +333,40 @@ class DepartmentPagesController extends Controller
 
         # this will show the My PPMP Page based on the provided department id by the logged in user
         public function show_by_year_created(Request $request) {
-            # this will get all the data form the ppmp table based on the given department_id
-                $project_titles = (new ProjectsController)->show_by_year_created($request->year_created);
-            # this is for affixing header links above the card directoryyy
-            $pageConfigs = ['pageHeader' => true];
-            $breadcrumbs = [
-            ["link" => "/", "name" => "Home"],
-            ["name" => "My PPMP"]
-            ];
-            # this will return the department.my-PPMP
-            return view('pages.department.my-ppmp-status',
-                ['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs], 
-                # this will attache the data to view
-                [
-                    'project_titles' => $project_titles['data']
-                ]
-            );
+           try {
+                # this will get all the data form the ppmp table based on the given department_id
+                $project_titles = \DB::table('project_titles')
+                ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
+                // ->join('departments', 'departments.immediate_supervisor', 'project_titles.department_id')
+                ->join('users', 'users.id', 'project_titles.immediate_supervisor')
+                ->where('project_titles.campus', session('campus'))
+                ->where('project_titles.department_id', session('department_id'))
+                ->where('project_titles.employee_id', session('employee_id'))
+                ->where('project_titles.year_created', (new AESCipher)->decrypt($request->year_created))
+                ->whereNull('project_titles.deleted_at')
+                ->get([
+                    'project_titles.*',
+                    'fund_sources.fund_source',
+                    'users.name as immediate_supervisor' 
+                ]);
+                # this is for affixing header links above the card directoryyy
+                $pageConfigs = ['pageHeader' => true];
+                $breadcrumbs = [
+                ["link" => "/", "name" => "Home"],
+                ["name" => "My PPMP"]
+                ];
+                # this will return the department.my-PPMP
+                return view('pages.department.my-ppmp-status',
+                    ['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs], 
+                    # this will attache the data to view
+                    [
+                        'project_titles' => $project_titles
+                    ]
+                );
+           } catch (\Throwable $th) {
+                throw $th;
+                return view('pages.error-500');
+           }
         }
 
         # this will show the status of the project

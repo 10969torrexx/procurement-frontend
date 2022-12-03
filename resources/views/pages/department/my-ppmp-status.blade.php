@@ -2,6 +2,7 @@
 @php
     use App\Http\Controllers\AESCipher;
     use App\Http\Controllers\GlobalDeclare;
+    use Carbon\Carbon;
     $aes = new AESCipher();
     $immediate_supervisor = '';
     $status = 0;
@@ -55,6 +56,23 @@
                     </h4>
                 </div>
                 <div class="card-body">
+
+                    <form action="{{ route('department-year-created') }}" method="POST"  class="row p-1 col-4">
+                        @csrf @method('POST')
+                        <div class="col-6 p-1">
+                            <select name="year_created" id="" class="form-control">
+                                <option value="">-- Select Year --</option>
+                                @for ($i = 0; $i < 5; $i++)
+                                    <option value="{{ (new AESCipher)->encrypt(Carbon::now()->subYears($i)->format('Y')) }}">{{ Carbon::now()->addYear($i)->format('Y') }}</option>
+                                @endfor
+                            </select>
+                        </div>
+                        <div class="col-6 p-1">
+                                <button type="submit" class="btn btn-success col-6">Search</button>
+                        </div>
+                    </form>
+
+
                     <div class="table-responsive col-12 container">
                         <table class="table zero-configuration item-table" id="item-table">
                             <thead>
