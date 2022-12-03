@@ -358,7 +358,6 @@ class DepartmentController extends Controller
      */
     public function submitPPMP(Request $request)
     {
-        // dd(doubleval($request->remaining_balance));
         $_deadline_of_submission = Carbon::parse($request->deadline_of_submission)->format('Y-m-d');
         $current_date = Carbon::now()->format('Y-m-d');
         # comparing dates if current date exceeds the allotted deadline of submission
@@ -387,7 +386,7 @@ class DepartmentController extends Controller
            if($has_project_items['status'] == 200) {
                 # this will submit ppmp 
                 $request->merge([
-                    'remaining_balance' => ( doubleval($request->remaining_balance) - doubleval($total_estimated_price) )
+                    'f_remaining_balance' => ( doubleval($request->remaining_balance) - doubleval($total_estimated_price) )
                 ]);
                 $response = (new PPMPController)->submitPPMP($request);
                 return redirect(route('department-showCreatetPPMP'))->with([
