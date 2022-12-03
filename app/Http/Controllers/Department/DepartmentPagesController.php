@@ -364,7 +364,7 @@ class DepartmentPagesController extends Controller
                     ]
                 );
            } catch (\Throwable $th) {
-                throw $th;
+                // throw $th;
                 return view('pages.error-500');
            }
         }
