@@ -100,37 +100,16 @@ class BudgetOfficerController extends Controller
           }
 
     public function status(Request $request){
-        // dd($request->all());
+        // dd(count($request->item_id));
         $item_id = $request->item_id;
         $project_code = $request->project_code;
         $status = $request->status;
         $remarks = $request->remarks;
         $count_disapproved = $request->count_disapproved;
-        $estimated_price = $request->estimated_price;
-        $sub_total = $request->sub_total;
+        // $estimated_price = $request->estimated_price;
 
-        $ppmp = DB::table('project_titles as pt')
-                ->select('ab.remaining_balance','ab.id','ab.allocated_budget')
-                ->join('allocated__budgets as ab','pt.allocated_budget','ab.id')
-                ->join('ppmps as p','p.project_code','=','pt.id')
-                ->where('pt.id',$project_code)
-                ->get();
-                
-        $allocated_budget = "";
-        $remaining = "";
-        $new_remaining = '';
-        $allocated_budget_id = "";
-
-        foreach($ppmp as $data){
-            $remaining = $data->remaining_balance;
-            $allocated_budget_id = $data->id;
-            $allocated_budget = $data->allocated_budget;
-        }
-
-        $calc = ($remaining + $estimated_price);
-        
         for($i = 0; $i < count($request->item_id);$i++){
-
+            // dd($item_id[$i]);
             if($status[$i] == 4){
                     $changed = DB::table('ppmps as p')
                             ->where('id', $item_id[$i])
@@ -138,56 +117,177 @@ class BudgetOfficerController extends Controller
                                 'status' =>  $status[$i],
                                 'remarks' =>  $remarks[$i]
                             ]);
-                            
-                    DB::table("allocated__budgets")
-                            ->where("id", $allocated_budget_id)
+                            // dd($changed);
+                }else if($status[$i] == 5){
+                        // $check = DB::table('ppmps as p')
+                        // ->where('id', $item_id[$i])
+                        // ->where('status',$status[$i])
+                        // ->get();
+            
+                        // if(count($check)==0){
+                        // $ppmp = DB::table('project_titles as pt')
+                        //         ->select('ab.remaining_balance','ab.id')
+                        //         ->join('allocated__budgets as ab','pt.allocated_budget','ab.id')
+                        //         ->join('ppmps as p','p.project_code','=','pt.id')
+                        //         ->where('p.id',$item_id[$i])
+                        //         ->get();
+                                // return response()->json([
+                                //     'status' => 200, 
+                                //     ]); 
+                        // $remaining = "";
+                        // $allocated_budget_id = "";
+            
+                        // foreach($ppmp as $data){
+                        //     $remaining = $data->remaining_balance;
+                        //     $allocated_budget_id = $data->id;
+                        // }
+            
+                        // $calc = ($remaining +  $estimated_price);
+            
+                        // $updateppmp = DB::table("allocated__budgets")
+                        //       ->where("id", $allocated_budget_id)
+                        //       ->update([
+                        //           'remaining_balance' =>$calc,
+                            //   ]);
+                        // dd($check);
+                            $changed = DB::table('ppmps as p')
+                            ->where('id', $item_id[$i])
                             ->update([
-                                'remaining_balance' =>$calc,
-                            ]);
-            }else if($status[$i] == 5){
-                    $changed = DB::table('ppmps as p')
-                    ->where('id', $item_id[$i])
-                    ->update([
-                        'status' =>  $status[$i],
-                        'remarks' =>  $remarks[$i]
-                        ]
-                    );
+                                'status' =>  $status[$i],
+                                'remarks' =>  $remarks[$i]
+                                ]
+                            );
+                        // }else{
+                            // return response()->json([
+                            //     'status' => 400, 
+                            //     'message' => 'Item already Rejected!', 
+                            //     ]); 
+                        // }
+                }
+                        $proTitle = DB::table('ppmps as p')
+                                    ->where('project_code',$project_code[$i])
+                                    ->where('status',5)
+                                    ->get();
+                        $count = count($proTitle);
+            
+                        if($count!=0){ 
+                            $stat = DB::table('project_titles')
+                                    ->where('id',$project_code[$i])
+                                    ->update([
+                                        'status' =>  5,
+                                        ]
+                                    );
+                        }else{
+                            $stat = DB::table('project_titles')
+                            ->where('id',$project_code[$i])
+                            ->update([
+                                'status' =>  4,
+                                ]
+                            );
+                        }
 
-                    DB::table("allocated__budgets")
-                        ->where("id", $allocated_budget_id)
-                        ->update([
-                            'remaining_balance' => $calc,
-                        ]); 
-                }  
+                        if($changed){
+                            return response()->json([
+                                'status' => 200, 
+                                ]); 
+                        }else{
+                            return response()->json([
+                                'status' => 400, 
+                            ]); 
+                        }
         }
-        if($changed){
-            if($count_disapproved == 0){
-                DB::table('project_titles')
-                    ->where('id',$project_code)
-                    ->update([
-                        'status' =>  4,
-                        ]
-                    );
-            }else{
-                DB::table('project_titles')
-                    ->where('id',$project_code)
-                    ->update([
-                        'status' =>  5,
-                        ]
-                );
-            }
-            return response()->json([
-                'status' => 200, 
-                ]); 
-        }else{
-            return response()->json([
-                'status' => 400, 
-            ]); 
-        }
+
+        // if($status == 4){
+        //     $changed = DB::table('ppmps as p')
+        //             ->where('id', $item_id)
+        //             ->update([
+        //                 'status' =>  $status,
+        //                 'remarks' =>  $remarks
+        //         ]
+        //             );
+        // }else if($status == 5){
+        //     $check = DB::table('ppmps as p')
+        //     ->where('id', $item_id)
+        //     ->where('status',$status)
+        //     ->get();
+
+        //     if(count($check)==0){
+        //     $ppmp = DB::table('project_titles as pt')
+        //             ->select('ab.remaining_balance','ab.id')
+        //             ->join('allocated__budgets as ab','pt.allocated_budget','ab.id')
+        //             ->join('ppmps as p','p.project_code','=','pt.id')
+        //             ->where('p.id',$item_id)
+        //             ->get();
+
+        //     $remaining = "";
+        //     $allocated_budget_id = "";
+
+        //     foreach($ppmp as $data){
+        //         $remaining = $data->remaining_balance;
+        //         $allocated_budget_id = $data->id;
+        //     }
+
+        //     $calc = ($remaining +  $estimated_price);
+
+        //     $updateppmp = DB::table("allocated__budgets")
+        //           ->where("id", $allocated_budget_id)
+        //           ->update([
+        //               'remaining_balance' =>$calc,
+        //           ]);
+        //     // dd($check);
+        //         $changed = DB::table('ppmps as p')
+        //         ->where('id', $item_id)
+        //         ->update([
+        //             'status' =>  $status,
+        //             'remarks' =>  $remarks
+        //             ]
+        //         );
+        //     }else{
+        //         return response()->json([
+        //             'status' => 400, 
+        //             'message' => 'Item already Rejected!', 
+        //             ]); 
+        //     }
+        //     // DB::table()
+        // }
+        //     $proTitle = DB::table('ppmps as p')
+        //                 ->where('project_code',$project_code)
+        //                 ->where('status',5)
+        //                 ->get();
+        //     $count = count($proTitle);
+
+        //     if($count!=0)
+        //     { 
+        //         $stat = DB::table('project_titles')
+        //                 ->where('id',$project_code)
+        //                 ->update([
+        //                     'status' =>  5,
+        //                     ]
+        //                 );
+        //     }
+        //     else{
+        //         $stat = DB::table('project_titles')
+        //         ->where('id',$project_code)
+        //         ->update([
+        //             'status' =>  4,
+        //             ]
+        //         );
+        //     }
+        //     if($changed)
+        // {
+        //     return response()->json([
+        //     'status' => 200, 
+        // ]); 
+        // }
+        // else{
+        //     return response()->json([
+        //     'status' => 400, 
+        //     ]); 
+        // }
     }
 
     public function timeline(Request $request){
-        // dd($request->all());
+        dd($request->all());
         $project_code = $request->project_code;
         $count_disapproved = $request->count_disapproved;
         if($count_disapproved == 0){

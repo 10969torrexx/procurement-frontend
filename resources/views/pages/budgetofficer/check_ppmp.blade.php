@@ -64,7 +64,6 @@
         </div> --}}
         <div class="card-cody">
         <div class="table-responsive">
-            <a href = "#" class = "done btn btn-success round mr-1 mb-1"><i class="bx bx-save"></i> Save</a>
 
             <table class="text-center ppmp" style=" line-height:22px;font-size:15px">
                 <thead>
@@ -145,7 +144,7 @@
                                 <?php
                                         }if($data[$i]->status == 5){
                                 ?>
-                                <td style="text-align: left; color:red;" id="status{{ $i }}" data-toggle="{{ $data[$i]->status }}">Disapproved</td>
+                                <td style="text-align: left; color:red;" id="status{{ $i }}" data-toggle="{{ $data[$i]->status }}">Rejected</td>
                                 <?php 
                                         }/* if($data[$i]->status == 6){
                                 ?>
@@ -178,7 +177,7 @@
                                     {{-- <i class="fa-solid fa-pen-to-square edit" data-index="{{ $i }}" title="Edit"></i> --}}
                                     <label style="font-size: 15px;" class="text-dark mt-1 ">{{ $data[$i]->item_name }} </label><br>
                                     <p style="font-size: 13px; text-align:left;" class="mt-1"> Description: <br>{{$data[$i]->item_description }}</p> <br>
-                                    <?php
+                                    {{-- <?php
                                         if($data[$i]->status == 2 || $data[$i]->status == 4 || $data[$i]->status == 5){
                                     ?>
                                         <div class="mb-1" id="action{{ $i }}">
@@ -187,7 +186,24 @@
                                         </div>
                                     <?php
                                         }
-                                    ?>
+                                    ?> --}}
+                                    <?php
+                                    if($data[$i]->status == 2){
+                                ?>
+                                    <div class="mb-1" id="action{{ $i }}">
+                                        <button class="btn btn-outline-success approve button" data-button="0" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="2" data-index="{{ $i }}" >Accept</button>
+                                        <button class="btn btn-outline-danger disapprove button" data-button="{{ $data[$i]->estimated_price }}" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="3" data-index="{{ $i }}">Reject</button> 
+                                    </div>
+                                <?php
+                                    }else if( $data[$i]->status == 4 || $data[$i]->status == 5 ){
+                                ?>
+                                    <div class="mb-1" id="action{{ $i }}" style="display:none">
+                                        <button class="btn btn-outline-success approve button" data-button="-{{ $data[$i]->estimated_price }}" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="2" data-index="{{ $i }}" >Accept</button>
+                                        <button class="btn btn-outline-danger disapprove button" data-button="{{ $data[$i]->estimated_price }}" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="3" data-index="{{ $i }}">Reject</button> 
+                                    </div>
+                                <?php
+                                    }
+                                ?>
                                 </td>
                                 <td  class="quantity " style="width: 40px;">{{$data[$i]->quantity }}</td>
                                 <td  class="unit" >{{$data[$i]->unit_of_measurement }}</td>
@@ -316,10 +332,24 @@
                     </tr>
                 </tfoot>
             </table>
+            
+        </div>
+        <div class="row" hidden>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+              <fieldset class="form-group">
+                  <label for="SubTotal">SubTotal</label>
+                  <input type="number" class="sub_total form-control" id="sub_total" placeholder="" value ={{$e}} >
+              </fieldset>
+            </div>
+          </div>
+        <div class="col-md-12 text-right">
+            <a href = "{{ route('view_ppmp') }}" class = "btn btn-primary round mr-1 mb-1"><i class="bx bx-left-arrow"></i> Back</a>
+            <a href = "#" class = "done btn btn-success round mr-1 mb-1"><i class="bx bx-save"></i> Save</a>
+            {{-- <button type="button" class="btn btn-success col-md-1 mt-1 ppmpDone" data-id="{{ $data[0]->pt_id }}">Done</button> --}}
         </div>
     </div>
     </div>
-    @include('pages.supervisor.supervisor_disapproved_ppmp_modal')
+    @include('pages.budgetofficer.disapproved_ppmp_modal')
 </section>
 <!-- Dashboard Ecommerce ends -->
 @endsection

@@ -11,13 +11,13 @@
       "navheader": "My Property"
     },
     {
-      "url": "department/my_par",
+      "url": "budgetofficer/my_par",
       "name": "PAR",
       "i18n": "User",
       "icon": "list"
     },
     {
-      "url": "department/my_ics",
+      "url": "budgetofficer/my_ics",
       "name": "ICS",
       "i18n": "User",
       "icon": "gears"
@@ -54,6 +54,6 @@
       "name": "View Signed PPMP",
       "i18n": "User",
       "icon": "search"
-    } 
+    }
   ]
 }

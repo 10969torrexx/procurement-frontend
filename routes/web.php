@@ -61,7 +61,7 @@ Route::group(['prefix' => 'superadmin','middleware' => ['authuser']], function()
     Route::post('/edit', 'SuperAdmin\AdminController@edit')->name('edit');
     Route::post('/update', 'SuperAdmin\AdminController@update')->name('update');
 
-    Route::get('/departments', 'SuperAdmin\AdminController@getDepartments');
+    Route::get('/departments', 'SuperAdmin\AdminController@departments_index');
     
     // Route::get('/getDepartments', 'SuperAdmin\AdminController@departments');
     Route::post('/getUsers', 'SuperAdmin\AdminController@getUsers');
@@ -530,6 +530,8 @@ Route::get('/delete-item/{id}', 'BAC\ItemController@delete');
 
 Route::group(['prefix' => 'budgetofficer','middleware' => ['authuser']], function() {
     Route::get('/try','BudgetOfficer\BudgetOfficerController@try');
+    Route::get('/my_par','BudgetOfficer\BudgetOfficerController@my_par');
+    Route::get('/my_ics','BudgetOfficer\BudgetOfficerController@my_ics');
 
     Route::get('/ppmp_deadline','BudgetOfficer\BudgetOfficerController@ppmp_deadline_index');
     Route::post('/save_ppmp_deadline','BudgetOfficer\BudgetOfficerController@save_ppmp_deadline')->name('save_ppmp_deadline');
@@ -554,12 +556,15 @@ Route::group(['prefix' => 'budgetofficer','middleware' => ['authuser']], functio
     Route::get('/getFundSources', 'BudgetOfficer\BudgetOfficerController@getFundSources')->name('getFundSources');
     Route::get('/getMandatoryExpenditures', 'BudgetOfficer\BudgetOfficerController@getMandatoryExpenditures')->name('getMandatoryExpenditures');
     Route::get('/getYears', 'BudgetOfficer\BudgetOfficerController@get_years')->name('getYears');
-    Route::get('/get_DeadlineByYear', 'BudgetOfficer\AllocateBudgetController@get_DeadlineByYear')->name('get_DeadlineByYear');
+    Route::get('/get_procurement_type', 'BudgetOfficer\BudgetOfficerController@get_procurement_type')->name('get_procurement_type');
+    Route::get('/get_DeadlineByYear', 'BudgetOfficer\BudgetOfficerController@get_DeadlineByYear')->name('get_DeadlineByYear');
 
-    Route::get('/view_ppmp','BudgetOfficer\BudgetOfficerController@PPMPindex');
+    Route::get('/view_ppmp','BudgetOfficer\BudgetOfficerController@PPMPindex')->name('view_ppmp');
+    Route::get('/returnView','BudgetOfficer\BudgetOfficerController@returnView');
     Route::post('/view_ppmp/showPPMP', 'BudgetOfficer\BudgetOfficerController@showPPMP')->name('showPPMP');
-    Route::post('/view_ppmp/showPPMP/ppmp-approved', 'BudgetOfficer\BudgetOfficerController@status')->name('ppmp-approved');
-    Route::post('/view_ppmp/showPPMP/ppmp-disapproved', 'BudgetOfficer\BudgetOfficerController@status')->name('ppmp-disapproved');
+    Route::post('/view_ppmp/showPPMP/ppmp-status', 'BudgetOfficer\BudgetOfficerController@status')->name('ppmp-status');
+    // Route::post('/view_ppmp/showPPMP/ppmp-approved', 'BudgetOfficer\BudgetOfficerController@status')->name('ppmp-approved');
+    // Route::post('/view_ppmp/showPPMP/ppmp-disapproved', 'BudgetOfficer\BudgetOfficerController@status')->name('ppmp-disapproved');
     Route::post('/view_ppmp/showPPMP/ppmp-timeline', 'BudgetOfficer\BudgetOfficerController@timeline')->name('ppmp-timeline');
 
     Route::get('/view_signed_ppmp','BudgetOfficer\ViewSignedPPMPController@index');

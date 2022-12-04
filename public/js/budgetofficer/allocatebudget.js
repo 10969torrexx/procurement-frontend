@@ -1,5 +1,6 @@
 $("#AllocateBudgetModal").on("hidden.bs.modal", function(e){
   // location.reload();
+      $('.type').val('');
       $('.department').val('');
       $('.fund_source').val('');
       $('.budget').val('');
@@ -56,6 +57,40 @@ $(function(){$(".year").change(function(){
       $('.end_date').empty()
       // console.log(response.deadline)
           $('.end_date').val(response['deadline'][0]['end_date']);
+        }
+    });
+
+});
+})
+
+$(function(){$(".type").change(function(){
+    
+  var type = $(".type option:selected").val();
+
+  $.ajaxSetup({
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    } 
+  });
+  $.ajax({
+    type: "GET",
+    url: "get_procurement_type",
+    data: {type},
+    dataType: "json",
+    beforeSend : function(){
+      $('.year').html('<option class="spinner-border spinner-border-sm">Please wait... </option>');
+    },
+    success: function (response) {
+      // alert(response);
+      // console.log(response);
+      $('.year').empty() 
+      $('.year').append('<option value="" selected disabled>-- Select Year --</option>')
+      for(var i = 0; i < response['years'].length; i++) {
+      $('.year').append(
+      '<option value="' + response['years'][i]['year'] + '">' 
+                        + response['years'][i]['year'] + '</option>')
+
+  }
         }
     });
 
@@ -163,6 +198,7 @@ $(document).on('click', '.btnAllocateBudget', function (e) {
   // alert('success');
   $(this).text('Allocating Budget..');
 
+      // var end_date = document.getElementById('end_date').value;
       var type = document.getElementById('type').value;
       var department = document.getElementById('department').value;
       var year = document.getElementById('year').value;
@@ -402,7 +438,7 @@ $(document).on('click', '.editbutton', function (e) {
         // console.log(response);
           if (response.status == 200) {
 
-            var array_type = ['Indicative','Supplemental','PPMP'];
+          var array_type = ['Indicative','Supplemental','PPMP'];
             // for (let i = 0; i < response['department_ids'].length; i++) {
             //   array_department.push(response['department_ids'][i]['id']);
             // }
@@ -431,10 +467,10 @@ $(document).on('click', '.editbutton', function (e) {
           var department_index = array_department.indexOf(parseInt(department_id));
           var fundsource_index = array_fundsources.indexOf(parseInt(fund_source_id));
           var year_index = array_years.indexOf(year.toString());
-// console.log(year);
+// console.log(department_index);
           
             document.getElementById('update_type').getElementsByTagName('option')[type_index+1].selected = 'selected';
-            document.getElementById('update_department').getElementsByTagName('option')[department_index+1].selected = 'selected';
+            document.getElementById('update_department').getElementsByTagName('option')[department_index].selected = 'selected';
             document.getElementById('update_fund_source').getElementsByTagName('option')[fundsource_index+1].selected = 'selected';
             document.getElementById('update_year').getElementsByTagName('option')[year_index+1].selected = 'selected';
 
