@@ -43,16 +43,16 @@
     
                             
                             @foreach ($data as $line)
-                                    {{-- @for ($i = 0; $i < count($data['0']); $i++) --}}
+                                    {{-- @for ($i = 0; $i < count($data->0); $i++) --}}
                             <tbody>
                                 <tr>
-                                    <td>{{ $line['department_name'] }}</td>
-                                    <td>{{ $line['project_code'] }}</td>
-                                    <td>{{ $line['project_title'] }}</td>
-                                    <td>Php {{  number_format($line['Total'],2,'.',',') }}</td>
+                                    <td>{{ $line->department_name }}</td>
+                                    <td>{{ $line->project_code }}</td>
+                                    <td>{{ $line->project_title }}</td>
+                                    <td>Php {{  number_format($line->Total,2,'.',',') }}</td>
                                     <td>
                                         {{-- <a href="" class="view" style="background-color: aquamarine"><i class="fa-regular fa-eye"  title="View" href=""></i> </a> --}}
-                                        <button type="button" class="btn btn-outline-secondary view"  href="<?=$aes->encrypt($line['id'])?>" >view</button>
+                                        <button type="button" class="btn btn-outline-secondary view"  href="<?=$aes->encrypt($line->id)?>" >view</button>
                                         {{-- <button class="btn-success view" data-toggle = "modal" id="view_modal"></button> --}}
                                     </td>
                                     
