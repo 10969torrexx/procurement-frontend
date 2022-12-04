@@ -415,13 +415,21 @@ class DepartmentController extends Controller
                 } 
             $total_estimated_price = 0.0;
             # this will determine if the project title has items,
-                $has_project_items = (new PPMPController)->show($request->current_project_code);
-                if($has_project_items['status'] == 400) {
+                $has_project_items = \DB::table('ppmps')
+                    ->where('project_code', (new AESCipher)->decrypt($request->current_project_code))
+                    ->where('campus', session('campus'))
+                    ->where('department_id', session('department_id'))
+                    ->where('employee_id', session('employee_id'))
+                    ->whereRaw("status = '3' OR status = '5'")
+                    ->whereNull('deleted_at')
+                    ->get();
+
+                if(count($has_project_items) <= 0) {
                     return back()->with([
                         'failed' => 'The submitted PPMP doesn\'t contains any item(s).'
                     ]);
                 }
-                foreach ($has_project_items['data'] as $item) {
+                foreach ($has_project_items as $item) {
                     $total_estimated_price += $item->estimated_price;
                 }
                 # this will determine the allocated budget
@@ -430,18 +438,18 @@ class DepartmentController extends Controller
                         'failed' => 'You\'ve exceeded the allocated budget for your department'
                     ]);
                 }
-            if($has_project_items['status'] == 200) {
-                    $request->merge([
-                        'remaining_balance' => ( doubleval($request->remaining_balance) - doubleval($total_estimated_price) )
-                    ]);
-                    # this will submit ppmp 
-                        $response = (new PPMPController)->re_submitPPMP($request);
-                    return redirect(route('department-showCreatetPPMP'))->with([
-                        'success' => $response['message']
-                    ]);
+            if($has_project_items) {
+                $request->merge([
+                    'f_remaining_balance' => ( doubleval($request->remaining_balance) - doubleval($total_estimated_price) )
+                ]);
+                # this will submit ppmp 
+                    $response = (new PPMPController)->re_submitPPMP($request);
+                return redirect(route('department-showCreatetPPMP'))->with([
+                    'success' => $response['message']
+                ]);
             }
         } catch (\Throwable $th) {
-            //throw $th;
+            // throw $th;
             return view('pages.error-500');
         } 
     }

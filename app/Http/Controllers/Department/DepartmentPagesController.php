@@ -45,7 +45,7 @@ class DepartmentPagesController extends Controller
                         ->groupBy('fund_sources.fund_source', 'allocated__budgets.year')
                         ->orderBy('allocated__budgets.year')
                         ->get([
-                            'fund_sources.id', 'allocated__budgets.*', 'fund_sources.fund_source', \DB::raw('sum(allocated__budgets.remaining_balance) as SumBudget')
+                            'fund_sources.id', 'allocated__budgets.*', 'fund_sources.fund_source', \DB::raw('sum(allocated__budgets.allocated_budget) as SumBudget')
                         ]); 
                     
                     $mandatory_expeditures = \DB::table("mandatory_expenditures as me")
@@ -446,6 +446,7 @@ class DepartmentPagesController extends Controller
                         ->where('campus', session('campus'))
                         ->where('department_id', session('department_id'))
                         ->where('employee_id', session('employee_id'))
+                        ->whereRaw("status = '3' OR status = '5'")
                         ->whereNull('deleted_at')
                         ->get();
                 # end

@@ -92,6 +92,7 @@ class PpmpController extends Controller
                         ->where('employee_id', session('employee_id'))
                         ->where('department_id', session('department_id'))
                         ->where('campus', session('campus'))
+                        ->whereRaw("status = '3' OR status = '5'")
                         ->update([
                             'status'    =>  6
                         ]);
