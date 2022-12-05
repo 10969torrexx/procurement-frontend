@@ -53,9 +53,13 @@ $(document).on('click', '.btnAddFundSource', function (e) {
                             }
                           }).then((result) => {
                             if (result.dismiss === Swal.DismissReason.timer) {
-                              $('#FundSourceModal').modal('hide');
+                              // $('#FundSourceModal').modal('hide');
+                                // location.reload();
+                              // console.log('I was closed by the timer')
+                              $('.fundsource').val('');
+                              $("#FundSourceModal").on("hidden.bs.modal", function(e){
                                 location.reload();
-                              console.log('I was closed by the timer')
+                              })
                             }
                           })
                       

@@ -68,7 +68,11 @@ class AdminController extends Controller
         // dd($request->campus);
         try {
             $campus = (new AESCipher())->decrypt($request->campus);
-            $departments =  DB::table('departments')->where('campus',$campus)->whereNull('deleted_at')->get();
+            $departments =  DB::table('departments')
+                                ->where('campus',$campus)
+                                ->whereNull('deleted_at')  
+                                ->orderBy('department_name')
+                                ->get();
             // dd($departments);
             return $departments;
             
@@ -89,29 +93,59 @@ class AdminController extends Controller
           ["link" => "/", "name" => "Home"],["name" => "Fund Sources"]
         ];
         // return view('pages.budgetofficer.index',['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs]);
-
-        $fund_sources =  Http::withToken(session('token'))->get(env('APP_API'). "/api/fund_sources/fund_sources_index")->json();
+        $fund_sources = DB::table('fund_sources')
+                            ->whereNull('deleted_at')
+                            ->orderBy('fund_source')
+                            ->get();
+        // $fund_sources =  Http::withToken(session('token'))->get(env('APP_API'). "/api/fund_sources/fund_sources_index")->json();
             // dd($fund_sources);
-            $error="";
-            if($fund_sources['status']==400){
-                $error=$fund_sources['message'];
-            }
+            // $error="";
+            // if($fund_sources['status']==400){
+            //     $error=$fund_sources['message'];
+            // }
 
             return view('pages.superadmin.fund-sources-index',compact('fund_sources'), [
                 'pageConfigs'=>$pageConfigs,
                 'breadcrumbs'=>$breadcrumbs,
-                'error' => $error,
+                // 'error' => $error,
             ]);
     }
     public function addFundSource(Request $request){
         // dd($request->all());
         $fundsource = $request->fundsource;
 
-        $response = Http::withToken(session('token'))->post(env('APP_API'). "/api/fundsource/add_FundSource",[
-            'fundsource' => $fundsource,
-            ])->json();
+        $check = DB::table('fund_sources')
+                    ->where('fund_source', $fundsource)
+                    ->get();
+        if(count($check)==0){
+            $response= DB::table('fund_sources')
+                    ->insert([
+                        'fund_source' => $fundsource,
+                        'created_at' => Carbon::now()
+                    ]);
+            if($response){
+                return response()->json([
+                    'status' => 200, 
+                    'message' => 'Fund Source Saved Successfully!',
+                ]);    
+            } else{
+                return response()->json([
+                    'status' => 400, 
+                    'message' => 'Something Went Wrong',
+                ]);    
+            }
+        }else{
+            return response()->json([
+                'status' => 400, 
+                'message' => 'Fund Source Already Exist!',
+            ]);    
+        }
+        
+        // $response = Http::withToken(session('token'))->post(env('APP_API'). "/api/fundsource/add_FundSource",[
+        //     'fundsource' => $fundsource,
+        //     ])->json();
             // dd($response);
-            return $response;
+            // return $response;
     }
     public function editFundSource(Request $request)
     {
@@ -122,7 +156,7 @@ class AdminController extends Controller
         $response = Http::withToken(session('token'))->get(env('APP_API'). "/api/fundsource/edit_FundSource/".$id1,[
             'id' => $id1,
         ])->json();
-        // dd($response);
+        dd($response);
         return $response;
     }
     public function updateFundSource(Request $request)
@@ -507,6 +541,7 @@ class AdminController extends Controller
             $response = DB::table('users')
             ->where('campus',$campus)
             ->whereNotNull('employee_id')
+            ->orderBy('name')
             ->get();
             // $response =   Http::withToken('800|4fVkxADAZJkcqHZR94yYLLq5itCN3kXCXwoQAevA')->post("http://192.168.0.11/hrmis/api/department/departmentheadslist", [ 
             //     'campus' =>  $campus 
@@ -595,129 +630,122 @@ class AdminController extends Controller
             // dd( $full_name);
             $email = $info[3];
             // $department_id = $info[4];
-            $id = $info[5];
+            $employee_id = $info[5];
 
-            $campus = $request->campus;
-            $role = $request->role;
+            $campus = (new AESCipher())->decrypt($request->campus);
+            $role = (new AESCipher())->decrypt($request->role);
             $department = $request->department;
 
-            $response = Http::withToken(session('token'))->post(env('APP_API'). "/api/users/store",[
-            'campus' => $campus,
-            'role' => $role,
-            'name' => $full_name,
-            'email' => $email,
-            'department_id' => $department,
-            'id' => $id,
-            ])->json();
-
+            $check = DB::table('users')
+                        ->where('email', $email)
+                        ->where('campus', $campus)
+                        ->get();
+            if(count($check)==0){
+                $response= DB::table('users')
+                ->insert([
+                    'campus' => $campus,
+                    'role' => $role,
+                    'name' => $full_name,
+                    'email' => $email,
+                    'department_id' => $department,
+                    'employee_id' => $employee_id,
+                    'created_at' => Carbon::now()
+                ]);
                 if($response){
-                    if($response['status'] == 200){
-                        return response()->json([
+                    return response()->json([
                         'status' => 200, 
-                        ]);    
-                    }
-                    
-
-                    elseif($response['status'] == 400){
-                        return response()->json([
-                            'status' => 400, 
-                            'message' => 'Email Already Exist!',
-                        ]);  
-                    }
+                        'message' => 'User Saved Successfully!',
+                    ]);    
+                } else{
+                    return response()->json([
+                        'status' => 400, 
+                        'message' => 'Something Went Wrong',
+                    ]);    
                 }
+            }else{
+                return response()->json([
+                    'status' => 400, 
+                    'message' => 'User Already Exist!',
+                ]); 
+            }
     }
 
     public function saveDepartment(Request $request){
             // dd($request->all());
-            $campus = $request->campus;
+            $campus = (new AESCipher())->decrypt($request->campus);
             $department_name = $request->department_name;
             $department_description = $request->department_description;
             $department_head = $request->department_head;
             $immediate_supervisor = $request->immediate_supervisor;
 
-            $response = Http::withToken(session('token'))->post(env('APP_API'). "/api/department/storeDepartment",[
-            'campus' => $campus,
-            'department_name' => $department_name,
-            'department_description' => $department_description,
-            'department_head' => $department_head,
-            'immediate_supervisor' => $immediate_supervisor,
-            ])->json();
-            // dd($response);
-            // return $response;
+            $check = DB::table('departments')
+                        ->where('department_name', $department_name)
+                        ->where('campus', $campus)
+                        ->get();
+            if(count($check)==0){
+                $response= DB::table('departments')
+                ->insert([
+                    'campus' => $campus,
+                    'department_name' => $department_name,
+                    'description' => $department_description,
+                    'department_head' => $department_head,
+                    'immediate_supervisor' => $immediate_supervisor,
+                    'created_at' => Carbon::now()
+                ]);
                 if($response){
-                    if($response['status'] == 200){
-                        return response()->json([
+                    return response()->json([
                         'status' => 200, 
-                        ]);    
-                    }
-                    
-
-                    elseif($response['status'] == 400){
-                        return response()->json([
-                            'status' => 400, 
-                            'message' => 'Department Already Exist!',
-                        ]);  
-                    }
+                        'message' => 'Department Saved Successfully!',
+                    ]);    
+                } else{
+                    return response()->json([
+                        'status' => 400, 
+                        'message' => 'Something Went Wrong',
+                    ]);    
                 }
+            }else{
+                return response()->json([
+                    'status' => 400, 
+                    'message' => 'Department Already Exist!',
+                ]);  
+            }
     }
 
     public function delete(Request $request){
         try {
-            // dd($request->all());
             $id = (new AESCipher())->decrypt($request->id);
             $user = DB::table('users')->where('id',$id)->delete();
-            // dd($user);
             if($user)
             {
                 return response()->json([
                     'status'=>200,
-                    'message'=>'Account Deleted Successfully.'
+                    'message'=>'Account Deleted Successfully!'
                 ]);
             }
             else
             {
                 return response()->json([
-                    'status'=>404,
-                    'message'=>'No Account Found.'
+                    'status'=>400,
+                    'message'=>'No Account Found!'
                 ]);
             }
         } catch (\Throwable $th) {
             dd('AdminContoller '.$th);
         }
-       
-
-        // $response = Http::withToken(session('token'))->delete(env('APP_API'). "/api/users/delete/".$id1,[
-        //     'id' => $id1,
-        // ])->json();
-        // // dd($response);
-        // if($response){
-        //     if($response['status'] == 200){
-        //         return response()->json([
-        //         'status' => 200, 
-        //         ]);    
-        //     }elseif($response['status'] == 404){
-        //         return response()->json([
-        //             'status' => 404, 
-        //         ]);  
-        //     }
-        // }
     }
     public function deleteDepartment(Request $request){
-        $id = $request->id;
-        $id1 = (new AESCipher())->decrypt($id);
-        $response = Http::withToken(session('token'))->delete(env('APP_API'). "/api/department/deleteDepartment/".$id1,[
-            'id' => $id1,
-        ])->json();
-        if($response){
-            if($response['status'] == 200){
-                return response()->json([
-                'status' => 200, 
-                ]);    
-            }elseif($response['status'] == 404){
-                return response()->json([
-                    'status' => 404, 
-                ]);  
-            }
+        $id = (new AESCipher())->decrypt($request->id);
+        $department = DB::table('departments')->where('id',$id)->delete();
+        if($department){
+            return response()->json([
+                'status'=>200,
+                'message'=>'Department Deleted Successfully!'
+            ]);
+        }else{
+            return response()->json([
+                'status'=>400,
+                'message'=>'No Department Found!'
+            ]);
         }
     }
     public function edit(Request $request)
@@ -812,17 +840,39 @@ class AdminController extends Controller
             $update_id = $request->update_id;
             
             $id = (new AESCipher())->decrypt($update_id);
-            
-            $response = Http::withToken(session('token'))->put(env('APP_API'). "/api/department/updateDepartment/".$id,[
-            'update_id' => $id,
-            'update_campus' => $update_campus,
-            'update_department_name' => $update_department_name,
-            'update_department_description' => $update_department_description,
-            'update_department_head' => $update_department_head,
-            'update_immediate_supervisor' => $update_immediate_supervisor,
-            ])->json();
+            $response = DB::table('departments')
+                        ->where('id',$id)
+                        ->update([
+                            'campus' => $update_campus,
+                            'department_name' => $update_department_name,
+                            'description' => $update_department_description,
+                            'department_head' => $update_department_head,
+                            'immediate_supervisor' => $update_immediate_supervisor,
+                            'updated_at' =>  Carbon::now()
+                            ]
+            );
+            if($response){
+                return response()->json([
+                        'status' => 200, 
+                        'message' => 'Department Updated Successfully!',
+                    ]);    
+            } else{
+                return response()->json([
+                        'status' => 400, 
+                        'message' => 'Failed',
+                    ]);    
+            }
+
+            // $response = Http::withToken(session('token'))->put(env('APP_API'). "/api/department/updateDepartment/".$id,[
+            // 'update_id' => $id,
+            // 'update_campus' => $update_campus,
+            // 'update_department_name' => $update_department_name,
+            // 'update_department_description' => $update_department_description,
+            // 'update_department_head' => $update_department_head,
+            // 'update_immediate_supervisor' => $update_immediate_supervisor,
+            // ])->json();
             // dd($response);
-            return $response;
+            // return $response;
             
     }
     
