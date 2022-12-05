@@ -15,7 +15,7 @@
       /* border-width: 2px; */
       border-left: 1px solid black;
       border-top: 1px solid black;
-      /* border-bottom: 1px solid black; */
+      border-right: 1px solid black;
       padding: 3px;
     }
     .remarks{
@@ -238,18 +238,47 @@
   <div class="card">
     <!-- Greetings Content Starts -->
     <section id="basic-datatable">
-      <div class="card-content">
-          <div class="card-header">
-          <div class="generate">
-            <button  type="button" class="btn btn-danger form-control col-sm-1 mt-1 generatepdf" >PDF</button>
-           {{-- <form action="{{ route('app-non-cse-generate') }}" method="POST">
-            @csrf
-            <input type="hidden" class="Year" name="year" value="{{ $Project_title[0]->project_year }}">
-            <button  type="submit" class="btn btn-danger form-control col-sm-1 mt-1 " >PDF</button>
-            </form> --}}
-            {{-- <button  type="submit" class="btn btn-success form-control col-sm-1 mt-1 generateexcel" id="downloadexcel" >EXCEL</button> --}}
-            <a href ="{{ route('app-non-cse-generate-excel') }}"><button  type="submit" class="btn btn-success form-control col-sm-1 mt-1 generate" >EXCEL</button></a>
-          </div>
+      <div class="card-content" >
+        
+          <div class="card-header" >
+            {{-- <div class="" >
+            <button  type="button" class="btn btn-light form-control col-sm-1 mt-1 generatepdf" >PDF</button>
+            <button  type="button" class="btn btn-light form-control col-sm-1 mt-1 generatepdf" >PDF</button>
+            </div>
+            <div class="mt-1" style="border-bottom:1px solid black;"></div> --}}
+            <?php $count=0; $camp = 0?>
+            @foreach($Categories as $categories)
+            <?php $count++
+                  // $camp =  $categories->campus?>
+                  @if($categories->campus == 1)
+                  <?php $camp++?>
+                  @endif
+            @endforeach
+
+            <div class="generate" {{-- style="background-color: #bf5279" --}}>
+              <input type="hidden" class="count" value="{{ $count }}">
+              <button  type="button" class="btn btn-danger form-control col-sm-1 mt-1 generatepdf" value="{{ $count }}">PDF</button>
+              {{-- <form action="{{ route('app-non-cse-generate') }}" method="POST">
+              @csrf
+              <input type="hidden" class="Year" name="year" value="{{ $Project_title[0]->project_year }}">
+              <button  type="submit" class="btn btn-danger form-control col-sm-1 mt-1 " >PDF</button>
+              </form> --}}
+              {{-- <button  type="submit" class="btn btn-success form-control col-sm-1 mt-1 generateexcel" id="downloadexcel" >EXCEL</button> --}}
+              <a href ="{{ route('app-non-cse-generate-excel') }}"><button  type="submit" class="btn btn-success form-control col-sm-1 mt-1 generate" >EXCEL</button></a>
+              @if($camp > 0)
+              <div class="dropdown" style="float: right">
+                <span
+                  class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
+                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu"></span>
+                <div class="dropdown-menu dropdown-menu-left">
+                  <a class="dropdown-item {{-- univ_wide --}}" id="{{-- univ_wide --}}" href = "{{ route('show-all') }}"> University Wide</a>
+                  <a class="dropdown-item main" href = "/bac/app-non-cse">
+                     Main Campus Only
+                  </a>
+                </div>
+              </div> 
+              @endif
+            </div>
           </div>
         <div class="card-body card-dashboard" >
           {{-- <div class="mb-2"style="border-top:1px solid black"></div> --}}
@@ -1238,3 +1267,5 @@ document.getElementById('downloadexcel').AddEventListener('click', function(){
   table2excel.export(document.querySelectorAll("#table"));
 });
 </script> --}}
+
+

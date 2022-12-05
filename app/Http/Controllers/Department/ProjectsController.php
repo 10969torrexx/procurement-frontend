@@ -17,14 +17,6 @@ class ProjectsController extends Controller
      */
     public function index()
     {
-        //
-        // $response = Project_Titles::
-        // where('department_id', session('department_id'))
-        // ->where('employee_id', session('employee_id'))
-        // ->where('campus', session('campus'))
-        // ->where('status', '!=', 0)
-        // ->whereNull('deleted_at')
-        // ->get();
         $response = Project_Titles::join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
         ->where('project_titles.department_id', session('department_id'))
         ->where('project_titles.employee_id', session('employee_id'))
@@ -43,15 +35,6 @@ class ProjectsController extends Controller
      # this will get all project title that are currently on draft
     public function showAllDraft()
     {
-        //
-        // $response = Project_Titles::
-        // where('department_id', session('department_id'))
-        // ->where('employee_id', session('employee_id'))
-        // ->where('campus', session('campus'))
-        // ->where('status', 0)
-        // ->whereNull('deleted_at')
-        // ->get();
-
         $response = Project_Titles::join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
         ->where('department_id', session('department_id'))
         ->where('employee_id', session('employee_id'))

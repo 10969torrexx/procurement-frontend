@@ -23,13 +23,41 @@
       "icon": "gears"
     },
     {
-      "navheader": "supplycustodian"
+      "navheader": "supply custodian"
     },
     {
-      "url": "users",
-      "name": "User",
+      "url": "Property",
+      "name": "Property",
       "i18n": "User",
-      "icon": "users"
+      "icon": "users",
+      "submenu": [
+        {
+          "url": "supply_custodian/property",
+          "name": "PAR",
+          "i18n": "User",
+          "icon": "shoppingcart-in"
+        },
+        {
+          "url": "supply_custodian/ics",
+          "name": "ICS",
+          "i18n": "User",
+          "icon": "users"
+        }
+      ]
+    },
+    {
+      "url": "Setup",
+      "name": "Setup",
+      "i18n": "User",
+      "icon": "users",
+      "submenu": [
+        {
+          "url": "supply_custodian/supplier",
+          "name": "Supplier",
+          "i18n": "Supplier",
+          "icon": "box"
+        }
+      ]
     }
   ]
 }

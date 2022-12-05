@@ -27,7 +27,7 @@ input.addEventListener("keypress", function(event) {
         Swal.fire('Complete the needed data', '', 'info')
       }
       else{
-        $(this).text('Saving..');
+        // $(this).text('Saving..');
         $.ajaxSetup({
           headers: {
               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -97,14 +97,13 @@ input.addEventListener("keypress", function(event) {
           // 'item id': $('.item-id').val(),
           'category': $('.category').val(),
       }
-      console.log(data);
       if( data.category == "")
       {
         Swal.fire('Input Category!!', '', 'info')
       }
       else
       {
-        $(this).text('Saving..');
+        // $(this).text('Saving..');
         $.ajaxSetup({
           headers: {
               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -117,7 +116,7 @@ input.addEventListener("keypress", function(event) {
           data: data,
           dataType: "json",
           success: function (response) {
-            console.log(response);
+            // console.log(response);
               if (response.status == 200) {
                 
                       // console.log(response);
@@ -287,7 +286,7 @@ input.addEventListener("keypress", function(event) {
       Swal.fire('Complete the needed data', '', 'info')
     }
     else{
-      $(this).text('Saving..');
+      // $(this).text('Saving..');
       $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -352,7 +351,7 @@ input.addEventListener("keypress", function(event) {
       Swal.fire('Complete the needed data', '', 'info')
     }
     else{
-      $(this).text('Saving..');
+      // $(this).text('Saving..');
       $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

@@ -11,10 +11,10 @@
                 </select>
                 {{-- <input type="text" style="margin-bottom: 1%;" class="form-control inputName" id="inputName" value=""> --}}
 
-                <label for="inputProffession" >Title:</label>
+                <label for="inputProffession" >Suffix (ex: Phd,MIT):</label>
                 <input type="text" class="form-control edutitle" id="edutitle" value="" placeholder="--Enter--">
 
-                <label for="inputProffession" >Proffession:</label>
+                <label for="inputProffession" >Designation:</label>
                 <input type="text" class="form-control inputProfession" id="inputProfession" value="">
     
                 <button type="button" class="btn btn-success form-control col-sm-3 ml-9 mt-1 float-right submitedit" value="">Submit</button>

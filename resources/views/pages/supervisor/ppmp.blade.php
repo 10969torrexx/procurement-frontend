@@ -82,7 +82,7 @@
                                         <?php
                                         }elseif($data->status == 6){
                                         ?>
-                                        <td style="text-align: left; color:yellowgreen;">Revised</td>
+                                        <td style="text-align: left; color:coral;">Revised</td>
                                         <?php
                                         }elseif($data->status == 4){
                                         ?>
