@@ -144,7 +144,7 @@
 <script src="{{asset('vendors/js/tables/datatable/dataTables.bootstrap4.min.js')}}"></script>
 <script src="{{asset('vendors/js/tables/datatable/dataTables.buttons.min.js')}}"></script>
 
-<script src="{{asset('js/budgetofficer/appdis.js')}}"></script>
+<script src="{{asset('js/budgetofficer/appdis.js?id=500')}}"></script>
 @endsection
 
 @section('page-scripts')

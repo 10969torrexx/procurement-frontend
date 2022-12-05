@@ -51,14 +51,19 @@ class BudgetOfficerController extends Controller
               ->join('departments as d','pt.department_id','=','d.id')
               ->join('allocated__budgets as ab','pt.allocated_budget','=','ab.id')
               ->join('fund_sources as fs','fs.id','=','ab.fund_source_id')
-              ->whereNull("pt.deleted_at")
-              ->whereRaw('pt.status = 2 or pt.status = 4 or pt.status = 5')  
-              ->where("p.is_supplemental","=", 0)
               ->where("pt.campus",session('campus'))
+              ->whereNull("pt.deleted_at")
+            //   ->whereRaw('pt.status = 2 or pt.status = 4 or pt.status = 5') 
+              ->where(function ($query) {
+                $query->where('pt.status', 2)
+                   ->orWhere('pt.status', 4)
+                   ->orWhere('pt.status', 5);
+             })
               ->groupBy("pt.project_title")
+              ->where("p.is_supplemental","=", 0)
               -> get();
   
-              
+            //   dd($ppmp);
         $item = DB::table("ppmps as p")
               ->select("pt.project_code as code","pt.id as pt_id","pt.project_title as title","p.*")
               ->join('project_titles as pt','pt.id','=','p.project_code')
@@ -83,10 +88,17 @@ class BudgetOfficerController extends Controller
                   ->whereNull("p.deleted_at")
                   ->where("p.is_supplemental","=", 0) 
                   ->where('p.campus',session('campus'))
-                  ->where('p.project_code','=',$id,'and', "p.status","=", 2 ,"or", 4,"or", 5)  
+                  ->where('p.project_code','=',$id)  
+                  ->where(function ($query) {
+                    $query->where('p.status', 2)
+                       ->orWhere('p.status', 4)
+                       ->orWhere('p.status', 5);
+                 })
                   -> get();
-        $pageConfigs = ['pageHeader' => true];
+
         // dd($data);
+
+        $pageConfigs = ['pageHeader' => true];
         $breadcrumbs = [
           ["link" => "/", "name" => "Home"],
           ["link" => "/budgetofficer/view_ppmp","name" =>"Pending PPMPs"],
