@@ -358,82 +358,100 @@ class DepartmentController extends Controller
      */
     public function submitPPMP(Request $request)
     {
-        // dd(doubleval($request->remaining_balance));
-        $_deadline_of_submission = Carbon::parse($request->deadline_of_submission)->format('Y-m-d');
-        $current_date = Carbon::now()->format('Y-m-d');
-        # comparing dates if current date exceeds the allotted deadline of submission
-            if($current_date > $_deadline_of_submission) {
-                return back()->with([
-                    'failed'    => 'You\'ve exceeded the alloted deadline of submission'
-                ]);
-            } 
-        $total_estimated_price = 0.0;
-        # this will determine if the project title has items,
-            $has_project_items = (new PPMPController)->show($request->current_project_code);
-            if($has_project_items['status'] == 400) {
-                return back()->with([
-                    'failed' => 'The submitted PPMP doesn\'t contains any item(s).'
-                ]);
-            }
-            foreach ($has_project_items['data'] as $item) {
-                $total_estimated_price += $item->estimated_price;
-            }
-            # this will determine the allocated budget
-            if($total_estimated_price > doubleval($request->remaining_balance)) {
-                return back()->with([
-                    'failed' => 'You\'ve exceeded the allocated budget for your department'
-                ]);
-            }
-           if($has_project_items['status'] == 200) {
-                # this will submit ppmp 
-                $request->merge([
-                    'remaining_balance' => ( doubleval($request->remaining_balance) - doubleval($total_estimated_price) )
-                ]);
-                $response = (new PPMPController)->submitPPMP($request);
-                return redirect(route('department-showCreatetPPMP'))->with([
-                    'success' => $response['message']
-                ]);
-           } 
+        try {
+            $_deadline_of_submission = Carbon::parse($request->deadline_of_submission)->format('Y-m-d');
+            $current_date = Carbon::now()->format('Y-m-d');
+            # comparing dates if current date exceeds the allotted deadline of submission
+                if($current_date > $_deadline_of_submission) {
+                    return back()->with([
+                        'failed'    => 'You\'ve exceeded the alloted deadline of submission'
+                    ]);
+                } 
+            $total_estimated_price = 0.0;
+            # this will determine if the project title has items,
+                $has_project_items = (new PPMPController)->show($request->current_project_code);
+                if($has_project_items['status'] == 400) {
+                    return back()->with([
+                        'failed' => 'The submitted PPMP doesn\'t contains any item(s).'
+                    ]);
+                }
+                foreach ($has_project_items['data'] as $item) {
+                    $total_estimated_price += $item->estimated_price;
+                }
+                # this will determine the allocated budget
+                if($total_estimated_price > doubleval($request->remaining_balance)) {
+                    return back()->with([
+                        'failed' => 'You\'ve exceeded the allocated budget for your department'
+                    ]);
+                }
+               if($has_project_items['status'] == 200) {
+                    # this will submit ppmp 
+                    $request->merge([
+                        'f_remaining_balance' => ( doubleval($request->remaining_balance) - doubleval($total_estimated_price) )
+                    ]);
+                    $response = (new PPMPController)->submitPPMP($request);
+                    return redirect(route('department-showCreatetPPMP'))->with([
+                        'success' => $response['message']
+                    ]);
+               } 
+
+        } catch (\Throwable $th) {
+            //throw $th;
+            return view('pages.error-500');
+        }
     }
 
     # get ppmps for edit
     public function resubmitPPMP(Request $request)
     {
-        $_deadline_of_submission = Carbon::parse($request->deadline_of_submission)->format('Y-m-d');
-        $current_date = Carbon::now()->format('Y-m-d');
-        # comparing dates if current date exceeds the allotted deadline of submission
-            if($current_date > $_deadline_of_submission) {
-                return back()->with([
-                    'failed'    => 'You\'ve exceeded the alloted deadline of submission'
-                ]);
-            } 
-        $total_estimated_price = 0.0;
-        # this will determine if the project title has items,
-            $has_project_items = (new PPMPController)->show($request->current_project_code);
-            if($has_project_items['status'] == 400) {
-                return back()->with([
-                    'failed' => 'The submitted PPMP doesn\'t contains any item(s).'
-                ]);
-            }
-            foreach ($has_project_items['data'] as $item) {
-                $total_estimated_price += $item->estimated_price;
-            }
-            # this will determine the allocated budget
-            if($total_estimated_price > doubleval($request->remaining_balance)) {
-                return back()->with([
-                    'failed' => 'You\'ve exceeded the allocated budget for your department'
-                ]);
-            }
-           if($has_project_items['status'] == 200) {
+        try {
+            $_deadline_of_submission = Carbon::parse($request->deadline_of_submission)->format('Y-m-d');
+            $current_date = Carbon::now()->format('Y-m-d');
+            # comparing dates if current date exceeds the allotted deadline of submission
+                if($current_date > $_deadline_of_submission) {
+                    return back()->with([
+                        'failed'    => 'You\'ve exceeded the alloted deadline of submission'
+                    ]);
+                } 
+            $total_estimated_price = 0.0;
+            # this will determine if the project title has items,
+                $has_project_items = \DB::table('ppmps')
+                    ->where('project_code', (new AESCipher)->decrypt($request->current_project_code))
+                    ->where('campus', session('campus'))
+                    ->where('department_id', session('department_id'))
+                    ->where('employee_id', session('employee_id'))
+                    ->whereRaw("status = '3' OR status = '5'")
+                    ->whereNull('deleted_at')
+                    ->get();
+
+                if(count($has_project_items) <= 0) {
+                    return back()->with([
+                        'failed' => 'The submitted PPMP doesn\'t contains any item(s).'
+                    ]);
+                }
+                foreach ($has_project_items as $item) {
+                    $total_estimated_price += $item->estimated_price;
+                }
+                # this will determine the allocated budget
+                if($total_estimated_price > doubleval($request->remaining_balance)) {
+                    return back()->with([
+                        'failed' => 'You\'ve exceeded the allocated budget for your department'
+                    ]);
+                }
+            if($has_project_items) {
                 $request->merge([
-                    'remaining_balance' => ( doubleval($request->remaining_balance) - doubleval($total_estimated_price) )
+                    'f_remaining_balance' => ( doubleval($request->remaining_balance) - doubleval($total_estimated_price) )
                 ]);
                 # this will submit ppmp 
                     $response = (new PPMPController)->re_submitPPMP($request);
                 return redirect(route('department-showCreatetPPMP'))->with([
                     'success' => $response['message']
                 ]);
-           } 
+            }
+        } catch (\Throwable $th) {
+            // throw $th;
+            return view('pages.error-500');
+        } 
     }
 
 }

@@ -203,9 +203,18 @@
 
                         /* Read more about handling dismissals below */
                         if (result.dismiss === Swal.DismissReason.timer) {
-                          $('#AddDepartmentModal').modal('hide');
-                          location.reload();
-                          console.log('I was closed by the timer')
+                          // $('#AddDepartmentModal').modal('hide');
+                          // location.reload();
+                            $('.submitbutton').text('Save');
+                            $('.campus').val('');
+                            $('.department_name').val('');
+                            $('.department_description').val('');
+                            $('.department_head').val('');
+                            $('.immediate_supervisor').val('');
+                            $("#AddDepartmentModal").on("hidden.bs.modal", function(e){
+                              location.reload();
+                            })
+                          // console.log('I was closed by the timer')
                         }
                       })
                   
@@ -425,22 +434,22 @@
 
                     for(var i = 0; i < response.length; i++) {
 
-                      array_users.push(response[i]['name']);
+                      array_users.push(response[i]['id']);
 
                       // appending response data to the unit of measurement element
                       $('.update_department_head ').append(
                         // + response['message'][i]['id'] + '
-                        '<option value="' + response[i]['name'] + ' ">' 
+                        '<option value="' + response[i]['id'] + ' ">' 
                                           + response[i]['name'] + '</option>')
         
                       $('.update_immediate_supervisor').append(
                         // + response['message'][i]['id'] + '
-                        '<option value="' + response[i]['name'] + ' ">' 
+                        '<option value="' + response[i]['id'] + ' ">' 
                                           + response[i]['name'] + '</option>')
                     }
   
-                    var department_head_index = array_users.indexOf(department_head);
-                    var immediate_supervisor_index = array_users.indexOf(immediate_supervisor);
+                    var department_head_index = array_users.indexOf(parseInt(department_head));
+                    var immediate_supervisor_index = array_users.indexOf(parseInt(immediate_supervisor));
                     // console.log(department_head);
                     document.getElementById('update_department_head').getElementsByTagName('option')[department_head_index+1].selected = 'selected';
                     document.getElementById('update_immediate_supervisor').getElementsByTagName('option')[immediate_supervisor_index+1].selected = 'selected';

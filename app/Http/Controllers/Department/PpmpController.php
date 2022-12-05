@@ -58,7 +58,7 @@ class PpmpController extends Controller
             # end
             # this will update remaining balance allocated budgets
                  $allocated_budgets = Allocated_Budgets::where('id', $request->allocated_budget)->update([
-                    'remaining_balance' => doubleval($request->remaining_balance)
+                    'remaining_balance' => doubleval($request->f_remaining_balance)
                  ]);
             # end
             # this will store project as pending on project timeline
@@ -92,13 +92,14 @@ class PpmpController extends Controller
                         ->where('employee_id', session('employee_id'))
                         ->where('department_id', session('department_id'))
                         ->where('campus', session('campus'))
+                        ->whereRaw("status = '3' OR status = '5'")
                         ->update([
                             'status'    =>  6
                         ]);
                 # end
                 # this will update remaining balance allocated budgets
                     $allocated_budgets = Allocated_Budgets::where('id', $request->allocated_budget)->update([
-                        'remaining_balance' => doubleval($request->remaining_balance)
+                        'remaining_balance' => doubleval($request->f_remaining_balance)
                     ]);
                 # end
                 # this will store project as pending on project timeline

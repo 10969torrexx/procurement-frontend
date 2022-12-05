@@ -46,6 +46,7 @@ class BudgetOfficerController extends Controller
         ];
         
         $ppmp = DB::table("project_titles as pt")
+
               ->select("pt.*","ab.allocated_budget","ab.remaining_balance","fs.fund_source","d.department_name")
               ->join('ppmps as p','p.project_code','=','pt.id')
               ->join('departments as d','pt.department_id','=','d.id')
@@ -64,6 +65,7 @@ class BudgetOfficerController extends Controller
               -> get();
   
             //   dd($ppmp);
+
         $item = DB::table("ppmps as p")
               ->select("pt.project_code as code","pt.id as pt_id","pt.project_title as title","p.*")
               ->join('project_titles as pt','pt.id','=','p.project_code')
@@ -86,14 +88,19 @@ class BudgetOfficerController extends Controller
                   ->select("pt.project_code as code","pt.status as projectStatus","pt.id as pt_id","pt.project_title as title","p.*")
                   ->join('project_titles as pt','pt.id','=','p.project_code')
                   ->whereNull("p.deleted_at")
+                  ->whereNull("pt.deleted_at")
                   ->where("p.is_supplemental","=", 0) 
                   ->where('p.campus',session('campus'))
+
                   ->where('p.project_code','=',$id)  
+
                   ->where(function ($query) {
                     $query->where('p.status', 2)
                        ->orWhere('p.status', 4)
                        ->orWhere('p.status', 5);
-                 })
+
+                    })
+
                   -> get();
 
         // dd($data);
