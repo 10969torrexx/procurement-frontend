@@ -14,7 +14,6 @@ $("#UpdateDeadlineModal").on("hidden.bs.modal", function(e){
 //   $( ".start_date" ).datepicker({  minDate: new Date() });
 // });
 $(document).on('click', '.set_deadline', function (e) {
-  $('.type').val('');
   $('.year').val('');
   $('.start_date').val('');
   $('.end_date').val('');
@@ -31,21 +30,19 @@ $(document).on('click', '.btnSetDeadline', function (e) {
     e.preventDefault();
     $(this).text('Saving..');
 
-      var type = document.getElementById('type').value;
       var year = document.getElementById('year').value;
       var start_date = document.getElementById('start_date').value;
       var end_date = document.getElementById('end_date').value;
-      if(type==''|| year==''|| start_date=='' || end_date==''){
+      if(year==''|| start_date=='' || end_date==''){
         Swal.fire({
               icon: 'error',
               title: 'Error',
-              text: 'Please complete the needed information!',
+              text: 'Please select date!',
             })
         $(this).text('Save');
       }else{
         var data = {
           'year': $('.year').val(),
-          'type': $('.type').val(),
           'start_date': $('.start_date').val(),
           'end_date': $('.end_date').val(),
       }
@@ -60,7 +57,7 @@ $(document).on('click', '.btnSetDeadline', function (e) {
   
         $.ajax({
             type: "POST",
-            url: "set_ppmp_deadline",
+            url: "save_ppmp_deadline",
             data: data,
             dataType: "json",
             success: function (response) {
@@ -129,7 +126,7 @@ $(document).on('click', '.hrefdelete', function (e) {
       if (result.isConfirmed) {
         $.ajax({
               type: "post",
-              url: "delete_ppmp_deadline",
+              url: "delete_deadline",
               data:{'id':id},
               success: function (response) {
                 // alert(response.status);
@@ -168,6 +165,26 @@ $(document).on('click', '.hrefdelete', function (e) {
     })
 });
 
+$.ajax({
+  type: "GET",
+  url: "ppmp_deadline",
+  // beforeSend : function(){
+  //         $('.update_department').html('<option class="spinner-border spinner-border-sm">Please wait... </option>');
+  // },
+  success: function (response) {
+    // alert(response);
+    // console.log(response.data)
+    //     $('.update_department').empty()
+    //     $('.update_department').append('<option value="" selected disabled>-- Select Department --</option>')
+    // for(var i = 0; i < response['departments'].length; i++) {
+    //   // appending response data to the unit of measurement element
+    //   $('.update_department').append(
+    //     '<option value="' + response['departments'][i]['id'] + '">' 
+    //                       + response['departments'][i]['department_name'] + '</option>')
+
+    // }
+  }
+});
 
 $(document).on('click', '.editbutton', function (e) {
   e.preventDefault();
@@ -180,7 +197,7 @@ $(document).on('click', '.editbutton', function (e) {
       });
   $.ajax({
       type: "POST",
-      url: "edit_ppmp_deadline",
+      url: "edit_deadline",
       data:{'id':id},
       success: function (response) {
 
@@ -189,7 +206,6 @@ $(document).on('click', '.editbutton', function (e) {
               var year = response['deadline'][0]['year'];
               var start_date = response['deadline'][0]['start_date'];
               var end_date = response['deadline'][0]['end_date'];
-              var type = response['deadline'][0]['procurement_type'];
               // alert(type);
               var current_year = 2023;
               var array_year = [];
@@ -199,10 +215,8 @@ $(document).on('click', '.editbutton', function (e) {
                   }
                   // console.log(array_year);
                   var year_index = array_year.indexOf(parseInt(year));
-                  var type_index = array_type.indexOf(type);
                   // console.log('year_index: '+year_index);
                   document.getElementById('update_year').getElementsByTagName('option')[year_index+1].selected = 'selected';
-                  document.getElementById('update_type').getElementsByTagName('option')[type_index+1].selected = 'selected';
                   $("#update_start_date").val(start_date);
                   $("#update_end_date").val(end_date);
                   $('.updateid').val(response['id']);  
@@ -214,31 +228,72 @@ $(document).on('click', '.editbutton', function (e) {
 
 });
 
+// $(document).on('click', '.editbutton', function (e) {
+//   e.preventDefault();
+//   var id = $(this).attr("href");
+//   // alert(id);
+//    $.ajaxSetup({
+//           headers: {
+//               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+//           }
+//       });
+//   $.ajax({
+//       type: "POST",
+//       url: "edit_deadline",
+//       data:{'id':id},
+//       success: function (response) {
+
+//           if (response.status == 200) {
+//           console.log(response);
+//           // $('.update_year').pickadate({
+//           //   format: 'yyyy/mm/dd',
+//           //   formatSubmit: 'yyyy/mm/dd'
+//           // })
+//           var year = response['deadline'][0]['year'];
+//           // var update_start_date = response[0]['start_date'];
+//           // var update_end_date = response[0]['end_date'];
+//           // const collection = document.getElementsByTagName("li");
+//           // document.getElementById("demo").innerHTML = collection[1].innerHTML;
+//           // document.getElementById('update_year').options[0].selected = 'selected';
+//           // document.getElementById('update_year').getElementsByTagName('option')[year].selected = 'selected'
+//           // document.getElementById('update_year').options[document.getElementById('update_year').selectedIndex].text;
+//           // document.getElementById('update_start_date').getElementsByTagName('option')[update_start_date].selected = 'selected'
+//           // document.getElementById('update_end_date').getElementsByTagName('option')[update_end_date].selected = 'selected'
+//             // $('#update_year').val(response['deadline'][0]['year']);
+//             // $('.update_start_date').val(response['deadline'][0]['start_date']);
+//             // $('.update_end_date').val(response['deadline'][0]['end_date']);
+//             $('.updateid').val(response['id']);  
+//             $('#UpdateDeadlineModal').modal('show');
+//           } 
+//       }
+//   });
+//   $('.btn-close').find('input').val('');
+
+// });
+
 //update
 $(document).on('click', '.updatebutton', function (e) {
   e.preventDefault();
 
   $(this).text('Updating..');
-  var update_type = document.getElementById('update_type').value;
   var update_year = document.getElementById('update_year').value;
   var update_start_date = document.getElementById('update_start_date').value;
   var update_end_date = document.getElementById('update_end_date').value;
-  if(update_type==''||update_year==''|| update_start_date=='' || update_end_date==''){
+  if(update_year==''|| update_start_date=='' || update_end_date==''){
     Swal.fire({
           icon: 'error',
           title: 'Error',
-          text: 'Please complete the needed information!',
+          text: 'Please select date!',
         })
     $(this).text('Update');
   }else{
     var data = {
-      'update_type': $('.update_type').val(),
       'update_year': $('.update_year').val(),
       'update_start_date': $('.update_start_date').val(),
       'update_end_date': $('.update_end_date').val(),
       'updateid': $('.updateid').val(),
   }
-// console.log(data);
+console.log(data);
 
   $.ajaxSetup({
     headers: {
@@ -248,12 +303,10 @@ $(document).on('click', '.updatebutton', function (e) {
 
   $.ajax({
     type: "POST",
-    url: "update_ppmp_deadline",
+    url: "update_deadline",
     data: data,
     dataType: "json",
     success: function (response) {
-      if(response['status'] == 200) {
-      }
           if(response['status'] == 200) {
             Swal.fire({
               title: 'Updated!',

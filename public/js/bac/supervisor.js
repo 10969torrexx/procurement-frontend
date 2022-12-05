@@ -1,3 +1,23 @@
+
+// $(document).ready(function() {
+//     var index = $('.index').val();
+//     // var status = $('.index').attr('data-toggle');
+//     console.log(status);
+//     for (var i = 0; i < index; i++)
+//     {
+//         var status = $('#status'+ i).attr('data-toggle');
+
+//         if(status == 1 || status == 6)
+//         {
+//             var btn = document.getElementById("action"+i);
+//             btn.style.display = 'block';
+//         }
+//         else{
+//             var btn = document.getElementById("action"+i);
+//             btn.style.display = 'none';
+//         }
+//     }
+// });
 var item_id = [];
 var project_code = [];
 var stat = [];
@@ -61,7 +81,11 @@ $(document).on('click', '.approve', function (e) {
 //show modal
 $(document).on('click', '.disapprove', function (e) {
    e.preventDefault();
+
    // console.log($(this).attr("data-button"));
+
+   console.log($(this).attr("value"));
+
    $("#viewDisapprovedPPMPmodal").modal('show');
    $('.item_id').val($(this).attr("data-toggle"));
    $('.balance').val($(this).attr("data-button"));
@@ -194,6 +218,7 @@ $(document).on('click', '.ppmpDone', function (e) {
                headers: {
                      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                }
+
                });
             
                $.ajax({
@@ -207,6 +232,73 @@ $(document).on('click', '.ppmpDone', function (e) {
                });
          }
          // console.log(count);
+/*
+            });
+      }else if(stat[i] == 3){
+
+         count++;
+         var data = {
+            'item_id': item_id[i],
+            'project_code': project_code[i],
+            'status': stat[i],
+            'remarks':remarks[i],
+         }
+
+         console.log(data);
+         $.ajaxSetup({
+            headers: {
+                  'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+            });
+         
+            $.ajax({
+               method: "post",
+               //url: "supervisor-ppmp-disapproved",
+			   url: "/bac/supervisor/supervisor-ppmp-disapproved",
+               data:data,
+               beforeSend : function(html){
+               },
+               success: function (response) {
+                  // console.log(response);
+                  // if(response['status'] == 200) { 
+                     
+                  //    // console.log(i );
+                  //    Swal.fire({
+                  //       title: '',
+                  //       html: 'Submitted Successfully!',
+                  //       icon: 'success',
+                  //       timer: 2000,
+                  //       timerProgressBar: true,
+                  //       didOpen: () => {
+                  //         Swal.showLoading()
+                  //         const b = Swal.getHtmlContainer().querySelector('b')
+                  //         timerInterval = setInterval(() => {
+                  //           b.textContent = Swal.getTimerLeft()
+                  //         }, 100)
+                  //       },
+                  //       willClose: () => {
+                  //         clearInterval(timerInterval)
+                  //       }
+                  //     }).then((result) => {
+                  //       $('#status'+ i).text("Need Revision");
+                  //       var element = document.getElementById("status"+i);
+                  //       element.style.color = "red";
+                  //       var btn = document.getElementById("action"+i);
+                  //       btn.style.display = 'none';
+                  //       $("#viewDisapprovedPPMPmodal").modal('hide');
+                  //     })
+                     
+                  //    // }
+                  // }else{
+                  //    Swal.fire({
+                  //       icon: 'error',
+                  //       title: 'Oops...',
+                  //       text: 'Check Inputs',
+                  //     })
+                  // }
+               }
+            });
+*/
       }
    //   $yuyu =  parseInt(stat.length)
    //   console.log(count);

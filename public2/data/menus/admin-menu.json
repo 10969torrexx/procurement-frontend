@@ -1,0 +1,44 @@
+{
+  "menu": [
+    {
+      "url": "/dashboard",
+      "name": "Dashboard",
+      "i18n": "Dashboard",
+      "slug": "dashboard",
+      "icon": "desktop"
+    },
+    {
+      "navheader": "SuperAdmin"
+    },
+    {
+      "url": "superadmin/users",
+      "name": "User Account",
+      "i18n": "User",
+      "icon": "users"
+    },
+    {
+      "url": "/",
+      "name": "Setup",
+      "i18n": "User",
+      "icon": "shoppingcart-in",
+      "submenu": [
+        {
+          "url": "superadmin/items",
+          "name": "Items",
+          "i18n": "User",
+          "icon": "shoppingcart-in"
+        },
+        {
+          "url": "superadmin/unit-of-measurement",
+          "name": "Measurement Unit",
+          "i18n": "User"
+        },
+        {
+          "url": "superadmin/mode-of-procurement",
+          "name": "Procurement Mode",
+          "i18n": "User"
+        }
+      ]
+    }
+  ]
+}
