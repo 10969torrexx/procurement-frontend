@@ -206,7 +206,6 @@ $(document).on('click', '.ppmpDone', function (e) {
                   }
                });
          }
-         // console.log(count);
       }
    //   $yuyu =  parseInt(stat.length)
    //   console.log(count);
