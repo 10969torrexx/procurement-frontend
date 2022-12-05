@@ -2,17 +2,27 @@ var array_status = [];
 var array_item_id = [];
 var array_remarks = [];
 var project_code;
+var array_estimated_price = [];
+var sub_total = $('.sub_total').val();;
 
+$.ajaxSetup({
+   headers: {
+         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+   }
+   });
+   
 $(document).on('click', '.done', function (e) {
-   console.log('array_status: '+array_status);
-   console.log('array_item_id: '+array_item_id);
-   console.log('array_remarks: '+array_remarks);
-   console.log('project_code: '+project_code);;
+   // console.log('array_status: '+array_status);
+   // console.log('array_item_id: '+array_item_id);
+   // console.log('array_remarks: '+array_remarks);
+   // console.log('project_code: '+project_code);;
 
    var count_disapproved = 0;
+   var estimated_price = 0;
    var count = 0;
    for(var i = 0; i < array_status.length; ++i){
       count++;
+      estimated_price += parseInt(array_estimated_price[i]);
        if(array_status[i] == 5)
        count_disapproved++;
    }
@@ -25,15 +35,66 @@ $(document).on('click', '.done', function (e) {
    }else{
       // console.log('count_disapproved: '+count_disapproved);
       var data = {
+         'item_id': array_item_id,
          'project_code': project_code,
+         'status': array_status,
+         'remarks': array_remarks,
          'count_disapproved': count_disapproved,
+         'sub_total': sub_total,
+         'estimated_price': estimated_price,
       }
-      $.ajaxSetup({
-      headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-      }
-      });
 
+// $.ajaxSetup({
+   // headers: {
+   //       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+   // }
+   // });
+
+   $.ajax({
+      type: "post",
+      url: "/budgetofficer/view_ppmp/showPPMP/ppmp-status",
+      data:data,
+   //    beforeSend : function(html){
+   //    },
+   //    success: function (response) {
+   //       if(response['status'] == 200) { 
+            
+   //          // console.log(i );
+   //          Swal.fire({
+   //             title: '',
+   //             html: 'Submitted Successfully!',
+   //             icon: 'success',
+   //             timer: 1000,
+   //             timerProgressBar: true,
+   //             didOpen: () => {
+   //               Swal.showLoading()
+   //               const b = Swal.getHtmlContainer().querySelector('b')
+   //               timerInterval = setInterval(() => {
+   //                 b.textContent = Swal.getTimerLeft()
+   //               }, 100)
+   //             },
+   //             willClose: () => {
+   //               clearInterval(timerInterval)
+   //             }
+   //           }).then((result) => {
+   //    $('#status'+ i).text("Disapproved");
+   //    var element = document.getElementById("status"+i);
+   //    element.style.color = "red";
+   //    var btn = document.getElementById("action"+i);
+   //    btn.style.display = 'none';
+   //          $("#viewDisapprovedPPMPmodal").modal('hide');
+   //        })
+   
+   //       // }
+   //    }else{
+   //       Swal.fire({
+   //          icon: 'error',
+   //          title: 'Error',
+   //          text: response.message,
+   //        })
+   //    }
+   // }
+});
       $.ajax({
          type: "post",
          url: "/budgetofficer/view_ppmp/showPPMP/ppmp-timeline",
@@ -99,132 +160,222 @@ $(document).on('click', '.done', function (e) {
 
 $(document).on('click', '.approve', function (e) {
    e.preventDefault();
-      // console.log($(this).attr('data-index'));
-      array_status.push('4');
-      array_item_id.push($(this).attr("data-toggle"));
-      project_code = $(this).attr("data-id");
-      array_remarks.push('Approved');
+      // console.log($(this).attr('data-button'));
+      // console.log($(this).attr("data-button"));
+      var i = $(this).attr('data-index');
+      if($('#status'+ i).text()=='Accepted'){
+         Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text:'Already Accepted!',
+          })
+      }else{
+         array_status.push('4');
+         array_item_id.push($(this).attr("data-toggle"));
+         array_estimated_price.push($(this).attr("data-button"));
+         project_code = $(this).attr("data-id");
+         array_remarks.push('Approved');
+         // estimated_price.push($('.data-button').val());
 
-   var data = {
-      'item_id': $(this).attr("data-toggle"),
-      'project_code': $(this).attr("data-id"),
-      'status': 4,
-   }
-            var i = $(this).attr('data-index');
-         console.log(data);
-   $.ajaxSetup({
-   headers: {
-         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-   }
-   });
+         $('#status'+ i).text("Accepted");
+         var element = document.getElementById("status"+i);
+         element.style.color = "green";
 
-   $.ajax({
-      type: "post",
-      url: "/budgetofficer/view_ppmp/showPPMP/ppmp-approved",
-      data:data,
-      beforeSend : function(html){
-      },
-      success: function (response) {
-         if(response['status'] == 200) { 
-            
-            // console.log(i );
-            $('#status'+ i).text("Approved");
-            var element = document.getElementById("status"+i);
-            element.style.color = "green";
- 
-            
-            var btn = document.getElementById("action"+i);
-            btn.style.display = 'none';
-
-            // var i = $('.approve').val();
-            // console.log(i);
-            // // for(var i = 0; i < value; i++) {
-            //    var element = document.getElementById("status"+i);
-            //    // element.innerHTML= "approved";
-            //    $('.status'+i).text("approved")
-            //    element.style.color = "green";
-                  //  $('.status'+i).style.color = "blue";
-            // }
-         }
+         
+         var btn = document.getElementById("action"+i);
+         btn.style.display = 'none';
       }
-   });
+
+
+   // var data = {
+   //    'item_id': $(this).attr("data-toggle"),
+   //    'project_code': $(this).attr("data-id"),
+   //    'status': 4,
+   //    'remarks': 'Approved',
+   // }
+   //       console.log(data);
+   // $.ajaxSetup({
+   // headers: {
+   //       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+   // }
+   // });
+
+   // $.ajax({
+   //    type: "post",
+   //    url: "/budgetofficer/view_ppmp/showPPMP/ppmp-approved",
+   //    data:data,
+   //    beforeSend : function(html){
+   //    },
+   //    success: function (response) {
+   //       if(response['status'] == 200) { 
+            
+   //          // console.log(i );
+
+
+   //          // var i = $('.approve').val();
+   //          // console.log(i);
+   //          // // for(var i = 0; i < value; i++) {
+   //          //    var element = document.getElementById("status"+i);
+   //          //    // element.innerHTML= "approved";
+   //          //    $('.status'+i).text("approved")
+   //          //    element.style.color = "green";
+   //                //  $('.status'+i).style.color = "blue";
+   //          // }
+   //       }
+   //    }
+   // });
 });
 
 //show modal
 $(document).on('click', '.disapprove', function (e) {
    e.preventDefault();
-   
-   $("#viewDisapprovedPPMPmodal").modal('show');
-   $('.item_id').val($(this).attr("data-toggle"));
-   $('.code').val( $(this).attr("data-id"));
-   $('.index').val($(this).attr("data-index"));
-   $('.remarks').val("")
+   var i = $(this).attr('data-index');
+   if($('#status'+ i).text()=='Rejected'){
+      Swal.fire({
+         icon: 'error',
+         title: 'Error',
+         text:'Already Rejected!',
+       })
+   }else{
+      $("#viewDisapprovedPPMPmodal").modal('show');
+      $('.item_id').val($(this).attr("data-toggle"));
+      $('.code').val( $(this).attr("data-id"));
+      $('.index').val($(this).attr("data-index"));
+      $('.estimated_price').val($(this).attr("data-button"));
+      $('.remarks').val("")
+   }
+
 });
 
 //disaaproved
 $(document).on('click', '.save', function (e) {
    e.preventDefault();
+   
+   remarks = $('.remarks').val();
+   // alert(remarks);
+   if(remarks != ''){
+      array_status.push('5');
+      array_item_id.push($('.item_id').val());
+      array_remarks.push( $('.remarks').val());
+      project_code =  $('.code').val();
+      array_estimated_price.push($('.estimated_price').val());
 
-   array_status.push('5');
-   array_item_id.push($('.item_id').val());
-   array_remarks.push( $('.remarks').val());
-   project_code =  $('.code').val();
+      // var data = {
+      //    'item_id': array_item_id,
+      //    'project_code': project_code,
+      //    'status': array_status,
+      //    'remarks': array_remarks,
+      //    // 'count_disapproved': count_disapproved,
+      // }
 
-   // $("#viewDisapprovedPPMPmodal").modal('show');
-      console.log($(this).attr('data-index'));
-   var data = {
-      'item_id': $('.item_id').val(),
-      'project_code': $('.code').val(),
-      'status': 5,
-      'remarks': $('.remarks').val(),
+      // $.ajax({
+      //       type: "post",
+      //       url: "/budgetofficer/view_ppmp/showPPMP/ppmp-status",
+      //       data:data,
+      //       beforeSend : function(html){
+      //       },
+      //       success: function (response) {
+      //          if(response['status'] == 200) { 
+      //             Swal.fire({
+      //                title: '',
+      //                html: 'Saved!',
+      //                icon: 'success',
+      //                timer: 1000,
+      //                timerProgressBar: true,
+      //                didOpen: () => {
+      //                  Swal.showLoading()
+      //                  const b = Swal.getHtmlContainer().querySelector('b')
+      //                  timerInterval = setInterval(() => {
+      //                    b.textContent = Swal.getTimerLeft()
+      //                  }, 100)
+      //                },
+      //                willClose: () => {
+      //                  clearInterval(timerInterval)
+      //                }
+      //              }).then((result) => {
+                     
+                     $("#viewDisapprovedPPMPmodal").modal('hide');
+      //              })
+                  var i = $('.index').val();
+                  $('#status'+ i).text("Rejected");
+                  var element = document.getElementById("status"+i);
+                  element.style.color = "red";
+                  var btn = document.getElementById("action"+i);
+                  btn.style.display = 'none';
+      //          }else{
+      //                   Swal.fire({
+      //                      icon: 'error',
+      //                      title: 'Error',
+      //                      text: response.message,
+      //                    })
+      //                }
+      //       }
+      //    });
+                  
+   }else{
+      Swal.fire({
+         icon: 'error',
+         title: 'Error',
+         text: 'Please enter remarks!',
+       })
    }
-            var i = $('.index').val();
-         console.log(data);
-   $.ajaxSetup({
-   headers: {
-         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-   }
-   });
+  
+      // console.log($(this).attr('data-index'));
+   // var data = {
+   //    'item_id': $('.item_id').val(),
+   //    'project_code': $('.code').val(),
+   //    'status': 5,
+   //    'estimated_price': $('.estimated_price').val(),
+   //    'remarks': $('.remarks').val(),
+   // }
+         // console.log(data);
+   // $.ajaxSetup({
+   // headers: {
+   //       'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+   // }
+   // });
 
-   $.ajax({
-      type: "post",
-      url: "/budgetofficer/view_ppmp/showPPMP/ppmp-disapproved",
-      data:data,
-      beforeSend : function(html){
-      },
-      success: function (response) {
-         if(response['status'] == 200) { 
+   // $.ajax({
+   //    type: "post",
+   //    url: "/budgetofficer/view_ppmp/showPPMP/ppmp-disapproved",
+   //    data:data,
+   //    beforeSend : function(html){
+   //    },
+   //    success: function (response) {
+   //       if(response['status'] == 200) { 
             
-            // console.log(i );
-            Swal.fire({
-               title: '',
-               html: 'Submitted Successfully!',
-               icon: 'success',
-               timer: 1000,
-               timerProgressBar: true,
-               didOpen: () => {
-                 Swal.showLoading()
-                 const b = Swal.getHtmlContainer().querySelector('b')
-                 timerInterval = setInterval(() => {
-                   b.textContent = Swal.getTimerLeft()
-                 }, 100)
-               },
-               willClose: () => {
-                 clearInterval(timerInterval)
-               }
-             }).then((result) => {
-               $('#status'+ i).text("Disapproved");
-               var element = document.getElementById("status"+i);
-               element.style.color = "red";
-               var btn = document.getElementById("action"+i);
-               btn.style.display = 'none';
-               $("#viewDisapprovedPPMPmodal").modal('hide');
-             })
+   //          // console.log(i );
+   //          Swal.fire({
+   //             title: '',
+   //             html: 'Submitted Successfully!',
+   //             icon: 'success',
+   //             timer: 1000,
+   //             timerProgressBar: true,
+   //             didOpen: () => {
+   //               Swal.showLoading()
+   //               const b = Swal.getHtmlContainer().querySelector('b')
+   //               timerInterval = setInterval(() => {
+   //                 b.textContent = Swal.getTimerLeft()
+   //               }, 100)
+   //             },
+   //             willClose: () => {
+   //               clearInterval(timerInterval)
+   //             }
+   //           }).then((result) => {
+               
+   //             $("#viewDisapprovedPPMPmodal").modal('hide');
+   //           })
             
-            // }
-         }
-      }
-   });
+   //          // }
+   //       }else{
+   //          Swal.fire({
+   //             icon: 'error',
+   //             title: 'Error',
+   //             text: response.message,
+   //           })
+   //       }
+   //    }
+   // });
 });
 
 $(document).on('click', '.edit', function (e) {

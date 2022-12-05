@@ -174,19 +174,30 @@
                                     {{-- <i class="fa-solid fa-pen-to-square edit" data-index="{{ $i }}" title="Edit"></i> --}}
                                     <label style="font-size: 15px;" class="text-dark mt-1 ">{{ $data[$i]->item_name }} </label><br>
                                     <p style="font-size: 13px; text-align:left;" class="mt-1"> Description: <br>{{$data[$i]->item_description }}</p> <br>
+
                                     <?php
                                         if($data[$i]->status == 1 || $data[$i]->status == 6){
                                     ?>
                                         <div class="mb-1" id="action{{ $i }}">
-                                            <button class="btn btn-outline-success approve button" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="2" data-index="{{ $i }}" >Accept</button>
-                                            <button class="btn btn-outline-danger disapprove button" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="3" data-index="{{ $i }}">Reject</button> 
+                                            <button class="btn btn-outline-success approve button" data-button="0" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="2" data-index="{{ $i }}" >Accept</button>
+                                            <button class="btn btn-outline-danger disapprove button"  data-button="{{ $data[$i]->estimated_price }}" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="3" data-index="{{ $i }}">Reject</button> 
                                         </div>
                                     <?php
                                         }else if( $data[$i]->status == 2 || $data[$i]->status == 3 ){
-                                    ?>
+                                    ?> 
                                         <div class="mb-1" id="action{{ $i }}" style="display:none">
-                                            <button class="btn btn-outline-success approve button" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="2" data-index="{{ $i }}" >Accept</button>
-                                            <button class="btn btn-outline-danger disapprove button" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="3" data-index="{{ $i }}">Reject</button> 
+                                            @if($data[$i]->status != 2)
+                                            <button class="btn btn-outline-success approve button" data-button="-{{ $data[$i]->estimated_price }}" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="2" data-index="{{ $i }}" >Accept</button>
+                                            @endif
+                                            @if($data[$i]->status == 2)
+                                            <button class="btn btn-outline-success approve button" data-button="-0" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="2" data-index="{{ $i }}" >Accept</button>
+                                            @endif
+                                            @if($data[$i]->status != 3)
+                                            <button class="btn btn-outline-danger disapprove button" data-button="{{ $data[$i]->estimated_price }}" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="3" data-index="{{ $i }}">Reject</button> 
+                                            @endif
+                                            @if($data[$i]->status == 3)
+                                            <button class="btn btn-outline-danger disapprove button" data-button="0" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="3" data-index="{{ $i }}">Reject</button> 
+                                            @endif
                                         </div>
                                     <?php
                                         }
@@ -320,6 +331,7 @@
                 </tfoot>
             </table>
             <div class="col-md-12 text-right">
+                <a href="/bac/supervisor"><button type="button" class="btn btn-primary col-md-1 mt-1 back" data-id="{{ $data[0]->pt_id }}">Back</button></a>
                 <button type="button" class="btn btn-success col-md-1 mt-1 ppmpDone" data-id="{{ $data[0]->pt_id }}">Done</button>
             </div>
         </div>

@@ -38,8 +38,14 @@
 
                         {{-- <a href = "#" class = "btn btn-success round mr-1 mb-1" data-flag = "{{ $aes->encrypt('accounts')}}" data-button = "{{ $aes->encrypt('add')}}" data-id = "{{ $aes->encrypt('0')}}" data-toggle = "modal" data-target = "#allModal"><i class="bx bx-plus"></i> New Account</a> --}}
                         {{-- <a href = "#" class = "add_btn btn btn-success round mr-1 mb-1" data-toggle = "modal" data-target = "#MandatoryExpenditureModal"><i class="bx bx-plus"></i>Add</a> --}}
-                        <a href = "#" class = "add_btn btn btn-success round mr-1 mb-1"><i class="bx bx-plus"></i>Add</a>
                         
+                        @if (!empty(session("globalerror")))
+                        <div class="alert alert-danger" role="alert">
+                            {{session("globalerror")." before adding mandatory expenditures!"}}
+                        </div>
+                        @else
+                        <a href = "#" class = "add_btn btn btn-success round mr-1 mb-1"><i class="bx bx-plus"></i>Add</a>
+                        @endif
 
                         {{-- {{ session('token') }} --}}
                         <p class="card-text"></p>

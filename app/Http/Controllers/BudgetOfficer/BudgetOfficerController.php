@@ -23,7 +23,11 @@ class BudgetOfficerController extends Controller
         // return view('pages.budgetofficer.index',['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs]);
 
         $ppmp_deadlines = DB::table('ppmp_deadline')->where('campus',session('campus'))->whereNull('deleted_at')->get();
-
+        // if(count($ppmp_deadlines)==0){
+        //     session(['globalerror' => "Please set deadline first"]);
+        // }else{
+        //     Session::forget('globalerror');
+        // }
             return view('pages.budgetofficer.ppmp_deadline_index',compact('ppmp_deadlines'), [
                 'pageConfigs'=>$pageConfigs,
                 'breadcrumbs'=>$breadcrumbs,
@@ -38,7 +42,7 @@ class BudgetOfficerController extends Controller
     public function PPMPindex(){
         $pageConfigs = ['pageHeader' => true];
         $breadcrumbs = [
-          ["link" => "/", "name" => "Home"],["name" =>"PPMPs"]
+          ["link" => "/", "name" => "Home"],["name" =>"Pending PPMPs"]
         ];
         
         $ppmp = DB::table("project_titles as pt")
@@ -50,6 +54,7 @@ class BudgetOfficerController extends Controller
               ->whereNull("pt.deleted_at")
               ->whereRaw('pt.status = 2 or pt.status = 4 or pt.status = 5')  
               ->where("p.is_supplemental","=", 0)
+              ->where("pt.campus",session('campus'))
               ->groupBy("pt.project_title")
               -> get();
   
@@ -58,15 +63,16 @@ class BudgetOfficerController extends Controller
               ->select("pt.project_code as code","pt.id as pt_id","pt.project_title as title","p.*")
               ->join('project_titles as pt','pt.id','=','p.project_code')
               ->whereNull("p.deleted_at")
+              ->where("p.campus",session('campus'))
               ->where("p.is_supplemental","=", 0)
-              -> get();
-
+              ->get();
+        
         return view('pages.budgetofficer.view-ppmp', compact('ppmp','item'),
         [
           'pageConfigs'=>$pageConfigs,
           'breadcrumbs'=>$breadcrumbs
         ]);
-      }
+      } 
 
       public function showPPMP(Request $request){
         $aes = new AESCipher();
@@ -80,9 +86,10 @@ class BudgetOfficerController extends Controller
                   ->where('p.project_code','=',$id,'and', "p.status","=", 2 ,"or", 4,"or", 5)  
                   -> get();
         $pageConfigs = ['pageHeader' => true];
+        // dd($data);
         $breadcrumbs = [
           ["link" => "/", "name" => "Home"],
-          ["link" => "/budgetofficer/view_ppmp","name" =>"Supervisor"],
+          ["link" => "/budgetofficer/view_ppmp","name" =>"Pending PPMPs"],
           ["name" =>"PPMP"]
         ];
             return view('pages.budgetofficer.check_ppmp',compact('data'),
@@ -92,102 +99,137 @@ class BudgetOfficerController extends Controller
             ]);
           }
 
-          public function status(Request $request){
-            $item_id = $request->item_id;
-            $project_code = $request->project_code;
-            $status = $request->status;
-            $remarks = $request->remarks;
-            if($status == 4){
-                $changed = DB::table('ppmps as p')
-                        ->where('id', $item_id)
-                        ->update(['status' =>  $status]
-                        );
-            }else if($status == 5){
+    public function status(Request $request){
+        // dd($request->all());
+        $item_id = $request->item_id;
+        $project_code = $request->project_code;
+        $status = $request->status;
+        $remarks = $request->remarks;
+        $count_disapproved = $request->count_disapproved;
+        $estimated_price = $request->estimated_price;
+        $sub_total = $request->sub_total;
 
-                $changed = DB::table('ppmps as p')
-                ->where('id', $item_id)
-                ->update([
-                    'status' =>  $status,
-                    'remarks' =>  $remarks
-                    ]
-                );
-            }
-                $proTitle = DB::table('ppmps as p')
-                            ->where('project_code',$project_code)
-                            ->where('status',5)
-                            ->get();
-                $count = count($proTitle);
+        $ppmp = DB::table('project_titles as pt')
+                ->select('ab.remaining_balance','ab.id','ab.allocated_budget')
+                ->join('allocated__budgets as ab','pt.allocated_budget','ab.id')
+                ->join('ppmps as p','p.project_code','=','pt.id')
+                ->where('pt.id',$project_code)
+                ->get();
+                
+        $allocated_budget = "";
+        $remaining = "";
+        $new_remaining = '';
+        $allocated_budget_id = "";
 
-                if($count!=0)
-                { 
-                    $stat = DB::table('project_titles')
-                            ->where('id',$project_code)
+        foreach($ppmp as $data){
+            $remaining = $data->remaining_balance;
+            $allocated_budget_id = $data->id;
+            $allocated_budget = $data->allocated_budget;
+        }
+
+        $calc = ($remaining + $estimated_price);
+        
+        for($i = 0; $i < count($request->item_id);$i++){
+
+            if($status[$i] == 4){
+                    $changed = DB::table('ppmps as p')
+                            ->where('id', $item_id[$i])
                             ->update([
-                                'status' =>  5,
-                                ]
-                            );
-                }
-                else{
-                    $stat = DB::table('project_titles')
+                                'status' =>  $status[$i],
+                                'remarks' =>  $remarks[$i]
+                            ]);
+                            
+                    DB::table("allocated__budgets")
+                            ->where("id", $allocated_budget_id)
+                            ->update([
+                                'remaining_balance' =>$calc,
+                            ]);
+            }else if($status[$i] == 5){
+                    $changed = DB::table('ppmps as p')
+                    ->where('id', $item_id[$i])
+                    ->update([
+                        'status' =>  $status[$i],
+                        'remarks' =>  $remarks[$i]
+                        ]
+                    );
+
+                    DB::table("allocated__budgets")
+                        ->where("id", $allocated_budget_id)
+                        ->update([
+                            'remaining_balance' => $calc,
+                        ]); 
+                }  
+        }
+        if($changed){
+            if($count_disapproved == 0){
+                DB::table('project_titles')
                     ->where('id',$project_code)
                     ->update([
                         'status' =>  4,
                         ]
                     );
-                }
-                if($changed)
-            {
-                return response()->json([
+            }else{
+                DB::table('project_titles')
+                    ->where('id',$project_code)
+                    ->update([
+                        'status' =>  5,
+                        ]
+                );
+            }
+            return response()->json([
                 'status' => 200, 
-            ]); 
-            }
-            else{
-                return response()->json([
-                'status' => 400, 
                 ]); 
-            }
-          }
-          public function timeline(Request $request){
-            $project_code = $request->project_code;
-            $count_disapproved = $request->count_disapproved;
-            if($count_disapproved == 0){
-                $project_timeline = DB::table("project_timeline")
-                    ->insert([
-                    'employee_id'=>session('employee_id'),
-                    'department_id'=>session('department_id'),
-                    'role'=>session('role'),
-                    'project_id'=>$project_code,
-                    'status'=>4,
-                    'campus'=>session('campus'),
-                    'remarks'=>"Your PPMP has been approved by the Budget Officer",
-                    'created_at' => Carbon::now()
-                    ]); 
-            }else if($count_disapproved > 0){
-                $project_timeline = DB::table("project_timeline")
-                    ->insert([
-                    'employee_id'=>session('employee_id'),
-                    'department_id'=>session('department_id'),
-                    'role'=>session('role'),
-                    'project_id'=>$project_code,
-                    'status'=>5,
-                    'campus'=>session('campus'),
-                    'remarks'=>"Your PPMP needs to be revised",
-                    'created_at' => Carbon::now()
-                    ]);
-            }
-            if($project_timeline)
-            {
-                return response()->json([
-                'status' => 200, 
-            ]); 
-            }
-            else{
-                return response()->json([
+        }else{
+            return response()->json([
                 'status' => 400, 
-                ]); 
-            }
-          }
+            ]); 
+        }
+    }
 
+    public function timeline(Request $request){
+        // dd($request->all());
+        $project_code = $request->project_code;
+        $count_disapproved = $request->count_disapproved;
+        if($count_disapproved == 0){
+            $project_timeline = DB::table("project_timeline")
+                ->insert([
+                'employee_id'=>session('employee_id'),
+                'department_id'=>session('department_id'),
+                'role'=>session('role'),
+                'project_id'=>$project_code,
+                'status'=>4,
+                'campus'=>session('campus'),
+                'remarks'=>"Your PPMP has been approved by the Budget Officer",
+                'created_at' => Carbon::now()
+                ]); 
+        }else if($count_disapproved > 0){
+            $project_timeline = DB::table("project_timeline")
+                ->insert([
+                'employee_id'=>session('employee_id'),
+                'department_id'=>session('department_id'),
+                'role'=>session('role'),
+                'project_id'=>$project_code,
+                'status'=>5,
+                'campus'=>session('campus'),
+                'remarks'=>"Your PPMP needs to be revised",
+                'created_at' => Carbon::now()
+                ]);
+        }
+        if($project_timeline)
+        {
+            return response()->json([
+            'status' => 200, 
+        ]); 
+        }
+        else{
+            return response()->json([
+            'status' => 400, 
+            ]); 
+        }
+        // return redirect("/view_ppmp");
+    }
+
+    
     public function addMandatoryExpenditure(Request $request){
         $department = $request->department;
         $fund_source = $request->fund_source;
@@ -335,7 +377,12 @@ class BudgetOfficerController extends Controller
                             ->where('mandatory_expenditures.campus',session('campus'))
                             ->whereNull('mandatory_expenditures.deleted_at')
                             ->get();
-        
+        $ppmp_deadlines = DB::table('ppmp_deadline')->where('campus',session('campus'))->whereNull('deleted_at')->get();
+            if(count($ppmp_deadlines)==0){
+                session(['globalerror' => "Please set deadline first"]);
+            }else{
+                Session::forget('globalerror');
+            }
             return view('pages.budgetofficer.mandatory-expenditures-index',compact('mandatory_expenditures'), [
                 'pageConfigs'=>$pageConfigs,
                 'breadcrumbs'=>$breadcrumbs,
@@ -364,7 +411,10 @@ class BudgetOfficerController extends Controller
     public function getMandatoryExpenditures(Request $request)
     {
         try {
-            $expenditures =  DB::table('mandatory_expenditures_list')->where('campus',session('campus'))->whereNull('deleted_at')->get();
+            $expenditures =  DB::table('mandatory_expenditures_list')
+                                // ->where('campus',session('campus'))
+                                ->whereNull('deleted_at')
+                                ->get();
         //   dd($expenditures);
           return $expenditures;
         } catch (\Throwable $th) {
@@ -378,6 +428,7 @@ class BudgetOfficerController extends Controller
                     ->select('year')
                     ->where('campus',session('campus'))
                     ->whereNull('deleted_at')
+                    ->groupBy('year')
                     ->get();
 
           return $years;
@@ -398,11 +449,17 @@ class BudgetOfficerController extends Controller
                                     ->whereNull('allocated__budgets.deleted_at')
                                     ->where("allocated__budgets.campus", session("campus"))
                                     ->get();
-        $ppmp_deadline = DB::table('ppmp_deadline')->where('year',$date+1)->whereNull('deleted_at')->get();
-        // dd($ppmp_deadline);
+        $ppmp_deadline = DB::table('ppmp_deadline')->where('campus',session('campus'))->where('year',$date+1)->whereNull('deleted_at')->get();
+        // $ppmp_deadlines = DB::table('ppmp_deadline')->where('campus',session('campus'))->whereNull('deleted_at')->get();
         if(count($ppmp_deadline)==0){
-            session(['globalerror' => "Please set a deadline first!"]);
+            session(['globalerror' => "Please set deadline first"]);
+        }else{
+            Session::forget('globalerror');
         }
+        // dd($ppmp_deadline);
+        // if(count($ppmp_deadline)==0){
+        //     session(['globalerror' => "Please set a deadline first before allocating budget!"]);
+        // }
             return view('pages.budgetofficer.allocatebudget',compact('ppmp_deadline','allocate_budget'), [
                 'pageConfigs'=>$pageConfigs,
                 'breadcrumbs'=>$breadcrumbs,
@@ -423,12 +480,17 @@ class BudgetOfficerController extends Controller
                                     ->where('department_id',$department_id)
                                     ->where('fund_source_id',$fund_source_id)
                                     ->where('year',$year)
+                                    ->where('campus',session('campus'))
+                                    ->whereNull('deleted_at')
                                     ->sum('price');
             $department_checker = DB::table('allocated__budgets')
                                     ->where('department_id',$department_id,'and')
                                     ->where('procurement_type',$type,'and')
                                     ->where('fund_source_id',$fund_source_id,'and')
-                                    ->where('year',$year)->get();
+                                    ->where('campus',session('campus'))
+                                    ->whereNull('deleted_at')
+                                    ->where('year',$year)
+                                    ->get();
             if(count($department_checker) >= 1){
                 return response()->json([
                         'status' => 400, 
@@ -445,6 +507,7 @@ class BudgetOfficerController extends Controller
                     'year' => $year,
                     'deadline_of_submission' => $deadline_of_submission,
                     'allocated_budget' => $allocated_budget,
+                    'mandatory_expenditures' => $total_expenditures,
                     'remaining_balance' => $remaining_balance,
                     'campus' => session("campus"),
                     'created_at' => Carbon::now()
@@ -495,7 +558,6 @@ class BudgetOfficerController extends Controller
                     'department_ids'=> $department_ids,
                     'fund_source_ids'=> $fund_source_ids,
                     'years'=> $years,
-                    'message' => 'Budget Allocated Updated Successfully!',
                 ]);    
         } else{
             return response()->json([
@@ -517,11 +579,13 @@ class BudgetOfficerController extends Controller
     {
         // dd($request->all());
         try {
+            $Type = (new AESCipher)->decrypt($request->type);
             $Year = (new AESCipher)->decrypt($request->year);
             $StartDate = $request->start_date;
             $EndDate = $request->end_date;
             // return $Year;
             $deadlinechecker = DB::table('ppmp_deadline')
+                                ->where('procurement_type',$Type)
                                 ->where('year',$Year)
                                 ->where('campus',session('campus'))
                                 ->whereNull('deleted_at')
@@ -529,11 +593,12 @@ class BudgetOfficerController extends Controller
             if(count($deadlinechecker) == 1){
                 return response()->json([
                         'status' => 400, 
-                        'message' => 'Deadline for the Year '.$Year.' is already set!',
+                        'message' => 'Deadline for '.$Type.' for the Year '.$Year.' is already set!',
                         ]);  
             }else if(count($deadlinechecker) == 0){
                 $deadline= DB::table('ppmp_deadline')
                                     ->insert([
+                                        'procurement_type'=>  $Type,
                                         'year'=>  $Year,
                                         'campus'=>  session('campus'),
                                         'start_date'=>  $StartDate,
@@ -590,7 +655,7 @@ class BudgetOfficerController extends Controller
         // dd($request->all());
         $id = (new AESCipher())->decrypt($request->id);
         $deadline = DB::table('ppmp_deadline')->where('id', $id)->get();
-        // return $deadline;
+        // dd($deadline);
             return response()->json([
                 'status'=>200,
                 'deadline'=> $deadline, 
@@ -600,42 +665,137 @@ class BudgetOfficerController extends Controller
 
     public function update_deadline(Request $request)
     {
+        // dd($request->all());
+            $update_type = (new AESCipher())->decrypt($request->update_type);
             $update_year = (new AESCipher())->decrypt($request->update_year);
             $update_start_date = $request->update_start_date;
             $update_end_date = $request->update_end_date;
             $updateid = $request->updateid;
             $id = (new AESCipher())->decrypt($updateid);
-
-            $response = DB::table('ppmp_deadline')
+           
+            $deadlinechecker = DB::table('ppmp_deadline')
+                                ->where('procurement_type',$update_type)
+                                ->where('year',$update_year)
+                                ->where('campus',session('campus'))
+                                ->where('start_date',$update_start_date)
+                                ->where('end_date',$update_end_date)
+                                ->whereNull('deleted_at')
+                                ->where('id',$id)
+                                ->get();              
+            $deadlinechecker1 = DB::table('ppmp_deadline')
+                                ->where('procurement_type',$update_type)
+                                ->where('year',$update_year)
+                                ->where('campus',session('campus'))
+                                ->whereNull('deleted_at')
+                                ->get();
+            $deadlinechecker2 = DB::table('ppmp_deadline')
+                                ->where('procurement_type',$update_type)
+                                ->where('year',$update_year)
+                                ->where('campus',session('campus'))
+                                ->where('id',$id)
+                                ->whereNull('deleted_at')
+                                ->get();
+            if(count($deadlinechecker) == 1){
+                return response()->json([
+                        'status' => 400, 
+                        'message' => 'No Changes Made!',
+                    ]);  
+            }else if(count($deadlinechecker1) == 1 && count($deadlinechecker2) == 0){
+                return response()->json([
+                        'status' => 400, 
+                        'message' => 'Deadline for '.$update_type.' for the Year '.$update_year.' is already set!',
+                    ]); 
+            }else if(count($deadlinechecker1) == 0 || count($deadlinechecker2) == 1){
+                $response = DB::table('ppmp_deadline')
                         ->where('id',$id)
                         ->update([
+                            'procurement_type' => $update_type,
                             'year' => $update_year,
                             'start_date' => $update_start_date,
                             'end_date' => $update_end_date,
                             'updated_at' =>  Carbon::now()
                             ]
                         );
-            if( $response)
-            {
-                return response()->json([
-                'status' => 200, 
-                'message' => 'Deadline Updated Successfully!',
-            ]);    
-            }
-            else{
-                return response()->json([
-                'status' => 400, 
-                'message' => 'Please select date!',
-                ]); 
+                if( $response)
+                {
+                    return response()->json([
+                    'status' => 200, 
+                    'message' => 'Deadline Updated Successfully!',
+                ]);    
+                }
+                else{
+                    return response()->json([
+                    'status' => 400, 
+                    'message' => 'Please select date!',
+                    ]); 
+                }
             }
     }
+    public function get_DeadlineByYear(Request $request)
+    {
+        try {
+            $year = $request->year;
+            $response = DB::table('ppmp_deadline')
+                        ->select('end_date')
+                        ->where('year', $year)
+                        ->get();
+            if($response){
+                return response()->json([
+                    'status' => 200,
+                    'deadline' =>$response,
+                ]);
+            }
+            return response()->json([
+                'status' => 400,
+                'message' => 'Server Error'
+            ]);
+         
+        } catch (\Throwable $th) {
+            dd($th);
+        }
+        
+    }
+    public function get_procurement_type(Request $request)
+    {
+        try {
+        //   dd($request->all());
 
-    public function show($id)
-    {
-        //
+            $type = (new AESCipher())->decrypt($request->type);
+        // $response = Http::withToken(env('Auth_HRMIS_Token'))->post(env('APP_HRMIS_API'). "/api/auth/employeelist", [
+        //     'department' => $department,
+        //   ])->json();
+            $response = DB::table('ppmp_deadline')
+                        ->select('year')
+                        ->where('campus', session('campus'))
+                        ->where('procurement_type', $type)
+                        ->groupBy('year')
+                        ->get();
+            // dd($response);
+            // if(count($response)==0){
+            //     session(['globalerror' => "Please set deadline first for ".$type]);
+            // }else{
+            //     Session::forget('globalerror');
+            // }
+            if($response){
+                return response()->json([
+                    'status' => 200,
+                    'years' =>$response,
+                ]);
+            }
+            return response()->json([
+                'status' => 400,
+                'message' => 'Server Error'
+            ]);
+         
+        } catch (\Throwable $th) {
+            dd($th);
+        }
+        
     }
-    public function destroy($id)
-    {
-        //
+    public function my_par(){
+        return view('pages.page-maintenance');
+    }
+    public function my_ics(){
+        return view('pages.page-maintenance');
     }
 }

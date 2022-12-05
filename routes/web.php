@@ -61,7 +61,7 @@ Route::group(['prefix' => 'superadmin','middleware' => ['authuser']], function()
     Route::post('/edit', 'SuperAdmin\AdminController@edit')->name('edit');
     Route::post('/update', 'SuperAdmin\AdminController@update')->name('update');
 
-    Route::get('/departments', 'SuperAdmin\AdminController@getDepartments');
+    Route::get('/departments', 'SuperAdmin\AdminController@departments_index');
     
     // Route::get('/getDepartments', 'SuperAdmin\AdminController@departments');
     Route::post('/getUsers', 'SuperAdmin\AdminController@getUsers');
@@ -520,6 +520,8 @@ Route::get('/delete-item/{id}', 'BAC\ItemController@delete');
 
 Route::group(['prefix' => 'budgetofficer','middleware' => ['authuser']], function() {
     Route::get('/try','BudgetOfficer\BudgetOfficerController@try');
+    Route::get('/my_par','BudgetOfficer\BudgetOfficerController@my_par');
+    Route::get('/my_ics','BudgetOfficer\BudgetOfficerController@my_ics');
 
     Route::get('/ppmp_deadline','BudgetOfficer\BudgetOfficerController@ppmp_deadline_index');
     Route::post('/save_ppmp_deadline','BudgetOfficer\BudgetOfficerController@save_ppmp_deadline')->name('save_ppmp_deadline');
@@ -544,12 +546,15 @@ Route::group(['prefix' => 'budgetofficer','middleware' => ['authuser']], functio
     Route::get('/getFundSources', 'BudgetOfficer\BudgetOfficerController@getFundSources')->name('getFundSources');
     Route::get('/getMandatoryExpenditures', 'BudgetOfficer\BudgetOfficerController@getMandatoryExpenditures')->name('getMandatoryExpenditures');
     Route::get('/getYears', 'BudgetOfficer\BudgetOfficerController@get_years')->name('getYears');
-    Route::get('/get_DeadlineByYear', 'BudgetOfficer\AllocateBudgetController@get_DeadlineByYear')->name('get_DeadlineByYear');
+    Route::get('/get_procurement_type', 'BudgetOfficer\BudgetOfficerController@get_procurement_type')->name('get_procurement_type');
+    Route::get('/get_DeadlineByYear', 'BudgetOfficer\BudgetOfficerController@get_DeadlineByYear')->name('get_DeadlineByYear');
 
-    Route::get('/view_ppmp','BudgetOfficer\BudgetOfficerController@PPMPindex');
+    Route::get('/view_ppmp','BudgetOfficer\BudgetOfficerController@PPMPindex')->name('view_ppmp');
+    Route::get('/returnView','BudgetOfficer\BudgetOfficerController@returnView');
     Route::post('/view_ppmp/showPPMP', 'BudgetOfficer\BudgetOfficerController@showPPMP')->name('showPPMP');
-    Route::post('/view_ppmp/showPPMP/ppmp-approved', 'BudgetOfficer\BudgetOfficerController@status')->name('ppmp-approved');
-    Route::post('/view_ppmp/showPPMP/ppmp-disapproved', 'BudgetOfficer\BudgetOfficerController@status')->name('ppmp-disapproved');
+    Route::post('/view_ppmp/showPPMP/ppmp-status', 'BudgetOfficer\BudgetOfficerController@status')->name('ppmp-status');
+    // Route::post('/view_ppmp/showPPMP/ppmp-approved', 'BudgetOfficer\BudgetOfficerController@status')->name('ppmp-approved');
+    // Route::post('/view_ppmp/showPPMP/ppmp-disapproved', 'BudgetOfficer\BudgetOfficerController@status')->name('ppmp-disapproved');
     Route::post('/view_ppmp/showPPMP/ppmp-timeline', 'BudgetOfficer\BudgetOfficerController@timeline')->name('ppmp-timeline');
 
     Route::get('/view_signed_ppmp','BudgetOfficer\ViewSignedPPMPController@index');
@@ -605,6 +610,7 @@ Route::group(['prefix' => 'bac','middleware' => ['authuser']], function() {
     Route::get('/app-non-cse', 'BAC\APPNONCSEController@index');
     Route::get('/try', 'BAC\APPNONCSEController@try');
     Route::post('/app-non-cse-generate', 'BAC\APPNONCSEController@generatepdf')->name('app-non-cse-generate');
+    Route::get('/show-all', 'BAC\APPNONCSEController@university_wide')->name('show-all');
     Route::get('/app-non-cse-generate-excel', 'BAC\APPNONCSEController@generateexcel')->name('app-non-cse-generate-excel');
     Route::post('/show-signatories', 'BAC\APPNONCSEController@show_signatories')->name('show-signatories');
     Route::post('/add-preparedby', 'BAC\APPNONCSEController@add_preparedby')->name('add-preparedby');
@@ -637,6 +643,38 @@ Route::group(['prefix' => 'bac','middleware' => ['authuser']], function() {
     //jrald end
     // Route::get('/adduser','Admin\AdminController@adduser');
     
+});
+
+Route::group(['prefix' => 'supply_custodian','middleware' => ['authuser']], function() {
+
+    Route::get('/property','SupplyCustodian\PropertyController@index');
+    Route::post('/assign-par','SupplyCustodian\PropertyController@assign_par')->name('assign-par');
+    Route::post('/finalize-par','SupplyCustodian\PropertyController@finalize_par')->name('finalize-par');
+    Route::post('/delete-par','SupplyCustodian\PropertyController@delete_par')->name('delete-par');
+    Route::post('/edit-par','SupplyCustodian\PropertyController@edit_par')->name('edit-par');
+    Route::post('/finaldelete-par','SupplyCustodian\PropertyController@finaldelete_par')->name('finaldelete-par');
+    Route::post('/submitdelete-par','SupplyCustodian\PropertyController@submitdelete_par')->name('submitdelete-par');
+    Route::post('/submitEdit-par','SupplyCustodian\PropertyController@submitEdit_par')->name('submitEdit-par');
+    Route::post('/submitadd-par','SupplyCustodian\PropertyController@submitadd_par')->name('submitadd-par');
+    Route::post('/additem-par','SupplyCustodian\PropertyController@additem_par')->name('additem-par');
+
+    Route::get('/ics','SupplyCustodian\ICSController@index');
+    Route::post('/assign-ics','SupplyCustodian\icsController@assign_ics')->name('assign-ics');
+    Route::post('/finalize-ics','SupplyCustodian\icsController@finalize_ics')->name('finalize-ics');
+    Route::post('/delete-ics','SupplyCustodian\icsController@delete_ics')->name('delete-ics');
+    Route::post('/edit-ics','SupplyCustodian\icsController@edit_ics')->name('edit-ics');
+    Route::post('/submitEdit-ics','SupplyCustodian\icsController@submitEdit_ics')->name('submitEdit-ics');
+    Route::post('/submitadd-ics','SupplyCustodian\icsController@submitadd_ics')->name('submitadd-ics');
+    Route::post('/additem-ics','SupplyCustodian\icsController@additem_ics')->name('additem-ics');
+
+
+    Route::get('/supplier','SupplyCustodian\SupplierController@index');
+    Route::post('/add-supplier','SupplyCustodian\SupplierController@add_supplier')->name('add-supplier');
+    Route::post('/edit-supplier','SupplyCustodian\SupplierController@edit_supplier')->name('edit-supplier');
+    Route::post('/submitedit-supplier','SupplyCustodian\SupplierController@submitedit_supplier')->name('submitedit-supplier');
+    Route::post('/delete-supplier','SupplyCustodian\SupplierController@delete_supplier')->name('delete-supplier');
+// });
+
 });
 #sdfghsh
 
@@ -709,6 +747,43 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
             # get data all project
             Route::post('/getAllProject', [ProjectsController::class, 'show'])->name('department-get-projects');
 });
+
+// Route::group(['prefix' => 'employee','middleware' => ['authuser']], function() {
+//     Route::get('/','finalControllers\EmployeeController@index')->name('employeelist');
+//     Route::post('/search-department-employment-status', 'finalControllers\EmployeeController@search');
+//     Route::get('/edit','finalControllers\EmployeeController@edit')->name('employee.edit');
+//     Route::post('/create','finalControllers\EmployeeController@store')->name('employee.add');
+//     Route::post('/update','finalControllers\EmployeeController@update')->name('employee.update');
+//     Route::post('/delete','finalControllers\EmployeeController@destroy')->name('employee.delete');
+//     Route::get('/employeelist','finalControllers\EmployeeController@employeelist')->name('employee.list');
+// });
+
+// Route::group(['prefix' => 'inventory','middleware' => ['authuser']], function() {
+//     Route::get('/','finalControllers\InventoryController@index');
+//     Route::post('/search','finalControllers\InventoryController@search')->name("psearch");
+//     Route::get('/print/{id}/{type}/{cluster}','finalControllers\InventoryController@print');
+// });
+
+// Route::group(['prefix' => 'property','middleware' => ['authuser']], function() {
+//     Route::get('/','finalControllers\PropertyController@index');
+//     Route::get('/print/{id}/{fund}/{empid}','finalControllers\PropertyController@print');
+// });
+
+// Route::group(['prefix' => 'ics','middleware' => ['authuser']], function() {
+//     Route::get('/','finalControllers\ICSController@index');
+//     Route::post('/search', 'finalControllers\ICSController@search');
+//     Route::get('/search/{Employee}', 'finalControllers\ICSController@search');
+//     Route::get('/print/{id}/{fund}/{empid}','finalControllers\ICSController@print');
+
+// });
+
+// Route::group(['prefix' => 'supplier','middleware' => ['authuser']], function() {
+//     Route::get('/','finalControllers\SupplierController@index');
+// });
+
+// Route::group(['prefix' => 'department','middleware' => ['authuser']], function() {
+//     Route::get('/','finalControllers\DepartmentController@index');
+// });
 
 
 

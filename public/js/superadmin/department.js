@@ -90,12 +90,12 @@
               // appending response data to the unit of measurement element
               $('.department_head').append(
                 // + response['message'][i]['id'] + '
-                '<option value="' + response[i]['name'] + ' ">' 
+                '<option value="' + response[i]['id'] + ' ">' 
                                   + response[i]['name'] + '</option>')
 
               $('.immediate_supervisor').append(
                 // + response['message'][i]['id'] + '
-                '<option value="' + response[i]['name'] + ' ">' 
+                '<option value="' + response[i]['id'] + ' ">' 
                                   + response[i]['name'] + '</option>')
             }
           }

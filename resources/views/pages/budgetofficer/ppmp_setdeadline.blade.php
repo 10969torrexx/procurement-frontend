@@ -20,6 +20,19 @@
               <div class="row">
                 <div class="col-md-12">
                     <fieldset class="form-group">
+                        <label for="selecttype" >Select Procurement Type</label>
+                        <select id="type" class="type form-control"  required>
+                            <option value="" selected disabled>Select Type</option>
+                            <option value="{{$aes->encrypt("Indicative")}}">Indicative</option>
+                            <option value="{{$aes->encrypt("Supplemental")}}">Supplemental</option>
+                            <option value="{{$aes->encrypt("PPMP")}}">PPMP</option>
+                        </select>
+                    </fieldset>
+                </div>
+              </div> 
+              <div class="row">
+                <div class="col-md-12">
+                    <fieldset class="form-group">
                         <label for="selectyear" >Select Year</label>
             
                         <select id="year" class="year form-control"  required>

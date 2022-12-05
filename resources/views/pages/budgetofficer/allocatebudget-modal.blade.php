@@ -38,11 +38,16 @@
                         <fieldset class="form-group">
                             <label for="EndDate">End Date</label>
                             {{-- <input type="text" class="end_date form-control"  value ="{{ date('M j, Y', strtotime($deadline['end_date'])) }}" disabled> --}}
-                            <input type="text" class="end_date form-control"  value ="" disabled>
+                            <input type="text" class="end_date form-control" placeholder="End_date" value ="" disabled>
                         </fieldset>
                       </div>
                   </div>
                 {{-- @endforeach --}}
+                {{-- @if (!empty(session("globalerror")))
+                <div class="alert alert-danger" role="alert">
+                    {{session("globalerror")}}
+                </div>
+                @endif --}}
                 <div class="row">
                     <div class="col-md-12">
                         <fieldset class="form-group">

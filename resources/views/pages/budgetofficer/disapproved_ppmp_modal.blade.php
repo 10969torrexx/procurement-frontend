@@ -12,6 +12,7 @@
                 <input type="text" id="project_code12" class=" form-control item_id" name="project_code" value="" hidden>
                 <input type="text" class="form-control code" name="employee_id" value="" hidden>
                 <input type="text" class="form-control index" name="department_id" value="" hidden>
+                <input type="text" class="form-control estimated_price" name="estimated_price" value="" hidden>
 
                 <label>REMARKS:  </label>
                 <input type="text" class="form-control remarks" placeholder="Input?" value="">

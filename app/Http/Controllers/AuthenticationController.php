@@ -111,7 +111,7 @@ class AuthenticationController extends Controller
                   ->where('EmailAddress', $email)
                   ->whereNull("deleted_at")
                   ->first();
-      
+      //  dd($checkEmail);
         if(!empty($checkEmail)){
 
          // if($checkEmail){
@@ -130,7 +130,7 @@ class AuthenticationController extends Controller
                   'employee_id' =>$employee_id,
                   'campus' => $checkEmail->Campus
                   ])->json();
-                 // dd('23',$login);
+                //  dd($login);
 
                 if($login['status'] == 200){
                     $login = $login['data'];
@@ -138,7 +138,7 @@ class AuthenticationController extends Controller
                       'token' => $login['token'] ,
                       'name' => $login['name'],
                       'role' => $login['role'],
-                      'photo' => $login['photo'],
+                      'photo' => $photo,
                       'campus' =>   $login['campus'],
                       /** Torrexx Additionals */
                         'department_id' => $login['department_id'],
