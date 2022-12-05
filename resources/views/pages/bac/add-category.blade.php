@@ -50,8 +50,6 @@
                             </tr>
                         </thead>
                         <tbody>
-
-                        @if (!empty($data))
                         @foreach($data as $data)
                             <tr>
                             <td>{{ $data->category }}</td>
@@ -74,7 +72,6 @@
                             </td> 
                             </tr>
                         @endforeach
-                        @endif
                         </tbody>
                         <tfoot>
                         

@@ -47,14 +47,14 @@
                                     {{-- @for ($i = 0; $i < count($data[); $i++) --}}
                             <tbody>
                                 <tr>
-                                    <td>{{ $data['department_name'] }}</td>
-                                    <td>{{ $data['project_code'] }}</td>
-                                    <td>{{ $data['project_title'] }}</td>
-                                    <td>Php {{  number_format($data['Total'],2,'.',',') }}</td>
+                                    <td>{{ $data->department_name }}</td>
+                                    <td>{{ $data->project_code }}</td>
+                                    <td>{{ $data->project_title }}</td>
+                                    <td>Php {{  number_format($data->Total,2,'.',',') }}</td>
                                     {{-- <td></td> --}}
                                     <td>
                                         {{-- <a href="" class="view" style="background-color: aquamarine"><i class="fa-regular fa-eye"  title="View" href=""></i> </a> --}}
-                                        <button type="button" class="btn btn-outline-secondary view"  href="<?=$aes->encrypt($data['project_code'])?>" data-toggle = "<?=$aes->encrypt($data['employee_id'])?>" data-id="<?=$aes->encrypt($data['department_id'])?>">view</button>
+                                        <button type="button" class="btn btn-outline-secondary view"  href="<?=$aes->encrypt($data->project_code)?>" data-toggle = "<?=$aes->encrypt($data->employee_id)?>" data-id="<?=$aes->encrypt($data->department_id)?>">view</button>
                                         {{-- <button class="btn-success view" data-toggle = "modal" id="view_modal"></button> --}}
                                     </td>
                                     

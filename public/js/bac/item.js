@@ -186,62 +186,62 @@ $(document).on('click', '.delete-item', function (e) {
   e.preventDefault();
   var id = $(this).attr("href");
   // alert(id );
-  Swal.fire({
-    title: 'Are you sure you want to delete?',
-    showDenyButton: true,
-    confirmButtonText: 'Yes',
-    icon: 'question',
-    denyButtonText: 'No',
-    customClass: {
-      actions: 'my-actions',
-      confirmButton: 'order-2',
-      denyButton: 'order-3',
-    }
-  }).then((result) => {
-      $.ajaxSetup({
-          headers: {
-              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-          }
-      });
-      if (result.isConfirmed) {
-        $.ajax({
-              type: "post",
-              url: "delete-item",
-              data:{'id' :id},
-              success: function (response) {
-                // alert(response.status);
-                if (response.status == 200) {
-                  Swal.fire({
-                    title: 'Deleted!!!',
-                    html: 'Account Deleted Successfully!',
-                    icon: 'success',
-                    timer: 1000,
-                    timerProgressBar: true,
-                    didOpen: () => {
-                      Swal.showLoading()
-                      const b = Swal.getHtmlContainer().querySelector('b')
-                      timerInterval = setInterval(() => {
-                        b.textContent = Swal.getTimerLeft()
-                      }, 100)
-                    },
-                    willClose: () => {
-                      clearInterval(timerInterval)
-                    }
-                  }).then((result) => {
-                    /* Read more about handling dismissals below */
-                    if (result.dismiss === Swal.DismissReason.timer) {
-                      location.reload();
-                      console.log('I was closed by the timer')
-                    }
-                  })
-                // Swal.fire('Deleted SuccessFully!', '', 'success')
-                // location.reload()
-                }
-              }
-            });
-      } else if (result.isDenied) {
-        Swal.fire('Changes are not saved', '', 'info')
+    Swal.fire({
+      title: 'Are you sure you want to delete?',
+      showDenyButton: true,
+      confirmButtonText: 'Yes',
+      icon: 'question',
+      denyButtonText: 'No',
+      customClass: {
+        actions: 'my-actions',
+        confirmButton: 'order-2',
+        denyButton: 'order-3',
       }
+    }).then((result) => {
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        if (result.isConfirmed) {
+          $.ajax({
+                type: "post",
+                url: "delete-item",
+                data:{'id' :id},
+                success: function (response) {
+                  // alert(response.status);
+                  if (response.status == 200) {
+                    Swal.fire({
+                      title: 'Deleted!!!',
+                      html: 'Account Deleted Successfully!',
+                      icon: 'success',
+                      timer: 1000,
+                      timerProgressBar: true,
+                      didOpen: () => {
+                        Swal.showLoading()
+                        const b = Swal.getHtmlContainer().querySelector('b')
+                        timerInterval = setInterval(() => {
+                          b.textContent = Swal.getTimerLeft()
+                        }, 100)
+                      },
+                      willClose: () => {
+                        clearInterval(timerInterval)
+                      }
+                    }).then((result) => {
+                      /* Read more about handling dismissals below */
+                      if (result.dismiss === Swal.DismissReason.timer) {
+                        location.reload();
+                        console.log('I was closed by the timer')
+                      }
+                    })
+                  // Swal.fire('Deleted SuccessFully!', '', 'success')
+                  // location.reload()
+                  }
+                }
+              });
+        } else if (result.isDenied) {
+          Swal.fire('Changes are not saved', '', 'info')
+        }
     })
 });
 
@@ -286,10 +286,12 @@ $(document).on('click', '.edit', function (e) {
           if(response['data'][0]['public_bidding'] == 0)
           {
             $('#public-bidding').text('Not Required');
+            $('#public-bidding').val(response['data'][0]['public_bidding']);
           }
           else if(response['data'][0]['public_bidding'] == 1)
           {
             $('#public-bidding').text('Required');
+            $('#public-bidding').val(response['data'][0]['public_bidding']);
           }
 
           $('.update-id').val(response['id']);
@@ -313,6 +315,25 @@ input.addEventListener("keypress", function(event) {
   if (event.key === "Enter") {
     event.preventDefault();
     
+  if($('.public-bidding').val() == "Required")
+  {
+    var data = {
+      'item_name': $('.update').val(),
+      'item_category': $('.item-category').val(),
+      'app_type': $('.app-type').val(),
+      'public_bidding': "1",
+      'id': $('.update-id').val(),
+    }
+  }else if($('.public-bidding').val() == "Not Required")
+  {
+    var data = {
+      'item_name': $('.update').val(),
+      'item_category': $('.item-category').val(),
+      'app_type': $('.app-type').val(),
+      'public_bidding': "0",
+      'id': $('.update-id').val(),
+    }
+  }else{
     var data = {
       'item_name': $('.update').val(),
       'item_category': $('.item-category').val(),
@@ -320,6 +341,7 @@ input.addEventListener("keypress", function(event) {
       'public_bidding': $('.public-bidding').val(),
       'id': $('.update-id').val(),
     }
+  }
     if(data.item_name=="" || data.item_category=="Choose.." || data.app_type=="Choose..")
     {
       Swal.fire('Complete the needed data', '', 'info')
@@ -383,12 +405,32 @@ input.addEventListener("keypress", function(event) {
 
 $(document).on('click', '.update-btn', function (e) {
   e.preventDefault();
-  var data = {
-    'item_name': $('.update').val(),
-    'item_category': $('.item-category').val(),
-    'app_type': $('.app-type').val(),
-    'public_bidding': $('.public-bidding').val(),
-    'id': $('.update-id').val(),
+  if($('.public-bidding').val() == "Required")
+  {
+    var data = {
+      'item_name': $('.update').val(),
+      'item_category': $('.item-category').val(),
+      'app_type': $('.app-type').val(),
+      'public_bidding': "1",
+      'id': $('.update-id').val(),
+    }
+  }else if($('.public-bidding').val() == "Not Required")
+  {
+    var data = {
+      'item_name': $('.update').val(),
+      'item_category': $('.item-category').val(),
+      'app_type': $('.app-type').val(),
+      'public_bidding': "0",
+      'id': $('.update-id').val(),
+    }
+  }else{
+    var data = {
+      'item_name': $('.update').val(),
+      'item_category': $('.item-category').val(),
+      'app_type': $('.app-type').val(),
+      'public_bidding': $('.public-bidding').val(),
+      'id': $('.update-id').val(),
+    }
   }
 
 // console.log(data);
@@ -413,39 +455,38 @@ $(document).on('click', '.update-btn', function (e) {
       success: function (response) {
         // console.log(response);
         if(response['status'] == 200) {
-          
           $("#edit_item_modal").modal('hide');
           Swal.fire({
-            title: 'Updated!!!',
-            html: 'Update Successfully!',
-            icon: 'success',
-            timer: 1000,
-            timerProgressBar: true,
-            didOpen: () => {
-              Swal.showLoading()
-              const b = Swal.getHtmlContainer().querySelector('b')
-              timerInterval = setInterval(() => {
-                b.textContent = Swal.getTimerLeft()
-              }, 100)
-            },
-            willClose: () => {
-              clearInterval(timerInterval)
-            }
-            }).then((result) => {
-              /* Read more about handling dismissals below */
-              if (result.dismiss === Swal.DismissReason.timer) {
-                location.reload();
-                console.log('I was closed by the timer')
-              }
-            })
-          }else{
-            Swal.fire({
-              icon: 'error',
-              title: 'Oops...',
-              text: 'Already Exist',
-            })
-            $(this).text('Update');
+          title: 'Updated!!!',
+          html: 'Update Successfully!',
+          icon: 'success',
+          timer: 1000,
+          timerProgressBar: true,
+          didOpen: () => {
+            Swal.showLoading()
+            const b = Swal.getHtmlContainer().querySelector('b')
+            timerInterval = setInterval(() => {
+              b.textContent = Swal.getTimerLeft()
+            }, 100)
+          },
+          willClose: () => {
+            clearInterval(timerInterval)
           }
+          }).then((result) => {
+            /* Read more about handling dismissals below */
+            if (result.dismiss === Swal.DismissReason.timer) {
+              location.reload();
+              console.log('I was closed by the timer')
+            }
+          })
+        }else{
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Already Exist',
+          })
+          $(this).text('Update');
+        }
       }
     })
   }

@@ -23,7 +23,7 @@
 @section('content')
 <!-- Dashboard Ecommerce Starts -->
 <section id="dashboard-ecommerce">
-  @foreach($data as $data)
+  {{-- @foreach($data as $data) --}}
   <div class="card">
     <!-- Greetings Content Starts -->
       <div class="card">
@@ -42,9 +42,10 @@
                     <select class="form-select form-control item_category" aria-label="Default select example">
                       <option selected>Choose..</option>
                       {{-- @foreach($data1 as $data1) --}}+
-                      @for ($i = 0; $i < count($data[1]); $i++)
-                        <option value="{{ $data[1][$i]['category'] }}">{{ $data[1][$i]['category'] }}</option>
-                      @endfor
+                      {{-- @for ($i = 0; $i < count($data[1]); $i++) --}}
+                      @foreach($category as $categories)
+                        <option value="{{ $categories->category }}">{{ $categories->category }}</option>
+                      @endforeach
                       
                       {{-- @endforeach --}}
                     </select>
@@ -90,41 +91,43 @@
                               <th>Action</th>
                           </tr>
                       </thead>
-                      @for ($i = 0; $i < count($data[0]); $i++)
+                      {{-- @for ($i = 0; $i < count($data[0]); $i++) --}}
                       <tbody>
+                            @foreach($item as $items)
                           <tr>
-                              <td>{{ $data[0][$i]['item_name'] }}</td>
-                              <td>{{ $data[0][$i]['item_category'] }}</td>
-                              <td>{{ $data[0][$i]['app_type'] }}</td>
+                              <td>{{ $items->item_name }}</td>
+                              <td>{{ $items->item_category }}</td>
+                              <td>{{ $items->app_type }}</td>
                               <td>
                                 <?php
-                                  if($data[0][$i]['public_bidding'] == 0){
+                                  if($items->public_bidding == 0){
                                   echo 'No';
-                                  }elseif($data[0][$i]['public_bidding'] == 1){
+                                  }elseif($items->public_bidding == 1){
                                   echo 'Yes';
                                   }
                                 ?>
                                 </td>
-                              <td>{{ $data[0][$i]['name'] }}</td>
-                              <td>{{ explode('-', date('j F, Y-', strtotime($data[0][$i]['created_at'])))[0] }}</td>
-                              <td>{{ explode('-', date('j F, Y-', strtotime($data[0][$i]['updated_at'])))[0] }}</td>
+                              <td>{{ $items->name }}</td>
+                              <td>{{ explode('-', date('j F, Y-', strtotime($items->created_at)))[0] }}</td>
+                              <td>{{ explode('-', date('j F, Y-', strtotime($items->updated_at)))[0] }}</td>
                               <td>
                                 <div class="dropdown">
                                   <span
                                     class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu"></span>
                                   <div class="dropdown-menu dropdown-menu-left">
-                                    <a class="dropdown-item edit" data-id = "<?=$aes->encrypt($data[0][$i]['id'])?>" data-toggle = "modal" id="edit_item_Modal" href = "{{ $aes->encrypt($data[0][$i]['id']) }}"><i class="bx bx-edit-alt mr-1"></i> edit</a>
-                                    <a class="dropdown-item delete-item" href = "{{ $aes->encrypt($data[0][$i]['id']) }}">
+                                    <a class="dropdown-item edit" data-id = "<?=$aes->encrypt($items->id)?>" data-toggle = "modal" id="edit_item_Modal" href = "{{ $aes->encrypt($items->id) }}"><i class="bx bx-edit-alt mr-1"></i> edit</a>
+                                    <a class="dropdown-item delete-item" href = "{{ $aes->encrypt($items->id) }}">
                                       <i class="bx bx-trash mr-1"></i> delete
                                     </a>
                                   </div>
                                 </div> 
                               </td>
                           </tr>
+                            @endforeach 
                           @include('pages.bac.edit-item-modal')
                       </tbody>
-                      @endfor
+                      {{-- @endfor --}}
                       
                     </table>
                   </div>
@@ -135,7 +138,7 @@
         </section>
       </div>
   </div>
-  @endforeach
+  {{-- @endforeach --}}
 </section>
 <!-- Dashboard Ecommerce ends -->
 @endsection
