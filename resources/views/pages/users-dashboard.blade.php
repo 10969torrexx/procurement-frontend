@@ -29,19 +29,68 @@
                <h4 class="text-primary border-bottom pb-1">
                   <strong> Announcements </strong>
                </h4>
-
-               <div class="row p-1">
-                  <div class="col-xl-6 col-md-3 col-6">
-                    Deadline for Submission of PPMP
-                  </div>
-                  <div class="col-xl-6 col-md-3 col-6 ">
-                    Allocated Budget
-                  </div>
-               </div>
-
+               
+            </div>
+            <div class="card-body">
+              <div class="row p-1">
+                <div class="text-center">
+                  Nothing to show as of the Moment
+                </div>
+              </div>
             </div>
           </div>
         </div>
+
+          @if (session('role') == 4)
+            <div class="card">
+              <div class="card-header">
+                  <h4 class="text-primary border-bottom pb-1">
+                    <strong> Budget Allocation </strong>
+                  </h4>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive col-12 container">
+                  <table class="table zero-configuration item-table" id="item-table">
+                      <thead>
+                          <tr>
+                              <th>#</th>
+                              <th>Fund Source</th>
+                              <th>year</th>
+                              <th>Allocated Budget</th>
+                              <th>Expenditure</th>
+                              <th>Mandatory Expenditure</th>
+                              <th>Balance</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          @foreach ($response as $item)
+                            <tr>
+                              <td>{{ $loop->iteration }}</td>
+                              <td>{{ $item->fund_source }}</td>
+                              <td>{{ $item->year }}</td>
+                              <td>₱{{ number_format($item->SumBudget,2,'.',',') }}</td>
+                                <?php
+                                  $sumMandatory = 0;
+                                  $expenditure = 0;
+                                ?>
+                                @foreach ($mandatory_expeditures as $item2)
+                                  @if ($item->year == $item2->year && $item->fund_source_id == $item2->fund_source_id) 
+                                      <?php
+                                          $sumMandatory += (!isset($item2->SumMandatory)?0:$item2->SumMandatory);
+                                      ?>
+                                  @endif
+                                @endforeach
+                              <td>₱{{ number_format($expenditure,2,'.',',') }}</td>
+                              <td>₱{{ number_format($sumMandatory,2,'.',',') }}</td>
+                              <td>₱{{ number_format(($item->SumBudget - ($expenditure + $sumMandatory)),2,'.',',') }}</td>
+                            </tr>
+                          @endforeach
+                      </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          @endif
 
       </div>
     </div>

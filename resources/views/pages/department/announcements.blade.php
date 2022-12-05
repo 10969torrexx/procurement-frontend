@@ -51,7 +51,6 @@
                                 <th>Expenditure</th>
                                 <th>Mandatory Expenditure</th>
                                 <th>Balance</th>
-                                <th>PPMP</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -75,7 +74,6 @@
                                 <td>₱{{ number_format($expenditure,2,'.',',') }}</td>
                                 <td>₱{{ number_format($sumMandatory,2,'.',',') }}</td>
                                 <td>₱{{ number_format(($item->SumBudget - ($expenditure + $sumMandatory) ),2,'.',',') }}</td>
-                                <td>to Follow</td>
                               </tr>
                             @endforeach
                         </tbody>

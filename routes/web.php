@@ -735,17 +735,8 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
             Route::get('/myPPMP', [DepartmentPagesController::class, 'showMyPPMP'])->name('department-showMyPPMP');
             # this will show the status of the project along with its item
             Route::post('/project/status', [DepartmentPagesController::class, 'showProjectStatus'])->name('department-showProjectStatus');
-
-            /** Submit revision of PPMP */            
                 # this will re-submit ppmp | revised PPMP
                 Route::post('/re-sumbit/ppmp', [DepartmentController::class, 'resubmitPPMP'])->name('department-re_submit-ppmp');
-            /** END */
-            
-             /** Disapproved PPMP | Project */
-                /** KEY to REMEMBER
-                 * This will also apply to all project category | INDICATIVE, PPMP, SUPPLEMENTAL 
-                 * */
-                
                 # this route will display the disapproved items
                 Route::get('/disapproved-items', [DepartmentPagesController::class, 'show_disapproved_items'])->name('dept_disapproved-items');
             /** END */
