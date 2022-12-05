@@ -86,16 +86,7 @@ class DepartmentPagesController extends Controller
         # this function will show Projec Titles that are status = 0
             public function showCreatePPMP(Request $request){
                 # this will get data from database
-                    # from project_titles table
-                        /** DOCUMENTATION
-                         * This will get all the draft project titles
-                         * Based on
-                         * 1. Campus
-                         * 2. Employee ID
-                         * 3. Department ID
-                         * ------------------------------------
-                         * project titles inner join with fund sources
-                         */
+                    # from project_titles table | draft project titles
                         $project_titles = \DB::table('project_titles')
                             ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
                             // ->join('departments', 'departments.immediate_supervisor', 'project_titles.department_id')
@@ -110,26 +101,18 @@ class DepartmentPagesController extends Controller
                                 'fund_sources.fund_source',
                                 'users.name as immediate_supervisor' 
                             ]);
-                    # from project titles table
-                        /** DOCUMENTATION
-                         * This will get all the disapproved project titles
-                         * - Disapproved by Immediate Supervisor 
-                         * - Disapproved by Budget Officer
-                         * Based on
-                         * 1. Campus
-                         * 2. Employee ID
-                         * 3. Department ID
-                         * ------------------------------------
-                         * project titles inner join with fund sources
-                         */
+                    # from project titles table | disapproved project titles
                         $pt_show_disapproved = \DB::table('project_titles')
                             ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
                             ->join('users', 'users.id', 'project_titles.immediate_supervisor')
                             ->where('project_titles.campus', session('campus'))
                             ->where('project_titles.department_id', session('department_id'))
                             ->where('project_titles.employee_id', session('employee_id'))
-                            ->where('project_titles.status', 3) //disapproved by Immediate Supervisor
-                            ->orWhere('project_titles.status', 5) //disapproved by Immediate Supervisor
+                            // ->whereRaw("project_titles.status ='3' OR project_titles.status='5'")
+                            ->where(function($query) {
+                                $query->where('project_titles.status', 3)
+                                    ->orWhere('project_titles.status', 5);
+                            })
                             ->whereNull('project_titles.deleted_at')
                             ->get([
                                 'project_titles.*',
@@ -137,30 +120,10 @@ class DepartmentPagesController extends Controller
                                 'users.name as immediate_supervisor' 
                             ]);
                     # from departments table
-                        /** DOCUMENTATION
-                         * This will get all the department data
-                         * Based on
-                         * 1. Department ID
-                         */
                         $departments = \DB::table('departments')->where('id', session('department_id'))->get();
                     # from categories table
-                        /** DOCUMENTATION
-                         * This will get all the categories data
-                         * Based on
-                         * 1. Campus
-                         */
                         $categories = \DB::table('categories')->where('campus', session('campus'))->whereNull('deleted_at')->get();
                     # from fund sources table
-                        /** DOCUMENTATION
-                         * This will get all the allocated budgets data
-                         * Based on
-                         * 1. Campus
-                         * 2. Employee ID
-                         * 3. Department ID
-                         * -------------------------------------
-                         * allocated budget | procurement type is PPMP
-                         * total of remaining balance
-                         */
                         $fund_sources = \DB::table('allocated__budgets')
                             ->join('fund_sources', 'fund_sources.id', 'allocated__budgets.fund_source_id')
                             ->where('allocated__budgets.campus', session('campus'))
@@ -446,7 +409,11 @@ class DepartmentPagesController extends Controller
                         ->where('campus', session('campus'))
                         ->where('department_id', session('department_id'))
                         ->where('employee_id', session('employee_id'))
-                        ->whereRaw("status = '3' OR status = '5'")
+                        // ->whereRaw("status = '3' OR status = '5'")
+                        ->where(function($query) {
+                            $query->where('status', 3)
+                                ->orWhere('status', 5);
+                        })
                         ->whereNull('deleted_at')
                         ->get();
                 # end
