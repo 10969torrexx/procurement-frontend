@@ -5,6 +5,11 @@ $("#UpdateDeadlineModal").on("hidden.bs.modal", function(e){
   // location.reload();
 })
 
+$.ajaxSetup({
+  headers: {
+      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+  }
+});
 // $("#datepicker").datepicker( {
 //   format: "mm-yyyy",
 //   startView: "months", 
@@ -14,6 +19,7 @@ $("#UpdateDeadlineModal").on("hidden.bs.modal", function(e){
 //   $( ".start_date" ).datepicker({  minDate: new Date() });
 // });
 $(document).on('click', '.set_deadline', function (e) {
+  $('.type').val('');
   $('.year').val('');
   $('.start_date').val('');
   $('.end_date').val('');
@@ -30,18 +36,20 @@ $(document).on('click', '.btnSetDeadline', function (e) {
     e.preventDefault();
     $(this).text('Saving..');
 
+      var type = document.getElementById('type').value;
       var year = document.getElementById('year').value;
       var start_date = document.getElementById('start_date').value;
       var end_date = document.getElementById('end_date').value;
-      if(year==''|| start_date=='' || end_date==''){
+      if(type==''|| year==''|| start_date=='' || end_date==''){
         Swal.fire({
               icon: 'error',
               title: 'Error',
-              text: 'Please select date!',
+              text: 'Please provide the needed information!',
             })
         $(this).text('Save');
       }else{
         var data = {
+          'type': $('.type').val(),
           'year': $('.year').val(),
           'start_date': $('.start_date').val(),
           'end_date': $('.end_date').val(),
@@ -49,11 +57,6 @@ $(document).on('click', '.btnSetDeadline', function (e) {
 // alert(data);
               // console.log(data);
 
-          $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
   
         $.ajax({
             type: "POST",
@@ -118,11 +121,7 @@ $(document).on('click', '.hrefdelete', function (e) {
           cancelButtonClass: 'btn btn-danger ml-1',
           buttonsStyling: false,
   }).then((result) => {
-      $.ajaxSetup({
-          headers: {
-              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-          }
-      });
+
       if (result.isConfirmed) {
         $.ajax({
               type: "post",
@@ -190,11 +189,7 @@ $(document).on('click', '.editbutton', function (e) {
   e.preventDefault();
   var id = $(this).attr("href");
   // alert(id);
-   $.ajaxSetup({
-          headers: {
-              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-          }
-      });
+
   $.ajax({
       type: "POST",
       url: "edit_deadline",
@@ -203,6 +198,9 @@ $(document).on('click', '.editbutton', function (e) {
 
           if (response.status == 200) {
 
+              var array_type = ['Indicative','Supplemental','PPMP'];
+
+              var type = response['deadline'][0]['procurement_type'];
               var year = response['deadline'][0]['year'];
               var start_date = response['deadline'][0]['start_date'];
               var end_date = response['deadline'][0]['end_date'];
@@ -214,72 +212,31 @@ $(document).on('click', '.editbutton', function (e) {
                     array_year.push(current_year++);
                   }
                   // console.log(array_year);
-                  var year_index = array_year.indexOf(parseInt(year));
-                  // console.log('year_index: '+year_index);
-                  document.getElementById('update_year').getElementsByTagName('option')[year_index+1].selected = 'selected';
-                  $("#update_start_date").val(start_date);
-                  $("#update_end_date").val(end_date);
-                  $('.updateid').val(response['id']);  
-                  $('#UpdateDeadlineModal').modal('show');
+              var type_index = array_type.indexOf(type);
+              var year_index = array_year.indexOf(parseInt(year));
+              // console.log('year_index: '+year_index);
+              document.getElementById('update_type').getElementsByTagName('option')[type_index+1].selected = 'selected';
+              document.getElementById('update_year').getElementsByTagName('option')[year_index+1].selected = 'selected';
+              $("#update_start_date").val(start_date);
+              $("#update_end_date").val(end_date);
+              $('.updateid').val(response['id']);  
+              $('#UpdateDeadlineModal').modal('show');
           } 
       }
   });
   $('.btn-close').find('input').val('');
 
 });
-
-// $(document).on('click', '.editbutton', function (e) {
-//   e.preventDefault();
-//   var id = $(this).attr("href");
-//   // alert(id);
-//    $.ajaxSetup({
-//           headers: {
-//               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-//           }
-//       });
-//   $.ajax({
-//       type: "POST",
-//       url: "edit_deadline",
-//       data:{'id':id},
-//       success: function (response) {
-
-//           if (response.status == 200) {
-//           console.log(response);
-//           // $('.update_year').pickadate({
-//           //   format: 'yyyy/mm/dd',
-//           //   formatSubmit: 'yyyy/mm/dd'
-//           // })
-//           var year = response['deadline'][0]['year'];
-//           // var update_start_date = response[0]['start_date'];
-//           // var update_end_date = response[0]['end_date'];
-//           // const collection = document.getElementsByTagName("li");
-//           // document.getElementById("demo").innerHTML = collection[1].innerHTML;
-//           // document.getElementById('update_year').options[0].selected = 'selected';
-//           // document.getElementById('update_year').getElementsByTagName('option')[year].selected = 'selected'
-//           // document.getElementById('update_year').options[document.getElementById('update_year').selectedIndex].text;
-//           // document.getElementById('update_start_date').getElementsByTagName('option')[update_start_date].selected = 'selected'
-//           // document.getElementById('update_end_date').getElementsByTagName('option')[update_end_date].selected = 'selected'
-//             // $('#update_year').val(response['deadline'][0]['year']);
-//             // $('.update_start_date').val(response['deadline'][0]['start_date']);
-//             // $('.update_end_date').val(response['deadline'][0]['end_date']);
-//             $('.updateid').val(response['id']);  
-//             $('#UpdateDeadlineModal').modal('show');
-//           } 
-//       }
-//   });
-//   $('.btn-close').find('input').val('');
-
-// });
-
 //update
 $(document).on('click', '.updatebutton', function (e) {
   e.preventDefault();
 
   $(this).text('Updating..');
+  var update_type = document.getElementById('update_type').value;
   var update_year = document.getElementById('update_year').value;
   var update_start_date = document.getElementById('update_start_date').value;
   var update_end_date = document.getElementById('update_end_date').value;
-  if(update_year==''|| update_start_date=='' || update_end_date==''){
+  if(update_type==''|| update_year==''|| update_start_date=='' || update_end_date==''){
     Swal.fire({
           icon: 'error',
           title: 'Error',
@@ -288,18 +245,15 @@ $(document).on('click', '.updatebutton', function (e) {
     $(this).text('Update');
   }else{
     var data = {
+      'update_type': $('.update_type').val(),
       'update_year': $('.update_year').val(),
       'update_start_date': $('.update_start_date').val(),
       'update_end_date': $('.update_end_date').val(),
       'updateid': $('.updateid').val(),
   }
-console.log(data);
+// console.log(data);
 
-  $.ajaxSetup({
-    headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-    }
-  });
+
 
   $.ajax({
     type: "POST",

@@ -39,8 +39,8 @@
                                         <th>Project Procurement</th>
                                         <th>Allocated Budget</th>
                                         <th>Fund Source</th>
-                                        <th>Remaining Balance</th>
-                                        <th>Total</th>
+                                        {{-- <th>Remaining Balance</th>
+                                        <th>Total</th> --}}
                                         <th>Status</th>
                                         <th>Action</th>
                                     </tr>
@@ -54,8 +54,8 @@
                                         <td>{{ $data->project_title }}</td>
                                         <td>Php {{ number_format($data->allocated_budget,2 )}}</td>
                                         <td>{{ $data->fund_source }}</td>
-                                        <td>Php {{ number_format($data->remaining_balance,2) }}</td>
-                                        <td>
+                                        {{-- <td>Php {{ number_format($data->remaining_balance,2) }}</td> --}}
+                                        {{-- <td>
                                             <?php $total = 0;
                                                 foreach($item as $items){
                                                     if($items->project_code == $data->id){
@@ -65,7 +65,7 @@
                                            ?>
 
                                                 Php {{ number_format($total) }}
-                                        </td>
+                                        </td> --}}
                                         <?php
                                         if($data->status == 2)
                                         {

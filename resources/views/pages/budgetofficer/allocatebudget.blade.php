@@ -39,17 +39,17 @@
 
                         {{-- <a href = "#" class = "btn btn-success round mr-1 mb-1" data-flag = "{{ $aes->encrypt('accounts')}}" data-button = "{{ $aes->encrypt('add')}}" data-id = "{{ $aes->encrypt('0')}}" data-toggle = "modal" data-target = "#allModal"><i class="bx bx-plus"></i> New Account</a> --}}
                         {{-- <a href = "#" class = "AllocateBudget btn btn-success round mr-1 mb-1" data-toggle = "modal" data-target = "#AllocateBudgetModal"><i class="bx bx-plus"></i>Allocate Budget</a> --}}
-                        <a href = "#" class = "AllocateBudget btn btn-success round mr-1 mb-1"><i class="bx bx-plus"></i>Allocate Budget</a>
                         @if (!empty(session("globalerror")))
                         <div class="alert alert-danger" role="alert">
-                            {{session("globalerror")}}
+                            {{session("globalerror")." before allocating budgets!"}}
                         </div>
-                        <?php Session::forget('globalerror')?>
+                        @else
+                        <a href = "#" class = "AllocateBudget btn btn-success round mr-1 mb-1"><i class="bx bx-plus"></i>Allocate Budget</a>
                         @endif
                         {{-- <a href = "allocate_budget1" class = "AllocateBudget1 btn btn-success round mr-1 mb-1"><i class="bx bx-plus"></i>Allocate Budget 1</a> --}}
                         
 
-                        {{-- {{ session('token') }} --}}
+                        {{-- {{ session('campus') }} --}}
                         <p class="card-text"></p>
                         <div class="table-responsive">
                             <table class="table nowrap zero-configuration" id="account-table">
@@ -59,7 +59,8 @@
                                         <th>Department</th>
                                         <th>Fund Source</th>
                                         <th>Budget</th>
-                                        {{-- <th>Mandatory Expenditures</th> --}}
+                                        <th>Mandatory Expenditures</th>
+                                        <th>Remaining Balance</th>
                                         <th>Procurement Type</th>
                                         <th>Year</th>
                                     </tr>
@@ -88,6 +89,8 @@
                                                 <td>{{ $data->department_name }}</td>
                                                 <td>{{ $data->fund_source }}</td>
                                                 <td>Php {{number_format($data->allocated_budget,2,'.',',')}}</td>
+                                                <td>Php {{number_format($data->mandatory_expenditures,2,'.',',')}}</td>
+                                                <td>Php {{number_format($data->remaining_balance,2,'.',',')}}</td>
                                                 {{-- <td>{{$data->mandatory_expenditures}}</td> --}}
                                                 <td>{{$data->procurement_type}}</td>
                                                 <td>{{ $data->year }}</td>
@@ -96,7 +99,7 @@
                                         
                                         @endforeach
                                         @endif
-                                         <p>No data</p>
+                                         {{-- <p>No data</p> --}}
                                    @endif
                                 </tbody>
                             </table>
