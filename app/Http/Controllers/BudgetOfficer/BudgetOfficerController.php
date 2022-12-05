@@ -46,24 +46,26 @@ class BudgetOfficerController extends Controller
         ];
         
         $ppmp = DB::table("project_titles as pt")
-                    ->select("pt.*","ab.allocated_budget","ab.remaining_balance","fs.fund_source","d.department_name")
-                    ->join('ppmps as p','p.project_code','=','pt.id')
-                    ->join('departments as d','pt.department_id','=','d.id')
-                    ->join('allocated__budgets as ab','pt.allocated_budget','=','ab.id')
-                    ->join('fund_sources as fs','fs.id','=','ab.fund_source_id')
-                    ->where("pt.campus",session('campus'))
-                    ->whereNull("pt.deleted_at")
-                    ->whereNull("p.deleted_at")
-                    //   ->whereRaw('pt.status = 2 or pt.status = 4 or pt.status = 5') 
-                    ->where(function ($query) {
-                        $query->where('pt.status', 2)
-                            ->orWhere('pt.status', 4)
-                            ->orWhere('pt.status', 5);
-                    })
-                    ->groupBy("pt.project_title")
-                    ->where("p.is_supplemental","=", 0)
-                    -> get();
-              
+
+              ->select("pt.*","ab.allocated_budget","ab.remaining_balance","fs.fund_source","d.department_name")
+              ->join('ppmps as p','p.project_code','=','pt.id')
+              ->join('departments as d','pt.department_id','=','d.id')
+              ->join('allocated__budgets as ab','pt.allocated_budget','=','ab.id')
+              ->join('fund_sources as fs','fs.id','=','ab.fund_source_id')
+              ->where("pt.campus",session('campus'))
+              ->whereNull("pt.deleted_at")
+            //   ->whereRaw('pt.status = 2 or pt.status = 4 or pt.status = 5') 
+              ->where(function ($query) {
+                $query->where('pt.status', 2)
+                   ->orWhere('pt.status', 4)
+                   ->orWhere('pt.status', 5);
+             })
+              ->groupBy("pt.project_title")
+              ->where("p.is_supplemental","=", 0)
+              -> get();
+  
+            //   dd($ppmp);
+
         $item = DB::table("ppmps as p")
               ->select("pt.project_code as code","pt.id as pt_id","pt.project_title as title","p.*")
               ->join('project_titles as pt','pt.id','=','p.project_code')
@@ -89,14 +91,21 @@ class BudgetOfficerController extends Controller
                   ->whereNull("pt.deleted_at")
                   ->where("p.is_supplemental","=", 0) 
                   ->where('p.campus',session('campus'))
+
+                  ->where('p.project_code','=',$id)  
+
                   ->where(function ($query) {
                     $query->where('p.status', 2)
                        ->orWhere('p.status', 4)
                        ->orWhere('p.status', 5);
+
                     })
+
                   -> get();
-        $pageConfigs = ['pageHeader' => true];
+
         // dd($data);
+
+        $pageConfigs = ['pageHeader' => true];
         $breadcrumbs = [
           ["link" => "/", "name" => "Home"],
           ["link" => "/budgetofficer/view_ppmp","name" =>"Pending PPMPs"],
