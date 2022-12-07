@@ -27,6 +27,7 @@ class UnitofMeasurementController extends Controller
     //       ["link" => "/", "name" => "Home"],["name" => "Unit of Measurement"]
     //     ];
         
+
     //     $unitofmeasurement =  Http::withToken(session('token'))->post(env('APP_API'). "/api/unit-of-measurement/index"[
     //       'campus' => session('campus')
     //     ])->json();
@@ -142,6 +143,20 @@ class UnitofMeasurementController extends Controller
     ] 
     );
   }
+/*
+        $unitofmeasurement =  Http::withToken(session('token'))->post(env('APP_API'). "/api/unit-of-measurement/index",[
+          'campus' => session('campus')
+        ])->json();
+        // dd($unitofmeasurement);
+        return view('pages.bac.add-unit-of-measurement',['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs],
+        [
+          // 'data' => $unitofmeasurement['data'],
+          'data' => $unitofmeasurement['data'],
+          'data1' => $unitofmeasurement['data1'],
+        ] 
+        );
+      }
+*/
 
   public function store(Request $request){
     // dd( $request -> all()); 

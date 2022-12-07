@@ -47,7 +47,12 @@
   //       }
   //   });
   // })
-    
+  $.ajaxSetup({
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+});
+
     $("#AddDepartmentModal").on("hidden.bs.modal", function(e){
       // location.reload();
     })
@@ -63,13 +68,7 @@
   $(function(){
     $(".campus").change(function(){
     
-        var campus = $(".campus option:selected").val();
-
-        $.ajaxSetup({
-          headers: {
-              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-          } 
-        });
+      var campus = $(".campus option:selected").val();
 
       $.ajax({
           type: "POST",
@@ -78,6 +77,7 @@
           dataType: "json",
           beforeSend : function(){
             $(".department_head").html('<option class="bx bx-loader-circle">Please wait...</option> ');
+            $(".immediate_supervisor").html('<option class="bx bx-loader-circle">Please wait...</option> ');
               },
           success: function (response) {
             // alert(response);
@@ -90,12 +90,12 @@
               // appending response data to the unit of measurement element
               $('.department_head').append(
                 // + response['message'][i]['id'] + '
-                '<option value="' + response[i]['name'] + ' ">' 
+                '<option value="' + response[i]['id'] + ' ">' 
                                   + response[i]['name'] + '</option>')
 
               $('.immediate_supervisor').append(
                 // + response['message'][i]['id'] + '
-                '<option value="' + response[i]['name'] + ' ">' 
+                '<option value="' + response[i]['id'] + ' ">' 
                                   + response[i]['name'] + '</option>')
             }
           }
@@ -167,11 +167,6 @@
               // console.log(data);
       // alert([data);
       
-      $.ajaxSetup({
-          headers: {
-              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-          }
-      });
 
       $.ajax({
           type: "POST",
@@ -179,7 +174,7 @@
           data: data,
           dataType: "json",
           success: function (response) {
-            console.log(response);
+            // console.log(response);
               if (response.status == 200) {
                       Swal.fire({
                         title: 'Saved',
@@ -245,11 +240,7 @@
               cancelButtonClass: 'btn btn-danger ml-1',
               buttonsStyling: false,
       }).then((result) => {
-          $.ajaxSetup({
-              headers: {
-                  'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-              }
-          });
+
           if (result.isConfirmed) {
             $.ajax({
                   type: "post",
@@ -296,65 +287,91 @@
       $(".update_campus").change(function(){
       
           var campus = $(".update_campus option:selected").val();
-  
-          $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            } 
-          });
-  
-        $.ajax({
-            type: "POST",
-            url: "getDepartmentHeads",
-            data: {campus},
-            dataType: "json",
-            beforeSend : function(){
-              $(".update_department_head").html('<option class="bx bx-loader-circle">Please wait...</option> ');
-                },
-            success: function (response) {
-              // alert(response);
-              $('.update_department_head').empty()
-              $('.update_department_head').append('<option value="" selected disabled>-- Select Department Head --</option>')
-              console.log(response.data)
-              for(var i = 0; i < response['message'].length; i++) {
-                // appending response data to the unit of measurement element
-                $('.update_department_head').append(
-                  // '<option value="' + response['message'][i]['id'] + ' ">' 
-                  '<option value="' + response['message'][i]['FirstName'] + ' ' 
-                                    + response['message'][i]['LastName'] + ' ">' 
-                                    + response['message'][i]['FirstName'] + ' ' 
-                                    + response['message'][i]['LastName'] + '</option>')
-  
-              }
-            }
-        });
 
-        $.ajax({
-          type: "POST",
-          url: "getSupervisors",
-          data: {campus},
-          dataType: "json",
-          beforeSend : function(){
-            $(".update_immediate_supervisor").html('<option class="bx bx-loader-circle">Please wait...</option> ');
-              },
-          success: function (response) {
-            // console.log(response);
-            // alert(response);
-            $('.update_immediate_supervisor').empty()
-            $('.update_immediate_supervisor').append('<option value="" selected disabled>-- Select Immediate Supervisor--</option>')
-            // console.log(response.data)
-            for(var i = 0; i < response['message'].length; i++) {
-              // appending response data to the unit of measurement element
-              $('.update_immediate_supervisor').append(
-                // + response['message'][i]['id'] + '
-                '<option value="' + response['message'][i]['FirstName'] + ' ' 
-                                  + response['message'][i]['LastName'] + ' ">' 
-                                  + response['message'][i]['FirstName'] + ' ' 
-                                  + response['message'][i]['LastName'] + '</option>')
+          // var campus = $(".campus option:selected").val();
+
+          $.ajax({
+              type: "POST",
+              url: "getUsers",
+              data: {campus},
+              dataType: "json",
+              beforeSend : function(){
+                $(".update_department_head ").html('<option class="bx bx-loader-circle">Please wait...</option> ');
+                $(".update_immediate_supervisor ").html('<option class="bx bx-loader-circle">Please wait...</option> ');
+                  },
+              success: function (response) {
+                // alert(response);
+                $('.update_department_head ').empty()
+                $('.update_department_head ').append('<option value="" selected disabled>-- Select Department Head --</option>')
+                $('.update_immediate_supervisor').empty()
+                $('.update_immediate_supervisor').append('<option value="" selected disabled>-- Select Immediate Supervisor--</option>')
+                // console.log(response)
+                for(var i = 0; i < response.length; i++) {
+                  // appending response data to the unit of measurement element
+                  $('.update_department_head ').append(
+                    // + response['message'][i]['id'] + '
+                    '<option value="' + response[i]['name'] + ' ">' 
+                                      + response[i]['name'] + '</option>')
+    
+                  $('.update_immediate_supervisor').append(
+                    // + response['message'][i]['id'] + '
+                    '<option value="' + response[i]['name'] + ' ">' 
+                                      + response[i]['name'] + '</option>')
+                }
+              }
+          });
+        // $.ajax({
+        //     type: "POST",
+        //     url: "getDepartmentHeads",
+        //     data: {campus},
+        //     dataType: "json",
+        //     beforeSend : function(){
+        //       $(".update_department_head").html('<option class="bx bx-loader-circle">Please wait...</option> ');
+        //         },
+        //     success: function (response) {
+        //       // alert(response);
+        //       $('.update_department_head').empty()
+        //       $('.update_department_head').append('<option value="" selected disabled>-- Select Department Head --</option>')
+        //       console.log(response.data)
+        //       for(var i = 0; i < response['message'].length; i++) {
+        //         // appending response data to the unit of measurement element
+        //         $('.update_department_head').append(
+        //           // '<option value="' + response['message'][i]['id'] + ' ">' 
+        //           '<option value="' + response['message'][i]['FirstName'] + ' ' 
+        //                             + response['message'][i]['LastName'] + ' ">' 
+        //                             + response['message'][i]['FirstName'] + ' ' 
+        //                             + response['message'][i]['LastName'] + '</option>')
   
-            }
-          }
-      });
+        //       }
+        //     }
+        // });
+
+      //   $.ajax({
+      //     type: "POST",
+      //     url: "getSupervisors",
+      //     data: {campus},
+      //     dataType: "json",
+      //     beforeSend : function(){
+      //       $(".update_immediate_supervisor").html('<option class="bx bx-loader-circle">Please wait...</option> ');
+      //         },
+      //     success: function (response) {
+      //       // console.log(response);
+      //       // alert(response);
+      //       $('.update_immediate_supervisor').empty()
+      //       $('.update_immediate_supervisor').append('<option value="" selected disabled>-- Select Immediate Supervisor--</option>')
+      //       // console.log(response.data)
+      //       for(var i = 0; i < response['message'].length; i++) {
+      //         // appending response data to the unit of measurement element
+      //         $('.update_immediate_supervisor').append(
+      //           // + response['message'][i]['id'] + '
+      //           '<option value="' + response['message'][i]['FirstName'] + ' ' 
+      //                             + response['message'][i]['LastName'] + ' ">' 
+      //                             + response['message'][i]['FirstName'] + ' ' 
+      //                             + response['message'][i]['LastName'] + '</option>')
+  
+      //       }
+      //     }
+      // });
       });
     })
 
@@ -363,12 +380,6 @@
       var id = $(this).attr("href");
 
       // alert(id);
-      $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
-
 
       $.ajax({
           type: "POST",
@@ -380,89 +391,141 @@
               // console.log(response);
 
                 var old_campus = response['department'][0]['campus'];
+                var department_head = response['department'][0]['department_head'];
+                var immediate_supervisor = response['department'][0]['immediate_supervisor'];
 
                 document.getElementById('update_campus').getElementsByTagName('option')[old_campus].selected = 'selected'
                 $('.update_department_name').val(response['department'][0]['department_name']);
                 $('.update_department_description').val(response['department'][0]['description']);
-                $('.update_department_head').val(response['department'][0]['department_head']);
-                $('.update_immediate_supervisor').val(response['department'][0]['immediate_supervisor']);
+                // $('.update_department_head').val(response['department'][0]['department_head']);
+                // $('.update_immediate_supervisor').val(response['department'][0]['immediate_supervisor']);
                 $('.update_id').val(response['id']);
                 // $('#UpdateDepartmentModal').modal('show');
+
+                var campus = $('.update_campus').val();
+                // alert(encrypted_campus);
+                $.ajax({
+                  type: "POST",
+                  url: "getUsers",
+                  data: {campus},
+                  dataType: "json",
+                  beforeSend : function(){
+                    $(".update_department_head ").html('<option class="bx bx-loader-circle">Please wait...</option> ');
+                    $(".update_immediate_supervisor ").html('<option class="bx bx-loader-circle">Please wait...</option> ');
+                      },
+                  success: function (response) {
+                    // alert('success');
+                    $('.update_department_head ').empty()
+                    $('.update_department_head ').append('<option value="" selected disabled>-- Select Department Head --</option>')
+                    $('.update_immediate_supervisor').empty()
+                    $('.update_immediate_supervisor').append('<option value="" selected disabled>-- Select Immediate Supervisor--</option>')
+                    // console.log(response)
+
+                    var array_users = [];
+
+                    for(var i = 0; i < response.length; i++) {
+
+                      array_users.push(response[i]['name']);
+
+                      // appending response data to the unit of measurement element
+                      $('.update_department_head ').append(
+                        // + response['message'][i]['id'] + '
+                        '<option value="' + response[i]['name'] + ' ">' 
+                                          + response[i]['name'] + '</option>')
+        
+                      $('.update_immediate_supervisor').append(
+                        // + response['message'][i]['id'] + '
+                        '<option value="' + response[i]['name'] + ' ">' 
+                                          + response[i]['name'] + '</option>')
+                    }
+  
+                    var department_head_index = array_users.indexOf(department_head);
+                    var immediate_supervisor_index = array_users.indexOf(immediate_supervisor);
+                    // console.log(department_head);
+                    document.getElementById('update_department_head').getElementsByTagName('option')[department_head_index+1].selected = 'selected';
+                    document.getElementById('update_immediate_supervisor').getElementsByTagName('option')[immediate_supervisor_index+1].selected = 'selected';
+                  $('#UpdateDepartmentModal').modal('show');
+  
+                  }
+              });
+
               } 
+
+              
 
               var departmentHead = response['department'][0]['department_head'];
               var supervisor = response['department'][0]['immediate_supervisor'];
               var campus = $(".update_campus option:selected").val();
 
-              $.ajax({
-                type: "POST",
-                url: "getDepartmentHeads",
-                data:{'campus':campus},
-                success: function (response) {
+            //   $.ajax({
+            //     type: "POST",
+            //     url: "getDepartmentHeads",
+            //     data:{'campus':campus},
+            //     success: function (response) {
         
-                    if (response.status == 200) {
-                    // console.log(response);
-                    // alert('success');
+            //         if (response.status == 200) {
+            //         // console.log(response);
+            //         // alert('success');
         
-                    $('.update_department_head').empty()
-                    $('.update_department_head').append('<option value="" selected disabled>-- Select Department Head --</option>')
-                    // console.log(response.data)
-                    for(var i = 0; i < response['message'].length; i++) {
-                      // appending response data to the unit of measurement element
-                      $('.update_department_head').append(
-                        // '<option value="' + response['message'][i]['id'] + ' ">' 
-                        '<option value="' + response['message'][i]['FirstName'] + ' ' 
-                                          + response['message'][i]['LastName'] + ' ">' 
-                                          + response['message'][i]['FirstName'] + ' ' 
-                                          + response['message'][i]['LastName'] + '</option>')
-                    }
-                    var array_departmentHead = [];
-                    for (let i = 0; i < response['message'].length; i++) {
-                      array_departmentHead.push(response['message'][i]['FirstName']+' '+response['message'][i]['LastName']);
-                    }
-                    var departmentHead_index = array_departmentHead.indexOf(departmentHead);
-                    // console.log('departmentHead_index: '.departmentHead_index);
-                      document.getElementById('update_department_head').getElementsByTagName('option')[departmentHead_index+1].selected = 'selected';
-                      // $('#UpdateDepartmentModal').modal('show');
+            //         $('.update_department_head').empty()
+            //         $('.update_department_head').append('<option value="" selected disabled>-- Select Department Head --</option>')
+            //         // console.log(response.data)
+            //         for(var i = 0; i < response['message'].length; i++) {
+            //           // appending response data to the unit of measurement element
+            //           $('.update_department_head').append(
+            //             // '<option value="' + response['message'][i]['id'] + ' ">' 
+            //             '<option value="' + response['message'][i]['FirstName'] + ' ' 
+            //                               + response['message'][i]['LastName'] + ' ">' 
+            //                               + response['message'][i]['FirstName'] + ' ' 
+            //                               + response['message'][i]['LastName'] + '</option>')
+            //         }
+            //         var array_departmentHead = [];
+            //         for (let i = 0; i < response['message'].length; i++) {
+            //           array_departmentHead.push(response['message'][i]['FirstName']+' '+response['message'][i]['LastName']);
+            //         }
+            //         var departmentHead_index = array_departmentHead.indexOf(departmentHead);
+            //         // console.log('departmentHead_index: '.departmentHead_index);
+            //           document.getElementById('update_department_head').getElementsByTagName('option')[departmentHead_index+1].selected = 'selected';
+            //           // $('#UpdateDepartmentModal').modal('show');
 
-                    } 
-                }
-            });
+            //         } 
+            //     }
+            // });
 
-            $.ajax({
-              type: "POST",
-              url: "getSupervisors",
-              data:{'campus':campus},
-              success: function (response) {
+          //   $.ajax({
+          //     type: "POST",
+          //     url: "getSupervisors",
+          //     data:{'campus':campus},
+          //     success: function (response) {
       
-                  if (response.status == 200) {
-                  console.log(response);
-                  // alert('success');
+          //         if (response.status == 200) {
+          //         console.log(response);
+          //         // alert('success');
       
-                  $('.update_immediate_supervisor').empty()
-                  $('.update_immediate_supervisor').append('<option value="" selected disabled>-- Select Department Head --</option>')
-                  // console.log(response.data)
-                  for(var i = 0; i < response['message'].length; i++) {
-                    // appending response data to the unit of measurement element
-                    $('.update_immediate_supervisor').append(
-                      // '<option value="' + response['message'][i]['id'] + ' ">' 
-                      '<option value="' + response['message'][i]['FirstName'] + ' ' 
-                                        + response['message'][i]['LastName'] + ' ">' 
-                                        + response['message'][i]['FirstName'] + ' ' 
-                                        + response['message'][i]['LastName'] + '</option>')
-                  }
-                  var array_supervisor = [];
-                  for (let i = 0; i < response['message'].length; i++) {
-                    array_supervisor.push(response['message'][i]['FirstName']+' '+response['message'][i]['LastName']);
-                  }
-                  var supervisor_index = array_supervisor.indexOf(supervisor);
-                  // console.log('supervisor_index: '.supervisor_index);
-                    document.getElementById('update_immediate_supervisor').getElementsByTagName('option')[supervisor_index+1].selected = 'selected';
-                    $('#UpdateDepartmentModal').modal('show');
+          //         $('.update_immediate_supervisor').empty()
+          //         $('.update_immediate_supervisor').append('<option value="" selected disabled>-- Select Department Head --</option>')
+          //         // console.log(response.data)
+          //         for(var i = 0; i < response['message'].length; i++) {
+          //           // appending response data to the unit of measurement element
+          //           $('.update_immediate_supervisor').append(
+          //             // '<option value="' + response['message'][i]['id'] + ' ">' 
+          //             '<option value="' + response['message'][i]['FirstName'] + ' ' 
+          //                               + response['message'][i]['LastName'] + ' ">' 
+          //                               + response['message'][i]['FirstName'] + ' ' 
+          //                               + response['message'][i]['LastName'] + '</option>')
+          //         }
+          //         var array_supervisor = [];
+          //         for (let i = 0; i < response['message'].length; i++) {
+          //           array_supervisor.push(response['message'][i]['FirstName']+' '+response['message'][i]['LastName']);
+          //         }
+          //         var supervisor_index = array_supervisor.indexOf(supervisor);
+          //         // console.log('supervisor_index: '.supervisor_index);
+          //           document.getElementById('update_immediate_supervisor').getElementsByTagName('option')[supervisor_index+1].selected = 'selected';
+          //           $('#UpdateDepartmentModal').modal('show');
 
-                  } 
-              }
-          });
+          //         } 
+          //     }
+          // });
 
 
           }
@@ -502,11 +565,7 @@ $(document).on('click', '.updatebutton', function (e) {
       // console.log(data);
     
       
-      $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-      });
+
     
       $.ajax({
         type: "POST",

@@ -1,5 +1,6 @@
 $("#AllocateBudgetModal").on("hidden.bs.modal", function(e){
   // location.reload();
+      $('.type').val('');
       $('.department').val('');
       $('.fund_source').val('');
       $('.budget').val('');
@@ -62,6 +63,40 @@ $(function(){$(".year").change(function(){
 });
 })
 
+$(function(){$(".type").change(function(){
+    
+  var type = $(".type option:selected").val();
+
+  $.ajaxSetup({
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    } 
+  });
+  $.ajax({
+    type: "GET",
+    url: "get_procurement_type",
+    data: {type},
+    dataType: "json",
+    beforeSend : function(){
+      $('.year').html('<option class="spinner-border spinner-border-sm">Please wait... </option>');
+    },
+    success: function (response) {
+      // alert(response);
+      // console.log(response);
+      $('.year').empty() 
+      $('.year').append('<option value="" selected disabled>-- Select Year --</option>')
+      for(var i = 0; i < response['years'].length; i++) {
+      $('.year').append(
+      '<option value="' + response['years'][i]['year'] + '">' 
+                        + response['years'][i]['year'] + '</option>')
+
+  }
+        }
+    });
+
+});
+})
+
 $(document).on('click', '.AllocateBudget', function (e) {
   e.preventDefault();
 
@@ -86,10 +121,10 @@ $(document).on('click', '.AllocateBudget', function (e) {
       success: function (response) { 
             $('.department').empty()
             $('.department').append('<option value="" selected disabled>-- Select Department --</option>')
-        for(var i = 0; i < response['departments'].length; i++) {
+        for(var i = 0; i < response.length; i++) {
           $('.department').append(
-            '<option value="' + response['departments'][i]['id'] + '">' 
-                              + response['departments'][i]['department_name'] + '</option>')
+            '<option value="' + response[i]['id'] + '">' 
+                              + response[i]['department_name'] + '</option>')
 
         }
       }
@@ -104,14 +139,17 @@ $(document).on('click', '.AllocateBudget', function (e) {
         },
     success: function (response) {
       // alert(response);
+      if(response.length==0){
+
+      }
       $('.year').empty()
       $('.year').append('<option value="" selected disabled>-- Select Year --</option>')
       // console.log(response.years)
-      for(var i = 0; i < response['years'].length; i++) {
+      for(var i = 0; i < response.length; i++) {
         // appending response years to the unit of measurement element
         $('.year').append(
-          '<option value="' + response['years'][i]['year'] + ' ">' 
-                            + response['years'][i]['year'] + ' </option>')
+          '<option value="' + response[i]['year'] + ' ">' 
+                            + response[i]['year'] + ' </option>')
 
       }
     }
@@ -127,11 +165,11 @@ $(document).on('click', '.AllocateBudget', function (e) {
       // console.log(response.data)
       $('.fund_source').empty()
       $('.fund_source').append('<option value="" selected disabled>-- Select Fund Source --</option>')
-      for(var i = 0; i < response['fund_sources'].length; i++) {
+      for(var i = 0; i < response.length; i++) {
         // appending response data to the unit of measurement element
         $('.fund_source').append(
-          '<option value="' + response['fund_sources'][i]['id'] + '">' 
-                            + response['fund_sources'][i]['fund_source'] + '</option>')
+          '<option value="' + response[i]['id'] + '">' 
+                            + response[i]['fund_source'] + '</option>')
 
       }
       $('#AllocateBudgetModal').modal('show');
@@ -143,10 +181,10 @@ $(document).on('click', '.AllocateBudget', function (e) {
   //   url: "getMandatoryExpenditures",
   //   success: function (response) {
   //     $('.mandatory_expenditures').empty()
-  //     for(var i = 0; i < response['expenditures'].length; i++) {
+  //     for(var i = 0; i < response.length; i++) {
   //       $('.mandatory_expenditures').append(
-  //         '<option value="' + response['expenditures'][i]['id'] + '">' 
-  //                           + response['expenditures'][i]['expenditure'] + '</option>')
+  //         '<option value="' + response[i]['id'] + '">' 
+  //                           + response[i]['expenditure'] + '</option>')
   //     }
 
   //   }
@@ -160,6 +198,7 @@ $(document).on('click', '.btnAllocateBudget', function (e) {
   // alert('success');
   $(this).text('Allocating Budget..');
 
+      // var end_date = document.getElementById('end_date').value;
       var type = document.getElementById('type').value;
       var department = document.getElementById('department').value;
       var year = document.getElementById('year').value;
@@ -321,10 +360,10 @@ $(document).on('click', '.hrefdelete', function (e) {
           success: function (response) {
                 $('.update_department').empty()
                 $('.update_department').append('<option value="" selected disabled>-- Select Department --</option>')
-            for(var i = 0; i < response['departments'].length; i++) {
+            for(var i = 0; i < response.length; i++) {
               $('.update_department').append(
-                '<option value="' + response['departments'][i]['id'] + '">' 
-                                  + response['departments'][i]['department_name'] + '</option>')
+                '<option value="' + response[i]['id'] + '">' 
+                                  + response[i]['department_name'] + '</option>')
 
             }
           }
@@ -336,10 +375,10 @@ $(document).on('click', '.hrefdelete', function (e) {
           success: function (response) {
             $('.update_fund_source').empty()
             $('.update_fund_source').append('<option value="" selected disabled>-- Select Fund Source --</option>')
-            for(var i = 0; i < response['fund_sources'].length; i++) {
+            for(var i = 0; i < response.length; i++) {
               $('.update_fund_source').append(
-                '<option value="' + response['fund_sources'][i]['id'] + '">' 
-                                  + response['fund_sources'][i]['fund_source'] + '</option>')
+                '<option value="' + response[i]['id'] + '">' 
+                                  + response[i]['fund_source'] + '</option>')
             }
           }
         });
@@ -349,18 +388,40 @@ $(document).on('click', '.hrefdelete', function (e) {
           url: "getMandatoryExpenditures",
           success: function (response) {
             $('.update_mandatory_expenditures').empty()
-            for(var i = 0; i < response['expenditures'].length; i++) {
+            for(var i = 0; i < response.length; i++) {
               $('.update_mandatory_expenditures').append(
-                '<option selected value="' + [response['expenditures'][i]['id']] + '">' 
-                                  + [response['expenditures'][i]['expenditure']] + '</option>')
+                '<option selected value="' + [response[i]['id']] + '">' 
+                                  + [response[i]['expenditure']] + '</option>')
             }
           }
         });
+
+        $.ajax({
+          type: "GET",
+          url: "getYears",
+          // data: {department},
+          dataType: "json",
+          beforeSend : function(){
+            $(".update_year").html('<option class="bx bx-loader-circle">Please wait...</option> ');
+              },
+          success: function (response) {
+            // alert(response);
+            $('.update_year').empty()
+            $('.update_year').append('<option value="" selected disabled>-- Select Year --</option>')
+            // console.log(response.years)
+            for(var i = 0; i < response.length; i++) {
+              // appending response years to the unit of measurement element
+              $('.update_year').append(
+                '<option value="' + response[i]['year'] + ' ">' 
+                                  + response[i]['year'] + ' </option>')
+      
+            }
+          }
+      });
 // START EDIT BUTTON
 $(document).on('click', '.editbutton', function (e) {
   e.preventDefault();
   // $('#UpdateAllocateBudgetModal').modal('show');
-
   var id = $(this).attr("href");
   // alert(id);
    $.ajaxSetup({
@@ -371,31 +432,50 @@ $(document).on('click', '.editbutton', function (e) {
       
   $.ajax({
       type: "POST",
-      url: "edit",
+      url: "edit_allocated_budget",
       data:{'id':id},
       success: function (response) {
         // console.log(response);
           if (response.status == 200) {
+
+          var array_type = ['Indicative','Supplemental','PPMP'];
+            // for (let i = 0; i < response['department_ids'].length; i++) {
+            //   array_department.push(response['department_ids'][i]['id']);
+            // }
+
           var array_department = [];
-          for (let i = 0; i < response['departments'].length; i++) {
-            array_department.push(response['departments'][i]['id']);
+          for (let i = 0; i < response['department_ids'].length; i++) {
+            array_department.push(response['department_ids'][i]['id']);
           }
 
           var array_fundsources = [];
-          for (let i = 0; i < response['fund_sources'].length; i++) {
-            array_fundsources.push(response['fund_sources'][i]['id']);
+          for (let i = 0; i < response['fund_source_ids'].length; i++) {
+            array_fundsources.push(response['fund_source_ids'][i]['id']);
           }
 
-          var department_id = response['allocated_budget'][0]['department_id'];
-          var fund_source_id = response['allocated_budget'][0]['fund_source_id'];
+          var array_years = [];
+          for (let i = 0; i < response['years'].length; i++) {
+            array_years.push(response['years'][i]['year']);
+          }
+
+          var type = response['data'][0]['procurement_type'];
+          var department_id = response['data'][0]['department_id'];
+          var fund_source_id = response['data'][0]['fund_source_id'];
+          var year = response['data'][0]['year'];
           
+          var type_index = array_type.indexOf(type);
           var department_index = array_department.indexOf(parseInt(department_id));
           var fundsource_index = array_fundsources.indexOf(parseInt(fund_source_id));
+          var year_index = array_years.indexOf(year.toString());
+// console.log(department_index);
           
-            document.getElementById('update_department').getElementsByTagName('option')[department_index+1].selected = 'selected';
+            document.getElementById('update_type').getElementsByTagName('option')[type_index+1].selected = 'selected';
+            document.getElementById('update_department').getElementsByTagName('option')[department_index].selected = 'selected';
             document.getElementById('update_fund_source').getElementsByTagName('option')[fundsource_index+1].selected = 'selected';
-            $('.update_budget').val(response['allocated_budget'][0]['allocated_budget']);
-            $('.updateid').val(response['allocated_budget'][0]['id']);
+            document.getElementById('update_year').getElementsByTagName('option')[year_index+1].selected = 'selected';
+
+            $('.update_budget').val(response['data'][0]['allocated_budget']);
+            $('.updateid').val(response['data'][0]['id']);
             $('#UpdateAllocateBudgetModal').modal('show');
           } 
       }

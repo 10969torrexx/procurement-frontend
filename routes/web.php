@@ -61,7 +61,7 @@ Route::group(['prefix' => 'superadmin','middleware' => ['authuser']], function()
     Route::post('/edit', 'SuperAdmin\AdminController@edit')->name('edit');
     Route::post('/update', 'SuperAdmin\AdminController@update')->name('update');
 
-    Route::get('/departments', 'SuperAdmin\AdminController@getDepartments');
+    Route::get('/departments', 'SuperAdmin\AdminController@departments_index');
     
     // Route::get('/getDepartments', 'SuperAdmin\AdminController@departments');
     Route::post('/getUsers', 'SuperAdmin\AdminController@getUsers');
@@ -215,66 +215,56 @@ Route::group(['prefix' => 'superadmin','middleware' => ['authuser']], function()
     
     //Ammendments
     Route::get('/request-for-amendments', 'BAC\RequestforAmendmentsController@index');
-    // Route::post('/app-non-cse-view', 'BAC\APPNONCSEController@view')->name('app-non-cse-view');
-    //jrald end
-    // Route::get('/adduser','Admin\AdminController@adduser');
-    
-//jerald
-// Route::get('/items', 'BAC\ItemController@additems');
-// Route::get('/unit-of-measurement', 'BAC\UnitofMeasurementController@additems');
-// Route::get('/mode-of-procurement', 'BAC\ModeofProcurementController@additems');
-//jrald end
-// Route::get('/adduser','Admin\AdminController@adduser');
 
      /* Torrexx Additionals */
-        /** Implementing Functions Related to the department end user */
-            # this will show dashboard for end user role
-            Route::get('/announcements', [DepartmentPagesController::class, 'showAnnouncementPage'])->name('department-dashboard');
-            # this will show the create project title 
-            Route::get('/project-category', [DepartmentPagesController::class, 'showProjectCategory'])->name('derpartment-project-category');
+/** Implementing Functions Related to the department end user */
+    # this will show dashboard for end user role
+    Route::get('/announcements', [DepartmentPagesController::class, 'showAnnouncementPage'])->name('department-dashboard');
+    # this will show the create project title 
+    Route::get('/project-category', [DepartmentPagesController::class, 'showProjectCategory'])->name('derpartment-project-category');
 
-            # this will create the PPMP or the project title
-            Route::get('/createPPMP', [DepartmentPagesController::class, 'showCreatePPMP'])->name('department-showCreatetPPMP');
-            # this will submit created project title by the end user or department roloe= 4 
-            Route::post('/createPPMP', [DepartmentController::class, 'createProjectTitle'])->name('department-createProjectTitle');
-            # this will get the project title based on id
-            Route::get('/get-project-title', [DepartmentController::class, 'getProjectTitle'])->name('department-get-project');
-            # this will delete project title 
-            Route::get('/destroy-project-title', [DepartmentController::class, 'destoryProjectTitle'])->name('department-destroy-project');
-            # this will update project title
-            Route::post('/update-project-title', [DepartmentController::class, 'updateProjectTitle'])->name('department-update-project');
+    # this will create the PPMP or the project title
+    Route::get('/createPPMP', [DepartmentPagesController::class, 'showCreatePPMP'])->name('department-showCreatetPPMP');
+    # this will submit created project title by the end user or department roloe= 4 
+    Route::post('/createPPMP', [DepartmentController::class, 'createProjectTitle'])->name('department-createProjectTitle');
+    # this will get the project title based on id
+    Route::get('/get-project-title', [DepartmentController::class, 'getProjectTitle'])->name('department-get-project');
+    # this will delete project title 
+    Route::get('/destroy-project-title', [DepartmentController::class, 'destoryProjectTitle'])->name('department-destroy-project');
+    # this will update project title
+    Route::post('/update-project-title', [DepartmentController::class, 'updateProjectTitle'])->name('department-update-project');
 
-            # this will show add item page based on the clicked project title id
-            Route::get('/addItem/projectid', [DepartmentPagesController::class, 'showAddItem'])->name('department-addItem');
-            # this will create items on the items table
-            Route::post('/create-ppmps', [DepartmentController::class, 'createPPMPs'])->name('department-create-ppmps');
-            # this will fetch all item description based on the given item name
-            Route::post('/fetch/item-description', [DepartmentController::class, 'getItemDescription'])->name('department-item-description');
-            # this will fetch all the item category based item name
-            Route::post('/fetch/item-category', [DepartmentController::class, 'getItemCategory'])->name('department-item-category');
-            # this will update item details on ppmps table
-            Route::post('/update/item-details', [DepartmentController::class, 'updatePPMPS'])->name('department-update-item');
-            # deleting data from ppmps table
-            Route::post('/delete/item-details', [DepartmentController::class, 'deletePPMPS'])->name('department-delete-item');
-            # this will submit ppmp on the 
-            Route::post('/sumbit/ppmp', [DepartmentController::class, 'submitPPMP'])->name('department-submit-ppmp');
+    # this will show add item page based on the clicked project title id
+    Route::get('/addItem/projectid', [DepartmentPagesController::class, 'showAddItem'])->name('department-addItem');
+    # this will create items on the items table
+    Route::post('/create-ppmps', [DepartmentController::class, 'createPPMPs'])->name('department-create-ppmps');
+    # this will fetch all item description based on the given item name
+    Route::post('/fetch/item-description', [DepartmentController::class, 'getItemDescription'])->name('department-item-description');
+    # this will fetch all the item category based item name
+    Route::post('/fetch/item-category', [DepartmentController::class, 'getItemCategory'])->name('department-item-category');
+    # this will update item details on ppmps table
+    Route::post('/update/item-details', [DepartmentController::class, 'updatePPMPS'])->name('department-update-item');
+    # deleting data from ppmps table
+    Route::post('/delete/item-details', [DepartmentController::class, 'deletePPMPS'])->name('department-delete-item');
+    # this will submit ppmp on the 
+    Route::post('/sumbit/ppmp', [DepartmentController::class, 'submitPPMP'])->name('department-submit-ppmp');
 
-            # this will show the my ppmp page based on the department id
-            Route::get('/myPPMP', [DepartmentPagesController::class, 'showMyPPMP'])->name('department-showMyPPMP');
-            # this will show the status of the project along with its item
-            Route::post('/project/status', [DepartmentPagesController::class, 'showProjectStatus'])->name('department-showProjectStatus');
-        /** Gettin data from the database */
-            # this will get the databa by unit of measure per item fron the unit measure from the dabase
-            Route::post('/UnitOfMeasure', 'Department\UnitOfMeasurementController@show')->name('UnitOfMeasure');
-            # get data all project
-            Route::post('/getAllProject', [ProjectsController::class, 'show'])->name('department-get-projects');
-            # this will get the project title by year created
-            Route::post('/get-by-year-created', [DepartmentPagesController::class, 'show_by_year_created'])->name('department-year-created');
+    # this will show the my ppmp page based on the department id
+    Route::get('/myPPMP', [DepartmentPagesController::class, 'showMyPPMP'])->name('department-showMyPPMP');
+    # this will show the status of the project along with its item
+    Route::post('/project/status', [DepartmentPagesController::class, 'showProjectStatus'])->name('department-showProjectStatus');
+/** Gettin data from the database */
+    # this will get the databa by unit of measure per item fron the unit measure from the dabase
+    Route::post('/UnitOfMeasure', 'Department\UnitOfMeasurementController@show')->name('UnitOfMeasure');
+    # get data all project
+    Route::post('/getAllProject', [ProjectsController::class, 'show'])->name('department-get-projects');
+    # this will get the project title by year created
+    Route::post('/get-by-year-created', [DepartmentPagesController::class, 'show_by_year_created'])->name('department-year-created');
 
-            Route::get('/pending_ppmps','BudgetOfficer\BudgetOfficerController@PPMPindex');
-            Route::post('/view_ppmp/showPPMP', 'BudgetOfficer\BudgetOfficerController@showPPMP')->name('showPPMP');
-            Route::post('/view_ppmp/showPPMP/ppmp-approved', 'BudgetOfficer\BudgetOfficerController@status')->name('ppmp-approved');
-            Route::post('/view_ppmp/showPPMP/ppmp-disapproved', 'BudgetOfficer\BudgetOfficerController@status')->name('ppmp-disapproved');
+    Route::get('/pending_ppmps','BudgetOfficer\BudgetOfficerController@PPMPindex');
+    Route::post('/view_ppmp/showPPMP', 'BudgetOfficer\BudgetOfficerController@showPPMP')->name('showPPMP');
+    Route::post('/view_ppmp/showPPMP/ppmp-approved', 'BudgetOfficer\BudgetOfficerController@status')->name('ppmp-approved');
+    Route::post('/view_ppmp/showPPMP/ppmp-disapproved', 'BudgetOfficer\BudgetOfficerController@status')->name('ppmp-disapproved');
 
 });
 // Route::group(['prefix' => 'superadmin','middleware' => ['authuser']], function() {
@@ -530,6 +520,8 @@ Route::get('/delete-item/{id}', 'BAC\ItemController@delete');
 
 Route::group(['prefix' => 'budgetofficer','middleware' => ['authuser']], function() {
     Route::get('/try','BudgetOfficer\BudgetOfficerController@try');
+    Route::get('/my_par','BudgetOfficer\BudgetOfficerController@my_par');
+    Route::get('/my_ics','BudgetOfficer\BudgetOfficerController@my_ics');
 
     Route::get('/ppmp_deadline','BudgetOfficer\BudgetOfficerController@ppmp_deadline_index');
     Route::post('/save_ppmp_deadline','BudgetOfficer\BudgetOfficerController@save_ppmp_deadline')->name('save_ppmp_deadline');
@@ -554,12 +546,15 @@ Route::group(['prefix' => 'budgetofficer','middleware' => ['authuser']], functio
     Route::get('/getFundSources', 'BudgetOfficer\BudgetOfficerController@getFundSources')->name('getFundSources');
     Route::get('/getMandatoryExpenditures', 'BudgetOfficer\BudgetOfficerController@getMandatoryExpenditures')->name('getMandatoryExpenditures');
     Route::get('/getYears', 'BudgetOfficer\BudgetOfficerController@get_years')->name('getYears');
-    Route::get('/get_DeadlineByYear', 'BudgetOfficer\AllocateBudgetController@get_DeadlineByYear')->name('get_DeadlineByYear');
+    Route::get('/get_procurement_type', 'BudgetOfficer\BudgetOfficerController@get_procurement_type')->name('get_procurement_type');
+    Route::get('/get_DeadlineByYear', 'BudgetOfficer\BudgetOfficerController@get_DeadlineByYear')->name('get_DeadlineByYear');
 
-    Route::get('/view_ppmp','BudgetOfficer\BudgetOfficerController@PPMPindex');
+    Route::get('/view_ppmp','BudgetOfficer\BudgetOfficerController@PPMPindex')->name('view_ppmp');
+    Route::get('/returnView','BudgetOfficer\BudgetOfficerController@returnView');
     Route::post('/view_ppmp/showPPMP', 'BudgetOfficer\BudgetOfficerController@showPPMP')->name('showPPMP');
-    Route::post('/view_ppmp/showPPMP/ppmp-approved', 'BudgetOfficer\BudgetOfficerController@status')->name('ppmp-approved');
-    Route::post('/view_ppmp/showPPMP/ppmp-disapproved', 'BudgetOfficer\BudgetOfficerController@status')->name('ppmp-disapproved');
+    Route::post('/view_ppmp/showPPMP/ppmp-status', 'BudgetOfficer\BudgetOfficerController@status')->name('ppmp-status');
+    // Route::post('/view_ppmp/showPPMP/ppmp-approved', 'BudgetOfficer\BudgetOfficerController@status')->name('ppmp-approved');
+    // Route::post('/view_ppmp/showPPMP/ppmp-disapproved', 'BudgetOfficer\BudgetOfficerController@status')->name('ppmp-disapproved');
     Route::post('/view_ppmp/showPPMP/ppmp-timeline', 'BudgetOfficer\BudgetOfficerController@timeline')->name('ppmp-timeline');
 
     Route::get('/view_signed_ppmp','BudgetOfficer\ViewSignedPPMPController@index');
@@ -732,7 +727,7 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
             # this will update item details on ppmps table
             Route::post('/update/item-details', [DepartmentController::class, 'updatePPMPS'])->name('department-update-item');
             # deleting data from ppmps table
-            Route::post('/delete/item-details', [DepartmentController::class, 'deletePPMPS'])->name('department-delete-item');
+            Route::get('/delete/item-details', [DepartmentController::class, 'deletePPMPS'])->name('department-delete-item');
             # this will submit ppmp on the 
             Route::post('/sumbit/ppmp', [DepartmentController::class, 'submitPPMP'])->name('department-submit-ppmp');
 
@@ -740,17 +735,8 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
             Route::get('/myPPMP', [DepartmentPagesController::class, 'showMyPPMP'])->name('department-showMyPPMP');
             # this will show the status of the project along with its item
             Route::post('/project/status', [DepartmentPagesController::class, 'showProjectStatus'])->name('department-showProjectStatus');
-
-            /** Submit revision of PPMP */            
                 # this will re-submit ppmp | revised PPMP
                 Route::post('/re-sumbit/ppmp', [DepartmentController::class, 'resubmitPPMP'])->name('department-re_submit-ppmp');
-            /** END */
-            
-             /** Disapproved PPMP | Project */
-                /** KEY to REMEMBER
-                 * This will also apply to all project category | INDICATIVE, PPMP, SUPPLEMENTAL 
-                 * */
-                
                 # this route will display the disapproved items
                 Route::get('/disapproved-items', [DepartmentPagesController::class, 'show_disapproved_items'])->name('dept_disapproved-items');
             /** END */

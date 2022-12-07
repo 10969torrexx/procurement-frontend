@@ -322,6 +322,9 @@ public function FundSource($id) {
             case 5:
                 $out = "Dispproved by Budget Officer";
                 break;
+            case 6:
+                $out = "Revised Project";
+                break;
         }
         return $out;
     }

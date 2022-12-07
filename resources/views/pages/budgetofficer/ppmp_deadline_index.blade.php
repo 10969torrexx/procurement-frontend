@@ -47,6 +47,7 @@
                                 <thead>
                                     <tr>
                                         <th>Action</th>
+                                        <th>Procurement Type</th>
                                         <th>Year</th>
                                         <th>Start Date</th>
                                         <th>End Date</th>
@@ -72,6 +73,7 @@
                                                         </div>
                                                     </div>   
                                                 </td>
+                                                <td>{{ $data->procurement_type}}</td>
                                                 <td>{{ $data->year}}</td>
                                                 <td>{{ date('M. j, Y', strtotime($data->start_date))}}</td>
                                                 <td>{{ date('M. j, Y', strtotime($data->end_date))}}</td>

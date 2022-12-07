@@ -40,6 +40,15 @@
                         </fieldset>
                       </div>
                   </div> --}}
+                  {{-- <div class="row">
+                    @if (!empty(session("globalerror")))
+                  <div class="alert alert-danger" role="alert">
+                      {{session("globalerror")}}
+                  </div>
+                  @endif
+                  </div>  --}}
+               {{-- <div class="row" > --}}
+                  
                   <div class="row">
                     <div class="col-md-12">
                         <fieldset class="form-group">

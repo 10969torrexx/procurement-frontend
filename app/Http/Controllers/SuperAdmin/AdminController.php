@@ -36,23 +36,30 @@ class AdminController extends Controller
             ]);
     }
 
-    public function getDepartments()
+    public function departments_index()
     {
             $pageConfigs = ['pageHeader' => true];
             $breadcrumbs = [
               ["link" => "/", "name" => "Home"],["name" => "Add Department"]
             ];
-            $departments =  Http::withToken(session('token'))->get(env('APP_API'). "/api/departments/getDepartments")->json();
+            $departments = DB::table('departments as d')
+                            ->select('d.department_name','d.campus','d.description','d.id','u.name as department_head','us.name as immediate_supervisor')
+                            ->join('users as u', 'u.id', '=', 'd.department_head')
+                            ->join('users as us', 'us.id', '=', 'd.immediate_supervisor')
+                            ->whereNull('u.deleted_at')
+                            ->get();
+
+            // $departments =  Http::withToken(session('token'))->get(env('APP_API'). "/api/departments/getDepartments")->json();
             // dd($departments);
-            $error="";
-            if($departments['status']==400){
-                $error=$departments['message'];
-            }
+            // $error="";
+            // if($departments['status']==400){
+            //     $error=$departments['message'];
+            // }
 
             return view('pages.superadmin.departments',compact('departments'), [
                 'pageConfigs'=>$pageConfigs,
                 'breadcrumbs'=>$breadcrumbs,
-                'error' => $error,
+                // 'error' => $error,
             ]);
 
     }

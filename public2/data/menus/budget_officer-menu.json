@@ -1,0 +1,26 @@
+{
+  "menu": [
+    {
+      "url": "/dashboard",
+      "name": "Dashboard",
+      "i18n": "Dashboard",
+      "slug": "dashboard",
+      "icon": "desktop"
+    },
+    {
+      "navheader": "budgetofficer"
+    },
+    {
+      "url": "budgetofficer/setdeadline",
+      "name": "PPMP Deadline",
+      "i18n": "User",
+      "icon": "users"
+    },
+    {
+      "url": "budgetofficer/allocate-budget",
+      "name": "Allocate Budget",
+      "i18n": "User",
+      "icon": "users"
+    }
+  ]
+}

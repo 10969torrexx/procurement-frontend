@@ -58,7 +58,7 @@ class PpmpController extends Controller
             # end
             # this will update remaining balance allocated budgets
                  $allocated_budgets = Allocated_Budgets::where('id', $request->allocated_budget)->update([
-                    'remaining_balance' => doubleval($request->remaining_balance)
+                    'remaining_balance' => doubleval($request->f_remaining_balance)
                  ]);
             # end
             # this will store project as pending on project timeline
@@ -92,13 +92,14 @@ class PpmpController extends Controller
                         ->where('employee_id', session('employee_id'))
                         ->where('department_id', session('department_id'))
                         ->where('campus', session('campus'))
+                        ->whereRaw("status = '3' OR status = '5'")
                         ->update([
                             'status'    =>  6
                         ]);
                 # end
                 # this will update remaining balance allocated budgets
                     $allocated_budgets = Allocated_Budgets::where('id', $request->allocated_budget)->update([
-                        'remaining_balance' => doubleval($request->remaining_balance)
+                        'remaining_balance' => doubleval($request->f_remaining_balance)
                     ]);
                 # end
                 # this will store project as pending on project timeline
@@ -124,7 +125,9 @@ class PpmpController extends Controller
         // 
         $response = ppmp::where('department_id', intval(session('department_id')))
         ->where('employee_id', intval(session('employee_id')))
-        ->where('project_code', (new AESCipher)->decrypt($project_code))->get();
+        ->where('project_code', (new AESCipher)->decrypt($project_code))
+        ->whereNull('deleted_at')
+        ->get();
         if(count($response) > 0) {
             return ([
                 'status'    =>  200,
@@ -190,9 +193,12 @@ class PpmpController extends Controller
     {
        $response = ppmp::
         where('project_code', (new AESCipher)->decrypt($request->id))
-       ->whereNull('deleted_at')
-       ->Where('status', 3)
-       ->get();
+        ->whereNull('deleted_at')
+        ->Where('status', '!=', 0)
+        ->Where('campus', session('campus'))
+        ->Where('department_id', session('department_id'))
+        ->Where('employee_id', session('employee_id'))
+        ->get();
 
        if($response) {
             return ([

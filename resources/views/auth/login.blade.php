@@ -35,7 +35,7 @@
                     <i class="bx bxl-google font-medium-3"></i>
                     <span class="pl-50 d-block text-center">Google</span>
                   </a> -->
-                  <a href="/auth/google" class="btn btn-outline-primary glow w-100 position-relative"> <img src="https://hrmis.southernleytestateu.edu.ph/images/logo/google.png" alt="Sign In" width="20"> Sign-in with Google
+                  <a href="/auth/google" class="btn btn-outline-primary glow w-100 position-relative"> <img src="{{asset('images/logo/google.png')}}" alt="Sign In" width="20"> Sign-in with Google
                 </a>
                 </div>
               </div>
