@@ -113,7 +113,7 @@
 <!--/ Scroll - horizontal and vertical table -->
 @endsection
 {{-- vendor scripts --}}
-@section('vendor-scripts')fgfgf
+@section('vendor-scripts')
 <script src="{{asset('vendors/js/tables/datatable/datatables.min.js')}}"></script>
 <script src="{{asset('vendors/js/tables/datatable/dataTables.bootstrap4.min.js')}}"></script>
 <script src="{{asset('vendors/js/tables/datatable/dataTables.buttons.min.js')}}"></script>

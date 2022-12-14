@@ -26,10 +26,206 @@
       "navheader": "Admin"
     },
     {
-      "url": "admin/users",
-      "name": "User Account",
+      "url": "admin/accounts_index",
+      "name": "Account",
       "i18n": "User",
       "icon": "users"
+    },
+    {
+      "url": "admin/departments_index",
+      "name": "Departments",
+      "i18n": "User",
+      "icon": "building"
+    },
+    {
+      "url": "admin/fund_sources_index",
+      "name": "Fund Sources",
+      "i18n": "User",
+      "icon": "coins"
+    },
+    {
+      "navheader": "Budget Officer"
+    },
+    {
+      "url": "admin/ppmp_deadline",
+      "name": "PPMP Deadline",
+      "i18n": "User",
+      "icon": "calendar"
+    },
+    {
+      "url": "admin/mandatory_expenditures_index",
+      "name": "Expenditures",
+      "i18n": "User",
+      "icon": "shoppingcart"
+    },
+    {
+      "url": "admin/allocate_budget_index",
+      "name": "Allocate Budget",
+      "i18n": "User",
+      "icon": "credit-card-in"
+    },
+    {
+      "url": "admin/view_ppmp_index",
+      "name": "Pending PPMPs",
+      "i18n": "User",
+      "icon": "list"
+    },
+    {
+      "url": "admin/view_signed_ppmp_index",
+      "name": "Signed PPMPs",
+      "i18n": "User",
+      "icon": "pen"
+    },
+    {
+      "navheader": "End-User"
+    },
+    {
+      "url": "department/announcements", 
+      "name": "Announcement",
+      "i18n": "Calendar",
+      "icon": "calendar"
+    },
+    {
+      "url": "department/project-category",
+      "name": "Create PPMP",
+      "i18n": "User",
+      "icon": "users"
+      
+    },
+    {
+      "url": "department/myPPMP",
+      "name": "MY PPMP",
+      "i18n": "Notebook",
+      "icon": "notebook"
+      
+    },
+    {
+      "url": "department/PR",
+      "name": "Purchase Request",
+      "i18n": "Shoppingcart",
+      "icon": "shoppingcart",
+      "submenu": [
+        {
+          "url": "department/purchaseRequest",
+          "name": "Create PR",
+          "i18n": "User",
+          "icon": "like"
+        },
+        {
+          "url": "department/trackPR",
+          "name": "Track PR",
+          "i18n": "User",
+          "icon": "shoppingcart-in"
+        }
+      ]
+    },
+    {
+      "navheader": "Supervisor"
+    },
+    {
+      "url": "admin/pending_ppmps_index",
+      "name": "Pending PPMPs",
+      "i18n": "User",
+      "icon": "list"
+    },
+    {
+      "navheader": "BAC Secretariat"
+    },
+    {
+      "url": "admin/setup",
+      "name": "Setup",
+      "i18n": "User",
+      "icon": "gears",
+      "submenu": [
+        {
+          "url": "admin/category_index",
+          "name": "Category",
+          "i18n": "User",
+          "icon": "shoppingcart-in"
+        },
+        {
+          "url": "admin/items_index",
+          "name": "Items",
+          "i18n": "User",
+          "icon": "shoppingcart-in"
+        },
+        {
+          "url": "admin/unit_of_measurement_index",
+          "name": "Unit of Measurement ",
+          "i18n": "User"
+        },
+        {
+          "url": "admin/mode_of_procurement_index",
+          "name": "Mode of Procurement ",
+          "i18n": "User"
+        }
+      ]
+    },
+    {
+      "url": "admin/ppmp_setup",
+      "name": "PPMP",
+      "i18n": "User",
+      "icon": "shoppingcart-in",
+      "submenu": [
+        {
+          "url": "admin/approved_ppmp",
+          "name": "Approved PPMP",
+          "i18n": "User",
+          "icon": "like"
+        },
+        {
+          "url": "admin/signed_ppmp",
+          "name": "Signed PPMP",
+          "i18n": "User",
+          "icon": "shoppingcart-in"
+        }
+      ]
+    },
+    {
+      "url": "admin/supplemental",
+      "name": "Supplemental",
+      "i18n": "User",
+      "icon": "shoppingcart",
+      "submenu": [
+        {
+          "url": "superadmin/approved-supplemental",
+          "name": "Approved Supplemental",
+          "i18n": "User",
+          "icon": "shoppingcart-in"
+        },
+        {
+          "url": "superadmin/signed-supplemental",
+          "name": "Signed Supplemental",
+          "i18n": "User",
+          "icon": "shoppingcart-in"
+        }
+      ]
+    },
+    {
+      "url": "admin/app_non_cse",
+      "name": "APP Non-CSE",
+      "i18n": "User",
+      "icon": "hammer",
+      "submenu": [
+        {
+          "url": "superadmin/app-non-cse",
+          "name": "Generate",
+          "i18n": "User",
+          "icon": "shoppingcart-in"
+        },
+        {
+          "url": "superadmin/signed-app-non-cse",
+          "name": "Signed APP",
+          "i18n": "User",
+          "icon": "shoppingcart-in"
+        }
+      ]
+    },
+    {
+      "url": "admin/bor-resolution",
+      "name": "BOR Resolutions",
+      "i18n": "User",
+      "icon": "envelope-pull"
     }
   ]
 }

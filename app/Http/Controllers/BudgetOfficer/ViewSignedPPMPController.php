@@ -22,7 +22,7 @@ class ViewSignedPPMPController extends Controller
         // return view('pages.budgetofficer.allocatebudget',['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs]);
 
         $ppmp_deadline =  Http::withToken(session('token'))->get(env('APP_API'). "/api/budget/get_deadline")->json();
-            // dd($ppmp_deadline);
+            dd($ppmp_deadline);
             $error="";
             if($ppmp_deadline['status']==400){
                 $error=$ppmp_deadline['message'];

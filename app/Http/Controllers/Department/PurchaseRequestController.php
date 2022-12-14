@@ -17,47 +17,32 @@ class PurchaseRequestController extends Controller
         public function __construct(){
             $this->aes = new AESCipher();
         }
+
   public function PurchaseRequestIndex(){
     $pageConfigs = ['pageHeader' => true];
     $breadcrumbs = [
       ["link" => "/", "name" => "Home"],["name" => "Approve PPMPs"]
     ];
-    // return view('pages.budgetofficer.allocatebudget',['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs]);
+    $year = Carbon::now()->format('Y');
+    $department_id = session('department_id');
+    $ppmps = DB::table("project_titles")
+                ->select('project_titles.id','project_titles.project_title','project_titles.project_year','fund_sources.fund_source')
+                ->join('fund_sources', 'fund_sources.id', '=', 'project_titles.fund_source')
+                ->where('department_id',$department_id)
+                ->where('project_year',$year+1)
+                ->where('status',4)
+                ->get();
 
-    
-    // $items =  Http::withToken(session('token'))->get(env('APP_API'). "/api/purchaseRequest/getItems")->json();
-    //     // dd($items);
-    //     $error="";
-    //     if($items['status']==400){
-    //         $error=$items['message'];
-    //     }
-    $ppmps =  Http::withToken(session('token'))->get(env('APP_API'). "/api/purchaseRequest/getPPMPs",[
-      'department_id' => session('department_id'),
-      ])->json();
-        // dd($ppmps);
-        $error="";
-        if($ppmps['status']==400){
-            $error=$ppmps['message'];
-        }
+      return view('pages.department.purchase-request-index',compact('ppmps'), [
+          'pageConfigs'=>$pageConfigs,
+          'breadcrumbs'=>$breadcrumbs,
+      ]); 
+  }
 
-    // $items = DB::table('ppmps')
-    //             ->select('id','item_name','item_description','unit_price','estimated_price','quantity')
-    //             ->where('status',4,'and')
-    //             ->where('department_id',session('department_id'))
-    //             ->where('mode_of_procurement','!=','Public Bidding')
-    //             // ->groupBy('project_code')
-    //             ->get();
-        // dd($items);
-        return view('pages.department.purchase-request-index',compact('ppmps'), [
-            'pageConfigs'=>$pageConfigs,
-            'breadcrumbs'=>$breadcrumbs,
-            'error' => $error,
-        ]); 
-    }
-    public function TrackPRIndex(){
+  public function TrackPRIndex(){
       $pageConfigs = ['pageHeader' => true];
       $breadcrumbs = [
-        ["link" => "/", "name" => "Home"],["name" => "Purchase Request"]
+        ["link" => "/", "name" => "Home"],["name" => "Track PR"]
       ];
       // return view('pages.budgetofficer.allocatebudget',['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs]);
   
@@ -76,8 +61,9 @@ class PurchaseRequestController extends Controller
               'breadcrumbs'=>$breadcrumbs,
               // 'error' => $error,
           ]); 
-      }
-    public function viewPR(Request $request) {
+  }
+
+  public function viewPR(Request $request) {
 
       // dd($request->all());
       try {
@@ -115,36 +101,45 @@ class PurchaseRequestController extends Controller
          throw $th;
      }
   }
-    public function createPR(Request $request) {
 
+  public function createPR(Request $request) {
       try {
-      // dd($request->all());
-      $date = Carbon::now()->format('Y-m-d');
-      $project_code = $request->id;
-      $id = $this->aes->decrypt($request->id);
-      // $items = Http::withToken(session('token'))->post(env('APP_API'). "/api/purchaseRequest/getItems", [
-      //             'department_id' =>   session('department_id'),
-      //             'id'  =>  $id
-      //         ])->json();
-      // dd($id);
+        $date = Carbon::now()->format('Y-m-d');
+        $project_code = $request->id;
+        $id = $this->aes->decrypt($request->id);
         $pageConfigs = ['pageHeader' => true];
         $breadcrumbs = [
             ["link" => "/", "name" => "Home"],
             ["link" => "/department/purchaseRequest", "name" => "Approve PPMPs"],
-            // ["link" => "/department/purchaseRequest/createPR", "name" => "Create PR"],
             ["name" => "Create PR"]
         ];
        
-          // dd($ppmps);
+          // dd($id);
           // $campusinfo = DB::table("campusinfo")
           // ->where("campus", 1)
           // ->get();
           
-          $items =  Http::withToken(session('token'))->get(env('APP_API'). "/api/purchaseRequest/getItems",[
-                    'department_id' => session('department_id'),
-                    'id' => $id,
-                    ])->json();
-                    
+          // $items =  Http::withToken(session('token'))->get(env('APP_API'). "/api/purchaseRequest/getItems",[
+          //           'department_id' => session('department_id'),
+          //           'id' => $id,
+          //           ])->json();
+                    // dd($items);
+
+          $items = DB::table("ppmps")
+                    ->select('id','item_name','item_description','quantity','unit_price','estimated_price','mode_of_procurement')
+                    ->where('department_id',session('department_id'))
+                    ->where('project_code',$id)
+                    ->where('for_pr',0)
+                    ->where('mode_of_procurement',"!=","Public Bidding")
+                    ->get();
+          $itemsForPR = DB::table("ppmps")
+                    ->select('id','item_name','item_description','quantity','unit_price','estimated_price','mode_of_procurement')
+                    ->where('department_id',session('department_id'))
+                    ->where('project_code',$id)
+                    ->where('for_pr',1)
+                    ->where('mode_of_procurement',"!=","Public Bidding")
+                    ->get();
+
           $ppmps = DB::table("ppmps as p")
                     ->select("pt.project_title", "d.department_name", "p.*","fs.fund_source","pt.project_code as ProjectCode")
                     ->join("project_titles as pt", "p.project_code", "=", "pt.id")
@@ -172,14 +167,14 @@ class PurchaseRequestController extends Controller
                     ->where("pt.id", $id)
                     ->get();
                     // dd($details);
-          $error="";
-          if($items['status']==400){
-              $error=$items['message'];
-          }
+          // $error="";
+          // if($items['status']==400){
+          //     $error=$items['message'];
+          // }
         //   if(count($ppmps) == 0){
         //     $error=$items['message'];
         // }
-          return view('pages.department.create-purchase-request',compact('items','ppmps','date','details','fund_source','project_code'),
+          return view('pages.department.create-purchase-request',compact('items','itemsForPR','ppmps','date','details','fund_source','project_code'),
               ['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs], 
               # this will attache the data to view
               [
@@ -306,5 +301,95 @@ class PurchaseRequestController extends Controller
     } catch (\Throwable $th) {
       dd('add_Items_To_PR FUNCTION '+$th);
     }
+  }
+
+  public function view_status(Request $request){
+    // dd($request->all());
+    // dd($id);
+    $pageConfigs = ['pageHeader' => true];
+    $breadcrumbs = [
+      ["link" => "/", "name" => "Home"],
+      ["link" => "/department/trackPR", "name" => "Track PR"],
+      // ["link" => "/department/purchaseRequest/createPR", "name" => "Create PR"],
+      ["name" => "View Status"]
+    ];
+
+    $id = (new AESCipher())->decrypt($request->id);
+
+    return view('pages.department.view_status_page', [
+                'pageConfigs'=>$pageConfigs,
+                'breadcrumbs'=>$breadcrumbs,
+                // 'error' => $error,
+            ]); 
+  }
+
+  public function view_pr(Request $request){
+    // dd($request->all());
+    // dd($id);
+    $pageConfigs = ['pageHeader' => true];
+    $breadcrumbs = [
+      ["link" => "/", "name" => "Home"],
+      ["link" => "/department/trackPR", "name" => "Track PR"],
+      // ["link" => "/department/purchaseRequest/createPR", "name" => "Create PR"],
+      ["name" => "View PR"]
+    ];
+
+    $id = (new AESCipher())->decrypt($request->id);
+    $date = Carbon::now()->format('Y-m-d');
+
+    $purchase_request = DB::table("purchase_request as pr")
+                          ->select("pr.*","fs.fund_source")
+                          ->join("fund_sources as fs","pr.fund_source_id","fs.id")
+                          ->where("pr.id",$id)
+                          ->get();
+    $items = DB::table("ppmps")
+                    ->select('id','item_name','item_description','quantity','unit_price','estimated_price','mode_of_procurement')
+                    ->where('department_id',session('department_id'))
+                    ->where('project_code',$id)
+                    ->where('for_pr',0)
+                    ->where('mode_of_procurement',"!=","Public Bidding")
+                    ->get();
+
+                    // dd($purchase_request);
+          $itemsForPR = DB::table("ppmps")
+                    ->select('id','item_name','item_description','quantity','unit_price','estimated_price','mode_of_procurement')
+                    ->where('department_id',session('department_id'))
+                    ->where('project_code',$id)
+                    ->where('for_pr',1)
+                    ->where('mode_of_procurement',"!=","Public Bidding")
+                    ->get();
+
+          $ppmps = DB::table("ppmps as p")
+                    ->select("pt.project_title", "d.department_name", "p.*","fs.fund_source","pt.project_code as ProjectCode")
+                    ->join("project_titles as pt", "p.project_code", "=", "pt.id")
+                    ->join("fund_sources as fs", "pt.fund_source", "=", "fs.id")
+                    ->join("departments as d", "pt.department_id", "=", "d.id")
+                    ->where("p.project_code", $id)
+                    ->where("p.for_PR", 1)
+                    // ->where("p.app_type", 'Non-CSE')
+                    ->where("p.mode_of_procurement", "!=", "Public Bidding")
+                    ->whereNull("p.deleted_at")
+                    ->where("p.is_supplemental", "=", 0)
+                    ->where("p.status", "=", 4)
+                    ->orderBy("p.department_id", "ASC")
+                    ->orderBy("p.project_code", "ASC")
+                    ->get();
+          $details = DB::table("project_titles as pt")
+                    ->select("pt.campus","pt.project_title","pt.fund_source","d.department_name")
+                    ->join("departments as d", "pt.department_id", "=", "d.id")
+                    ->join("fund_sources as fs", "pt.fund_source", "=", "fs.id")
+                    ->where("pt.id", $id)
+                    ->get();
+          $fund_source = DB::table("project_titles as pt")
+                    ->select("fs.fund_source")
+                    ->join("fund_sources as fs", "pt.fund_source", "=", "fs.id")
+                    ->where("pt.id", $id)
+                    ->get();
+
+    return view('pages.department.view_pr_page',compact('items','itemsForPR','ppmps','date','details','fund_source'), [
+                'pageConfigs'=>$pageConfigs,
+                'breadcrumbs'=>$breadcrumbs,
+                // 'error' => $error,
+            ]); 
   }
 }

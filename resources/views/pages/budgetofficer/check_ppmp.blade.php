@@ -92,17 +92,7 @@
                     </tr>
                     <tr >
                         <td style="font-size: 15px;" class="text-dark text-bold-600" >{{-- {{ $data[0]->code }} --}}
-                        <?php
-                            if($data[0]->projectStatus != 2){
-                        ?>
-                            --
-                        <?php
-                            }else if($data[0]->projectStatus == 2){
-                        ?>
                             {{ $data[0]->code }}
-                        <?php
-                            }
-                        ?>
                         </td>
                         <td style="font-size: 15px;" class="text-dark text-bold-600">{{ $data[0]->title }}</td>
                         <td ></td>

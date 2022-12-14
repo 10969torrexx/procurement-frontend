@@ -106,14 +106,14 @@
                   </div>
                 </div>
                 
-                {{-- <div class="row">
+                <div class="row" hidden>
                   <div class="col-md-12">
                   <fieldset class="form-group">
                       <label for="MandatoryExpenditures">Mandatory Expenditures</label>
-                      <input type="text" class="update_mandatory_expenditures form-control"  placeholder="Enter Mandatory Expenditures" value="" required>
+                      <input type="text" id="update_mandatory_expenditures" class="update_mandatory_expenditures form-control"  placeholder="Enter Mandatory Expenditures" value="0" required>
                   </fieldset>
                   </div> 
-              </div> --}}
+              </div>
 
               <div class="row" hidden>
                 <div class="col-md-12">
