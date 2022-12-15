@@ -8,6 +8,64 @@
         "icon": "desktop"
       },
       {
+        "navheader": "My Property"
+      },
+      {
+        "url": "department/my_par",
+        "name": "PAR",
+        "i18n": "User",
+        "icon": "list"
+      },
+      {
+        "url": "department/my_ics",
+        "name": "ICS",
+        "i18n": "User",
+        "icon": "gears"
+      },
+      {
+        "navheader": "End-User"
+      },
+      {
+        "url": "department/announcements", 
+        "name": "Announcement",
+        "i18n": "Calendar",
+        "icon": "calendar"
+      },
+      {
+        "url": "department/project-category",
+        "name": "Create PPMP",
+        "i18n": "User",
+        "icon": "users"
+        
+      },
+      {
+        "url": "department/myPPMP",
+        "name": "MY PPMP",
+        "i18n": "Notebook",
+        "icon": "notebook"
+        
+      },
+      {
+        "url": "department/PR",
+        "name": "Purchase Request",
+        "i18n": "Shoppingcart",
+        "icon": "shoppingcart",
+        "submenu": [
+          {
+            "url": "department/purchaseRequest",
+            "name": "Create PR",
+            "i18n": "User",
+            "icon": "like"
+          },
+          {
+            "url": "department/trackPR",
+            "name": "Track PR",
+            "i18n": "User",
+            "icon": "shoppingcart-in"
+          }
+        ]
+      },
+      {
         "navheader": "Supervisor"
       },
       {

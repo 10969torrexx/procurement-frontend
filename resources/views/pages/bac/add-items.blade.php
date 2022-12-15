@@ -33,7 +33,7 @@
                 {{-- <div class="card-header"><div class="col-sm-3 ">
                 </div> --}}
                 <div class="row" >
-                  <div class="col-md-3 ml-1"  >
+                  <div class="col-md-2 ml-1"  >
                     <label>Add Item</label>
                     <input type="text" name="item_name" id="item_name" placeholder="Item Name" class="form-control item_name" required>
                   </div> 
@@ -58,13 +58,23 @@
                       <option value="Non-CSE">Non - CSE</option>
                     </select>
                   </div>
-                  
-                  <div class="col-md-2" >
-                    <label>Public Bidding:</label>
-                    <select class="form-select form-control public_bidding" aria-label="Default select example">
+
+                  {{-- <div class="col-md-2" >
+                    <label for="public_bidding">Public Bidding:</label>
+                    <select name="public_bidding" class="form-select form-control public_bidding" aria-label="Default select example">
                       <option selected>Choose..</option>
                       <option value="0">Not Required</option>
                       <option value="1">Required</option>
+                    </select>
+                  </div> --}}
+                  
+                  <div class="col-md-2 mp">
+                    <label for="mode_of_procurement">Mode of Procurement:</label>
+                    <select name="mode_of_procurement" class="form-select form-control mode_of_procurement" aria-label="Default select example">
+                      <option value="0" selected>Choose..</option>
+                      @foreach($mode as $mode)
+                        <option value="{{ $mode->id }}">{{ $mode->mode_of_procurement }}</option>
+                      @endforeach
                     </select>
                   </div>
 
@@ -84,8 +94,9 @@
                               {{-- <th>Campus</th> --}}
                               <th>Category</th>
                               <th>APP TYPE</th>
-                              <th>Public Bidding</th>
+                              <th>Mode Of Procurement</th>
                               <th>Added By</th>
+                              <th>Campus</th>
                               <th>Date Added</th>
                               <th>Date Updated</th>
                               <th>Action</th>
@@ -98,16 +109,31 @@
                               <td>{{ $items->item_name }}</td>
                               <td>{{ $items->item_category }}</td>
                               <td>{{ $items->app_type }}</td>
-                              <td>
-                                <?php
+                              <td>{{ $items->mode_of_procurement }}
+                                  {{-- <input type="hidden" class="campusCheck" value="{{ $campuscount }}"> --}}
+
+                                {{-- <?php
                                   if($items->public_bidding == 0){
-                                  echo 'No';
+                                  echo $items->mode_of_procurement;
                                   }elseif($items->public_bidding == 1){
-                                  echo 'Yes';
+                                  echo 'Public Bidding';
                                   }
-                                ?>
-                                </td>
+                                ?>  --}}
+                                {{-- @if($items->public_bidding == 0)
+                                  <?php $pro = ""; ?>
+                                  @foreach($procurement as $procurements)
+                                    <?php if( $procurements->id == $items->mode_of_procurement_id )
+                                      $pro = $procurements->mode_of_procurement;
+                                    ?>
+                                  @endforeach
+                                  {{ $pro }}
+                                @endif
+                                @if($items->public_bidding == 1)
+                                  Public Bidding
+                                @endif --}}
+                              </td>
                               <td>{{ $items->name }}</td>
+                              <td>{{(new GlobalDeclare)->Campus($items->campus)}}</td>
                               <td>{{ explode('-', date('j F, Y-', strtotime($items->created_at)))[0] }}</td>
                               <td>{{ explode('-', date('j F, Y-', strtotime($items->updated_at)))[0] }}</td>
                               <td>
@@ -116,7 +142,7 @@
                                     class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu"></span>
                                   <div class="dropdown-menu dropdown-menu-left">
-                                    <a class="dropdown-item edit" data-id = "<?=$aes->encrypt($items->id)?>" data-toggle = "modal" id="edit_item_Modal" href = "{{ $aes->encrypt($items->id) }}"><i class="bx bx-edit-alt mr-1"></i> edit</a>
+                                    <a class="dropdown-item edit" data-id = "<?=$aes->encrypt($items->id)?>" value="{{ $items->mode_of_procurement }}" data-toggle = "modal" id="edit_item_Modal" href = "{{ $aes->encrypt($items->id) }}"><i class="bx bx-edit-alt mr-1"></i> edit</a>
                                     <a class="dropdown-item delete-item" href = "{{ $aes->encrypt($items->id) }}">
                                       <i class="bx bx-trash mr-1"></i> delete
                                     </a>
@@ -125,7 +151,6 @@
                               </td>
                           </tr>
                             @endforeach 
-                          @include('pages.bac.edit-item-modal')
                       </tbody>
                       {{-- @endfor --}}
                       
@@ -139,6 +164,7 @@
       </div>
   </div>
   {{-- @endforeach --}}
+  @include('pages.bac.edit-item-modal')
 </section>
 <!-- Dashboard Ecommerce ends -->
 @endsection

@@ -43,7 +43,7 @@
 
 @extends('layouts.contentLayoutMaster')
 {{-- page Title --}}
-@section('title','New PPMP Request')
+@section('title','Pending PPMP')
 {{-- vendor css --}}
 @section('vendor-styles')
 <link rel="stylesheet" type="text/css" href="{{asset('vendors/css/charts/apexcharts.css')}}">
@@ -61,7 +61,14 @@
     <div class="card">
         <div class="card-cody">
             
+            
         <div class="table-responsive">
+            {{-- <?php $overalltotal = 0 ;?> --}}
+                <a href="/bac/supervisor"><<- {{ $data[0]->title }}</a>
+            <div class="col-md-12 mb-1 text-left">
+                <button type="button" class="btn btn-success  mt-1 accept_all" value="2"  data-id="{{ $data[0]->pt_id }}">Accept All</button></a>
+                <button type="button" class="btn btn-danger  mt-1 reject_all" value="3"  data-id="{{ $data[0]->pt_id }}">Reject All</button>
+            </div>
             <table class="text-center ppmp" style=" line-height:22px;font-size:15px">
                 <thead>
                     <tr style=" border-top: 1px solid black;">
@@ -90,11 +97,11 @@
                     <tr >
                         <td style="font-size: 15px;" class="text-dark text-bold-600" >{{-- {{ $data[0]->code }} --}}
                         <?php
-                            if($data[0]->projectStatus != 2){
+                            if($data[0]->projectStatus == 0 || $data[0]->projectStatus == 1 ||$data[0]->projectStatus == 3 ){
                         ?>
                             --
                         <?php
-                            }else if($data[0]->projectStatus == 2){
+                            }else{
                         ?>
                             {{ $data[0]->code }}
                         <?php
@@ -124,7 +131,7 @@
                    @php $e = 0 @endphp
                    @php $index = 0 @endphp
                     @for ($i = 0; $i < count($data); $i++)
-                        @php $e += $data[$i]->estimated_price; $index+=count($data);@endphp
+                        @php $e += $data[$i]->estimated_price; $index+=count($data); @endphp
                         <input type="text" id="project_code12" class=" form-control d-none index" name="project_code" value="{{ $index }}" >
                         <tbody class="tbody">
                             <tr>
@@ -179,24 +186,24 @@
                                         if($data[$i]->status == 1 || $data[$i]->status == 6){
                                     ?>
                                         <div class="mb-1" id="action{{ $i }}">
-                                            <button class="btn btn-outline-success approve button" data-button="0" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="2" data-index="{{ $i }}" >Accept</button>
-                                            <button class="btn btn-outline-danger disapprove button"  data-button="{{ $data[$i]->estimated_price }}" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="3" data-index="{{ $i }}">Reject</button> 
+                                            <button class="btn btn-outline-success approve button " id="superbtn" data-button="0" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="2" data-index="{{ $i }}" >Accept</button>
+                                            <button class="btn btn-outline-danger disapprove button " id="superbtn"  data-button="{{ $data[$i]->estimated_price }}" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="3" data-index="{{ $i }}">Reject</button> 
                                         </div>
                                     <?php
                                         }else if( $data[$i]->status == 2 || $data[$i]->status == 3 ){
                                     ?> 
                                         <div class="mb-1" id="action{{ $i }}" style="display:none">
                                             @if($data[$i]->status != 2)
-                                            <button class="btn btn-outline-success approve button" data-button="-{{ $data[$i]->estimated_price }}" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="2" data-index="{{ $i }}" >Accept</button>
+                                            <button class="btn btn-outline-success approve button " id="superbtn" data-button="-{{ $data[$i]->estimated_price }}" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="2" data-index="{{ $i }}" >Accept</button>
                                             @endif
                                             @if($data[$i]->status == 2)
-                                            <button class="btn btn-outline-success approve button" data-button="-0" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="2" data-index="{{ $i }}" >Accept</button>
+                                            <button class="btn btn-outline-success approve button " id="superbtn" data-button="-0" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="2" data-index="{{ $i }}" >Accept</button>
                                             @endif
                                             @if($data[$i]->status != 3)
-                                            <button class="btn btn-outline-danger disapprove button" data-button="{{ $data[$i]->estimated_price }}" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="3" data-index="{{ $i }}">Reject</button> 
+                                            <button class="btn btn-outline-danger disapprove button " id="superbtn" data-button="{{ $data[$i]->estimated_price }}" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="3" data-index="{{ $i }}">Reject</button> 
                                             @endif
                                             @if($data[$i]->status == 3)
-                                            <button class="btn btn-outline-danger disapprove button" data-button="0" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="3" data-index="{{ $i }}">Reject</button> 
+                                            <button class="btn btn-outline-danger disapprove button " id="superbtn" data-button="0" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="3" data-index="{{ $i }}">Reject</button> 
                                             @endif
                                         </div>
                                     <?php
@@ -323,20 +330,27 @@
                     @endfor
                 {{-- @endforeach --}}
                 <tfoot>
-                    <tr >
+                    <tr > 
+                        @if($data[0]->projectStatus == 1 || $data[0]->projectStatus == 6)
+                            <input type="hidden" class="overalltotal" value=" 0" >
+                        @endif
+
+                        @if($data[0]->projectStatus == 2 || $data[0]->projectStatus == 3)
+                            <input type="hidden" class="overalltotal" value=" {{ $e }}" >
+                        @endif
                         <td colspan="4" style="text-align: right; color:black; font-size:12px" class="text-bold-600">SUB-TOTAL:</td>
                         <td class="total1">Php @php echo number_format($e,2) @endphp</td>
                         <td colspan="13"></td>
                     </tr>
                 </tfoot>
             </table>
-            <div class="col-md-12 text-right">
-                <a href="/bac/supervisor"><button type="button" class="btn btn-primary col-md-1 mt-1 back" data-id="{{ $data[0]->pt_id }}">Back</button></a>
-                <button type="button" class="btn btn-success col-md-1 mt-1 ppmpDone" data-id="{{ $data[0]->pt_id }}">Done</button>
+            <div class="col-md-12 text-right" style="display: none" id="ppmpDone">
+                <button type="button"  class="btn btn-success col-md-1 mt-1 ppmpDone" value="{{ $data[0]->year_created }}" data-id="{{ $data[0]->pt_id }}">Done</button>
             </div>
         </div>
     </div>
     </div>
+    @include('pages.supervisor.supervisor_reject_all_ppmp_modal')
     @include('pages.supervisor.supervisor_disapproved_ppmp_modal')
 </section>
 <!-- Dashboard Ecommerce ends -->
