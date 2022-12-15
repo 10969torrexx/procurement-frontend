@@ -450,6 +450,7 @@ Route::group(['prefix' => 'budgetofficer','middleware' => ['authuser']], functio
     Route::post('/view_ppmp/showPPMP', 'BudgetOfficer\BudgetOfficerController@showPPMP')->name('showPPMP');
     Route::post('/view_ppmp/showPPMP/ppmp-status', 'BudgetOfficer\BudgetOfficerController@status')->name('ppmp-status');
     Route::post('/view_ppmp/showPPMP/ppmp-timeline', 'BudgetOfficer\BudgetOfficerController@timeline')->name('ppmp-timeline');
+    Route::post('/view_ppmp/showPPMP/accept-reject-all', 'BudgetOfficer\BudgetOfficerController@accept_reject_all')->name('accept-reject-all');
 
 });
 #End Route for Budget Officer

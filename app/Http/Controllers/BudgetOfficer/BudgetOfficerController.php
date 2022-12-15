@@ -244,6 +244,133 @@ class BudgetOfficerController extends Controller
         // return redirect("/view_ppmp");
     }
 
+    public function accept_reject_all(Request $request){
+        // dd($request->all());
+        $budget = DB::table("project_titles as pt")
+                ->select("ab.remaining_balance")
+                ->join('allocated__budgets as ab','pt.allocated_budget','=','ab.id')
+                ->whereNull("pt.deleted_at")
+                ->whereNull("ab.deleted_at")
+                ->where("pt.id",$request->id)
+                ->get();
+  
+        if($request->value == 4){
+          $itemcheck = DB::table("project_titles as pt")
+                  ->select("p.estimated_price")
+                  ->join('ppmps as p','p.project_code','=','pt.id')
+                  ->whereNull("pt.deleted_at")
+                  ->whereNull("p.deleted_at")
+                  ->where(function ($query) {
+                    $query->where('p.status', 5);
+  
+                    })
+                  ->where("pt.id",$request->id)
+                  ->get();
+
+            $itemcheckpending = DB::table("project_titles as pt")
+                ->select("p.estimated_price")
+                ->join('ppmps as p','p.project_code','=','pt.id')
+                ->whereNull("pt.deleted_at")
+                ->whereNull("p.deleted_at")
+                ->where(function ($query) {
+                  $query->where('p.status', 1);
+
+                  })
+                ->where("pt.id",$request->id)
+                ->get();
+        }else{
+          $itemcheck = DB::table("project_titles as pt")
+                  ->select("p.estimated_price")
+                  ->join('ppmps as p','p.project_code','=','pt.id')
+                  ->whereNull("pt.deleted_at")
+                  ->whereNull("p.deleted_at")
+                  ->where(function ($query) {
+                    $query->where('p.status', 2)
+                       ->orWhere('p.status', 4);
+                    })
+                  ->where("pt.id",$request->id)
+                  ->get();
+        }
+        // dd($itemcheck);
+        $itemtotal = 0;
+        // $project_id = "";
+        foreach($itemcheck as $itemcheck){
+          $itemtotal += $itemcheck->estimated_price;
+        }
+  
+        if($itemtotal > 0 || !empty($itemcheckpending)){
+          $total = 0;
+          foreach($budget as $budget){
+            $total = $budget->remaining_balance;
+          }
+             
+          if($request->value == 4){
+            $compute = $total - $itemtotal;
+          }else{
+            $compute = $total + $itemtotal;
+          }
+          // dd($compute);
+          $ppmp = DB::table("project_titles as pt")
+                ->join('ppmps as p','p.project_code','=','pt.id')
+                ->join('allocated__budgets as ab','pt.allocated_budget','=','ab.id')
+                ->join('fund_sources as fs','fs.id','=','pt.fund_source')
+                ->where("pt.id",$request->id)
+                ->update([
+                  'pt.status' => $request->value,
+                  'p.status' => $request->value,
+                  'p.remarks' => $request->remarks,
+                  'ab.remaining_balance' => $compute,
+                ]);
+          // dd($ppmp);
+  
+              if($request->value == 4 ){
+                $timeline = DB::table("project_timeline")
+                ->insert([
+                'employee_id'=>session('employee_id'),
+                'department_id'=>session('department_id'),
+                'role'=>session('role'),
+                'project_id'=>$request->id,
+                'status'=>4,
+                'campus'=>session('campus'),
+                'remarks'=>"Your PPMP has been approved by the Budget Officer",
+                'created_at' => Carbon::now()
+                ]);
+  
+              }else{
+                $timeline = DB::table("project_timeline")
+                ->insert([
+                'employee_id'=>session('employee_id'),
+                'department_id'=>session('department_id'),
+                'role'=>session('role'),
+                'project_id'=>$request->id,
+                'status'=>5,
+                'campus'=>session('campus'),
+                'remarks'=>"Your PPMP needs to be revised",
+                'created_at' => Carbon::now()
+                ]);  
+              }
+  
+          if($ppmp)
+          {
+              return response()->json([
+              'status' => 200, 
+              // 'message' => $timeline,
+          ]);    
+          }
+          else{
+              return response()->json([
+              'status' => 400, 
+              // 'message' => 'error',
+              ]); 
+          }
+          
+        }else{
+          // dd("akgsdk");
+          return response()->json([
+          'status' => 500, 
+          ]); 
+        }
+      }
     
     public function addMandatoryExpenditure(Request $request){
         $department = $request->department;
