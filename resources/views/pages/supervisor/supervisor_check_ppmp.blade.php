@@ -66,8 +66,10 @@
             {{-- <?php $overalltotal = 0 ;?> --}}
                 <a href="/bac/supervisor"><<- {{ $data[0]->title }}</a>
             <div class="col-md-12 mb-1 text-left">
-                <button type="button" class="btn btn-success  mt-1 accept_all" value="2"  data-id="{{ $data[0]->pt_id }}">Accept All</button></a>
-                <button type="button" class="btn btn-danger  mt-1 reject_all" value="3"  data-id="{{ $data[0]->pt_id }}">Reject All</button>
+                @if($data[0]->status == 1 || $data[0]->status == 2 || $data[0]->status == 3 || $data[0]->status == 6)
+                    <button type="button" class="btn btn-success  mt-1 accept_all" value="2"  data-id="{{ $data[0]->pt_id }}">Accept All</button></a>
+                    <button type="button" class="btn btn-danger  mt-1 reject_all" value="3"  data-id="{{ $data[0]->pt_id }}">Reject All</button>
+                @endif
             </div>
             <table class="text-center ppmp" style=" line-height:22px;font-size:15px">
                 <thead>
@@ -213,7 +215,7 @@
                                 <td  class="quantity " style="width: 40px;">{{$data[$i]->quantity }}</td>
                                 <td  class="unit" >{{$data[$i]->unit_of_measurement }}</td>
                                 <td  class="budget" >Php {{number_format($data[$i]->estimated_price,2 )}}</td>
-                                <td  class="mode align" >{{$data[$i]->mode_of_procurement }}</td>
+                                <td  class="mode align" >{{$data[$i]->procurementName }}</td>
                                 <td  class="jan"+$i>@php 
                                 if($data[$i]->expected_month == '1') {
                                     echo '<i class="fa-solid fa-check"></i>';

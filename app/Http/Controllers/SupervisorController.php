@@ -56,8 +56,9 @@ class SupervisorController extends Controller
       $aes = new AESCipher();
       $id = $aes->decrypt($request->project_code);
       $data = DB::table("ppmps as p")
-                ->select("pt.project_code as code","pt.status as projectStatus","pt.id as pt_id","pt.project_title as title","p.*","pt.year_created")
+                ->select("pt.project_code as code","pt.status as projectStatus","pt.id as pt_id","pt.project_title as title","p.*","pt.year_created","m.mode_of_procurement as procurementName")
                 ->join('project_titles as pt','pt.id','=','p.project_code')
+                ->join('mode_of_procurement as m','m.id','=','p.mode_of_procurement')
                 ->where('p.project_code','=',$id)
                 ->whereNull("p.deleted_at")
                 ->where("p.is_supplemental","=", 0)
@@ -459,7 +460,7 @@ class SupervisorController extends Controller
               ]);  
             }
 
-        if( $ppmp)
+        if($ppmp)
         {
             return response()->json([
             'status' => 200, 
