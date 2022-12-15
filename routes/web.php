@@ -58,7 +58,6 @@ Route::group(['prefix' => 'superadmin','middleware' => ['authuser']], function()
     Route::post('/edit', 'SuperAdmin\AdminController@edit')->name('edit');
     Route::post('/update', 'SuperAdmin\AdminController@update')->name('update');
 
-    Route::get('/departments', 'SuperAdmin\AdminController@departments_index');
     
     // Route::get('/getDepartments', 'SuperAdmin\AdminController@departments');
     Route::post('/getUsers', 'SuperAdmin\AdminController@getUsers');
@@ -66,10 +65,19 @@ Route::group(['prefix' => 'superadmin','middleware' => ['authuser']], function()
     
     Route::get('/getDepartmentsByCampus', 'SuperAdmin\AdminController@getDepartmentsByCampus')->name('getDepartmentsByCampus');
 
+    Route::get('/departments', 'SuperAdmin\AdminController@departments_index');
     Route::get('/getDepartments', 'BudgetOfficer\BudgetOfficerController@getDepartments')->name('getDepartments');
     Route::get('/getFundSources', 'BudgetOfficer\BudgetOfficerController@getFundSources')->name('getFundSources');
     Route::get('/getMandatoryExpenditures', 'BudgetOfficer\BudgetOfficerController@getMandatoryExpenditures')->name('getMandatoryExpenditures');
     Route::get('/getYears', 'BudgetOfficer\BudgetOfficerController@get_years')->name('getYears');
+
+    #START CRUD EXPENDITURES ROUTES
+    Route::get('/mandatory_expenditure_list', 'Admin\AdminController@mandatory_expenditures_index');
+    Route::post('/save_mandatory_expenditure', 'Admin\AdminController@save_mandatory_expenditure')->name('save_mandatory_expenditure');
+    Route::post('/delete_mandatory_expenditure', 'Admin\AdminController@delete_mandatory_expenditure')->name('delete_mandatory_expenditure');
+    Route::post('/edit_mandatory_expenditure', 'Admin\AdminController@edit_mandatory_expenditure')->name('edit_mandatory_expenditure');
+    Route::post('/update_mandatory_expenditure', 'Admin\AdminController@update_mandatory_expenditure')->name('update_mandatory_expenditure');
+    #END CRUD EXPENDITURES ROUTES
 
     Route::get('/ppmp_deadline','BudgetOfficer\BudgetOfficerController@ppmp_deadline_index');
     Route::post('/save_ppmp_deadline','BudgetOfficer\BudgetOfficerController@save_ppmp_deadline')->name('save_ppmp_deadline');
@@ -110,11 +118,10 @@ Route::group(['prefix' => 'superadmin','middleware' => ['authuser']], function()
     // Route::post('/update_allocated_budget', 'SuperAdmin\AdminController@update_allocated_budget')->name('update_allocated_budget');
 
     Route::get('/allocate_budget','BudgetOfficer\BudgetOfficerController@allocate_budget_index');
-    // Route::get('/allocate_budget1','BudgetOfficer\AllocateBudgetController@index1');
     Route::post('/allocate_budget','BudgetOfficer\BudgetOfficerController@allocate_budget')->name('allocate_budget');
-    Route::post('/delete', 'BudgetOfficer\AllocateBudgetController@delete')->name('delete');
+    Route::post('/delete_allocated_budget', 'BudgetOfficer\BudgetOfficerController@delete_allocated_budget')->name('delete_allocated_budget');
     Route::post('/edit_allocated_budget', 'BudgetOfficer\BudgetOfficerController@edit_allocated_budget')->name('edit_allocated_budget');
-    Route::post('/updateAllocatedBudget', 'BudgetOfficer\AllocateBudgetController@updateAllocatedBudget')->name('updateAllocatedBudget');
+    Route::post('/updateAllocatedBudget', 'BudgetOfficer\BudgetOfficerController@update_allocated_budget')->name('updateAllocatedBudget');
 
     Route::get('/get_Departments', 'SuperAdmin\AdminController@get_Departments')->name('get_Departments');
     Route::get('/get_FundSources', 'SuperAdmin\AdminController@get_FundSources')->name('get_FundSources');
@@ -264,256 +271,143 @@ Route::group(['prefix' => 'superadmin','middleware' => ['authuser']], function()
             Route::post('/view_ppmp/showPPMP/ppmp-disapproved', 'BudgetOfficer\BudgetOfficerController@status')->name('ppmp-disapproved');
 
 });
-// Route::group(['prefix' => 'superadmin','middleware' => ['authuser']], function() {
-//     Route::get('/users', 'SuperAdmin\AdminController@index');
-//     Route::post('/save', 'SuperAdmin\AdminController@store')->name('save');
-//     Route::post('/pass', 'SuperAdmin\AdminController@pass')->name('pass');
-//     Route::post('/delete', 'SuperAdmin\AdminController@delete')->name('delete');
-//     Route::post('/edit', 'SuperAdmin\AdminController@edit')->name('edit');
-//     Route::post('/update', 'SuperAdmin\AdminController@update')->name('update');
-
-//     Route::get('/departments', 'SuperAdmin\AdminController@getDepartments');
-    
-//     Route::get('/getDepartments', 'SuperAdmin\AdminController@departments');
-
-//     Route::get('/get_Departments', 'BudgetOfficer\AllocateBudgetController@getDepartments')->name('getDepartments');
-//     Route::get('/getFundSources', 'BudgetOfficer\AllocateBudgetController@getFundSources')->name('getFundSources');
-//     Route::get('/getMandatoryExpenditures', 'BudgetOfficer\AllocateBudgetController@getMandatoryExpenditures')->name('getMandatoryExpenditures');
-//     Route::get('/getYears', 'BudgetOfficer\AllocateBudgetController@get_years')->name('getYears');
-//     Route::post('/getUsers', 'SuperAdmin\AdminController@getUsers');
-
-//     Route::get('/ppmp_deadline','SuperAdmin\AdminController@setDeadlineIndex');
-//     Route::post('/set_ppmp_deadline','SuperAdmin\AdminController@set_deadline')->name('set_ppmp_deadline');
-//     Route::post('/edit_ppmp_deadline', 'SuperAdmin\AdminController@edit_deadline')->name('edit_ppmp_deadline');
-//     Route::post('/update_ppmp_deadline', 'SuperAdmin\AdminController@update_deadline')->name('update_ppmp_deadline');
-//     Route::post('/delete_ppmp_deadline', 'SuperAdmin\AdminController@delete_deadline')->name('delete_ppmp_deadline');
-
-//     Route::get('/fund_sources', 'SuperAdmin\AdminController@fund_sources_index');
-//     Route::post('/add_FundSource','SuperAdmin\AdminController@addFundSource')->name('add_FundSource');
-//     Route::post('/edit_FundSource', 'SuperAdmin\AdminController@editFundSource')->name('edit_FundSource');
-//     Route::post('/update_FundSource', 'SuperAdmin\AdminController@updateFundSource')->name('update_FundSource');
-//     Route::post('/delete_FundSource', 'SuperAdmin\AdminController@deleteFundSource')->name('delete_FundSource');
-
-//     Route::get('/mandatory_expenditures', 'SuperAdmin\AdminController@mandatory_expenditures_index');
-//     Route::post('/add_MandatoryExpenditure','SuperAdmin\AdminController@addMandatoryExpenditure')->name('add_MandatoryExpenditure');
-//     Route::post('/edit_MandatoryExpenditure', 'SuperAdmin\AdminController@editMandatoryExpenditure')->name('edit_MandatoryExpenditure');
-//     Route::post('/update_MandatoryExpenditure', 'SuperAdmin\AdminController@updateMandatoryExpenditure')->name('update_MandatoryExpenditure');
-//     Route::post('/delete_MandatoryExpenditure', 'SuperAdmin\AdminController@deleteMandatoryExpenditure')->name('delete_MandatoryExpenditure');
-
-//     Route::get('/allocate_budget','SuperAdmin\AdminController@allocateBudgetIndex');
-//     Route::post('/save_allocate_budget','SuperAdmin\AdminController@save_allocate_budget')->name('save_allocate_budget');
-//     Route::post('/delete_allocated_budget', 'SuperAdmin\AdminController@delete_allocated_budget')->name('delete_allocated_budget');
-//     Route::post('/edit_allocated_budget', 'SuperAdmin\AdminController@edit_allocated_budget')->name('edit_allocated_budget');
-//     Route::post('/update_allocated_budget', 'SuperAdmin\AdminController@update_allocated_budget')->name('update_allocated_budget');
-
-//     // Route::get('/get_Departments', 'SuperAdmin\AdminController@get_Departments')->name('get_Departments');
-//     // Route::get('/get_FundSources', 'SuperAdmin\AdminController@get_FundSources')->name('get_FundSources');
-//     // Route::get('/get_Mandatory_Expenditures', 'SuperAdmin\AdminController@get_MandatoryExpenditures')->name('get_MandatoryExpenditures');
-
-    
-//     Route::post('/saveDepartment', 'SuperAdmin\AdminController@saveDepartment')->name('saveDepartment');
-//     Route::post('/deleteDepartment', 'SuperAdmin\AdminController@deleteDepartment')->name('deleteDepartment');
-//     Route::post('/editDepartment', 'SuperAdmin\AdminController@editDepartment')->name('editDepartment');
-//     Route::post('/updateDepartment', 'SuperAdmin\AdminController@updateDepartment')->name('updateDepartment');
-//     Route::post('/getDepartmentHeads', 'SuperAdmin\AdminController@getDepartmentHeads')->name('getDepartmentHeads');
-//     Route::post('/getSupervisors', 'SuperAdmin\AdminController@getSupervisors')->name('getSupervisors');
-//     Route::get('/get_Years', 'SuperAdmin\AdminController@getYears')->name('get_Years');
-//     Route::get('/getDeadlineByYear', 'SuperAdmin\AdminController@getDeadlineByYear')->name('getDeadlineByYear');
-//     Route::get('/getYearByType', 'SuperAdmin\AdminController@getYearByType')->name('getYearByType');
-
-
-//     //PURCHASE REQUEST ROUTES
-//     Route::get('/purchase_request', 'SuperAdmin\AdminController@PurchaseRequestIndex');
-
-
-
-//     //END PURCHASE REQUEST ROUTES
-
-//       // Route::get('/users', 'SuperAdmin\AdminController@index');
-//     //jerald
-    
-//     //Category
-//     Route::get('/category', 'BAC\CategoryController@index');
-//     Route::post('/add-category', 'BAC\CategoryController@store')->name('add-category');
-//     Route::post('/delete-category', 'BAC\CategoryController@delete')->name('delete-category');
-//     Route::post('/show-category', 'BAC\CategoryController@show')->name('show-category');
-//     Route::post('/update-category', 'BAC\CategoryController@update')->name('update-category');
-
-//     //Items
-//     Route::get('/items', 'BAC\ItemController@additems');
-//     Route::post('/add-item', 'BAC\ItemController@store')->name('add-item');
-//     Route::post('/delete-item', 'BAC\ItemController@delete')->name('delete-item');
-//     Route::post('/show-item', 'BAC\ItemController@show')->name('show-item');
-//     Route::post('/update-item', 'BAC\ItemController@update')->name('update-item');
-
-//     //Unit of Measurement
-//     Route::get('/unit-of-measurement', 'BAC\UnitofMeasurementController@index');
-//     Route::post('/add-unit', 'BAC\UnitofMeasurementController@store')->name('add-unit');
-//     Route::post('/delete-unit', 'BAC\UnitofMeasurementController@delete')->name('delete-unit');
-//     Route::post('/show-unit', 'BAC\UnitofMeasurementController@show')->name('show-unit');
-//     Route::post('/update-unit', 'BAC\UnitofMeasurementController@update')->name('update-unit');
-
-//     //Mode of Procurement
-//     Route::get('/mode-of-procurement', 'BAC\ModeofProcurementController@index');
-//     Route::post('/add-procurement', 'BAC\ModeofProcurementController@store')->name('add-procurement');
-//     Route::post('/delete-procurement', 'BAC\ModeofProcurementController@delete')->name('delete-procurement');
-//     Route::post('/show-procurement', 'BAC\ModeofProcurementController@show')->name('show-procurement');
-//     Route::post('/update-procurement', 'BAC\ModeofProcurementController@update')->name('update-procurement');
-
-//     //Approved PPMP
-//     Route::get('/approved-ppmp', 'BAC\ApprovedPPMPController@index');
-//     Route::post('/show-approved', 'BAC\ApprovedPPMPController@show');
-    
-//     //Approved Supplemental
-//     Route::get('/approved-supplemental', 'BAC\ApprovedSupplementalController@index');
-//     Route::post('/show-supplemental', 'BAC\ApprovedSupplementalController@show');
-    
-//     //New PPMP Request
-//     Route::get('/request-new-ppmp', 'BAC\NewPPMPRequestController@index');
-//     // Route::post('/show-approved', 'BAC\ApprovedPPMPController@show');
-
-    
-//     //generate APP - NONCSE
-//     Route::get('/app-non-cse', 'BAC\APPNONCSEController@index');
-//     Route::get('/try', 'BAC\APPNONCSEController@try');
-//     Route::post('/app-non-cse-generate', 'BAC\APPNONCSEController@generatepdf')->name('app-non-cse-generate');
-//     Route::get('/app-non-cse-generate-excel', 'BAC\APPNONCSEController@generateexcel')->name('app-non-cse-generate-excel');
-//     Route::post('/show-signatories', 'BAC\APPNONCSEController@show_signatories')->name('show-signatories');
-//     Route::post('/add-preparedby', 'BAC\APPNONCSEController@add_preparedby')->name('add-preparedby');
-//     Route::post('/add-approvedby', 'BAC\APPNONCSEController@add_approvedby')->name('add-approvedby');
-//     Route::post('/add-recommendingapproval', 'BAC\APPNONCSEController@add_recommendingapproval')->name('add-recommendingapproval');
-//     Route::post('/update-signatories', 'BAC\APPNONCSEController@update_signatories')->name('update-signatories');
-//     Route::get('/app-non-cse-year', 'BAC\APPNONCSEController@app_non_cse_year')->name('app-non-cse-year');
-    
-//     Route::post('/show-campusinfo', 'BAC\APPNONCSEController@show_campusinfo')->name('show-campusinfo');
-//     Route::post('/update-campusinfo', 'BAC\APPNONCSEController@update_campusinfo')->name('update-campusinfo');
-//     // Route::post('/show-campuslogo', 'BAC\APPNONCSEController@show_campuslogo')->name('show-campusinfo');
-//     Route::post('/update-campuslogo', 'BAC\APPNONCSEController@update_campuslogo')->name('update-campuslogo');
-//     Route::post('/update-logo', 'BAC\APPNONCSEController@update_logo')->name('update-logo');
-
-    
-//     Route::group(['prefix' => 'supervisor','middleware' => ['authuser']], function() {
-//         //Supervisor Side
-//         Route::get('/', 'SupervisorController@index');
-//         Route::post('/show-ppmp', 'SupervisorController@show')->name('show-ppmp');
-//         Route::post('/supervisor-ppmp-approved', 'SupervisorController@status')->name('supervisor-ppmp-approved');
-//         Route::post('/supervisor-ppmp-disapproved', 'SupervisorController@status')->name('supervisor-ppmp-disapproved');
-//     });
-    
-//     //Ammendments
-//     Route::get('/request-for-amendments', 'BAC\RequestforAmendmentsController@index');
-//     // Route::post('/app-non-cse-view', 'BAC\APPNONCSEController@view')->name('app-non-cse-view');
-//     //jrald end
-//     // Route::get('/adduser','Admin\AdminController@adduser');
-    
-//     //jerald
-//     // Route::get('/items', 'BAC\ItemController@additems');
-//     // Route::get('/unit-of-measurement', 'BAC\UnitofMeasurementController@additems');
-//     // Route::get('/mode-of-procurement', 'BAC\ModeofProcurementController@additems');
-//     //jrald end
-//     // Route::get('/adduser','Admin\AdminController@adduser');
-
-//      /* Torrexx Additionals */
-//         /** Implementing Functions Related to the department end user */
-//             # this will show dashboard for end user role
-//             Route::get('/announcements', [DepartmentPagesController::class, 'showAnnouncementPage'])->name('department-dashboard');
-//             # this will show the create project title 
-//             Route::get('/project-category', [DepartmentPagesController::class, 'showProjectCategory'])->name('derpartment-project-category');
-
-//             # this will create the PPMP or the project title
-//             Route::get('/createPPMP', [DepartmentPagesController::class, 'showCreatePPMP'])->name('department-showCreatetPPMP');
-//             # this will submit created project title by the end user or department roloe= 4 
-//             Route::post('/createPPMP', [DepartmentController::class, 'createProjectTitle'])->name('department-createProjectTitle');
-//             # this will get the project title based on id
-//             Route::get('/get-project-title', [DepartmentController::class, 'getProjectTitle'])->name('department-get-project');
-//             # this will delete project title 
-//             Route::get('/destroy-project-title', [DepartmentController::class, 'destoryProjectTitle'])->name('department-destroy-project');
-//             # this will update project title
-//             Route::post('/update-project-title', [DepartmentController::class, 'updateProjectTitle'])->name('department-update-project');
-
-//             # this will show add item page based on the clicked project title id
-//             Route::get('/addItem/projectid', [DepartmentPagesController::class, 'showAddItem'])->name('department-addItem');
-//             # this will create items on the items table
-//             Route::post('/create-ppmps', [DepartmentController::class, 'createPPMPs'])->name('department-create-ppmps');
-//             # this will fetch all item description based on the given item name
-//             Route::post('/fetch/item-description', [DepartmentController::class, 'getItemDescription'])->name('department-item-description');
-//             # this will fetch all the item category based item name
-//             Route::post('/fetch/item-category', [DepartmentController::class, 'getItemCategory'])->name('department-item-category');
-//             # this will update item details on ppmps table
-//             Route::post('/update/item-details', [DepartmentController::class, 'updatePPMPS'])->name('department-update-item');
-//             # deleting data from ppmps table
-//             Route::post('/delete/item-details', [DepartmentController::class, 'deletePPMPS'])->name('department-delete-item');
-//             # this will submit ppmp on the 
-//             Route::post('/sumbit/ppmp', [DepartmentController::class, 'submitPPMP'])->name('department-submit-ppmp');
-
-//             # this will show the my ppmp page based on the department id
-//             Route::get('/myPPMP', [DepartmentPagesController::class, 'showMyPPMP'])->name('department-showMyPPMP');
-//             # this will show the status of the project along with its item
-//             Route::post('/project/status', [DepartmentPagesController::class, 'showProjectStatus'])->name('department-showProjectStatus');
-//         /** Gettin data from the database */
-//             # this will get the databa by unit of measure per item fron the unit measure from the dabase
-//             Route::post('/UnitOfMeasure', 'Department\UnitOfMeasurementController@show')->name('UnitOfMeasure');
-//             # get data all project
-//             Route::post('/getAllProject', [ProjectsController::class, 'show'])->name('department-get-projects');
-//             # this will get the project title by year created
-//             Route::post('/get-by-year-created', [DepartmentPagesController::class, 'show_by_year_created'])->name('department-year-created');
-
-//             Route::get('/pending_ppmps','BudgetOfficer\BudgetOfficerController@PPMPindex');
-//             Route::post('/view_ppmp/showPPMP', 'BudgetOfficer\BudgetOfficerController@showPPMP')->name('showPPMP');
-//             Route::post('/view_ppmp/showPPMP/ppmp-approved', 'BudgetOfficer\BudgetOfficerController@status')->name('ppmp-approved');
-//             Route::post('/view_ppmp/showPPMP/ppmp-disapproved', 'BudgetOfficer\BudgetOfficerController@status')->name('ppmp-disapproved');
-
-// });
-#End Route for SuperAdmin
 
 Route::group(['prefix' => 'admin','middleware' => ['authuser']], function() {
-    Route::get('/users', 'Admin\AdminController@index');
-    Route::post('/save', 'Admin\AdminController@store')->name('save');
-    Route::post('/delete', 'Admin\AdminController@delete')->name('delete');
-    Route::post('/edit', 'Admin\AdminController@edit')->name('edit');
-    Route::post('/update', 'Admin\AdminController@update')->name('update');
+    #START CRUD ACCOUNT ROUTES
+    Route::get('/accounts_index', 'Admin\AdminController@accounts_index');
+    Route::get('/get_accounts_HRMIS', 'Admin\AdminController@get_accounts_HRMIS')->name('get_accounts_HRMIS');
+    Route::get('/getDepartmentsByCampus', 'Admin\AdminController@getDepartmentsByCampus')->name('getDepartmentsByCampus');
+    Route::post('/save_account', 'Admin\AdminController@save_account')->name('save_account');
+    Route::post('/edit_account', 'Admin\AdminController@edit_account')->name('edit_account');
+    Route::post('/update_account', 'Admin\AdminController@update_account')->name('update_account');
+    Route::post('/delete_account', 'Admin\AdminController@delete_account')->name('delete_account');
+    #END CRUD ACCOUNT ROUTES
+
+    #START CRUD DEPARTMENT ROUTES
+    Route::get('/departments_index', 'Admin\AdminController@departments_index');
+    Route::get('/get_accounts_PMIS', 'Admin\AdminController@get_accounts_PMIS')->name('get_accounts_PMIS');
+    Route::post('/save_department', 'Admin\AdminController@save_department')->name('save_department');
+    Route::post('/delete_department', 'Admin\AdminController@delete_department')->name('delete_department');
+    Route::post('/edit_department', 'Admin\AdminController@edit_department')->name('edit_department');
+    Route::post('/update_department', 'Admin\AdminController@update_department')->name('update_department');
+    #END CRUD DEPARTMENT ROUTES
+
+    #START CRUD EXPENDITURES ROUTES
+    Route::get('/mandatory_expenditures', 'Admin\AdminController@mandatory_expenditures_index');
+    Route::post('/save_mandatory_expenditure', 'Admin\AdminController@save_mandatory_expenditure')->name('save_mandatory_expenditure');
+    Route::post('/delete_mandatory_expenditure', 'Admin\AdminController@delete_mandatory_expenditure')->name('delete_mandatory_expenditure');
+    Route::post('/edit_mandatory_expenditure', 'Admin\AdminController@edit_mandatory_expenditure')->name('edit_mandatory_expenditure');
+    Route::post('/update_mandatory_expenditure', 'Admin\AdminController@update_mandatory_expenditure')->name('update_mandatory_expenditure');
+    #END CRUD EXPENDITURES ROUTES
+
+    #START CRUD FUND SOURCE ROUTES
+    Route::get('/fund_sources_index', 'Admin\AdminController@fund_sources_index');
+    Route::post('/add_fund_source','Admin\AdminController@add_fund_source')->name('add_fund_source');
+    Route::post('/edit_fund_source', 'Admin\AdminController@edit_fund_source')->name('edit_fund_source');
+    Route::post('/update_fund_source', 'Admin\AdminController@update_fund_source')->name('update_fund_source');
+    Route::post('/delete_fund_source', 'Admin\AdminController@delete_fund_source')->name('delete_fund_source');
+    #END CRUD FUND SOURCE ROUTES
+
+    #START CRUD ITEM ROUTES
+    Route::get('/items_index', 'Admin\AdminController@items_index');
+    Route::post('/add_item', 'Admin\AdminController@add_item');
+    Route::post('/delete_item', 'Admin\AdminController@delete_item')->name('delete_item');
+    Route::post('/edit_item', 'Admin\AdminController@edit_item')->name('edit_item');
+    Route::post('/update_item', 'Admin\AdminController@update_item')->name('update_item');
+
+    Route::get('/get_mode_of_procurement', 'Admin\AdminController@get_mode_of_procurement')->name('get_mode_of_procurement');
+    #END CRUD ITEM ROUTES
+
+    #START CRUD DEADLINE ROUTES
+    Route::get('/ppmp_deadline','BudgetOfficer\BudgetOfficerController@ppmp_deadline_index');
+    Route::post('/save_ppmp_deadline','BudgetOfficer\BudgetOfficerController@save_ppmp_deadline')->name('save_ppmp_deadline');
+    Route::post('/edit_deadline', 'BudgetOfficer\BudgetOfficerController@edit_deadline')->name('edit_deadline');
+    Route::post('/update_deadline', 'BudgetOfficer\BudgetOfficerController@update_deadline')->name('update_deadline');
+    Route::post('/delete_deadline', 'BudgetOfficer\BudgetOfficerController@delete_deadline')->name('delete_deadline');
+    #END CRUD DEADLINE ROUTES
+
+    #START CRUD MANDATORY EXPENDITURE ROUTES
+    Route::get('/mandatory_expenditures_index','BudgetOfficer\BudgetOfficerController@mandatory_expenditures_index');
+    Route::post('/addMandatoryExpenditure','BudgetOfficer\BudgetOfficerController@addMandatoryExpenditure')->name('addMandatoryExpenditure');
+    Route::post('/editMandatoryExpenditure', 'BudgetOfficer\BudgetOfficerController@editMandatoryExpenditure')->name('editMandatoryExpenditure');
+    Route::post('/updateMandatoryExpenditure', 'BudgetOfficer\BudgetOfficerController@updateMandatoryExpenditure')->name('updateMandatoryExpenditure');
+    Route::post('/deleteMandatoryExpenditure', 'BudgetOfficer\BudgetOfficerController@deleteMandatoryExpenditure')->name('deleteMandatoryExpenditure');
+
+    Route::get('/getDepartments', 'BudgetOfficer\BudgetOfficerController@getDepartments')->name('getDepartments');
+    Route::get('/getFundSources', 'BudgetOfficer\BudgetOfficerController@getFundSources')->name('getFundSources');
+    Route::get('/getMandatoryExpenditures', 'BudgetOfficer\BudgetOfficerController@getMandatoryExpenditures')->name('getMandatoryExpenditures');
+    Route::get('/getYears', 'BudgetOfficer\BudgetOfficerController@get_years')->name('getYears');
+    #END CRUD MANDATORY EXPENDITURE ROUTES
+
+    #START CRUD ALLOCATE BUDGET ROUTES
+    Route::get('/allocate_budget_index','BudgetOfficer\BudgetOfficerController@allocate_budget_index');
+    Route::post('/allocate_budget','BudgetOfficer\BudgetOfficerController@allocate_budget')->name('allocate_budget');
+    Route::post('/delete_allocated_budget', 'BudgetOfficer\BudgetOfficerController@delete_allocated_budget')->name('delete_allocated_budget');
+    Route::post('/edit_allocated_budget', 'BudgetOfficer\BudgetOfficerController@edit_allocated_budget')->name('edit_allocated_budget');
+    Route::post('/updateAllocatedBudget', 'BudgetOfficer\BudgetOfficerController@update_allocated_budget')->name('updateAllocatedBudget');
+
+    Route::get('/get_procurement_type', 'BudgetOfficer\BudgetOfficerController@get_procurement_type')->name('get_procurement_type');
+    Route::get('/get_DeadlineByYear', 'BudgetOfficer\BudgetOfficerController@get_DeadlineByYear')->name('get_DeadlineByYear');
+    #END CRUD ALLOCATE BUDGET ROUTES   
+
+    #START CRUD PENDING PPMPS ROUTES
+    Route::get('/view_ppmp_index','BudgetOfficer\BudgetOfficerController@PPMPindex')->name('view_ppmp');
+    Route::get('/returnView','BudgetOfficer\BudgetOfficerController@returnView');
+    Route::post('/view_ppmp/showPPMP', 'BudgetOfficer\BudgetOfficerController@showPPMP')->name('showPPMP');
+    Route::post('/view_ppmp/showPPMP/ppmp-status', 'BudgetOfficer\BudgetOfficerController@status')->name('ppmp-status');
+    Route::post('/view_ppmp/showPPMP/ppmp-timeline', 'BudgetOfficer\BudgetOfficerController@timeline')->name('ppmp-timeline');
+    #END CRUD PENDING PPMPS ROUTES   
+
+    #START VIEW SIGNED PPMPS ROUTE
+    Route::get('/view_signed_ppmp_index','BudgetOfficer\BudgetOfficerController@signed_ppmps_index');
+    #END VIEW SIGNED PPMPS ROUTE
+
+    #START CRUD CATEGORY ROUTES
+    Route::get('/category_index', 'Admin\AdminController@category_index');
+    Route::post('/add_category', 'Admin\AdminController@add_category')->name('add_category');
+    Route::post('/delete_category', 'Admin\AdminController@delete_category')->name('delete_category');
+    Route::post('/edit_category', 'Admin\AdminController@edit_category')->name('edit_category');
+    Route::post('/update_category', 'Admin\AdminController@update_category')->name('update_category');
+    #END CRUD CATEGORY ROUTES
+
+    #START CRUD UNIT OF MEASUREMENT ROUTES
+    Route::get('/unit_of_measurement_index', 'Admin\AdminController@unit_of_measurement_index');
+    Route::post('/add_unit', 'Admin\AdminController@add_unit')->name('add_unit');
+    Route::post('/delete_unit', 'Admin\AdminController@delete_unit')->name('delete_unit');
+    Route::post('/edit_unit', 'Admin\AdminController@edit_unit')->name('edit_unit');
+    Route::post('/update_unit', 'Admin\AdminController@update_unit')->name('update_unit');
+    #END CRUD UNIT OF MEASUREMENT ROUTES
+
+    #START CRUD MODE OF PROCUREMENT ROUTES
+    Route::get('/mode_of_procurement_index', 'Admin\AdminController@mode_of_procurement_index');
+    Route::post('/add_procurement', 'Admin\AdminController@add_procurement')->name('add_procurement');
+    Route::post('/delete_procurement', 'Admin\AdminController@delete_procurement')->name('delete_procurement');
+    Route::post('/edit_procurement', 'Admin\AdminController@edit_procurement')->name('edit_procurement');
+    Route::post('/update_procurement', 'Admin\AdminController@update_procurement')->name('update_procurement');
+    #END CRUD MODE OF PROCUREMENT ROUTES
+
+    #START VIEW APPROVED AND SIGNED PPMP ROUTES
+    Route::get('/approved_ppmp', 'Admin\AdminController@approved_ppmp_index');
+    Route::post('/show_approved_ppmp', 'Admin\AdminController@show_approved_ppmp');
+    #END VIEW APPROVED AND SIGNED PPMP ROUTES
+
+
+    #START PENDING PPMP ROUTES
+    Route::get('/pending_ppmps_index', 'Admin\AdminController@pending_ppmps_index');
+    Route::post('/show_ppmp', 'Admin\AdminController@show_ppmp')->name('show_ppmp');
+    Route::post('/supervisor_ppmp_approved', 'Admin\AdminController@status')->name('supervisor_ppmp_approved');
+    Route::post('/supervisor_ppmp_disapproved', 'Admin\AdminController@status')->name('supervisor_ppmp_disapproved');
+    #END PENDING PPMP ROUTES
+
+    // Route::post('/save', 'Admin\AdminController@store')->name('save');
+    // Route::post('/delete', 'Admin\AdminController@delete')->name('delete');
+    // Route::post('/edit', 'Admin\AdminController@edit')->name('edit');
+    // Route::post('/update', 'Admin\AdminController@update')->name('update');
 });
+
 //Jerald 
 Route::post('/add-item', 'BAC\ItemController@store');
 Route::get('/delete-item/{id}', 'BAC\ItemController@delete');
-
-#Romar
-#Start Route for Budget Officer
-// Route::group(['prefix' => 'budgetofficer','middleware' => ['authuser']], function() {
-//     Route::get('/try','BudgetOfficer\BudgetOfficerController@try');
-
-//     Route::get('/ppmp_deadline','BudgetOfficer\BudgetOfficerController@index');
-//     Route::post('/ppmp_deadline','BudgetOfficer\BudgetOfficerController@store')->name('ppmp_deadline');
-//     Route::post('/edit_deadline', 'BudgetOfficer\BudgetOfficerController@edit')->name('edit_deadline');
-//     Route::post('/update_deadline', 'BudgetOfficer\BudgetOfficerController@update')->name('update_deadline');
-//     Route::post('/delete_deadline', 'BudgetOfficer\BudgetOfficerController@delete')->name('delete_deadline');
-
-//     Route::get('/mandatory_expenditures','BudgetOfficer\BudgetOfficerController@mandatory_expenditures');
-//     Route::post('/addMandatoryExpenditure','BudgetOfficer\BudgetOfficerController@addMandatoryExpenditure')->name('addMandatoryExpenditure');
-//     Route::post('/editMandatoryExpenditure', 'BudgetOfficer\BudgetOfficerController@editMandatoryExpenditure')->name('editMandatoryExpenditure');
-//     Route::post('/updateMandatoryExpenditure', 'BudgetOfficer\BudgetOfficerController@updateMandatoryExpenditure')->name('updateMandatoryExpenditure');
-//     Route::post('/deleteMandatoryExpenditure', 'BudgetOfficer\BudgetOfficerController@deleteMandatoryExpenditure')->name('deleteMandatoryExpenditure');
-
-//     Route::get('/allocate_budget','BudgetOfficer\AllocateBudgetController@index');
-//     // Route::get('/allocate_budget1','BudgetOfficer\AllocateBudgetController@index1');
-//     Route::post('/allocate_budget','BudgetOfficer\AllocateBudgetController@allocate_budget')->name('allocate_budget');
-//     Route::post('/delete', 'BudgetOfficer\AllocateBudgetController@delete')->name('delete');
-//     Route::post('/edit', 'BudgetOfficer\AllocateBudgetController@edit')->name('edit');
-//     Route::post('/updateAllocatedBudget', 'BudgetOfficer\AllocateBudgetController@updateAllocatedBudget')->name('updateAllocatedBudget');
-//     Route::get('/getDepartments', 'BudgetOfficer\AllocateBudgetController@getDepartments')->name('getDepartments');
-//     Route::get('/getFundSources', 'BudgetOfficer\AllocateBudgetController@getFundSources')->name('getFundSources');
-//     Route::get('/getMandatoryExpenditures', 'BudgetOfficer\AllocateBudgetController@getMandatoryExpenditures')->name('getMandatoryExpenditures');
-//     Route::get('/getYears', 'BudgetOfficer\AllocateBudgetController@get_years')->name('getYears');
-//     Route::get('/get_DeadlineByYear', 'BudgetOfficer\AllocateBudgetController@get_DeadlineByYear')->name('get_DeadlineByYear');
-
-//     Route::get('/view_ppmp','BudgetOfficer\BudgetOfficerController@PPMPindex');
-//     Route::post('/view_ppmp/showPPMP', 'BudgetOfficer\BudgetOfficerController@showPPMP')->name('showPPMP');
-//     Route::post('/view_ppmp/showPPMP/ppmp-approved', 'BudgetOfficer\BudgetOfficerController@status')->name('ppmp-approved');
-//     Route::post('/view_ppmp/showPPMP/ppmp-disapproved', 'BudgetOfficer\BudgetOfficerController@status')->name('ppmp-disapproved');
-//     Route::post('/view_ppmp/showPPMP/ppmp-timeline', 'BudgetOfficer\BudgetOfficerController@timeline')->name('ppmp-timeline');
-
-//     Route::get('/view_signed_ppmp','BudgetOfficer\ViewSignedPPMPController@index');
-// });
 
 Route::group(['prefix' => 'budgetofficer','middleware' => ['authuser']], function() {
     Route::get('/try','BudgetOfficer\BudgetOfficerController@try');
@@ -535,9 +429,10 @@ Route::group(['prefix' => 'budgetofficer','middleware' => ['authuser']], functio
     Route::get('/allocate_budget','BudgetOfficer\BudgetOfficerController@allocate_budget_index');
     // Route::get('/allocate_budget1','BudgetOfficer\AllocateBudgetController@index1');
     Route::post('/allocate_budget','BudgetOfficer\BudgetOfficerController@allocate_budget')->name('allocate_budget');
-    Route::post('/delete', 'BudgetOfficer\AllocateBudgetController@delete')->name('delete');
+    // Route::post('/delete', 'BudgetOfficer\AllocateBudgetController@delete')->name('delete');
+    Route::post('/delete_allocated_budget', 'BudgetOfficer\BudgetOfficerController@delete_allocated_budget')->name('delete_allocated_budget');
     Route::post('/edit_allocated_budget', 'BudgetOfficer\BudgetOfficerController@edit_allocated_budget')->name('edit_allocated_budget');
-    Route::post('/updateAllocatedBudget', 'BudgetOfficer\AllocateBudgetController@updateAllocatedBudget')->name('updateAllocatedBudget');
+    Route::post('/updateAllocatedBudget', 'BudgetOfficer\BudgetOfficerController@update_allocated_budget')->name('updateAllocatedBudget');
 
     Route::get('/getDepartments', 'BudgetOfficer\BudgetOfficerController@getDepartments')->name('getDepartments');
     Route::get('/getFundSources', 'BudgetOfficer\BudgetOfficerController@getFundSources')->name('getFundSources');
@@ -546,15 +441,14 @@ Route::group(['prefix' => 'budgetofficer','middleware' => ['authuser']], functio
     Route::get('/get_procurement_type', 'BudgetOfficer\BudgetOfficerController@get_procurement_type')->name('get_procurement_type');
     Route::get('/get_DeadlineByYear', 'BudgetOfficer\BudgetOfficerController@get_DeadlineByYear')->name('get_DeadlineByYear');
 
+    Route::get('/view_signed_ppmp','BudgetOfficer\BudgetOfficerController@signed_ppmps_index');
     Route::get('/view_ppmp','BudgetOfficer\BudgetOfficerController@PPMPindex')->name('view_ppmp');
     Route::get('/returnView','BudgetOfficer\BudgetOfficerController@returnView');
     Route::post('/view_ppmp/showPPMP', 'BudgetOfficer\BudgetOfficerController@showPPMP')->name('showPPMP');
     Route::post('/view_ppmp/showPPMP/ppmp-status', 'BudgetOfficer\BudgetOfficerController@status')->name('ppmp-status');
-    // Route::post('/view_ppmp/showPPMP/ppmp-approved', 'BudgetOfficer\BudgetOfficerController@status')->name('ppmp-approved');
-    // Route::post('/view_ppmp/showPPMP/ppmp-disapproved', 'BudgetOfficer\BudgetOfficerController@status')->name('ppmp-disapproved');
     Route::post('/view_ppmp/showPPMP/ppmp-timeline', 'BudgetOfficer\BudgetOfficerController@timeline')->name('ppmp-timeline');
+    Route::post('/view_ppmp/showPPMP/accept-reject-all', 'BudgetOfficer\BudgetOfficerController@accept_reject_all')->name('accept-reject-all');
 
-    Route::get('/view_signed_ppmp','BudgetOfficer\ViewSignedPPMPController@index');
 });
 #End Route for Budget Officer
 
@@ -606,6 +500,7 @@ Route::group(['prefix' => 'bac','middleware' => ['authuser']], function() {
     //generate APP - NONCSE
     Route::get('/app-non-cse', 'BAC\APPNONCSEController@index');
     Route::get('/try', 'BAC\APPNONCSEController@try');
+    Route::post('/app-non-cse-done', 'BAC\APPNONCSEController@endorse_to_main')->name('app-non-cse-done');
     Route::post('/app-non-cse-generate', 'BAC\APPNONCSEController@generatepdf')->name('app-non-cse-generate');
     Route::get('/show-all', 'BAC\APPNONCSEController@university_wide')->name('show-all');
     Route::get('/app-non-cse-generate-excel', 'BAC\APPNONCSEController@generateexcel')->name('app-non-cse-generate-excel');
@@ -632,6 +527,7 @@ Route::group(['prefix' => 'bac','middleware' => ['authuser']], function() {
         Route::post('/supervisor-ppmp-approved', 'SupervisorController@status')->name('supervisor-ppmp-approved');
         Route::post('/supervisor-ppmp-disapproved', 'SupervisorController@status')->name('supervisor-ppmp-disapproved');
         Route::post('/supervisor-ppmp-done', 'SupervisorController@done')->name('supervisor-ppmp-done');
+        Route::post('/accept-reject-all', 'SupervisorController@accept_reject_all')->name('accept-reject-all');
     });
     
     //Ammendments
@@ -690,7 +586,9 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
     Route::get('/purchaseRequest/getEmployees', 'Department\PurchaseRequestController@getEmployees');
     Route::post('/purchaseRequest/savePR', 'Department\PurchaseRequestController@savePR');
 
-    Route::get('/trackPR', 'Department\PurchaseRequestController@TrackPRIndex');
+    Route::get('/trackPR', 'Department\PurchaseRequestController@TrackPRIndex')->name('trackPR');
+    Route::get('/trackPR/view_status', 'Department\PurchaseRequestController@view_status')->name('view_status');
+    Route::get('/trackPR/view_pr', 'Department\PurchaseRequestController@view_pr')->name('view_pr');
     // Route::get('/trackPR/viewPR', 'Department\PurchaseRequestController@viewPR')->name('viewPR');
 
     //END PURCHASE REQUEST ROUTES

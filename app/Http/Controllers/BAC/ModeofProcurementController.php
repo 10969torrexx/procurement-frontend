@@ -131,14 +131,11 @@ class ModeofProcurementController extends Controller
     // dd($modeofprocurement);
 
     $modeofprocurement = DB::table("mode_of_procurement")
-                  ->where("campus", session('campus'))
                   ->whereNull("deleted_at")
                   ->get();
 
     return view('pages.bac.add-mode-of-procurement',['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs],
     [
-      // // 'data' => $unitofmeasurement['data'],
-      // 'data' => $unitofmeasurement['data'],
       'data' => $modeofprocurement,
     ] 
     );

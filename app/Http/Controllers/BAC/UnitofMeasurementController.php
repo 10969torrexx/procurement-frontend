@@ -235,7 +235,7 @@ class UnitofMeasurementController extends Controller
       $unit = DB::table("unit_of_measurements")
               ->where('id',$id)
               ->update([
-                'unit_of_measurements' => $request->unit_of_measurements,
+                'unit_of_measurement' => $request->unit_of_measurement,
                 'name'     =>session('name'),
                 'updated_at'=> Carbon::now(),
               ]);

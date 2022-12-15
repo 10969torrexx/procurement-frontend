@@ -4,6 +4,7 @@
 
 $(document).on('click', '.generatepdf', function (e) {
   var year = $(".Year").val();
+  var campusCheck = $(".campusCheck").val();
 
   console.log(year);
   if(year == ""){
@@ -19,7 +20,7 @@ $(document).on('click', '.generatepdf', function (e) {
     $.ajax({
       type: "post",
       url: "app-non-cse-generate",
-      data:{'year': year},
+      data:{'year': year,'campusCheck': campusCheck},
       xhrFields: {
         responseType: 'blob'
       },
@@ -43,7 +44,7 @@ $(document).on('click', '.generatepdf', function (e) {
         Swal.fire({
             icon: 'error',
             title: 'Oops...',
-            text: 'Incomplete Inputs',
+            text: 'Incomplete Signatories',
           })
           // console.log(blob);
       }
@@ -639,6 +640,63 @@ $(document).on('click', '.submitapproval', function (e) {
         });
   }
       
+});
+
+//allowed main campus to view
+$(document).on('click', '.endorse', function (e) {
+  var year = $(".Year").val();
+  var data = {
+    'year' :  $(".Year").val(),
+    'endorse' : $(this).val()
+  }
+  $.ajaxSetup({
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+  });
+
+  $.ajax({
+    type: "POST",
+    url: "app-non-cse-done",
+    data: data,
+    dataType: "json",
+    success: function (response) {
+      // console.log(response);
+      if(response['status'] == 200) {
+        Swal.fire({
+          title: '',
+          html: 'Loading...',
+          icon: 'success',
+          timer: 1000,
+          timerProgressBar: true,
+          didOpen: () => {
+            Swal.showLoading()
+            const b = Swal.getHtmlContainer().querySelector('b')
+            timerInterval = setInterval(() => {
+              b.textContent = Swal.getTimerLeft()
+            }, 100)
+          },
+          willClose: () => {
+            clearInterval(timerInterval)
+          }
+          }).then((result) => {
+            /* Read more about handling dismissals below */
+            if (result.dismiss === Swal.DismissReason.timer) {
+              location.reload();
+              console.log('I was closed by the timer')
+            }
+            location.reload();
+          })
+      }else{
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Already Exist',
+        })
+        // $(this).text('Shared');
+      }
+    }
+  })
 });
 
 //trigger edit new recommendingapproval modal

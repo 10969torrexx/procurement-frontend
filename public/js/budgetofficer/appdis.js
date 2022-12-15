@@ -11,6 +11,120 @@ $.ajaxSetup({
    }
    });
    
+   $(document).on('click', '#superbtn', function (e) {
+      var ppmpDone = document.getElementById("ppmpDone");
+        if (ppmpDone.style.display === 'none'){
+         ppmpDone.style.display = 'block';
+        }
+    });
+    
+   $(document).on('click', '.accept_all', function (e) {
+      // alert('ssss')
+      var data = {
+         'id': $(this).attr("data-id"),
+         'remarks': "Accepted",
+         // 'total': $('.overalltotal').val(),
+         'value': $(this).val(),
+      }
+
+      $.ajax({
+
+            type: "post",
+            url: "/budgetofficer/view_ppmp/showPPMP/accept-reject-all",
+            data:data,
+            success: function (response) {
+               if (response.status == 200) {
+               Swal.fire({
+                  title: 'Accepted!!!',
+                  html: 'Project Accepted',
+                  icon: 'success',
+                  timer: 1000,
+                  timerProgressBar: true,
+                  didOpen: () => {
+                     Swal.showLoading()
+                     const b = Swal.getHtmlContainer().querySelector('b')
+                     timerInterval = setInterval(() => {
+                     b.textContent = Swal.getTimerLeft()
+                     }, 100)
+                  },
+                  willClose: () => {
+                     clearInterval(timerInterval)
+                  }
+               }).then((result) => {
+                  /* Read more about handling dismissals below */
+                  if (result.dismiss === Swal.DismissReason.timer) {
+                     location.reload();
+                     console.log('I was closed by the timer')
+                  }
+               })
+               // Swal.fire('Deleted SuccessFully!', '', 'success')
+               // location.reload()
+               }else if (response.status == 500) {
+                  Swal.fire('All Items are already Approved', '', 'info')
+               }
+            }
+         });
+    });
+   
+    $(document).on('click', '.reject_all', function (e) {
+      
+      $("#reject_all_ppmp_modal").modal('show');
+      $('.reject_val').val($(this).val());
+      $('.reject_id').val($(this).attr("data-id"));
+   
+    });
+    
+    $(document).on('click', '.submitreject', function (e) {
+      var data = {
+         'id': $('.reject_id').val(),
+         'remarks': $('.reject_remarks').val(),
+         'value': $('.reject_val').val(),
+      }
+      $.ajaxSetup({
+          headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          }
+      });
+      console.log(data);
+      $.ajax({
+            type: "post",
+            url: "/budgetofficer/view_ppmp/showPPMP/accept-reject-all",
+            data:data,
+            success: function (response) {
+               if (response.status == 200) {
+               Swal.fire({
+                  title: 'Rejected!!!',
+                  html: 'Project Rejected',
+                  icon: 'success',
+                  timer: 1000,
+                  timerProgressBar: true,
+                  didOpen: () => {
+                     Swal.showLoading()
+                     const b = Swal.getHtmlContainer().querySelector('b')
+                     timerInterval = setInterval(() => {
+                     b.textContent = Swal.getTimerLeft()
+                     }, 100)
+                  },
+                  willClose: () => {
+                     clearInterval(timerInterval)
+                  }
+               }).then((result) => {
+                  /* Read more about handling dismissals below */
+                  if (result.dismiss === Swal.DismissReason.timer) {
+                     location.reload();
+                     console.log('I was closed by the timer')
+                  }
+               })
+               // Swal.fire('Deleted SuccessFully!', '', 'success')
+               // location.reload()
+               }else if (response.status == 500) {
+                  console.log(response);
+                  Swal.fire('All Items are already Rejected', '', 'info')
+               }
+            }
+         });
+    });
+
 $(document).on('click', '.done', function (e) {
    // console.log('array_status: '+array_status);
    // console.log('array_item_id: '+array_item_id);

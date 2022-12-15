@@ -55,7 +55,7 @@
                                     <tr><td class="text-center" colspan="4"><span class="text-danger">{{ $error}}</span></td></tr>
                                     @else
                                         <?php $ctr=1; ?>
-                                        @foreach($fund_sources['data'] as $data)
+                                        @foreach($fund_sources as $data)
                                             <tr id = "{{$ctr}}">
                                                 <td>
                                                     <div class="dropdown">
@@ -63,14 +63,14 @@
                                                             class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
                                                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu"></span>
                                                         <div class="dropdown-menu dropdown-menu-left">
-                                                            <a class="dropdown-item editbutton" ctr = "<?=$ctr?>" href = "<?=$aes->encrypt($data['id'])?>" >
+                                                            <a class="dropdown-item editbutton" ctr = "<?=$ctr?>" href = "<?=$aes->encrypt($data->id)?>" >
                                                                 <i class="bx bx-edit-alt mr-1"></i> edit</a>
-                                                            <a class="dropdown-item hrefdelete" ctr = "<?=$ctr?>" href = "<?=$aes->encrypt($data['id'])?>">
+                                                            <a class="dropdown-item hrefdelete" ctr = "<?=$ctr?>" href = "<?=$aes->encrypt($data->id)?>">
                                                                 <i class="bx bx-trash mr-1"></i> delete </a>
                                                         </div>
                                                     </div>   
                                                 </td>
-                                                <td>{{ $data['fund_source']}}</td>
+                                                <td>{{ $data->fund_source}}</td>
                                             </tr>
                                             <?php $ctr = $ctr + 1 ?>
                                         @endforeach
