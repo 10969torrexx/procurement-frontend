@@ -59,10 +59,10 @@
                                     <tr><td class="text-center" colspan="4"><span class="text-danger">{{ $error}}</span></td></tr>
                                     @else
                                         <?php $ctr=1; ?>
-                                        @foreach($ppmps['ppmps'] as $data)
+                                        @foreach($ppmps as $data)
                                             <tr id = "{{$ctr}}">
                                                 <td>
-                                                    <a class = "btn btn-success round mr-1 mb-1" ctr = "<?=$ctr?>" href = "{{ route('createPR', ['id' => $aes->encrypt($data['id'])]) }}">
+                                                    <a class = "btn btn-success round mr-1 mb-1" ctr = "<?=$ctr?>" href = "{{ route('createPR', ['id' => $aes->encrypt($data->id)]) }}">
                                                         <i class="fa fa-plus mr-2"></i>Create PR</a>
                                                     {{-- <div class="dropdown">
                                                         <span
@@ -80,9 +80,9 @@
                                                         {{-- </div>
                                                     </div>    --}}
                                                 </td>
-                                                <td>{{ $data['project_title'] }}</td>
-                                                <td>{{$data['project_year']}}</td>
-                                                <td>{{$data['fund_source']}}</td>
+                                                <td>{{ $data->project_title }}</td>
+                                                <td>{{$data->project_year}}</td>
+                                                <td>{{$data->fund_source}}</td>
                                             </tr>
                                             <?php $ctr = $ctr + 1 ?>
                                         @endforeach

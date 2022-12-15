@@ -349,7 +349,7 @@
                 </div>
             </div>
         </div>
-    </div>\
+    </div>
     </strong>
 </section>
 {{-- Torrexx | Code not mine --}}

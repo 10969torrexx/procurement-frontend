@@ -22,11 +22,12 @@ class AdminController extends Controller
               ["link" => "/", "name" => "Home"],["name" => "Add User"]
             ];
             $users = DB::table('users as u')
-            ->select('u.*','d.department_name')
-            ->join('departments as d', 'd.id', '=', 'u.department_id')
-            ->whereNotNull('u.email')
-            ->whereNull('u.deleted_at')
-            ->get();
+                        ->select('u.*','d.department_name')
+                        ->join('departments as d', 'd.id', '=', 'u.department_id')
+                        ->whereNotNull('u.email')
+                        ->whereNull('u.deleted_at')
+                        ->orderBy('u.name')
+                        ->get();
             // dd($users);
             
             return view('pages.superadmin.index',compact('users'), [
@@ -47,6 +48,7 @@ class AdminController extends Controller
                             ->join('users as u', 'u.id', '=', 'd.department_head')
                             ->join('users as us', 'us.id', '=', 'd.immediate_supervisor')
                             ->whereNull('u.deleted_at')
+                            ->orderBy('d.department_name')
                             ->get();
 
             // $departments =  Http::withToken(session('token'))->get(env('APP_API'). "/api/departments/getDepartments")->json();
@@ -92,23 +94,17 @@ class AdminController extends Controller
         $breadcrumbs = [
           ["link" => "/", "name" => "Home"],["name" => "Fund Sources"]
         ];
-        // return view('pages.budgetofficer.index',['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs]);
+
         $fund_sources = DB::table('fund_sources')
                             ->whereNull('deleted_at')
                             ->orderBy('fund_source')
                             ->get();
-        // $fund_sources =  Http::withToken(session('token'))->get(env('APP_API'). "/api/fund_sources/fund_sources_index")->json();
-            // dd($fund_sources);
-            // $error="";
-            // if($fund_sources['status']==400){
-            //     $error=$fund_sources['message'];
-            // }
 
-            return view('pages.superadmin.fund-sources-index',compact('fund_sources'), [
-                'pageConfigs'=>$pageConfigs,
-                'breadcrumbs'=>$breadcrumbs,
-                // 'error' => $error,
-            ]);
+        return view('pages.superadmin.fund-sources-index',compact('fund_sources'), [
+            'pageConfigs'=>$pageConfigs,
+            'breadcrumbs'=>$breadcrumbs,
+            // 'error' => $error,
+        ]);
     }
     public function addFundSource(Request $request){
         // dd($request->all());
@@ -116,6 +112,7 @@ class AdminController extends Controller
 
         $check = DB::table('fund_sources')
                     ->where('fund_source', $fundsource)
+                    ->whereNull('deleted_at')
                     ->get();
         if(count($check)==0){
             $response= DB::table('fund_sources')
@@ -140,44 +137,77 @@ class AdminController extends Controller
                 'message' => 'Fund Source Already Exist!',
             ]);    
         }
-        
-        // $response = Http::withToken(session('token'))->post(env('APP_API'). "/api/fundsource/add_FundSource",[
-        //     'fundsource' => $fundsource,
-        //     ])->json();
-            // dd($response);
-            // return $response;
     }
     public function editFundSource(Request $request)
     {
-        // dd($request->all());
-        $id = $request->id;
-        $id1 = (new AESCipher())->decrypt($id);
+        $id = (new AESCipher())->decrypt($request->id);
 
-        $response = Http::withToken(session('token'))->get(env('APP_API'). "/api/fundsource/edit_FundSource/".$id1,[
-            'id' => $id1,
-        ])->json();
-        dd($response);
-        return $response;
+        $fund_source = DB::table('fund_sources')->where('id', $id)->get();
+        return response()->json([
+            'status'=>200,
+            'fund_source'=> $fund_source, 
+            'id'=> $request->id, 
+        ]);
     }
-    public function updateFundSource(Request $request)
-    {
-        // dd($request->all());
+    public function updateFundSource(Request $request){
             $fundsource = $request->fundsource;
             $id = (new AESCipher())->decrypt($request->id);
-            // dd($id);
-            $response = Http::withToken(session('token'))->put(env('APP_API'). "/api/fundsource/update_FundSource/".$id,[
-            'fundsource' => $fundsource,
-            'id' => $id,
-            ])->json();
-            // dd($response);
-            return $response;
+            $check = DB::table('fund_sources')
+                        ->where('fund_source', $fundsource)
+                        ->whereNull('deleted_at')
+                        ->get();
+            $check1 = DB::table('fund_sources')
+                        ->where('fund_source', $fundsource)
+                        ->where('id', $id)
+                        ->whereNull('deleted_at')
+                        ->get();
+            if(count($check) == 1 && count($check1) == 0){
+                return response()->json([
+                    'status' => 400, 
+                    'message' => 'Fund Source Already Exist!',
+                ]); 
+            }else if(count($check1) == 1){
+                return response()->json([
+                    'status' => 400, 
+                    'message' => 'No Changes Made!',
+                ]); 
+            }else if(count($check) == 0 && count($check1) == 0){
+                $response = DB::table('fund_sources')
+                                ->where('id',$id)
+                                ->update([
+                                    'fund_source' => $fundsource,
+                                    'updated_at' =>  Carbon::now()
+                                ]);
+                        if($response){
+                            return response()->json([
+                                    'status' => 200, 
+                                    'message' => 'Fund Source Updated Successfully!',
+                                ]);    
+                        } else{
+                            return response()->json([
+                                    'status' => 400, 
+                                    'message' => 'Failed!',
+                                ]);    
+                        }
+            }
     }
     public function deleteFundSource(Request $request){
         $id = (new AESCipher())->decrypt($request->id);
-        $response = Http::withToken(session('token'))->delete(env('APP_API'). "/api/fundsource/delete_FundSource/".$id,[
-            'id' => $id,
-        ])->json();
-        return $response;
+        $fund_source = DB::table('fund_sources')->where('id',$id)->delete();
+        if($fund_source)
+        {
+            return response()->json([
+                'status'=>200,
+                'message'=>'Fund Source Deleted Successfully!'
+            ]);
+        }
+        else
+        {
+            return response()->json([
+                'status'=>400,
+                'message'=>'No Account Found!'
+            ]);
+        }
     }
 
     public function mandatory_expenditures_index(){
@@ -213,14 +243,21 @@ class AdminController extends Controller
     public function editMandatoryExpenditure(Request $request)
     {
         // dd($request->all());
-        $id = $request->id;
-        $id1 = (new AESCipher())->decrypt($id);
+        $id = (new AESCipher())->decrypt($request->id);
 
-        $response = Http::withToken(session('token'))->get(env('APP_API'). "/api/expenditure/edit_MandatoryExpenditure/".$id1,[
-            'id' => $id1,
-        ])->json();
+        $response = DB::table('mandatory_expenditures')->where('id', $id)->get();
+        dd($response);
+        return response()->json([
+            'status'=>200,
+            'expenditure'=> $response, 
+            'id'=> $request->id, 
+        ]);
+        
+        // $response = Http::withToken(session('token'))->get(env('APP_API'). "/api/expenditure/edit_MandatoryExpenditure/".$id1,[
+        //     'id' => $id1,
+        // ])->json();
         // dd($response);
-        return $response;
+        // return $response;
     }
     public function updateMandatoryExpenditure(Request $request)
     {
@@ -539,14 +576,11 @@ class AdminController extends Controller
         try {
             $campus = (new AESCipher)->decrypt($request->campus);
             $response = DB::table('users')
-            ->where('campus',$campus)
-            ->whereNotNull('employee_id')
-            ->orderBy('name')
-            ->get();
-            // $response =   Http::withToken('800|4fVkxADAZJkcqHZR94yYLLq5itCN3kXCXwoQAevA')->post("http://192.168.0.11/hrmis/api/department/departmentheadslist", [ 
-            //     'campus' =>  $campus 
-            //     ])->json();
-        //   dd($response);
+                            ->where('campus',$campus)
+                            ->whereNull('deleted_at')
+                            ->whereNotNull('employee_id')
+                            ->orderBy('name')
+                            ->get();
           return $response;
         } catch (\Throwable $th) {
             dd($th);
@@ -760,8 +794,7 @@ class AdminController extends Controller
             'id'=> $request->id, 
         ]);
     }
-    public function editDepartment(Request $request)
-    {
+    public function editDepartment(Request $request){
         // dd($request->all());
         $id = (new AESCipher())->decrypt($request->id);
 
@@ -772,15 +805,6 @@ class AdminController extends Controller
             'department'=> $department, 
             'id'=> $request->id, 
         ]);
-
-        // $id = $request->id;
-        // $id1 = (new AESCipher())->decrypt($id);
-
-        // $response = Http::withToken(session('token'))->get(env('APP_API'). "/api/department/editDepartment/".$id1,[
-        //     'id' => $id1,
-        // ])->json();
-        // // dd($response);
-        // return $response;
     }
 
     public function update(Request $request)
@@ -817,20 +841,9 @@ class AdminController extends Controller
                         'message' => 'failed',
                     ]);    
                 }
-
-            // $response = Http::withToken(session('token'))->put(env('APP_API'). "/api/users/update/".$id,[
-            // 'updateid' => $id,
-            // 'updatename' => $updatename,
-            // 'updateselectcampus' => $updateselectcampus,
-            // 'updateselectrole' => $updateselectrole,
-            // // 'updateemail' => $updateemail,
-            // ])->json();
-            // // dd($response);
-            // return $response;
     }
 
-    public function updateDepartment(Request $request)
-    {
+    public function updateDepartment(Request $request){
             // dd($request->all());
             $update_campus = (new AESCipher())->decrypt($request->update_campus);
             $update_department_name = $request->update_department_name;
@@ -862,18 +875,6 @@ class AdminController extends Controller
                         'message' => 'Failed',
                     ]);    
             }
-
-            // $response = Http::withToken(session('token'))->put(env('APP_API'). "/api/department/updateDepartment/".$id,[
-            // 'update_id' => $id,
-            // 'update_campus' => $update_campus,
-            // 'update_department_name' => $update_department_name,
-            // 'update_department_description' => $update_department_description,
-            // 'update_department_head' => $update_department_head,
-            // 'update_immediate_supervisor' => $update_immediate_supervisor,
-            // ])->json();
-            // dd($response);
-            // return $response;
-            
     }
     
 }

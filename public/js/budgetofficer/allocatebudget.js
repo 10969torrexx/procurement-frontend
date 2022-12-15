@@ -89,9 +89,8 @@ $(function(){$(".type").change(function(){
       $('.year').append(
       '<option value="' + response['years'][i]['year'] + '">' 
                         + response['years'][i]['year'] + '</option>')
-
-  }
         }
+      }
     });
 
 });
@@ -314,7 +313,7 @@ $(document).on('click', '.hrefdelete', function (e) {
       if (result.isConfirmed) {
         $.ajax({
               type: "post",
-              url: "delete",
+              url: "delete_allocated_budget",
               data:{'id':id},
               success: function (response) {
                 // alert(response.status);
@@ -464,18 +463,19 @@ $(document).on('click', '.editbutton', function (e) {
           var year = response['data'][0]['year'];
           
           var type_index = array_type.indexOf(type);
-          var department_index = array_department.indexOf(parseInt(department_id));
+          var department_index = array_department.indexOf(department_id);
           var fundsource_index = array_fundsources.indexOf(parseInt(fund_source_id));
           var year_index = array_years.indexOf(year.toString());
 // console.log(department_index);
           
             document.getElementById('update_type').getElementsByTagName('option')[type_index+1].selected = 'selected';
-            document.getElementById('update_department').getElementsByTagName('option')[department_index].selected = 'selected';
+            document.getElementById('update_department').getElementsByTagName('option')[department_index+1].selected = 'selected';
             document.getElementById('update_fund_source').getElementsByTagName('option')[fundsource_index+1].selected = 'selected';
             document.getElementById('update_year').getElementsByTagName('option')[year_index+1].selected = 'selected';
 
             $('.update_budget').val(response['data'][0]['allocated_budget']);
-            $('.updateid').val(response['data'][0]['id']);
+            $('.update_mandatory_expenditures').val(response['data'][0]['mandatory_expenditures']);
+            $('.updateid').val(id);
             $('#UpdateAllocateBudgetModal').modal('show');
           } 
       }
@@ -490,11 +490,13 @@ $(document).on('click', '.updatebutton', function (e) {
   e.preventDefault();
 
   $(this).text('Updating..');
+  var type = document.getElementById('update_type').value;
   var department = document.getElementById('update_department').value;
   var fund_source = document.getElementById('update_fund_source').value;
   var budget = document.getElementById('update_budget').value;
-  var mandatory_expenditure = document.getElementById('update_mandatory_expenditures').value;
-  if(department==''|| fund_source=='' || budget==''|| mandatory_expenditure==''){
+  var year = document.getElementById('update_year').value;
+  // var mandatory_expenditure = document.getElementById('update_mandatory_expenditures').value;
+  if(type==''|| department==''|| fund_source=='' || budget=='' || year==''){
     Swal.fire({
           icon: 'error',
           title: 'Error', 
@@ -504,21 +506,23 @@ $(document).on('click', '.updatebutton', function (e) {
   }else{
 
   }
-  var mandatory_expenditures_array = [];
-  for (var option of document.querySelector('.update_mandatory_expenditures').options)
-  {
-      if (option.selected) {
-        mandatory_expenditures_array.push(option.text);
-      }
-  }
-  var mandatory_expenditures = mandatory_expenditures_array.join(', ');
+  // var mandatory_expenditures_array = [];
+  // for (var option of document.querySelector('.update_mandatory_expenditures').options)
+  // {
+  //     if (option.selected) {
+  //       mandatory_expenditures_array.push(option.text);
+  //     }
+  // }
+  // var mandatory_expenditures = mandatory_expenditures_array.join(', ');
 
   var data = {
+      'update_type': $('.update_type').val(),
       'update_department': $('.update_department').val(),
       'update_fund_source': $('.update_fund_source').val(),
       'update_budget': $('.update_budget').val(),
-      'update_mandatory_expenditures': mandatory_expenditures,
+      'update_mandatory_expenditures': $('.update_mandatory_expenditures').val(),
       'updateid': $('.updateid').val(),
+      'update_year': $('.update_year').val(),
   }
 // console.log(data);
 
