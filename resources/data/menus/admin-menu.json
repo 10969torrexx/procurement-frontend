@@ -32,6 +32,12 @@
       "icon": "users"
     },
     {
+      "url": "admin/mandatory_expenditures",
+      "name": "Mandatory",
+      "i18n": "User",
+      "icon": "shoppingcart"
+    },
+    {
       "url": "admin/departments_index",
       "name": "Departments",
       "i18n": "User",

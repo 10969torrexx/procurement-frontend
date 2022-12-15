@@ -101,7 +101,7 @@
                             <tr >
                                 <td  class="numbering" style="width: 3px;">1</td>
                                 <td  class="activity" style="width: 500px;">Approve BAC Resolution</td>
-                                <td  class="blank" style="width: 100px; text-align:center; vertical-align: middle;"><input type="checkbox" name="query_myTextEditBox"> </td>
+                                <td  class="blank" style="width: 100px; text-align:center; vertical-align: middle;"><input type="checkbox" name="query_myTextEditBox"></td>
                                 <td  class="blank" style="width: 100px;"></td>
                                 <td  class="blank" style="width: 100px;"></td>
                                 <td  class="blank" style="width: 200px;"></td>
@@ -118,7 +118,7 @@
                             <tr >
                                 <td  class="numbering" style="width: 3px;">1</td>
                                 <td  class="activity" style="width: 500px;">Post PR in PhilGEPS for PRs amounting to 50,000.00 and above.</td>
-                                <td  class="blank" style="width:100px; text-align:center; vertical-align: middle;"><input type="checkbox" name="query_myTextEditBox"> </td>
+                                <td  class="blank" style="width:100px; text-align:center; vertical-align: middle;"><input type="checkbox" name="query_myTextEditBox"></td>
                                 <td  class="blank" style="width: 100px;"></td>
                                 <td  class="blank" style="width: 100px;"></td>
                                 <td  class="blank" style="width: 200px;"></td>
@@ -135,7 +135,7 @@
                             <tr >
                                 <td  class="numbering" style="width: 3px;">1</td>
                                 <td  class="activity" style="width: 500px;">Prepare Agency Purchase Request.</td>
-                                <td  class="blank" style="width:100px; text-align:center; vertical-align: middle;"><input type="checkbox" name="query_myTextEditBox"> </td>
+                                <td  class="blank" style="width:100px; text-align:center; vertical-align: middle;"><input type="checkbox" name="query_myTextEditBox"></td>
                                 <td  class="blank" style="width: 100px;"></td>
                                 <td  class="blank" style="width: 100px;"></td>
                                 <td  class="blank" style="width: 200px;"></td>
@@ -498,6 +498,10 @@
                             </tr> --}}
                         </tbody>
                     </table>
+                    <div class="col-md-12 text-right" style="padding-right: 100px">
+                        <a href = "{{ route('trackPR') }}" class = "btn btn-primary round mr-1 mb-1"><i class="bx bx-left-arrow"></i> Back</a>
+                    </div>
+
                 </div>
             </div>
         </div>

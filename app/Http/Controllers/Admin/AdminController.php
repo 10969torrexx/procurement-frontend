@@ -372,6 +372,128 @@ class AdminController extends Controller
         }
     }
 
+    public function mandatory_expenditures_index(){
+        $pageConfigs = ['pageHeader' => true];
+        $breadcrumbs = [
+          ["link" => "/", "name" => "Home"],["name" => "Mandatory Expenditure List"]
+        ];
+        
+        $mandatory_expenditures = DB::table('mandatory_expenditures_list')
+                            ->whereNull('deleted_at')
+                            ->get();
+        // dd($mandatory_expenditures);
+        return view('pages.admin.mandatory_expenditures_index',compact('mandatory_expenditures'), [
+            'pageConfigs'=>$pageConfigs,
+            'breadcrumbs'=>$breadcrumbs,
+            // 'error' => $error,
+        ]);
+    }
+
+    public function save_mandatory_expenditure(Request $request){
+        // dd($request->all());
+        $mandatory_expenditure = $request->mandatory_expenditure;
+        $check = DB::table('mandatory_expenditures_list')
+                    ->where('expenditure', $mandatory_expenditure)
+                    ->whereNull('deleted_at')
+                    ->get();
+        if(count($check)==0){
+            $response= DB::table('mandatory_expenditures_list')
+                    ->insert([
+                        'expenditure' => $mandatory_expenditure,
+                        'created_at' => Carbon::now()
+                    ]);
+            if($response){
+                return response()->json([
+                    'status' => 200, 
+                    'message' => 'Mandatory Expenditure Saved Successfully!',
+                ]);    
+            } else{
+                return response()->json([
+                    'status' => 400, 
+                    'message' => 'Something Went Wrong',
+                ]);    
+            }
+        }else{
+            return response()->json([
+                'status' => 400, 
+                'message' => 'Mandatory Expenditure Already Exist!',
+            ]);    
+        }
+    }
+
+    public function delete_mandatory_expenditure(Request $request){
+        $id = (new AESCipher())->decrypt($request->id);
+        $mandatory_expenditure = DB::table('mandatory_expenditures_list')->where('id',$id)->delete();
+        if($mandatory_expenditure)
+        {
+            return response()->json([
+                'status'=>200,
+                'message'=>'Mandatory Expenditure Deleted Successfully!'
+            ]);
+        }
+        else
+        {
+            return response()->json([
+                'status'=>400,
+                'message'=>'No Account Found!'
+            ]);
+        }
+    }
+
+    public function edit_mandatory_expenditure(Request $request){
+        $id = (new AESCipher())->decrypt($request->id);
+        $mandatory_expenditure = DB::table('mandatory_expenditures_list')->where('id', $id)->get();
+        // dd($mandatory_expenditure);
+        return response()->json([
+            'status'=>200,
+            'mandatory_expenditure'=> $mandatory_expenditure, 
+            'id'=> $request->id, 
+        ]);
+    }
+
+    public function update_mandatory_expenditure(Request $request){
+        $mandatory_expenditure = $request->mandatory_expenditure;
+        $id = (new AESCipher())->decrypt($request->id);
+        $check = DB::table('mandatory_expenditures_list')
+                    ->where('expenditure', $mandatory_expenditure)
+                    ->whereNull('deleted_at')
+                    ->get();
+        $check1 = DB::table('mandatory_expenditures_list')
+                    ->where('expenditure', $mandatory_expenditure)
+                    ->where('id', $id)
+                    ->whereNull('deleted_at')
+                    ->get();
+        if(count($check) == 1 && count($check1) == 0){
+            return response()->json([
+                'status' => 400, 
+                'message' => 'Mandatory Expenditure Already Exist!',
+            ]); 
+        }else if(count($check1) == 1){
+            return response()->json([
+                'status' => 400, 
+                'message' => 'No Changes Made!',
+            ]); 
+        }else if(count($check) == 0 && count($check1) == 0){
+            $response = DB::table('mandatory_expenditures_list')
+                            ->where('id',$id)
+                            ->update([
+                                'expenditure' => $mandatory_expenditure,
+                                'updated_at' =>  Carbon::now()
+                            ]);
+                    if($response){
+                        return response()->json([
+                                'status' => 200, 
+                                'message' => 'Mandatory Expenditure Updated Successfully!',
+                            ]);    
+                    } else{
+                        return response()->json([
+                                'status' => 400, 
+                                'message' => 'Failed!',
+                            ]);    
+                    }
+        }
+    }
+    
     public function fund_sources_index(){
         $pageConfigs = ['pageHeader' => true];
         $breadcrumbs = [

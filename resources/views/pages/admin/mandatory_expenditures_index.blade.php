@@ -8,7 +8,7 @@
 
 @extends('layouts.contentLayoutMaster')
 {{-- title --}}
-@section('title','Fund Sources')
+@section('title','Mandatory Expenditures')
 
 {{-- vendor style --}}
 @section('vendor-styles')
@@ -31,13 +31,13 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title">Fund Sources</h4>
+                    <h4 class="card-title">Mandatory Expenditure List</h4>
                 </div>
                 <div class="card-content">
                     <div class="card-body card-dashboard">
 
                         {{-- <a href = "#" class = "btn btn-success round mr-1 mb-1" data-flag = "{{ $aes->encrypt('accounts')}}" data-button = "{{ $aes->encrypt('add')}}" data-id = "{{ $aes->encrypt('0')}}" data-toggle = "modal" data-target = "#allModal"><i class="bx bx-plus"></i> New Account</a> --}}
-                        <a href = "#" class = "add_btn btn btn-success round mr-1 mb-1" data-toggle = "modal" data-target = "#FundSourceModal"><i class="bx bx-plus"></i>Add</a>
+                        <a href = "#" class = "add_btn btn btn-success round mr-1 mb-1" data-toggle = "modal" data-target = "#MandatoryExpenditureModal"><i class="bx bx-plus"></i>Add</a>
                         
 
                         {{-- {{ session('token') }} --}}
@@ -47,7 +47,8 @@
                                 <thead>
                                     <tr>
                                         <th>Action</th>
-                                        <th>Fund Source</th>
+                                        <th>Mandatory Expenditures</th>
+                                        <th>Date Added</th>
                                     </tr>
                                 </thead>
                                 <tbody id="table-account-tbody">
@@ -55,7 +56,7 @@
                                     <tr><td class="text-center" colspan="4"><span class="text-danger">{{ $error}}</span></td></tr>
                                     @else
                                         <?php $ctr=1; ?>
-                                        @foreach($fund_sources as $data)
+                                        @foreach($mandatory_expenditures as $data)
                                             <tr id = "{{$ctr}}">
                                                 <td>
                                                     <div class="dropdown">
@@ -70,7 +71,8 @@
                                                         </div>
                                                     </div>   
                                                 </td>
-                                                <td>{{ $data->fund_source}}</td>
+                                                <td>{{ $data->expenditure}}</td>
+                                                <td>{{ date('M. j, Y', strtotime($data->created_at))}}</td>
                                             </tr>
                                             <?php $ctr = $ctr + 1 ?>
                                         @endforeach
@@ -84,8 +86,8 @@
         </div>
     </div>
 </section>
-@include('pages.admin.fund_source_modal')
-@include('pages.admin.update_fund_source_modal')
+@include('pages.admin.mandatory_expenditure_modal')
+@include('pages.admin.update_mandatory_expenditure_modal')
 {{-- @include('pages.superadmin.update') --}}
 
 {{-- ADD MODAL --}}
@@ -112,7 +114,7 @@
 
 <script src="{{asset('vendors/js/extensions/toastr.min.js')}}"></script>
 {{-- employee JS --}}
-<script src="{{asset('js/admin/fund_source.js?id=1')}}"></script>
+<script src="{{asset('js/admin/mandatory_expenditure_list.js?id=1')}}"></script>
 
 @endsection
 {{-- page scripts --}}

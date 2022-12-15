@@ -338,55 +338,26 @@ class PurchaseRequestController extends Controller
     $date = Carbon::now()->format('Y-m-d');
 
     $purchase_request = DB::table("purchase_request as pr")
-                          ->select("pr.*","fs.fund_source")
+                          ->select("pr.*","fs.fund_source","d.department_name","u.name")
                           ->join("fund_sources as fs","pr.fund_source_id","fs.id")
+                          ->join("departments as d","pr.department_id","d.id")
+                          ->join("users as u","pr.printed_name","u.id")
                           ->where("pr.id",$id)
                           ->get();
-    $items = DB::table("ppmps")
-                    ->select('id','item_name','item_description','quantity','unit_price','estimated_price','mode_of_procurement')
-                    ->where('department_id',session('department_id'))
-                    ->where('project_code',$id)
-                    ->where('for_pr',0)
-                    ->where('mode_of_procurement',"!=","Public Bidding")
-                    ->get();
-
                     // dd($purchase_request);
-          $itemsForPR = DB::table("ppmps")
-                    ->select('id','item_name','item_description','quantity','unit_price','estimated_price','mode_of_procurement')
-                    ->where('department_id',session('department_id'))
-                    ->where('project_code',$id)
-                    ->where('for_pr',1)
-                    ->where('mode_of_procurement',"!=","Public Bidding")
-                    ->get();
+    $itemsForPR = DB::table("ppmps as p")
+              ->select('p.*')
+              ->join("purchase_request as pr", "p.pr_no", "=", "pr.pr_no")
+              ->where('p.department_id',session('department_id'))
+              ->where('pr.id',$id)
+              ->where('p.for_pr',2)
+              // ->where('mode_of_procurement',"!=","Public Bidding")
+              ->get();
+              // dd($itemsForPR);
 
-          $ppmps = DB::table("ppmps as p")
-                    ->select("pt.project_title", "d.department_name", "p.*","fs.fund_source","pt.project_code as ProjectCode")
-                    ->join("project_titles as pt", "p.project_code", "=", "pt.id")
-                    ->join("fund_sources as fs", "pt.fund_source", "=", "fs.id")
-                    ->join("departments as d", "pt.department_id", "=", "d.id")
-                    ->where("p.project_code", $id)
-                    ->where("p.for_PR", 1)
-                    // ->where("p.app_type", 'Non-CSE')
-                    ->where("p.mode_of_procurement", "!=", "Public Bidding")
-                    ->whereNull("p.deleted_at")
-                    ->where("p.is_supplemental", "=", 0)
-                    ->where("p.status", "=", 4)
-                    ->orderBy("p.department_id", "ASC")
-                    ->orderBy("p.project_code", "ASC")
-                    ->get();
-          $details = DB::table("project_titles as pt")
-                    ->select("pt.campus","pt.project_title","pt.fund_source","d.department_name")
-                    ->join("departments as d", "pt.department_id", "=", "d.id")
-                    ->join("fund_sources as fs", "pt.fund_source", "=", "fs.id")
-                    ->where("pt.id", $id)
-                    ->get();
-          $fund_source = DB::table("project_titles as pt")
-                    ->select("fs.fund_source")
-                    ->join("fund_sources as fs", "pt.fund_source", "=", "fs.id")
-                    ->where("pt.id", $id)
-                    ->get();
+          
 
-    return view('pages.department.view_pr_page',compact('items','itemsForPR','ppmps','date','details','fund_source'), [
+    return view('pages.department.view_pr_page',compact('purchase_request','itemsForPR','date'), [
                 'pageConfigs'=>$pageConfigs,
                 'breadcrumbs'=>$breadcrumbs,
                 // 'error' => $error,

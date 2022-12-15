@@ -74,6 +74,14 @@ Route::group(['prefix' => 'superadmin','middleware' => ['authuser']], function()
     Route::get('/getMandatoryExpenditures', 'BudgetOfficer\BudgetOfficerController@getMandatoryExpenditures')->name('getMandatoryExpenditures');
     Route::get('/getYears', 'BudgetOfficer\BudgetOfficerController@get_years')->name('getYears');
 
+    #START CRUD EXPENDITURES ROUTES
+    Route::get('/mandatory_expenditure_list', 'Admin\AdminController@mandatory_expenditures_index');
+    Route::post('/save_mandatory_expenditure', 'Admin\AdminController@save_mandatory_expenditure')->name('save_mandatory_expenditure');
+    Route::post('/delete_mandatory_expenditure', 'Admin\AdminController@delete_mandatory_expenditure')->name('delete_mandatory_expenditure');
+    Route::post('/edit_mandatory_expenditure', 'Admin\AdminController@edit_mandatory_expenditure')->name('edit_mandatory_expenditure');
+    Route::post('/update_mandatory_expenditure', 'Admin\AdminController@update_mandatory_expenditure')->name('update_mandatory_expenditure');
+    #END CRUD EXPENDITURES ROUTES
+
     Route::get('/ppmp_deadline','BudgetOfficer\BudgetOfficerController@ppmp_deadline_index');
     Route::post('/save_ppmp_deadline','BudgetOfficer\BudgetOfficerController@save_ppmp_deadline')->name('save_ppmp_deadline');
     Route::post('/edit_deadline', 'BudgetOfficer\BudgetOfficerController@edit_deadline')->name('edit_deadline');
@@ -286,6 +294,14 @@ Route::group(['prefix' => 'admin','middleware' => ['authuser']], function() {
     Route::post('/edit_department', 'Admin\AdminController@edit_department')->name('edit_department');
     Route::post('/update_department', 'Admin\AdminController@update_department')->name('update_department');
     #END CRUD DEPARTMENT ROUTES
+
+    #START CRUD EXPENDITURES ROUTES
+    Route::get('/mandatory_expenditures', 'Admin\AdminController@mandatory_expenditures_index');
+    Route::post('/save_mandatory_expenditure', 'Admin\AdminController@save_mandatory_expenditure')->name('save_mandatory_expenditure');
+    Route::post('/delete_mandatory_expenditure', 'Admin\AdminController@delete_mandatory_expenditure')->name('delete_mandatory_expenditure');
+    Route::post('/edit_mandatory_expenditure', 'Admin\AdminController@edit_mandatory_expenditure')->name('edit_mandatory_expenditure');
+    Route::post('/update_mandatory_expenditure', 'Admin\AdminController@update_mandatory_expenditure')->name('update_mandatory_expenditure');
+    #END CRUD EXPENDITURES ROUTES
 
     #START CRUD FUND SOURCE ROUTES
     Route::get('/fund_sources_index', 'Admin\AdminController@fund_sources_index');
@@ -570,7 +586,7 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
     Route::get('/purchaseRequest/getEmployees', 'Department\PurchaseRequestController@getEmployees');
     Route::post('/purchaseRequest/savePR', 'Department\PurchaseRequestController@savePR');
 
-    Route::get('/trackPR', 'Department\PurchaseRequestController@TrackPRIndex');
+    Route::get('/trackPR', 'Department\PurchaseRequestController@TrackPRIndex')->name('trackPR');
     Route::get('/trackPR/view_status', 'Department\PurchaseRequestController@view_status')->name('view_status');
     Route::get('/trackPR/view_pr', 'Department\PurchaseRequestController@view_pr')->name('view_pr');
     // Route::get('/trackPR/viewPR', 'Department\PurchaseRequestController@viewPR')->name('viewPR');
