@@ -18,6 +18,7 @@ class DashboardController extends Controller
                     ->join('fund_sources', 'allocated__budgets.fund_source_id', 'fund_sources.id')
                     ->where('allocated__budgets.department_id', $departmentID)
                     ->where('allocated__budgets.campus', session('campus'))
+                    ->whereNull('allocated__budgets.deleted_at')
                     ->groupBy('fund_sources.fund_source', 'allocated__budgets.year')
                     ->orderBy('allocated__budgets.year')
                     ->get([
@@ -47,7 +48,6 @@ class DashboardController extends Controller
 
                     return view('pages.users-dashboard', compact('mandatory_expeditures',  'response', 'ppmp_expenses'));
         } 
-        
         return view('pages.users-dashboard');
     }
     // analystic
