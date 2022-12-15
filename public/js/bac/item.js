@@ -26,11 +26,9 @@ input.addEventListener("keypress", function(event) {
       'item_name': $('.item_name').val(),
       'item_category': $('.item_category').val(),
       'app_type': $('.item_type').val(),
-      'campus': $('.campus').val(),
-      'name': $('.name').val(),
-      'public_bidding': $('.public_bidding').val(),
+      'mode_of_procurement': $('.mode_of_procurement').val(),
   }
-  if(data.item_name=="" || data.item_category=="Choose.." || data.app_type=="Choose.." || data.public_bidding=="Choose..")
+  if(data.item_name=="" || data.item_category=="Choose.." || data.app_type=="Choose.." || data.mode_of_procurement=="Choose..")
   {
     Swal.fire('Complete the needed data', '', 'info')
   }
@@ -100,7 +98,6 @@ input.addEventListener("keypress", function(event) {
   }
 });
 
-
 $(document).on('click', '.add-item', function (e) {
     e.preventDefault();
 
@@ -108,11 +105,10 @@ $(document).on('click', '.add-item', function (e) {
         'item_name': $('.item_name').val(),
         'item_category': $('.item_category').val(),
         'app_type': $('.item_type').val(),
-        // 'campus': $('.campus').val(),
-        // 'name': $('.name').val(),
-        'public_bidding': $('.public_bidding').val(),
+        // 'public_bidding': $('.mode_of_procurement').attr("data-id"),
+        'mode_of_procurement': $('.mode_of_procurement').val(),
     }
-    if(data.item_name=="" || data.item_category=="Choose.." || data.app_type=="Choose.." || data.public_bidding=="Choose..")
+    if(data.item_name=="" || data.item_category=="Choose.." || data.app_type=="Choose.." || data.mode_of_procurement=="Choose..")
     {
       Swal.fire('Complete the needed data', '', 'info')
     }
@@ -179,7 +175,19 @@ $(document).on('click', '.add-item', function (e) {
 
 });
 
-
+$(document).on('click', '.public_bidding', function (e) {
+  console.log($(this).val() == 0);
+  var mp = document.getElementById("mp");
+  if($('.public_bidding').val() == 0){
+    if (mp.style.display === 'none'){
+      mp.style.display = 'block';
+    }
+  }else{
+    if (mp.style.display === 'block'){
+      mp.style.display = 'none';
+    }
+  }
+});
 
 //delete
 $(document).on('click', '.delete-item', function (e) {
@@ -272,30 +280,47 @@ $(document).on('click', '.edit', function (e) {
             $('.update').val('Pls wait..');
             $('#item-category').text('Pls wait..');
             $('#app-type').text('Pls wait..');
-            $('#public-bidding').text('Pls wait..');
+            $('#p_bidding').text('Pls wait..');
             $('.update-id').val('Pls wait..');
           },
           success : function(html){
-          $('.title').text('Item Name');
-          $('.update').val(response['data'][0]['item_name']);
-          $('#item-category').text(response['data'][0]['item_category']);
-        //  for(var i in response['data1'][0]['category'] ){
-        //     $('#item-category').append('<option value='+response[i]+ 'selected disabled>'+ response[i]+'</option>')
-        //   };
-          $('#app-type').text(response['data'][0]['app_type']);
-          if(response['data'][0]['public_bidding'] == 0)
-          {
-            $('#public-bidding').text('Not Required');
-            $('#public-bidding').val(response['data'][0]['public_bidding']);
-          }
-          else if(response['data'][0]['public_bidding'] == 1)
-          {
-            $('#public-bidding').text('Required');
-            $('#public-bidding').val(response['data'][0]['public_bidding']);
-          }
+            $('.title').text('Item Name');
+            $('.update').val(response['data'][0]['item_name']);
+            $('#item-category').text(response['data'][0]['item_category']);
+            //  for(var i in response['data1'][0]['category'] ){
+            //     $('#item-category').append('<option value='+response[i]+ 'selected disabled>'+ response[i]+'</option>')
+            //   };
+            $('#app-type').text(response['data'][0]['app_type']);
+            $('#m_procurement').text(response['data'][0]['mode_of_procurement']);
+            $('#m_procurement').val(response['data'][0]['mid']);
+            // if(response['data'][0]['public_bidding'] == 0){
+            //   $('#p_bidding').text("Not Required");
+            //   $('#p_bidding').val(response['data'][0]['public_bidding']);
 
-          $('.update-id').val(response['id']);
-            },
+            //   var mp = document.getElementById("procurement");
+            //   if(response['data'][0]['public_bidding'] == 0){
+            //     if (mp.style.display === 'none'){
+            //       mp.style.display = 'block';
+            //     }
+            //   };
+            //   for(var mode_p = 0 ; mode_p < response['mode'].length; mode_p++){
+            //     if(response['mode'][mode_p]['id'] == response['data'][0]['mode_of_procurement_id']){
+            //       $('#m_procurement').selected(response['data'][0]['mode_of_procurement_id']);
+            //    $('#m_procurement').val(response['data'][0]['mid']);
+            //     }
+            //   }
+            // }else if(response['data'][0]['public_bidding'] == 1){
+            //   $('#p_bidding').text("Required");
+            //   $('#p_bidding').val(response['data'][0]['public_bidding']);
+            //   var mp1 = document.getElementById("procurement");
+            //   if(response['data'][0]['public_bidding'] == 1){
+            //     if (mp1.style.display === 'block'){
+            //       mp1.style.display = 'none';
+            //     }
+            //   }
+            // }
+            $('.update-id').val(response['id']);
+          },
         });
 
         //  $(document).on('click', '.category', function (b) {
@@ -315,34 +340,35 @@ input.addEventListener("keypress", function(event) {
   if (event.key === "Enter") {
     event.preventDefault();
     
-  if($('.public-bidding').val() == "Required")
-  {
+  // if($('.public-bidding').val() == "Required")
+  // {
+  //   var data = {
+  //     'item_name': $('.update').val(),
+  //     'item_category': $('.item-category').val(),
+  //     'app_type': $('.app-type').val(),
+  //     'public_bidding': "1",
+  //     'id': $('.update-id').val(),
+  //   }
+  // }else if($('.public-bidding').val() == "Not Required")
+  // {
+  //   var data = {
+  //     'item_name': $('.update').val(),
+  //     'item_category': $('.item-category').val(),
+  //     'app_type': $('.app-type').val(),
+  //     'public_bidding': "0",
+  //     'id': $('.update-id').val(),
+  //   }
+  // }else{
     var data = {
       'item_name': $('.update').val(),
       'item_category': $('.item-category').val(),
       'app_type': $('.app-type').val(),
-      'public_bidding': "1",
+      'mode_of_procurement': $('.m_procurement').val(),
       'id': $('.update-id').val(),
+      // 'public_bidding': 0,
     }
-  }else if($('.public-bidding').val() == "Not Required")
-  {
-    var data = {
-      'item_name': $('.update').val(),
-      'item_category': $('.item-category').val(),
-      'app_type': $('.app-type').val(),
-      'public_bidding': "0",
-      'id': $('.update-id').val(),
-    }
-  }else{
-    var data = {
-      'item_name': $('.update').val(),
-      'item_category': $('.item-category').val(),
-      'app_type': $('.app-type').val(),
-      'public_bidding': $('.public-bidding').val(),
-      'id': $('.update-id').val(),
-    }
-  }
-    if(data.item_name=="" || data.item_category=="Choose.." || data.app_type=="Choose..")
+  // }
+    if(data.item_name=="" || data.item_category=="Choose.." || data.app_type=="Choose.." || data.mode_of_procurement == "Choose..")
     {
       Swal.fire('Complete the needed data', '', 'info')
     }
@@ -405,36 +431,41 @@ input.addEventListener("keypress", function(event) {
 
 $(document).on('click', '.update-btn', function (e) {
   e.preventDefault();
-  if($('.public-bidding').val() == "Required")
-  {
+  // if($('.p_bidding').val() == "1")
+  // {
+  //   var data = {
+  //     'item_name': $('.update').val(),
+  //     'item_category': $('.item-category').val(),
+  //     'app_type': $('.app-type').val(),
+  //     'mode_of_procurement': 0,
+  //     'id': $('.update-id').val(),
+  //     'public_bidding': 1,
+  //   }
+  // }else{
     var data = {
       'item_name': $('.update').val(),
       'item_category': $('.item-category').val(),
       'app_type': $('.app-type').val(),
-      'public_bidding': "1",
+      'mode_of_procurement': $('.m_procurement').val(),
       'id': $('.update-id').val(),
+      // 'public_bidding': 0,
     }
-  }else if($('.public-bidding').val() == "Not Required")
-  {
-    var data = {
-      'item_name': $('.update').val(),
-      'item_category': $('.item-category').val(),
-      'app_type': $('.app-type').val(),
-      'public_bidding': "0",
-      'id': $('.update-id').val(),
-    }
-  }else{
-    var data = {
-      'item_name': $('.update').val(),
-      'item_category': $('.item-category').val(),
-      'app_type': $('.app-type').val(),
-      'public_bidding': $('.public-bidding').val(),
-      'id': $('.update-id').val(),
-    }
-  }
+  // }
+  // }else if($('.public-bidding').val() == "Not Required")
+  // {
+  //   var data = {
+  //     'item_name': $('.update').val(),
+  //     'item_category': $('.item-category').val(),
+  //     'app_type': $('.app-type').val(),
+  //     'public_bidding': "0",
+  //     'id': $('.update-id').val(),
+  //   }
+  // }else{
+    
+  // }
 
-// console.log(data);
-  if(data.item_name=="" || data.item_category=="Choose.." || data.app_type=="Choose..")
+console.log(data);
+  if(data.item_name=="" || data.item_category=="Choose.." || data.app_type=="Choose.."|| data.mode_of_procurement=="Choose..")
   {
     Swal.fire('Complete the needed data', '', 'info')
   }
@@ -479,11 +510,18 @@ $(document).on('click', '.update-btn', function (e) {
               console.log('I was closed by the timer')
             }
           })
-        }else{
+        }else if(response['status'] == 400){
           Swal.fire({
             icon: 'error',
             title: 'Oops...',
             text: 'Already Exist',
+          })
+          $(this).text('Update');
+        }else{
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'error',
           })
           $(this).text('Update');
         }
@@ -491,6 +529,22 @@ $(document).on('click', '.update-btn', function (e) {
     })
   }
 });
+
+$(document).on('click', '.p_bidding', function (e) {
+  console.log($(this).val() == 0);
+  var procurement = document.getElementById("procurement");
+  if($('.p_bidding').val() == 0){
+    if (procurement.style.display === 'none'){
+      procurement.style.display = 'block';
+    }
+  }else{
+    if (procurement.style.display === 'block'){
+      procurement.style.display = 'none';
+    }
+  }
+});
+
+
 
 
 // //modal Dropdown

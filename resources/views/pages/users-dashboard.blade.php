@@ -41,56 +41,56 @@
           </div>
         </div>
 
-          @if (session('role') == 4)
-            <div class="card">
-              <div class="card-header">
-                  <h4 class="text-primary border-bottom pb-1">
-                    <strong> Budget Allocation </strong>
-                  </h4>
-              </div>
-              <div class="card-body">
-                <div class="table-responsive col-12 container">
-                  <table class="table zero-configuration item-table" id="item-table">
-                      <thead>
+        @if (session('role') == 4 || session('role') == 11)
+          <div class="card">
+            <div class="card-header">
+                <h4 class="text-primary border-bottom pb-1">
+                  <strong> Budget Allocation </strong>
+                </h4>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive col-12 container">
+                <table class="table zero-configuration item-table" id="item-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Fund Source</th>
+                            <th>year</th>
+                            <th>Allocated Budget</th>
+                            <th>Expenditure</th>
+                            <th>Mandatory Expenditure</th>
+                            <th>Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($response as $item)
                           <tr>
-                              <th>#</th>
-                              <th>Fund Source</th>
-                              <th>year</th>
-                              <th>Allocated Budget</th>
-                              <th>Expenditure</th>
-                              <th>Mandatory Expenditure</th>
-                              <th>Balance</th>
+                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $item->fund_source }}</td>
+                            <td>{{ $item->year }}</td>
+                            <td>₱{{ number_format($item->SumBudget,2,'.',',') }}</td>
+                              <?php
+                                $sumMandatory = 0;
+                                $expenditure = 0;
+                              ?>
+                              @foreach ($mandatory_expeditures as $item2)
+                                @if ($item->year == $item2->year && $item->fund_source_id == $item2->fund_source_id) 
+                                    <?php
+                                        $sumMandatory += (!isset($item2->SumMandatory)?0:$item2->SumMandatory);
+                                    ?>
+                                @endif
+                              @endforeach
+                            <td>₱{{ number_format($expenditure,2,'.',',') }}</td>
+                            <td>₱{{ number_format($sumMandatory,2,'.',',') }}</td>
+                            <td>₱{{ number_format(($item->SumBudget - ($expenditure + $sumMandatory)),2,'.',',') }}</td>
                           </tr>
-                      </thead>
-                      <tbody>
-                          @foreach ($response as $item)
-                            <tr>
-                              <td>{{ $loop->iteration }}</td>
-                              <td>{{ $item->fund_source }}</td>
-                              <td>{{ $item->year }}</td>
-                              <td>₱{{ number_format($item->SumBudget,2,'.',',') }}</td>
-                                <?php
-                                  $sumMandatory = 0;
-                                  $expenditure = 0;
-                                ?>
-                                @foreach ($mandatory_expeditures as $item2)
-                                  @if ($item->year == $item2->year && $item->fund_source_id == $item2->fund_source_id) 
-                                      <?php
-                                          $sumMandatory += (!isset($item2->SumMandatory)?0:$item2->SumMandatory);
-                                      ?>
-                                  @endif
-                                @endforeach
-                              <td>₱{{ number_format($expenditure,2,'.',',') }}</td>
-                              <td>₱{{ number_format($sumMandatory,2,'.',',') }}</td>
-                              <td>₱{{ number_format(($item->SumBudget - ($expenditure + $sumMandatory)),2,'.',',') }}</td>
-                            </tr>
-                          @endforeach
-                      </tbody>
-                  </table>
-                </div>
+                        @endforeach
+                    </tbody>
+                </table>
               </div>
             </div>
-          @endif
+          </div>
+        @endif
 
       </div>
     </div>

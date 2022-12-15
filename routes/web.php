@@ -503,6 +503,7 @@ Route::group(['prefix' => 'bac','middleware' => ['authuser']], function() {
     //generate APP - NONCSE
     Route::get('/app-non-cse', 'BAC\APPNONCSEController@index');
     Route::get('/try', 'BAC\APPNONCSEController@try');
+    Route::post('/app-non-cse-done', 'BAC\APPNONCSEController@endorse_to_main')->name('app-non-cse-done');
     Route::post('/app-non-cse-generate', 'BAC\APPNONCSEController@generatepdf')->name('app-non-cse-generate');
     Route::get('/show-all', 'BAC\APPNONCSEController@university_wide')->name('show-all');
     Route::get('/app-non-cse-generate-excel', 'BAC\APPNONCSEController@generateexcel')->name('app-non-cse-generate-excel');
@@ -529,6 +530,7 @@ Route::group(['prefix' => 'bac','middleware' => ['authuser']], function() {
         Route::post('/supervisor-ppmp-approved', 'SupervisorController@status')->name('supervisor-ppmp-approved');
         Route::post('/supervisor-ppmp-disapproved', 'SupervisorController@status')->name('supervisor-ppmp-disapproved');
         Route::post('/supervisor-ppmp-done', 'SupervisorController@done')->name('supervisor-ppmp-done');
+        Route::post('/accept-reject-all', 'SupervisorController@accept_reject_all')->name('accept-reject-all');
     });
     
     //Ammendments

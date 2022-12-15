@@ -239,25 +239,27 @@
     <!-- Greetings Content Starts -->
     <section id="basic-datatable">
       <div class="card-content" >
-        
+        <?php $campuscount = count($campusCheck); $camp = 0; $endorse = 0; $campusload = "";?>
+            @foreach($campusCheck as $campusload)
+              <?php/* $campuscount++ */;?>
+                @if($campusload->campus == 1)
+                    <?php $camp++;?>
+                @endif
+                @if($campusload->endorse == 1)
+                    <?php $endorse++;?>
+                @endif
+            @endforeach
           <div class="card-header" >
             {{-- <div class="" >
             <button  type="button" class="btn btn-light form-control col-sm-1 mt-1 generatepdf" >PDF</button>
             <button  type="button" class="btn btn-light form-control col-sm-1 mt-1 generatepdf" >PDF</button>
             </div>
             <div class="mt-1" style="border-bottom:1px solid black;"></div> --}}
-            <?php $count=0; $camp = 0?>
-            @foreach($Categories as $categories)
-            <?php $count++
-                  // $camp =  $categories->campus?>
-                  @if($categories->campus == 1)
-                  <?php $camp++?>
-                  @endif
-            @endforeach
+            
 
             <div class="generate" {{-- style="background-color: #bf5279" --}}>
-              <input type="hidden" class="count" value="{{ $count }}">
-              <button  type="button" class="btn btn-danger form-control col-sm-1 mt-1 generatepdf" value="{{ $count }}">PDF</button>
+              <input type="hidden" class="campusCheck" value="{{ $campuscount }}">
+              <button  type="button" class="btn btn-danger form-control col-sm-1 mt-1 generatepdf" value="{{ $campuscount }}">PDF</button>
               {{-- <form action="{{ route('app-non-cse-generate') }}" method="POST">
               @csrf
               <input type="hidden" class="Year" name="year" value="{{ $Project_title[0]->project_year }}">
@@ -265,18 +267,26 @@
               </form> --}}
               {{-- <button  type="submit" class="btn btn-success form-control col-sm-1 mt-1 generateexcel" id="downloadexcel" >EXCEL</button> --}}
               <a href ="{{ route('app-non-cse-generate-excel') }}"><button  type="submit" class="btn btn-success form-control col-sm-1 mt-1 generate" >EXCEL</button></a>
+              @if(count($campusCheck) == 1)
+                @if($endorse == 0)
+                  <button  type="button" class="btn btn-primary form-control col-sm-1 mt-1 endorse" value="1">ENDORSE</button>
+                @endif
+                @if($endorse > 0)
+                  <button  type="button" class="btn btn-primary form-control col-sm-1 mt-1 endorse" value="0"><i class="fa-solid fa-rotate-left"></i></button>
+                @endif
+              @endif
               @if($camp > 0)
-              <div class="dropdown" style="float: right">
-                <span
-                  class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
-                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu"></span>
-                <div class="dropdown-menu dropdown-menu-left">
-                  <a class="dropdown-item {{-- univ_wide --}}" id="{{-- univ_wide --}}" href = "{{ route('show-all') }}"> University Wide</a>
-                  <a class="dropdown-item main" href = "/bac/app-non-cse">
-                     Main Campus Only
-                  </a>
-                </div>
-              </div> 
+                <div class="dropdown" style="float: right">
+                  <span
+                    class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu"></span>
+                  <div class="dropdown-menu dropdown-menu-left">
+                    <a class="dropdown-item {{-- univ_wide --}}" id="{{-- univ_wide --}}" href = "{{ route('show-all') }}"> University Wide</a>
+                    <a class="dropdown-item main" href = "/bac/app-non-cse">
+                      Main Campus Only
+                    </a>
+                  </div>
+                </div> 
               @endif
             </div>
           </div>
@@ -344,28 +354,35 @@
                     </div>
                   </tr>
                   <tr>
-                    <label for="year"> Year: </label>
-                    {{-- <select class="custom-select col-sm-1 ml-1 " >
-                      <option selected> {{ $Project[0]->project_year }} </option>
-                      @foreach ($Project as $Project)
-                        <option value="{{ $Project->project_year }}" class="year">{{ $Project->project_year }}</option>
-                      @endforeach
-                    </select> --}}
-
-                    <div class="btn-group dropright ml-1">
+                    <div class="col-sm-4" >
+                      <div class="row">
+                        <label for="year" style="padding-top:10px;"> Year: </label>
+                        <div class="btn-group dropright ml-1">
                           <input type="hidden" class="Year" value="{{ reset($val) }}">
                           <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             {{ reset($val) }}
                           </button>
-                    
-                      <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                          @foreach ($Project as $Project)
-                          <form action="{{ route('app-non-cse-year') }}">
-                            <button class="dropdown-item year" type="submit" value="{{ $Project->project_year }}" name="year">{{ $Project->project_year }}</button>
-                          </form>
-                          {{-- <option value="{{ $Project->project_year }}" >{{ $Project->project_year }}</option> --}}
-                          @endforeach
-                        
+                      
+                          <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                            @foreach ($Project as $Project)
+                            <form action="{{ route('app-non-cse-year') }}">
+                              <button class="dropdown-item year" type="submit" value="{{ $Project->project_year }}" name="year">{{ $Project->project_year }}</button>
+                            </form>
+                            {{-- <option value="{{ $Project->project_year }}" >{{ $Project->project_year }}</option> --}}
+                            @endforeach
+                          </div>
+                        </div>
+                        @if(count($campusCheck) == 1)
+                          <div class="col-sm-4">
+                            <label style="float: left;padding-top:10px;" > Status: </label>
+                            @if($endorse == 0)
+                              <label class="ml-1" style="font-size:15px;float: left;padding-top:6px;text-transform: capitalize;color:blue" > Pending </label>
+                            @endif
+                            @if($endorse > 0)
+                              <label class="ml-1" style="font-size:15px;float: left;padding-top:6px;text-transform: capitalize;color:coral" > Endorsed </label>
+                            @endif
+                          </div>
+                        @endif
                       </div>
                     </div>
                   </tr>
@@ -375,7 +392,7 @@
                       <td  rowspan="2"  class="end_user">PMO / End-User&nbsp;&nbsp;</td>
                       <td  rowspan="2"  class="activity">Is this <br>an Early<br> Procurement Activity? <br>(Yes/No)</td>
                       <td  rowspan="2"  class="mode">MODE OF PROCUREMENT</td>
-                      <td  colspan="4" >Schedule for Each Procurem bordfer-right:1px solid black;ent Activity</td>
+                      <td  colspan="4" >Schedule for Each Procurement Activity</td>
                       <td  rowspan="2"  class="funds">Source of Funds</td>
                       <td  colspan="3"  class="est">Estimated Budget (PhP)</td>
                       <td  rowspan="2"  class="remarks">Remarks&nbsp;(brief Description of Project)</td>

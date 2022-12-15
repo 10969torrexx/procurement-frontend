@@ -231,134 +231,7 @@ $(document).on('click', '.ppmpDone', function (e) {
                   }
                });
          }
-         // console.log(count);
-/*
-            });
-      }else if(stat[i] == 3){
-
-         count++;
-         var data = {
-            'item_id': item_id[i],
-            'project_code': project_code[i],
-            'status': stat[i],
-            'remarks':remarks[i],
-         }
-
-         console.log(data);
-         $.ajaxSetup({
-            headers: {
-                  'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-            });
-         
-            $.ajax({
-               method: "post",
-               //url: "supervisor-ppmp-disapproved",
-			   url: "/bac/supervisor/supervisor-ppmp-disapproved",
-               data:data,
-               beforeSend : function(html){
-               },
-               success: function (response) {
-                  // console.log(response);
-                  // if(response['status'] == 200) { 
-                     
-                  //    // console.log(i );
-                  //    Swal.fire({
-                  //       title: '',
-                  //       html: 'Submitted Successfully!',
-                  //       icon: 'success',
-                  //       timer: 2000,
-                  //       timerProgressBar: true,
-                  //       didOpen: () => {
-                  //         Swal.showLoading()
-                  //         const b = Swal.getHtmlContainer().querySelector('b')
-                  //         timerInterval = setInterval(() => {
-                  //           b.textContent = Swal.getTimerLeft()
-                  //         }, 100)
-                  //       },
-                  //       willClose: () => {
-                  //         clearInterval(timerInterval)
-                  //       }
-                  //     }).then((result) => {
-                  //       $('#status'+ i).text("Need Revision");
-                  //       var element = document.getElementById("status"+i);
-                  //       element.style.color = "red";
-                  //       var btn = document.getElementById("action"+i);
-                  //       btn.style.display = 'none';
-                  //       $("#viewDisapprovedPPMPmodal").modal('hide');
-                  //     })
-                     
-                  //    // }
-                  // }else{
-                  //    Swal.fire({
-                  //       icon: 'error',
-                  //       title: 'Oops...',
-                  //       text: 'Check Inputs',
-                  //     })
-                  // }
-               }
-            });
-*/
       }
-   //   $yuyu =  parseInt(stat.length)
-   //   console.log(count);
-      // if(count == $yuyu ){
-      //    var data2 = {
-      //       'project_id': $(this).attr("data-id"),
-      //       'status' : 2
-      //    }
-   
-      //    $.ajaxSetup({
-      //       headers: {
-      //             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-      //       }
-      //       });
-         
-      //       $.ajax({
-      //          type: "post",
-      //          url: "supervisor-ppmp-done",
-      //          data:data2,
-      //          beforeSend : function(html){
-      //          },
-      //          success: function (response) {
-      //             console.log(response);
-      //             if(response['status'] == 200) { 
-                     
-      //                // console.log(i );
-      //                Swal.fire({
-      //                   title: '',
-      //                   html: 'Submitted Successfully!',
-      //                   icon: 'success',
-      //                   timer: 2000,
-      //                   timerProgressBar: true,
-      //                   didOpen: () => {
-      //                     Swal.showLoading()
-      //                     const b = Swal.getHtmlContainer().querySelector('b')
-      //                     timerInterval = setInterval(() => {
-      //                       b.textContent = Swal.getTimerLeft()
-      //                     }, 100)
-      //                   },
-      //                   willClose: () => {
-      //                     clearInterval(timerInterval)
-      //                   }
-      //                 }).then((result) => {
-      //                   if (result.dismiss === Swal.DismissReason.timer) {
-      //                      location.reload();
-      //                      console.log('I was closed by the timer')
-      //                    }
-      //                 })
-                     
-      //                // }
-      //             }else{
-      //                Swal.fire({
-      //                   icon: 'error',
-      //                   title: 'Oops...',
-      //                   text: 'Check Inputs',
-      //                 })
-      //             }
-      //          }
-      //       });
-      // }else{
          for(var i =0 ; i < balance.length; i++){
             
             $totalBalance += parseInt(balance[i]);
@@ -380,6 +253,7 @@ $(document).on('click', '.ppmpDone', function (e) {
          var data2 = {
             'balance': $totalBalance,
             'project_id': $(this).attr("data-id"),
+            'year_created': $(this).attr("value"),
             'status' : $titlestatus
          }
    
@@ -455,3 +329,119 @@ $(document).on('click', '.edit', function (e) {
 $(document).ready(function() {
     
 });
+
+$(document).on('click', '#superbtn', function (e) {
+   var ppmpDone = document.getElementById("ppmpDone");
+     if (ppmpDone.style.display === 'none'){
+      ppmpDone.style.display = 'block';
+     }
+ });
+
+ $(document).on('click', '.accept_all', function (e) {
+   var data = {
+      'id': $(this).attr("data-id"),
+      'remarks': "Accepted",
+      // 'total': $('.overalltotal').val(),
+      'value': $(this).val(),
+   }
+   $.ajaxSetup({
+       headers: {
+           'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+       }
+   });
+   $.ajax({
+         type: "post",
+         url: "accept-reject-all",
+         data:data,
+         success: function (response) {
+            if (response.status == 200) {
+            Swal.fire({
+               title: 'Accepted!!!',
+               html: 'Project Accepted',
+               icon: 'success',
+               timer: 1000,
+               timerProgressBar: true,
+               didOpen: () => {
+                  Swal.showLoading()
+                  const b = Swal.getHtmlContainer().querySelector('b')
+                  timerInterval = setInterval(() => {
+                  b.textContent = Swal.getTimerLeft()
+                  }, 100)
+               },
+               willClose: () => {
+                  clearInterval(timerInterval)
+               }
+            }).then((result) => {
+               /* Read more about handling dismissals below */
+               if (result.dismiss === Swal.DismissReason.timer) {
+                  location.reload();
+                  console.log('I was closed by the timer')
+               }
+            })
+            // Swal.fire('Deleted SuccessFully!', '', 'success')
+            // location.reload()
+            }else if (response.status == 500) {
+               Swal.fire('All Items are already Approved', '', 'info')
+            }
+         }
+      });
+ });
+
+ $(document).on('click', '.reject_all', function (e) {
+   
+   $("#supervisor_reject_all_ppmp_modal").modal('show');
+   $('.reject_val').val($(this).val());
+   $('.reject_id').val($(this).attr("data-id"));
+
+ });
+ 
+ $(document).on('click', '.submitreject', function (e) {
+   var data = {
+      'id': $('.reject_id').val(),
+      'remarks': $('.reject_remarks').val(),
+      'value': $('.reject_val').val(),
+   }
+   $.ajaxSetup({
+       headers: {
+           'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+       }
+   });
+   console.log(data);
+   $.ajax({
+         type: "post",
+         url: "accept-reject-all",
+         data:data,
+         success: function (response) {
+            if (response.status == 200) {
+            Swal.fire({
+               title: 'Rejected!!!',
+               html: 'Project Rejected',
+               icon: 'success',
+               timer: 1000,
+               timerProgressBar: true,
+               didOpen: () => {
+                  Swal.showLoading()
+                  const b = Swal.getHtmlContainer().querySelector('b')
+                  timerInterval = setInterval(() => {
+                  b.textContent = Swal.getTimerLeft()
+                  }, 100)
+               },
+               willClose: () => {
+                  clearInterval(timerInterval)
+               }
+            }).then((result) => {
+               /* Read more about handling dismissals below */
+               if (result.dismiss === Swal.DismissReason.timer) {
+                  location.reload();
+                  console.log('I was closed by the timer')
+               }
+            })
+            // Swal.fire('Deleted SuccessFully!', '', 'success')
+            // location.reload()
+            }else if (response.status == 500) {
+               console.log(response);
+               Swal.fire('All Items are already Rejected', '', 'info')
+            }
+         }
+      });
+ });

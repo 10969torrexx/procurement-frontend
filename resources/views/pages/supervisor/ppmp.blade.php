@@ -37,6 +37,7 @@
                                     <tr>
                                         <th>#</th>
                                         <th>Project Procurement</th>
+                                        <th>Prepared By</th>
                                         <th>Allocated Budget</th>
                                         <th>Fund Source</th>
                                         <th>Remaining Balance</th>
@@ -51,6 +52,7 @@
                                     <tr>
                                         <td>{{-- {{ $data->year_created }}- --}}{{ $loop->iteration  }}</td>
                                         <td>{{ $data->project_title }}</td>
+                                        <td>{{ $data->username }}</td>
                                         <td>Php {{ number_format($data->allocated_budget,2 )}}</td>
                                         <td>{{ $data->fund_source }}</td>
                                         <td>Php {{ number_format($data->remaining_balance,2) }}</td>
