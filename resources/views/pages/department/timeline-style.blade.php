@@ -1,31 +1,27 @@
 <style>
-   .events {
-        position: relative;
-        margin: 0 auto;
-        background-color: #606060;
-        height: 100%;
-        width: 3px;
-        border-radius: 4px;
+   .circle {
+        height: 12px;
+        width: 12px;
+        border-radius: 50%;
+        margin-bottom: 5px;
+        background-color: rgb(94, 131, 252);
         position: relative;
     }
-
-    .circle {
-      background-color: inherit;
-      height: 30px; width: 30px;
-      padding: 100%;
-      margin: 30%;
-      border-radius: 100%;
-      position: relative;
-      top: -10%; left: -480%;
+    .text-white{
+        border-left: 3px solid rgb(236, 233, 233);
+        height: 80px;
+        top: 20px;
+        left: 37%;
+        position: absolute;
     }
-
-    .icon {
-      width: 100%;
-      height: 100%;
-      text-align: center;
-      border-radius: 100%;
-      font-size: 24px;
-      line-height: 16px;
-      padding-top: 10%;
+    p{
+        font-size: 14px;
+    }
+    .border-bottom{
+        margin-top: 10px;
+    }
+    .datetime{
+        margin-top: 14px;
+        font-size: 13px;
     }
 </style>

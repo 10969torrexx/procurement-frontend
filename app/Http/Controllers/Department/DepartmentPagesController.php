@@ -378,13 +378,16 @@ class DepartmentPagesController extends Controller
                         'users.name as immediate_supervisor' 
                     ]);
                 $ppmp_response = \DB::table('ppmps')
-                    ->where('department_id', session('department_id'))
-                    ->where('employee_id', intval(session('employee_id')))
-                    ->where('project_code', (new AESCipher)->decrypt($request->id))
-                    ->whereNull('deleted_at')
+                    ->join('mode_of_procurement', 'mode_of_procurement.id', 'ppmps.mode_of_procurement')
+                    ->where('ppmps.department_id', session('department_id'))
+                    ->where('ppmps.employee_id', intval(session('employee_id')))
+                    ->where('ppmps.project_code', (new AESCipher)->decrypt($request->id))
+                    ->whereNull('ppmps.deleted_at')
                     ->get();
 
-                $project_timeline = (new ProjectTimelineController)->index($request->id);
+                $project_timeline = \DB::table('project_timeline')
+                    ->where('project_id', (new AESCipher)->decrypt($request->id))
+                    ->get();
                 # this will check if all required data is not null 
                     if((count($ppmp_response) <= 0) || $ppmp_response == null) {
                         # if there are null data this will retur na page maintenance page
@@ -405,7 +408,7 @@ class DepartmentPagesController extends Controller
                     [
                         'project_titles' => $project_titles,
                         'ppmp_response' => $ppmp_response,
-                        'project_timeline'  => $project_timeline['data']
+                        'project_timeline'  => $project_timeline
                     ]
                 );
             } catch (\Throwable $th) {
