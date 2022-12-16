@@ -114,6 +114,7 @@ class DepartmentPagesController extends Controller
                             ->where('allocated__budgets.procurement_type', 'PPMP') // make this dynamic
                             ->whereNull('allocated__budgets.deleted_at')
                             ->get(['allocated__budgets.*', 'allocated__budgets.id as allocated_id','fund_sources.fund_source']);
+
                 # end 
                 # this will return the page
                     $pageConfigs = ['pageHeader' => true];
