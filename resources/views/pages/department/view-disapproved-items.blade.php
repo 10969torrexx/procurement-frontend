@@ -458,7 +458,7 @@
                     {{-- adding submit ppmp feature --}}
                     <div class="form-group p-1 row justify-content-center">
                         <div class="form-group col-6">
-                            <form action="{{ route('department-submit-ppmp') }}" method="post">@csrf @method('POST')
+                            <form action="{{ route('department-re_submit-ppmp') }}" method="post">@csrf @method('POST')
                                 <input type="text" value="{{ (new AESCipher)->encrypt($project_title_id) }}" class="form-control d-none" name="current_project_code">
                                 <input type="text" class="form-control d-none" name="remaining_balance" value="{{ $allocated_budgets[0]->remaining_balance }}">
                                 <input type="text" class="form-control d-none" name="total_estimated_price" value="{{ $total_estimated_price }}">
