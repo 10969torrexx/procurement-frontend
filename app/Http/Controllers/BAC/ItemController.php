@@ -144,7 +144,6 @@ class ItemController extends Controller
     $item = DB::table("items as i")
               ->select("i.*","m.id as mid", "m.mode_of_procurement")
               ->join("mode_of_procurement as m","m.id","=", "i.mode_of_procurement_id" )
-              ->where("i.campus", session('campus'))
               ->whereNull("i.deleted_at")
               ->get();
 

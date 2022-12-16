@@ -137,17 +137,19 @@
                               <td>{{ explode('-', date('j F, Y-', strtotime($items->created_at)))[0] }}</td>
                               <td>{{ explode('-', date('j F, Y-', strtotime($items->updated_at)))[0] }}</td>
                               <td>
-                                <div class="dropdown">
-                                  <span
-                                    class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
-                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu"></span>
-                                  <div class="dropdown-menu dropdown-menu-left">
-                                    <a class="dropdown-item edit" data-id = "<?=$aes->encrypt($items->id)?>" value="{{ $items->mode_of_procurement }}" data-toggle = "modal" id="edit_item_Modal" href = "{{ $aes->encrypt($items->id) }}"><i class="bx bx-edit-alt mr-1"></i> edit</a>
-                                    <a class="dropdown-item delete-item" href = "{{ $aes->encrypt($items->id) }}">
-                                      <i class="bx bx-trash mr-1"></i> delete
-                                    </a>
-                                  </div>
-                                </div> 
+                                @if($items->campus == session('campus'))
+                                  <div class="dropdown">
+                                    <span
+                                      class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
+                                      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu"></span>
+                                    <div class="dropdown-menu dropdown-menu-left">
+                                      <a class="dropdown-item edit" data-id = "<?=$aes->encrypt($items->id)?>" value="{{ $items->mode_of_procurement }}" data-toggle = "modal" id="edit_item_Modal" href = "{{ $aes->encrypt($items->id) }}"><i class="bx bx-edit-alt mr-1"></i> edit</a>
+                                      <a class="dropdown-item delete-item" href = "{{ $aes->encrypt($items->id) }}">
+                                        <i class="bx bx-trash mr-1"></i> delete
+                                      </a>
+                                    </div>
+                                  </div> 
+                                @endif
                               </td>
                           </tr>
                             @endforeach 
