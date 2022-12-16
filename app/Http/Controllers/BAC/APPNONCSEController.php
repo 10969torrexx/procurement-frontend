@@ -174,11 +174,11 @@ class APPNONCSEController extends Controller
         ->orderBy("p.campus","ASC")
         ->get();
 
-        // dd($Categories);
         
     $ppmps = DB::table("ppmps as p")
-          ->select("pt.project_title", "d.department_name", "p.*", "pt.fund_source","pt.project_code as ProjectCode","ab.allocated_budget","ab.remaining_balance","fs.fund_source")
+          ->select("pt.project_title", "d.department_name", "p.*", "pt.fund_source","pt.project_code as ProjectCode","ab.allocated_budget","ab.remaining_balance","fs.fund_source","m.mode_of_procurement as procurementName")
           ->join("project_titles as pt", "p.project_code", "=", "pt.id")
+          ->join('mode_of_procurement as m','m.id','=','p.mode_of_procurement')
           ->join("departments as d", "pt.department_id", "=", "d.id")
           ->join('allocated__budgets as ab','pt.allocated_budget','=','ab.id')
           ->join('fund_sources as fs','fs.id','=','ab.fund_source_id')
@@ -192,6 +192,7 @@ class APPNONCSEController extends Controller
           ->orderBy("p.department_id", "ASC")
           ->orderBy("p.project_code", "ASC")
           ->get();
+        // dd($ppmps);
           
     $campusCheck = DB::table("project_titles as pt")
           ->select("pt.campus","pt.endorse")
@@ -406,8 +407,9 @@ class APPNONCSEController extends Controller
             ->get();
           // dd($Categories);
           $ppmps = DB::table("ppmps as p")
-            ->select("pt.project_title", "d.department_name", "p.*", "pt.fund_source","pt.project_code as ProjectCode","ab.allocated_budget","ab.remaining_balance","fs.fund_source")
+            ->select("pt.project_title", "d.department_name", "p.*", "pt.fund_source","pt.project_code as ProjectCode","ab.allocated_budget","ab.remaining_balance","fs.fund_source","m.mode_of_procurement as procurementName")
             ->join("project_titles as pt", "p.project_code", "=", "pt.id")
+            ->join('mode_of_procurement as m','m.id','=','p.mode_of_procurement')
             ->join("departments as d", "pt.department_id", "=", "d.id")
             ->join('allocated__budgets as ab','pt.allocated_budget','=','ab.id')
             ->join('fund_sources as fs','fs.id','=','ab.fund_source_id')
@@ -438,8 +440,9 @@ class APPNONCSEController extends Controller
             ->get();
 
             $ppmps = DB::table("ppmps as p")
-              ->select("pt.project_title", "d.department_name", "p.*", "pt.fund_source","pt.project_code as ProjectCode","ab.allocated_budget","ab.remaining_balance","fs.fund_source")
+              ->select("pt.project_title", "d.department_name", "p.*", "pt.fund_source","pt.project_code as ProjectCode","ab.allocated_budget","ab.remaining_balance","fs.fund_source","m.mode_of_procurement as procurementName")
               ->join("project_titles as pt", "p.project_code", "=", "pt.id")
+              ->join('mode_of_procurement as m','m.id','=','p.mode_of_procurement')
               ->join("departments as d", "pt.department_id", "=", "d.id")
               ->join('allocated__budgets as ab','pt.allocated_budget','=','ab.id')
               ->join('fund_sources as fs','fs.id','=','ab.fund_source_id')
@@ -457,25 +460,25 @@ class APPNONCSEController extends Controller
 
       $signatures = DB::table("signatories_app_non_cse")
           ->where("campus",session('campus'))
-          ->where("Year",$request->year)
+          ->where("Year",2022)
           ->get();
           
 
       $prepared_by = DB::table("signatories_app_non_cse")
           ->where("campus",session('campus'))
-          ->where("Year",$request->year)
+          ->where("Year",2022)
           ->where("Role","=",1)
           ->get();
 
       $recommending_approval = DB::table("signatories_app_non_cse")
           ->where("campus",session('campus'))
-          ->where("Year",$request->year)
+          ->where("Year",2022)
           ->where("Role","=",3)
           ->get();
 
       $approved_by = DB::table("signatories_app_non_cse")
           ->where("campus",session('campus'))
-          ->where("Year",$request->year)
+          ->where("Year",2022)
           ->where("Role","=",2)
           ->get();
           
