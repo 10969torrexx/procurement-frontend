@@ -53,6 +53,7 @@
                                         <th>Fund Source</th>
                                         <th>Purpose</th>
                                         <th>Printed Name</th>
+                                        <th>Created at</th>
                                     </tr>
                                 </thead>
                                 <tbody id="table-account-tbody">
@@ -63,17 +64,20 @@
                                         @foreach($pr as $data)
                                             <tr id = "{{$ctr}}">
                                                 <td>
+                                                    {{-- <form action="{{ route('view_status') }}" method="post">
+                                                        @csrf
+                                                        <input type="text" id="project_code12" class=" form-control d-none" name="id" value="<?=$aes->encrypt($data->id)?>">
+                                                        <button type="submit" class="btn btn-outline-secondary view">view status</button>
+                                                    </form> --}}
                                                     <div class="dropdown">
                                                         <span
                                                             class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
                                                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu"></span>
                                                         <div class="dropdown-menu dropdown-menu-left">
-                                                            <a class="dropdown-item editbutton" ctr = "<?=$ctr?>" href = "<?=$aes->encrypt($data->id)?>" >
-                                                                <i class="bx bx-edit-alt mr-1"></i>Edit</a>
-                                                            <a class="dropdown-item hrefdelete" ctr = "<?=$ctr?>" href = "<?=$aes->encrypt($data->id)?>">
-                                                                <i class="bx bx-trash mr-1"></i>Delete</a>
-                                                            <a class="dropdown-item hrefdelete" ctr = "<?=$ctr?>" href = "<?=$aes->encrypt($data->id)?>">
-                                                                <i class="bx bx-trash mr-1"></i>View PR</a>
+                                                            <a class="dropdown-item" ctr = "<?=$ctr?>" href = "{{ route('view_pr', ['id' => $aes->encrypt($data->id)]) }}" >
+                                                                <i class="bx bx-show-alt mr-1"></i>View PR</a>
+                                                            <a class="dropdown-item" ctr = "<?=$ctr?>" href = "{{ route('view_status', ['id' => $aes->encrypt($data->id)]) }}">
+                                                                <i class="bx bx-edit-alt mr-1"></i>View Status</a>
                                                             {{-- <a class="dropdown-item" ctr = "<?=$ctr?>" href = "{{ route('viewPR', ['id' => $aes->encrypt($data->id)]) }}">
                                                                 <i class="fa fa-eye mr-2"></i>View PR</a> --}}
                                                             {{-- <a href = "{{ route('department-addItem', ['id' => $aes->encrypt($data['id']) => $aes->encrypt($ProjectTitleResponse[$i]['allocated_budget']) ]) }}" class="dropdown-item">
@@ -85,6 +89,7 @@
                                                 <td>{{$data->fund_source}}</td>
                                                 <td>{{$data->purpose}}</td>
                                                 <td>{{$data->name}}</td>
+                                                <td>{{ date('M. j, Y', strtotime($data->created_at))}}</td>
                                             </tr>
                                             <?php $ctr = $ctr + 1 ?>
                                         @endforeach

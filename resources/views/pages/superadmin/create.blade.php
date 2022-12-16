@@ -77,7 +77,7 @@
                             <label for="SelectDepartment" >Select Department</label>
                 
                             <select id="department" class="department form-control" required>
-                                <option value="" selected disabled>-- Select Department --</option>
+                                <option value="" selected disabled>-- Select Campus First --</option>
                             </select>
                             
                         </fieldset>

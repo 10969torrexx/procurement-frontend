@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use DB;
 class DashboardController extends Controller
 {
     //users
@@ -91,6 +91,7 @@ class DashboardController extends Controller
     // }
     public function dashboard(){
         //jerald
+
         if(\session('role') == 4) {
             /** Torrexx Changes */
                 $departmentID = \session('department_id');
@@ -111,6 +112,7 @@ class DashboardController extends Controller
                 $mandatory_expeditures = \DB::table("mandatory_expenditures as me")
                     ->select("me.year", "me.fund_source_id", \DB::raw('sum(me.price) as SumMandatory'))
                     ->where("me.department_id", $departmentID)
+                    ->whereNull('me.deleted_at')
                     ->where("me.campus", session('campus'))
                     ->groupBy("me.year")
                     ->groupBy("me.fund_source_id")
@@ -139,8 +141,10 @@ class DashboardController extends Controller
                     $response = \DB::table('allocated__budgets')
                         ->join('fund_sources', 'allocated__budgets.fund_source_id', 'fund_sources.id')
                         ->where('allocated__budgets.department_id', $departmentID)
-                        ->where('allocated__budgets.campus', session('campus'))
+
                         ->whereNull('allocated__budgets.deleted_at')
+                        ->where('allocated__budgets.campus', session('campus'))
+
                         ->groupBy('fund_sources.fund_source', 'allocated__budgets.year')
                         ->orderBy('allocated__budgets.year')
                         ->get([
@@ -150,6 +154,9 @@ class DashboardController extends Controller
                     $mandatory_expeditures = \DB::table("mandatory_expenditures as me")
                         ->select("me.year", "me.fund_source_id", \DB::raw('sum(me.price) as SumMandatory'))
                         ->where("me.department_id", $departmentID)
+
+                        ->whereNull('me.deleted_at')
+
                         ->where("me.campus", session('campus'))
                         ->groupBy("me.year")
                         ->groupBy("me.fund_source_id")

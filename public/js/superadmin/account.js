@@ -97,7 +97,8 @@
       $('.campus').val('');
       $('.employee').val('');
       $('.role').val('');
-
+      $('.department').val('');
+      
      
     });
 
@@ -168,9 +169,18 @@
 
                         /* Read more about handling dismissals below */
                         if (result.dismiss === Swal.DismissReason.timer) {
-                          $('#AddUserModal').modal('hide');
-                          location.reload();
-                          console.log('I was closed by the timer')
+
+                          $('.submitbutton').text('Save');
+                          $('.campus').val('');
+                          $('.employee').val('');
+                          $('.role').val('');
+                          $('.department').val('');
+                          $("#AddUserModal").on("hidden.bs.modal", function(e){
+                            location.reload();
+                          })
+                          // $('#AddUserModal').modal('hide');
+                          // location.reload();
+                          // console.log('I was closed by the timer')
                         }
                       })
                   

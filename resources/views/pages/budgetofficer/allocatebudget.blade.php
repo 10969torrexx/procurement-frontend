@@ -56,12 +56,12 @@
                                 <thead>
                                     <tr>
                                         <th>Action</th>
+                                        <th>Procurement Type</th>
                                         <th>Department</th>
                                         <th>Fund Source</th>
                                         <th>Budget</th>
                                         <th>Mandatory Expenditures</th>
                                         <th>Remaining Balance</th>
-                                        <th>Procurement Type</th>
                                         <th>Year</th>
                                     </tr>
                                 </thead>
@@ -86,13 +86,13 @@
                                                         </div>
                                                     </div>   
                                                 </td>
+                                                <td>{{$data->procurement_type}}</td>
                                                 <td>{{ $data->department_name }}</td>
                                                 <td>{{ $data->fund_source }}</td>
                                                 <td>Php {{number_format($data->allocated_budget,2,'.',',')}}</td>
                                                 <td>Php {{number_format($data->mandatory_expenditures,2,'.',',')}}</td>
                                                 <td>Php {{number_format($data->remaining_balance,2,'.',',')}}</td>
                                                 {{-- <td>{{$data->mandatory_expenditures}}</td> --}}
-                                                <td>{{$data->procurement_type}}</td>
                                                 <td>{{ $data->year }}</td>
                                             </tr>
                                             <?php $ctr = $ctr + 1 ?>

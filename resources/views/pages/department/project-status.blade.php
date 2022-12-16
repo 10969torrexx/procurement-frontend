@@ -20,9 +20,11 @@
 @section('page-styles')
 <link rel="stylesheet" type="text/css" href="{{asset('css/plugins/extensions/toastr.css')}}">
 <link rel="stylesheet" type="text/css" href="{{asset('css/plugins/forms/wizard.css')}}">
-
 @endsection
 @section('content')
+<style>
+   
+</style>
 <!-- Zero configuration table -->
 <section id="horizontal-vertical">
     <div class="row">
@@ -85,179 +87,40 @@
                         <strong>Project Timeline</strong>
                     </h4>
                 </div>
-                <div class="card-body">
-                    
+                <div class="card-body" style="padding-bottom: 70px;">
                     @for ($i = (count($project_timeline) - 1); $i >= 0; $i--)
-                        <div class="row col-12 m-1">
-                            <div class="col-1">
-                                {{-- Creating Logo --}}
-                                    @switch($project_timeline[$i]->status)
-                                        @case(0)
-                                            @if ($i == count($project_timeline) - 1)
-                                                <div class="events mt-1">
-                                                    <div class="circle bg-primary">
-                                                        <div class="icon">
-                                                            <h3 class="text-white">
-                                                                {{-- <i class="fa-solid fa-compass-drafting"></i> --}}
-                                                            </h3>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @else
-                                                <div class="events mt-1">
-                                                    <div class="circle">
-                                                        <div class="icon">
-                                                            <h3 class="text-white">
-                                                                {{-- <i class="fa-solid fa-compass-drafting"></i> --}}
-                                                            </h3>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @endif
-                                        @break
-                                        @case(1)
-                                           @if ($i == count($project_timeline) - 1)
-                                                <div class="events mt-1">
-                                                    <div class="circle bg-primary">
-                                                        <div class="icon">
-                                                            <h3 class="text-white">
-                                                                {{-- <i class="fa-regular fa-envelope"></i> --}}
-                                                            </h3>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                           @else
-                                                <div class="events mt-1">
-                                                    <div class="circle">
-                                                        <div class="icon">
-                                                            <h3 class="text-white">
-                                                                {{-- <i class="fa-regular fa-envelope"></i> --}}
-                                                            </h3>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                           @endif
-                                        @break
-                                        @case(2)
-                                           @if ($i == count($project_timeline) - 1)
-                                                <div class="events mt-1">
-                                                    <div class="circle bg-primary text-center">
-                                                        <div class="icon">
-                                                            <h3 class="text-white">
-                                                                {{-- <i class="fa-regular fa-thumbs-up"></i> --}}
-                                                            </h3>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                           @else
-                                                <div class="events mt-1">
-                                                    <div class="circle text-center">
-                                                        <div class="icon">
-                                                            <h3 class="text-white">
-                                                                {{-- <i class="fa-regular fa-thumbs-up"></i> --}}
-                                                            </h3>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                           @endif
-                                        @break
-                                        @case(3)
-                                            @if ($i == count($project_timeline) -1 )
-                                                <div class="events mt-1">
-                                                    <div class="circle bg-primary">
-                                                        <div class="icon">
-                                                            <h3 class="text-white">
-                                                                <i class="fa-regular fa-thumbs-down"></i>
-                                                            </h3>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @else
-                                                <div class="events mt-1">
-                                                    <div class="circle">
-                                                        <div class="icon">
-                                                            <h3 class="text-white">
-                                                                {{-- <i class="fa-regular fa-thumbs-down"></i> --}}
-                                                            </h3>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @endif
-                                        @break
-                                        @case(4)
-                                           @if ($i == count($project_timeline) - 1)
-                                                <div class="events mt-1">
-                                                    <div class="circle">
-                                                        <div class="icon">
-                                                            <h3 class="text-white">
-                                                                {{-- <i class="fa-regular fa-circle-check"></i> --}}
-                                                            </h3>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                           @else
-                                                <div class="events mt-1">
-                                                    <div class="circle">
-                                                        <div class="icon">
-                                                            <h3 class="text-white">
-                                                                {{-- <i class="fa-regular fa-circle-check"></i> --}}
-                                                            </h3>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                           @endif
-                                        @break
-                                        @case(5)
-                                            @if ($i == count($project_timeline) - 1)
-                                                <div class="events mt-1">
-                                                    <div class="circle bg-primary">
-                                                        <div class="icon">
-                                                            <h3 class="text-white">
-                                                                {{-- <i class="fa-regular fa-ban"></i> --}}
-                                                            </h3>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @else
-                                                <div class="events mt-1">
-                                                    <div class="circle">
-                                                        <div class="icon">
-                                                            <h3 class="text-white">
-                                                                {{-- <i class="fa-regular fa-ban"></i> --}}
-                                                            </h3>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @endif
-                                        @break
-                                        @case(6)
-                                            @if ($i == count($project_timeline) - 1)
-                                                <div class="events mt-1">
-                                                    <div class="circle bg-primary">
-                                                        <div class="icon">
-                                                            <h3 class="text-white">
-                                                                {{-- <i class="fa-regular fa-ban"></i> --}}
-                                                            </h3>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @else
-                                                <div class="events mt-1">
-                                                    <div class="circle">
-                                                        <div class="icon">
-                                                            <h3 class="text-white">
-                                                                {{-- <i class="fa-regular fa-ban"></i> --}}
-                                                            </h3>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @endif
-                                        @break
-                                        @default
-                                    @endswitch
-                                {{-- end --}}
+                        <div class="row">
+                            <div class="col-2 d-flex justify-content-end">
+                                <span class="datetime">
+                                    <i style="color: rgb(122, 120, 120)">{{ explode('-', date('M j, Y', strtotime($project_timeline[$i]->created_at)))[0] }}</i><br>
+                                    <i style="color: rgb(122, 120, 120)" class="d-flex justify-content-end">{{ explode('-', date('H:m', strtotime($project_timeline[$i]->created_at)))[0] }}</i>
+                                </span>
                             </div>
-                            <div class="col-11 border-bottom">
+                            <div class="col-1 d-flex justify-content-center">
+                                {{-- Creating Logo --}}
+                                @if ($i == count($project_timeline) - 1)
+                                    <div class="events mt-1">
+                                        <div class="circle" style="height: 20px; width: 20px;">
+                                            <div class="icon">
+                                                <h3 class="text-white" style="left: 42%;">
+                                                    
+                                                </h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @else
+                                    <div class="events mt-1">
+                                        <div class="circle" style="background-color: rgb(223, 219, 219)">
+                                            <div class="icon">
+                                                <h3 class="text-white">
+                                                </h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="col-9 border-bottom">
+                                
                                 @if ($i == (count($project_timeline) - 1) )
                                     <h5 class="text-primary">
                                         <strong>
@@ -266,17 +129,20 @@
                                     </h5>
                                 @else
                                     <h5 class="">
-                                        <strong>
+                                        <strong style="color: rgb(151, 150, 150)">
                                             {{ (new GlobalDeclare)->Status($project_timeline[$i]->status) }}
                                         </strong>
                                     </h5>
                                 @endif
-                                <h6>
-                                    <i>{{ explode('-', date('F j, Y', strtotime($project_timeline[$i]->created_at)))[0] }}</i>
-                                </h6>
-                                <p>
-                                    {{ $project_timeline[$i]->remarks }}
-                                </p>
+                                @if ($i == (count($project_timeline) - 1) )
+                                    <p class="text-primary">
+                                        {{$project_timeline[$i]->remarks }}
+                                    </p>
+                                @else
+                                    <p style="color: gray">
+                                        {{$project_timeline[$i]->remarks }}
+                                    </p>
+                                @endif
                             </div>
                         </div>
                     @endfor
@@ -320,8 +186,8 @@
                                         <td>{{ $ppmp_response[$i]->item_category }}</td>
                                         <td>{{ $ppmp_response[$i]->item_description }}</td>
                                         <td>{{ $ppmp_response[$i]->quantity }}</td>
-                                        <td>{{ $ppmp_response[$i]->unit_price}}</td>
-                                        <td>{{ $ppmp_response[$i]->estimated_price }}</td>
+                                        <td>₱{{ number_format($ppmp_response[$i]->unit_price,2,'.',',')  }}</td>
+                                        <td>₱{{ number_format($ppmp_response[$i]->estimated_price,2,'.',',')  }}</td>
                                         <td>{{ $ppmp_response[$i]->mode_of_procurement }}</td>
                                         <td>{{ (new GlobalDeclare)->status($ppmp_response[$i]->status) }}</td>
                                         <td>{{ (new GlobalDeclare)->Month($ppmp_response[$i]->expected_month) }}</td>

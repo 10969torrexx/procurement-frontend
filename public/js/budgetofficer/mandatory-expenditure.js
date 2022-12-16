@@ -337,7 +337,7 @@ else{
             'price': price,
             'id': id,
       }
-	  console.log(data);
+	  // console.log(data);
       // alert(expenditure); 
       $.ajaxSetup({
             headers: {

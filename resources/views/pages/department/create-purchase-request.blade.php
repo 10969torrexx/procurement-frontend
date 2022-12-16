@@ -90,10 +90,10 @@
                                     <tr><td class="text-center" colspan="4"><span class="text-danger">{{ $error}}</span></td></tr>
                                     @else
                                         <?php $ctr=1; ?>
-                                        @foreach($items['items'] as $data)
+                                        @foreach($items as $data)
                                             <tr id = "{{$ctr}}">
                                                 <td>
-                                                    <input class="form-check-input" type="checkbox" value="<?=$aes->encrypt($data['id'])?>" name="itemCheckbox[]" required>
+                                                    <input class="form-check-input" type="checkbox" value="<?=$aes->encrypt($data->id)?>" name="itemCheckbox[]" required>
                                                     {{-- <div class="dropdown">
                                                         <span
                                                             class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
@@ -110,11 +110,11 @@
                                                         {{-- </div>
                                                     </div>    --}}
                                                 </td>
-                                                <td>{{ $data['item_name'] }}</td>
-                                                <td>{{$data['item_description']}}</td>
-                                                <td>{{$data['quantity']}}</td>
-                                                <td>Php {{number_format($data['unit_price'],2,'.',',')}}</td>
-                                                <td>Php {{number_format($data['estimated_price'],2,'.',',')}}</td>
+                                                <td>{{ $data->item_name }}</td>
+                                                <td>{{$data->item_description}}</td>
+                                                <td>{{$data->quantity}}</td>
+                                                <td>Php {{number_format($data->unit_price,2,'.',',')}}</td>
+                                                <td>Php {{number_format($data->estimated_price,2,'.',',')}}</td>
                                                 {{-- <td>{{$data['mode_of_procurement']}}</td> --}}
                                                 {{-- <td>{{$data['fund_source']}}</td> --}}
                                             </tr>
@@ -186,7 +186,7 @@
                                     <tr><td class="text-center" colspan="4"><span class="text-danger">{{ $error}}</span></td></tr>
                                     @else
                                         <?php $ctr=1; ?>
-                                        @foreach($items['itemsForPR'] as $data)
+                                        @foreach($itemsForPR as $data)
                                             <tr id = "{{$ctr}}">
                                                 <td>
                                                     {{-- <input type="checkbox" value="<?=$data['id']?>"> --}}
@@ -195,22 +195,22 @@
                                                             class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
                                                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu"></span>
                                                         <div class="dropdown-menu dropdown-menu-left">
-                                                            <a class="dropdown-item editbutton" ctr = "<?=$ctr?>" href = "<?=$aes->encrypt($data['id'])?>" >
+                                                            <a class="dropdown-item editbutton" ctr = "<?=$ctr?>" href = "<?=$aes->encrypt($data->id)?>" >
                                                                 <i class="bx bx-edit-alt mr-1"></i> edit</a>
-                                                            <a class="dropdown-item hrefdelete" ctr = "<?=$ctr?>" href = "<?=$aes->encrypt($data['id'])?>" >
+                                                            <a class="dropdown-item hrefdelete" ctr = "<?=$ctr?>" href = "<?=$aes->encrypt($data->id)?>" >
                                                                 <i class="bx bx-trash mr-1"></i> delete </a>
-                                                            {{-- <a class="dropdown-item" ctr = "<?=$ctr?>" href = "{{ route('createPR', ['id' => $aes->encrypt($data['id'])]) }}">
+                                                            {{-- <a class="dropdown-item" ctr = "<?=$ctr?>" href = "{{ route('createPR', ->id' => $aes->encrypt($data->id)]) }}">
                                                                 <i class="fa fa-plus mr-2"></i> Create PR </a>
-                                                            <a href = "{{ route('department-addItem', ['id' => $aes->encrypt($data['id']) => $aes->encrypt($ProjectTitleResponse[$i]['allocated_budget']) ]) }}" class="dropdown-item">
+                                                            <a href = "{{ route('department-addItem', ->id' => $aes->encrypt($data->id) => $aes->encrypt($ProjectTitleResponse[$i]->allocated_budget) ]) }}" class="dropdown-item">
                                                                 <i class = "fa fa-plus mr-2"></i>Add Item</a> --}}
                                                         </div>
                                                     </div>   
                                                 </td>
-                                                <td>{{ $data['item_name'] }}</td>
-                                                <td>{{$data['item_description']}}</td>
-                                                <td>{{$data['quantity']}}</td>
-                                                <td>Php {{number_format($data['unit_price'],2,'.',',')}}</td>
-                                                <td>Php {{number_format($data['estimated_price'],2,'.',',')}}</td>
+                                                <td>{{ $data->item_name }}</td>
+                                                <td>{{$data->item_description}}</td>
+                                                <td>{{$data->quantity}}</td>
+                                                <td>Php {{number_format($data->unit_price,2,'.',',')}}</td>
+                                                <td>Php {{number_format($data->estimated_price,2,'.',',')}}</td>
                                                 {{-- <td>{{$data['mode_of_procurement']}}</td> --}}
                                                 {{-- <td>{{$data['fund_source']}}</td> --}}
                                             </tr>

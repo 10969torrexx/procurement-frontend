@@ -33,13 +33,6 @@
                             Create PPMP
                         </a>
                     </li>
-                    {{-- 2nd Tab | Dissapproved PPMP --}}
-                    <li class="nav-item">
-                        <a class="nav-link" id="dissapproved-ppmp-tab" data-toggle="tab" href="#dissapproved" aria-controls="regular9" role="tab" aria-selected="false">
-                            <i class="fa-regular fa-thumbs-down"></i>
-                            Dissapproved PPMP &nbsp; <strong>({{ count($pt_show_disapproved) }})</strong>
-                        </a>
-                    </li>
                 </ul>
                     {{-- edit project title modal --}}
                         <div class="modal fade" id="viewmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -106,9 +99,9 @@
                     <div class="tab-pane active" id="create-ppmp" aria-labelledby="create-ppmp-tab" role="tabpanel">
                         {{-- Creat PPMP Tab --}}
                         <div class="tab-pane active" id="create-ppmp-div" aria-labelledby="create-ppmp-div-tab" role="tabpanel">
-                            <div class="row justify-content-center mb-2">
+                            <div class="row justify-content-center">
                                 @if (count($fund_sources) > 0)
-                                    <form class="col-10 row" action="{{ route('department-createProjectTitle') }}" method="post">@csrf @method('POST')
+                                    <form class="col-12 col-md-12 col-sm-12 row" action="{{ route('department-createProjectTitle') }}" method="post">@csrf @method('POST')
                                         <input type="text" name="project_category" value="{{ $project_category }}" class="form-control d-none">
                                         <div class="col-sm-3">
                                             <div class="form-group">
@@ -153,7 +146,7 @@
                                                     <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
                                                     <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
                                                 </svg>
-                                                Create
+                                                Create Project
                                             </button>
                                         </div>
                                     </form>
@@ -227,7 +220,7 @@
                             </div>
 
                             {{-- creating data tables for the list of project titles --}}
-                                <div class="table-responsive col-10 container">
+                                <div class="table-responsive col-12 col-md-12 col-sm-12 container">
                                     <table class="table zero-configuration item-table" id="item-table">
                                         <thead>
                                             <tr>
@@ -289,67 +282,10 @@
                             {{-- creating data tables for the list of project titles --}}
                         </div>
                     </div>
-                    {{-- Dissapproved PPMP Tab--}}
-                    <div class="tab-pane" id="dissapproved" aria-labelledby="dissapproved-ppmp-tab" role="tabpanel">
-                        <div class="row justify-content-center">
-                            <div class="col-10">
-                                <table class="table zero-configuration item-table" id="item-table">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Project Title</th>
-                                            <th>Year</th>
-                                            <th>Status</th>
-                                            <th>IMmEDIATE SUPERVISOR</th>
-                                            <th>Project Type</th>
-                                            <th>Fund Source</th>
-                                            <th>Date Added</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {{-- showing ppmp data based on department and user --}}
-                                            @foreach ($pt_show_disapproved as $item)
-                                                <tr>
-                                                    <td>{{ $loop->iteration }}</td>
-                                                    <td>{{ $item->project_title }}</td>
-                                                    <td>{{ $item->year_created }}</td>
-                                                    <td>{{ Str::ucfirst((new GlobalDeclare)->status($item->status)) }}</td>
-                                                    <td>{{ $item->immediate_supervisor }}</td>
-                                                    <td>{{ $item->project_type }}</td>
-                                                    <td>{{ $item->fund_source }}</td>
-                                                    <td>{{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0]  }}</td>
-                                                    <td>
-                                                        <div class="dropdown">
-                                                            <span
-                                                                class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
-                                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu">
-                                                            </span>
-                                                            <div class="btn dropdown-menu dropdown-menu-left">
-                                                                <a href = "" data-id="{{ $aes->encrypt($item->id) }}" id="edit-title-btn" class="dropdown-item">
-                                                                    <i class="bx bx-edit-alt mr-1"></i>Edit
-                                                                </a>
-                                                                <a href = "{{ route('department-destroy-project', ['id' => $aes->encrypt($item->id) ]) }}" class="dropdown-item">
-                                                                    <i class="bx bx-trash mr-1"></i> delete
-                                                                </a>
-                                                                <a href = "{{ route('dept_disapproved-items', ['id' => $aes->encrypt($item->id), 'allocated_budget' => $aes->encrypt($item->allocated_budget) ]) }}" class="dropdown-item">
-                                                                    <i class="fa-regular fa-eye mr-1"></i>View Item
-                                                                </a>
-                                                            </div>
-                                                        </div> 
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        {{-- showing ppmp data based on department and user --}}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
-    </div>\
+    </div>
     </strong>
 </section>
 {{-- Torrexx | Code not mine --}}

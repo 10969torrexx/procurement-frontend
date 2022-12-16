@@ -93,7 +93,8 @@ $(document).on('click', '.editbutton', function (e) {
         data:{'id':id},
         success: function (response) {
             if (response.status == 200) {
-              $('.update_fundsource').val(response['data'][0]['fund_source']);
+              // console.log(response);
+              $('.update_fundsource').val(response['fund_source'][0]['fund_source']);
               $('.update_id').val(id);
               $('#UpdateFundSourceModal').modal('show');
             }

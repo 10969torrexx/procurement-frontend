@@ -64,7 +64,14 @@
         </div> --}}
         <div class="card-cody">
         <div class="table-responsive">
-
+            <div class="col-md-12 mb-1 text-left">
+                {{-- <a href = "{{ route('view_ppmp') }}" class = "btn btn-primary round mr-1 mb-1"><i class="bx bx-left-arrow"></i> Back</a> --}}
+                <a href = "{{ route('view_ppmp') }}"><button type="button" class="btn btn-primary  mt-1">Back</button></a>
+                @if($data[0]->status == 2 || $data[0]->status == 4 || $data[0]->status == 5)
+                    <button type="button" class="btn btn-success  mt-1 accept_all" value="4"  data-id="{{ $data[0]->pt_id }}">Accept All</button></a>
+                    <button type="button" class="btn btn-danger  mt-1 reject_all" value="5"  data-id="{{ $data[0]->pt_id }}">Reject All</button>
+                @endif
+            </div>
             <table class="text-center ppmp" style=" line-height:22px;font-size:15px">
                 <thead>
                     <tr style=" border-top: 1px solid black;">
@@ -92,17 +99,7 @@
                     </tr>
                     <tr >
                         <td style="font-size: 15px;" class="text-dark text-bold-600" >{{-- {{ $data[0]->code }} --}}
-                        <?php
-                            if($data[0]->projectStatus != 2){
-                        ?>
-                            --
-                        <?php
-                            }else if($data[0]->projectStatus == 2){
-                        ?>
                             {{ $data[0]->code }}
-                        <?php
-                            }
-                        ?>
                         </td>
                         <td style="font-size: 15px;" class="text-dark text-bold-600">{{ $data[0]->title }}</td>
                         <td ></td>
@@ -191,15 +188,15 @@
                                     if($data[$i]->status == 2){
                                 ?>
                                     <div class="mb-1" id="action{{ $i }}">
-                                        <button class="btn btn-outline-success approve button" data-button="0" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="2" data-index="{{ $i }}" >Accept</button>
-                                        <button class="btn btn-outline-danger disapprove button" data-button="{{ $data[$i]->estimated_price }}" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="3" data-index="{{ $i }}">Reject</button> 
+                                        <button id="superbtn" class="btn btn-outline-success approve button" data-button="0" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="2" data-index="{{ $i }}" >Accept</button>
+                                        <button id="superbtn" class="btn btn-outline-danger disapprove button" data-button="{{ $data[$i]->estimated_price }}" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="3" data-index="{{ $i }}">Reject</button> 
                                     </div>
                                 <?php
                                     }else if( $data[$i]->status == 4 || $data[$i]->status == 5 ){
                                 ?>
                                     <div class="mb-1" id="action{{ $i }}" style="display:none">
-                                        <button class="btn btn-outline-success approve button" data-button="-{{ $data[$i]->estimated_price }}" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="2" data-index="{{ $i }}" >Accept</button>
-                                        <button class="btn btn-outline-danger disapprove button" data-button="{{ $data[$i]->estimated_price }}" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="3" data-index="{{ $i }}">Reject</button> 
+                                        <button id="superbtn" class="btn btn-outline-success approve button" data-button="-{{ $data[$i]->estimated_price }}" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="2" data-index="{{ $i }}" >Accept</button>
+                                        <button id="superbtn" class="btn btn-outline-danger disapprove button" data-button="{{ $data[$i]->estimated_price }}" data-toggle ="{{ $data[$i]->id }}" data-id="{{ $data[$i]->pt_id }}" value="3" data-index="{{ $i }}">Reject</button> 
                                     </div>
                                 <?php
                                     }
@@ -342,14 +339,14 @@
               </fieldset>
             </div>
           </div>
-        <div class="col-md-12 text-right">
-            <a href = "{{ route('view_ppmp') }}" class = "btn btn-primary round mr-1 mb-1"><i class="bx bx-left-arrow"></i> Back</a>
+        <div class="col-md-12 text-right" style="display: none" id="ppmpDone">
             <a href = "#" class = "done btn btn-success round mr-1 mb-1"><i class="bx bx-save"></i> Save</a>
             {{-- <button type="button" class="btn btn-success col-md-1 mt-1 ppmpDone" data-id="{{ $data[0]->pt_id }}">Done</button> --}}
         </div>
     </div>
     </div>
     @include('pages.budgetofficer.disapproved_ppmp_modal')
+    @include('pages.budgetofficer.reject_all_ppmp_modal')
 </section>
 <!-- Dashboard Ecommerce ends -->
 @endsection

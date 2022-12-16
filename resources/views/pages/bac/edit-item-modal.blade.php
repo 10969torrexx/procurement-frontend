@@ -32,13 +32,23 @@
           <option  value="Non-CSE">Non-CSE</option>
         </select>
 
-        <label class="mt-1">Public Bidding</label>
-        <select class="form-select form-control public-bidding" name = "public_bidding"  aria-label="Default select example">
-          <option id="public-bidding" value="" selected></option>
+        {{-- <label class="mt-1">Public Bidding</label>
+        <select class="form-select form-control p_bidding" name ="p_bidding"  aria-label="Default select example">
+          <option id="p_bidding" value="" selected></option>
           <option disabled>--------------------------------------------------------------------------</option>
-          <option  value="0">Not Required</option>
-          <option  value="1">Required</option>
-        </select>
+          <option value="0">Not Required</option>
+          <option value="1">Required</option>
+        </select> --}}
+        <div id="procurement" >
+          <label class="mt-1">Mode Of Procurement:</label>
+          <select class="form-select form-control m_procurement" name ="m_procurement"  aria-label="Default select example" >
+            <option id="m_procurement" value="" selected> Choose...</option>
+            <option disabled>--------------------------------------------------------------------------</option>
+            @foreach($mode2 as $m_procurement)
+              <option value="{{ $m_procurement->id }}">{{ $m_procurement->mode_of_procurement }}</option>
+            @endforeach
+          </select>
+        </div>
 
       </div>
       <div class="modal-footer" id = "footModal">
