@@ -42,6 +42,7 @@ class DepartmentPagesController extends Controller
                         ->join('fund_sources', 'allocated__budgets.fund_source_id', 'fund_sources.id')
                         ->where('allocated__budgets.department_id', $departmentID)
                         ->where('allocated__budgets.campus', session('campus'))
+                        ->whereNull('allocated__budgets.deleted_at')
                         ->groupBy('fund_sources.fund_source', 'allocated__budgets.year')
                         ->orderBy('allocated__budgets.year')
                         ->get([
@@ -131,6 +132,7 @@ class DepartmentPagesController extends Controller
                             ->where('allocated__budgets.procurement_type', 'PPMP') // make this dynamic
                             ->whereNull('allocated__budgets.deleted_at')
                             ->get(['allocated__budgets.*', 'allocated__budgets.id as allocated_id','fund_sources.fund_source']);
+
                 # end 
                 # this will return the page
                     $pageConfigs = ['pageHeader' => true];

@@ -41,7 +41,7 @@
           </div>
         </div>
 
-          @if (session('role') == 4)
+          @if (session('role') == 4 || session('role') == 11)
             <div class="card">
               <div class="card-header">
                   <h4 class="text-primary border-bottom pb-1">

@@ -128,7 +128,7 @@
 
 <script src="{{asset('vendors/js/extensions/toastr.min.js')}}"></script>
 {{-- employee JS --}}
-<script src="{{asset('js/superadmin/account.js?id=158')}}"></script>
+<script src="{{asset('js/superadmin/account.js?id=160')}}"></script>
 
 @endsection
 {{-- page scripts --}}

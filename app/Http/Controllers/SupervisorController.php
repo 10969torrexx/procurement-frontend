@@ -17,11 +17,12 @@ class SupervisorController extends Controller
         ];
         
         $ppmp = DB::table("project_titles as pt")
-              ->select("pt.*","ab.allocated_budget","ab.remaining_balance","fs.fund_source")
+              ->select("pt.*","ab.allocated_budget","ab.remaining_balance","fs.fund_source","u.name as username")
               // ->selectRaw("Sum(p.estimated_price) as Total")
               ->join('ppmps as p','p.project_code','=','pt.id')
               ->join('allocated__budgets as ab','pt.allocated_budget','=','ab.id')
               ->join('fund_sources as fs','fs.id','=','pt.fund_source')
+              ->join('users as u','u.employee_id','=','pt.employee_id')
               ->whereNull("pt.deleted_at")
               ->where("pt.status","!=", 0)
               ->where("pt.campus",session('campus'))
