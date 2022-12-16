@@ -386,6 +386,18 @@ class SupervisorController extends Controller
                   })
                 ->where("pt.id",$request->id)
                 ->get();
+
+          $itemcheckpending = DB::table("project_titles as pt")
+                ->select("p.estimated_price")
+                ->join('ppmps as p','p.project_code','=','pt.id')
+                ->whereNull("pt.deleted_at")
+                ->whereNull("p.deleted_at")
+                ->where(function ($query) {
+                  $query->where('p.status', 1);
+
+                  })
+                ->where("pt.id",$request->id)
+                ->get();
       }else{
         $itemcheck = DB::table("project_titles as pt")
                 ->select("p.estimated_price")
@@ -408,7 +420,7 @@ class SupervisorController extends Controller
         $itemtotal += $itemcheck->estimated_price;
       }
 
-      if($itemtotal > 0){
+      if($itemtotal > 0 || !empty($itemcheckpending)){
         $total = 0;
         foreach($budget as $budget){
           $total = $budget->remaining_balance;
