@@ -23,6 +23,12 @@
         "icon": "building"
       },
       {
+        "url": "superadmin/mandatory_expenditure_list",
+        "name": "Mandatory",
+        "i18n": "User",
+        "icon": "shoppingcart"
+      },
+      {
         "url": "superadmin/fund_sources",
         "name": "Fund Sources",
         "i18n": "User",

@@ -144,42 +144,67 @@ class DepartmentController extends Controller
      */
     public function createPPMPs(Request $request)
     {
-        # form fields validation
-        $this->validate($request, [
-            # field validation | disabled
-                'item_name'     =>  'required',
-                'item_category' =>  'required',
-                'unit_price'     =>  'required',
-                'estimated_price'     =>  'required',
-                'quantity'  =>  'required',
-                'item_description'  =>  'required',
-                'mode_of_procurement'  =>  'required',
-                'expected_month'    =>  'required',
-                'unit_of_measurement'  =>  'required',
-        ]); 
-        // this will send data to project titles table using api
-            $create_items = \DB::table('ppmps')
-                ->insert([
-                    'employee_id' => session('employee_id'),
-                    'department_id' => session('department_id'),
-                    'campus' => session('campus'),
-                    'project_code'  =>  explode('**', $request->item_name)[3],
-                    'item_name' => (new AESCipher)->decrypt(explode('**', $request->item_name)[0]),
-                    'unit_price'    =>  $request->unit_price,
-                    'app_type'  => (new AESCipher)->decrypt(explode('**', $request->item_name)[1]),
-                    'estimated_price'  => $request->estimated_price,
-                    'item_description' =>  $request->item_description,
-                    'item_category'     =>  (new AESCipher)->decrypt(explode('**', $request->item_name)[2]),
-                    'quantity'  => $request->quantity,
-                    'unit_of_measurement'   =>  $request->unit_of_measurement,
-                    'mode_of_procurement'   =>  $request->mode_of_procurement,
-                    'expected_month'    => (new AESCipher)->decrypt($request->expected_month),
-                    'created_at'    =>  Carbon::now(),
-                    'updated_at'    =>  Carbon::now(),
+        try {
+            # form fields validation
+            $this->validate($request, [
+                # field validation | disabled
+                    'item_name'     =>  'required',
+                    'item_category' =>  'required',
+                    'app_type' =>  'required',
+                    'unit_price'     =>  'required',
+                    'estimated_price'     =>  'required',
+                    'quantity'  =>  'required',
+                    'item_description'  =>  'required',
+                    'mode_of_procurement'  =>  'required',
+                    'expected_month'    =>  'required',
+                    'unit_of_measurement'  =>  'required',
+            ]); 
+            // dd($request->estimated_price);
+            $__total_estimated_price = $request->total_estimated_price + doubleval($request->estimated_price);
+        //    dd( doubleval($request->remaining_balance));
+            # comparing total estimated price to remaining balance
+            if($__total_estimated_price > doubleval($request->remaining_balance)) {
+                return back()->with([
+                    'failed' => 'Your total estimated price has exceeded your remaining balance. Please make necessary adjustments!'
                 ]);
-            return back()->with([
-                'success'   => 'Item added as Draft!'
-            ]);
+            }
+
+            # comparing current date to deadline of submission
+            $_deadline_of_submission = Carbon::parse($request->deadline_of_submission)->format('Y-m-d');
+            $current_date = Carbon::now()->format('Y-m-d');
+            if($current_date > $_deadline_of_submission) {
+                return back()->with([
+                    'failed'    => 'You\'ve exceeded the alloted deadline of submission.'
+                ]);
+            } 
+            
+            // this will send data to project titles table using api
+                $create_items = \DB::table('ppmps')
+                    ->insert([
+                        'employee_id' => session('employee_id'),
+                        'department_id' => session('department_id'),
+                        'campus' => session('campus'),
+                        'project_code'  =>  (new AESCipher)->decrypt($request->project_code),
+                        'item_name' => $request->item_name,
+                        'unit_price'    =>  $request->unit_price,
+                        'app_type'  => $request->app_type,
+                        'estimated_price'  => $request->estimated_price,
+                        'item_description' =>  $request->item_description,
+                        'item_category'     =>  $request->item_category,
+                        'quantity'  => $request->quantity,
+                        'unit_of_measurement'   =>  $request->unit_of_measurement,
+                        'mode_of_procurement'   =>  $request->mode_of_procurement,
+                        'expected_month'    => (new AESCipher)->decrypt($request->expected_month),
+                        'created_at'    =>  Carbon::now(),
+                        'updated_at'    =>  Carbon::now(),
+                    ]);
+                return back()->with([
+                    'success'   => 'Item added as Draft!'
+                ]);
+        } catch (\Throwable $th) {
+            throw $th;
+            return view('pages.error-500');
+        }
     }
     /**
      * 
@@ -192,58 +217,23 @@ class DepartmentController extends Controller
      */
     public function getItemDescription(Request $request)
     {
-        // this will send data to api
-        $item_description =  Http::withToken(session('token'))->post(env('APP_API'). "/api/department/fetch-item-description", [
-           'item_name'  => (new AESCipher)->encrypt($request->item_name)
-        ])->json();
-
-        # this will be sent if status is 200
-            if($item_description['status'] == 200) {
-                return response()->json([
-                    'status'    => $item_description['status'],
-                    'data'  => $item_description['data']
-                ]);
-            }
-        # end
-        # this will be returned if status is equal tp 400
-            if($item_description['status']  == 400) {
-                return response()->json([
-                    'status'    => $item_description['status'],
-                    'message'  => $item_description['message']
-                ]);
-            }
-        # end
-    }
-
-    /**
-     * 
-     * Display the specified resource.
-     *
-     * this function is accessed using AJAX
-     * 
-     * @param  Request $request
-     * @return \Illuminate\Http\Response
-     */
-    public function getItemCategory(Request $request)
-    {
-        // this will get the item category
-            $itemController = (new ItemsController)->show($request->item_name);
-        # this will be sent if status is 200
-            if($itemController['status'] == 200) {
-                return response()->json([
-                    'status'    => $itemController['status'],
-                    'data'  => $itemController['data']
-                ]);
-            }
-        # end
-        # this will be returned if status is equal tp 400
-            if($itemController['status']  == 400) {
-                return response()->json([
-                    'status'    => $itemController['status'],
-                    'message'  => $itemController['message']
-                ]);
-            }
-        # end
+        $item_description = \DB::table('ppmps')
+            ->join('users', 'users.employee_id', 'ppmps.employee_id')
+            ->where('ppmps.item_name', $request->item_name)
+            ->whereNull('ppmps.deleted_at')
+            ->whereNull('users.deleted_at')
+            ->get([
+                'ppmps.item_description',
+                'ppmps.unit_price',
+                'ppmps.unit_of_measurement',
+                'ppmps.quantity',
+                'ppmps.estimated_price',
+                'users.name'
+            ]);
+        
+        if($item_description) {
+            return \json_decode($item_description);
+        }
     }
 
     /**
@@ -269,55 +259,37 @@ class DepartmentController extends Controller
                     'expected_month'    =>  'required',
                     'unit_of_measurement'  =>  'required',
             ]); 
-            $final_expected_date = '';
-            if(strlen($request->expected_month) > 1) {
-                $final_expected_date = $request->expected_month;
-            } else {
-                $final_expected_date = (new AESCipher)->encrypt($request->expected_month);
-            }
+           
+            # update ppmps
+            $response = \DB::table('ppmps')
+                ->where('id', $request->id)
+                ->where('campus', session('campus'))
+                ->where('department_id', session('department_id'))
+                ->where('employee_id', session('employee_id'))
+                ->update([
+                    'item_name' => $request->item_name,
+                    'item_category' => $request->item_category,
+                    'app_type'  =>  $request->app_type,
+                    'unit_of_measurement'   =>  $request->unit_of_measurement,
+                    'quantity'  => $request->quantity,
+                    'unit_price'    => $request->unit_price,
+                    'estimated_price'   => $request->estimated_price,
+                    'item_description'  => $request->item_description,
+                    'mode_of_procurement'   => $request->mode_of_procurement,
+                    'expected_month'    => $request->expected_month,
+                    'updated_at'    => Carbon::now()
+                ]);
 
-            $final_item_name = '';
-            if(strpos($request->item_name, '**') > 0) {
-                $final_item_name = $request->item_name;
-            } else {
-                $final_item_name = $request->item_name;
-            }
-            # sending the dato to the API
-            $ppmp_response =  Http::withToken(session('token'))->post(env('APP_API'). "/api/department/update-ppmps", [
-                'id' => $request->id,
-                'item_name'  =>  $final_item_name,
-                'estimated_price'    =>  $request->estimated_price,
-                'unit_price' => $request->unit_price,
-                'item_category' =>  $request->item_category,
-                'quantity'   => $request->quantity,
-                'unit_of_measurement'    => $request->unit_of_measurement,
-                'item_description'   =>  $request->item_description,
-                'mode_of_procurement'    => $request->mode_of_procurement,
-                'expected_month' =>  $final_expected_date
-            ])->json();
-            # this will be returned if status 200
-            if($ppmp_response['status'] == 200) {
-                // dd($ppmp_response['message']);
-                return back()->with([
-                    'success'   =>  $ppmp_response['message']
-                ]);
-            }
-            # this will be returned if status is 400
-            if($ppmp_response['status'] == 400) {
-                if(count($ppmp_response['message']) > 0) {
-                    // dd($ppmp_response['message']['errorInfo'][2]);
-                    return back()->with([
-                        'failed'   =>  $ppmp_response['message']['errorInfo'][2]
-                    ]);
-                }
-                return back()->with([
-                    'failed'   =>  $ppmp_response['message']
-                ]);
-            }
-            
-            // return $request;
+            return back()->with([
+                'success'   => 'Item details updated successfully!'
+            ]);
+
        } catch (\Throwable $th) {
-            throw $th;
+            // throw $th;
+            // return view('pages.error-500');
+            return back()->with([
+                'failed'   => 'Failed to update item details!'
+            ]);
        }
     }
 
@@ -339,7 +311,6 @@ class DepartmentController extends Controller
                 ->update([
                     'deleted_at' => Carbon::now()
                 ]);
-
             return back()->with([
                 'success' => 'Item deleted successfully!'
             ]);
@@ -454,4 +425,45 @@ class DepartmentController extends Controller
         } 
     }
 
+    # get items 
+    public function get_items() {
+        $items = \DB::table('items')
+                ->join('mode_of_procurement', 'mode_of_procurement.id', 'items.mode_of_procurement_id')
+                ->whereNull('mode_of_procurement.deleted_at')
+                ->whereNull('items.deleted_at')
+                ->get();
+        if($items) {
+            return \json_decode($items);
+        }
+    }
+
+    # get specified mode of procurement
+    public function get_mode_of_procurement(Request $request) {
+        $response = \DB::table('mode_of_procurement')
+            ->where('id', $request->id)
+            ->get();
+
+        if($request) {
+            return \json_decode($response);
+        }
+    }
+
+    # get specified mode 
+    public function get_ppmps(Request $request) {
+        $ppmp_response = \DB::table('ppmps')
+            ->join('mode_of_procurement', 'mode_of_procurement.id', 'ppmps.mode_of_procurement')
+            ->where('ppmps.id', $request->id)
+            ->where('ppmps.campus', session('campus'))
+            ->where('ppmps.department_id', session('department_id'))
+            ->where('ppmps.employee_id', session('employee_id'))
+            ->whereNull('ppmps.deleted_at')
+            ->get([
+                'ppmps.*',
+                'mode_of_procurement.*',
+                'ppmps.id as ppmps_id',
+                'mode_of_procurement.id as procurement_id',
+            ]);
+
+        return \json_decode($ppmp_response);
+    }
 }

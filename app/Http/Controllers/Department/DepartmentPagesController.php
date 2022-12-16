@@ -42,6 +42,7 @@ class DepartmentPagesController extends Controller
                         ->join('fund_sources', 'allocated__budgets.fund_source_id', 'fund_sources.id')
                         ->where('allocated__budgets.department_id', $departmentID)
                         ->where('allocated__budgets.campus', session('campus'))
+                        ->whereNull('allocated__budgets.deleted_at')
                         ->groupBy('fund_sources.fund_source', 'allocated__budgets.year')
                         ->orderBy('allocated__budgets.year')
                         ->get([
@@ -101,28 +102,10 @@ class DepartmentPagesController extends Controller
                                 'fund_sources.fund_source',
                                 'users.name as immediate_supervisor' 
                             ]);
-                    # from project titles table | disapproved project titles
-                        $pt_show_disapproved = \DB::table('project_titles')
-                            ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
-                            ->join('users', 'users.id', 'project_titles.immediate_supervisor')
-                            ->where('project_titles.campus', session('campus'))
-                            ->where('project_titles.department_id', session('department_id'))
-                            ->where('project_titles.employee_id', session('employee_id'))
-                            // ->whereRaw("project_titles.status ='3' OR project_titles.status='5'")
-                            ->where(function($query) {
-                                $query->where('project_titles.status', 3)
-                                    ->orWhere('project_titles.status', 5);
-                            })
-                            ->whereNull('project_titles.deleted_at')
-                            ->get([
-                                'project_titles.*',
-                                'fund_sources.fund_source',
-                                'users.name as immediate_supervisor' 
-                            ]);
                     # from departments table
                         $departments = \DB::table('departments')->where('id', session('department_id'))->get();
                     # from categories table
-                        $categories = \DB::table('categories')->where('campus', session('campus'))->whereNull('deleted_at')->get();
+                        $categories = \DB::table('categories')->whereNull('deleted_at')->get();
                     # from fund sources table
                         $fund_sources = \DB::table('allocated__budgets')
                             ->join('fund_sources', 'fund_sources.id', 'allocated__budgets.fund_source_id')
@@ -148,7 +131,6 @@ class DepartmentPagesController extends Controller
                         'departments'   =>  $departments,
                         'categories'    => $categories,
                         'project_category' => $request->project_category,
-                        'pt_show_disapproved'   => $pt_show_disapproved
                     ]);
                 # end
             }
@@ -174,12 +156,17 @@ class DepartmentPagesController extends Controller
                 # end
                 # this will get the item based on the project code, department id, employee id 
                     $ppmp_response = \DB::table('ppmps')
-                        ->where('project_code', $id)
-                        ->where('campus', session('campus'))
-                        ->where('department_id', session('department_id'))
-                        ->where('employee_id', session('employee_id'))
-                        ->whereNull('deleted_at')
-                        ->get();
+                        ->join('mode_of_procurement', 'mode_of_procurement.id', 'ppmps.mode_of_procurement')
+                        ->where('ppmps.project_code', $id)
+                        ->where('ppmps.campus', session('campus'))
+                        ->where('ppmps.department_id', session('department_id'))
+                        ->where('ppmps.employee_id', session('employee_id'))
+                        ->whereNull('ppmps.deleted_at')
+                        ->get([
+                            'ppmps.*',
+                            'mode_of_procurement.*',
+                            'ppmps.id as ppmps_id'
+                        ]);
                 # end
                 # this will get data from database
                     # for allocated budgets table
@@ -197,7 +184,7 @@ class DepartmentPagesController extends Controller
                             }
                     # for mode of procurement
                         $mode_of_procurements = \DB::table('mode_of_procurement')
-                            ->where('campus', session('campus'))
+                            // ->where('campus', session('campus'))
                             ->whereNull('deleted_at')
                             ->get();
                         # return if null
@@ -208,7 +195,7 @@ class DepartmentPagesController extends Controller
                             }
                     # for unit of measure
                         $unit_of_measurement = \DB::table('unit_of_measurements')
-                            ->where('campus', session('campus'))
+                            // ->where('campus', session('campus'))
                             ->whereNull('deleted_at')
                             ->get();
                         # return if null
@@ -219,9 +206,11 @@ class DepartmentPagesController extends Controller
                             }
                     # for items
                         $items = \DB::table('items')
-                            ->where('campus', session('campus'))
-                            ->whereNull('deleted_at')
+                            ->join('mode_of_procurement', 'mode_of_procurement.id', 'items.mode_of_procurement_id')
+                            ->whereNull('mode_of_procurement.deleted_at')
+                            ->whereNull('items.deleted_at')
                             ->get();
+
                         # return if null
                             if((count($items) <= 0) || $items == null) {
                                 return back()->with([
@@ -258,111 +247,150 @@ class DepartmentPagesController extends Controller
 
         # this will show the My PPMP Page based on the provided department id by the logged in user
         public function showMyPPMP() {
-            # this will get all the data form the ppmp table based on the given department_id
-                $project_titles = \DB::table('project_titles')
-                ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
-                // ->join('departments', 'departments.immediate_supervisor', 'project_titles.department_id')
-                ->join('users', 'users.id', 'project_titles.immediate_supervisor')
-                ->where('project_titles.campus', session('campus'))
-                ->where('project_titles.department_id', session('department_id'))
-                ->where('project_titles.employee_id', session('employee_id'))
-                ->whereNull('project_titles.deleted_at')
-                ->get([
-                    'project_titles.*',
-                    'fund_sources.fund_source',
-                    'users.name as immediate_supervisor' 
-                ]);
+            try {
+                # this will get all the data form the ppmp table based on the given department_id
+                    $project_titles = \DB::table('project_titles')
+                        ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
+                        // ->join('departments', 'departments.immediate_supervisor', 'project_titles.department_id')
+                        ->join('users', 'users.id', 'project_titles.immediate_supervisor')
+                        ->where('project_titles.campus', session('campus'))
+                        ->where('project_titles.department_id', session('department_id'))
+                        ->where('project_titles.employee_id', session('employee_id'))
+                        ->whereNull('project_titles.deleted_at')
+                        ->get([
+                            'project_titles.*',
+                            'fund_sources.fund_source',
+                            'users.name as immediate_supervisor' 
+                        ]);
+                # from project titles table | disapproved project titles
+                    $pt_show_disapproved = \DB::table('project_titles')
+                        ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
+                        ->join('users', 'users.id', 'project_titles.immediate_supervisor')
+                        ->where('project_titles.campus', session('campus'))
+                        ->where('project_titles.department_id', session('department_id'))
+                        ->where('project_titles.employee_id', session('employee_id'))
+                        ->where(function($query) {
+                            $query->where('project_titles.status', 3)
+                                ->orWhere('project_titles.status', 5);
+                        })
+                        ->whereNull('project_titles.deleted_at')
+                        ->get([
+                            'project_titles.*',
+                            'fund_sources.fund_source',
+                            'users.name as immediate_supervisor' 
+                        ]);
 
-            # this will check if all required data is not null 
-                if(count($project_titles) < 0) {
-                    # if there are null data this will retur na page maintenance page
-                    return view('pages.page-maintenance');
-                } 
-            # this is for affixing header links above the card directoryyy
-            $pageConfigs = ['pageHeader' => true];
-            $breadcrumbs = [
-            ["link" => "/", "name" => "Home"],
-            ["name" => "My PPMP"]
-            ];
-            # this will return the department.my-PPMP
-            return view('pages.department.my-ppmp-status',
-                ['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs], 
-                # this will attache the data to view
-                [
-                    'project_titles' => $project_titles
-                ]
-            );
+                # this is for affixing header links above the card directoryyy
+                    $pageConfigs = ['pageHeader' => true];
+                    $breadcrumbs = [
+                    ["link" => "/", "name" => "Home"],
+                    ["name" => "My PPMP"]
+                    ];
+                    # this will return the department.my-PPMP
+                    return view('pages.department.my-ppmp-status',
+                        ['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs], 
+                        # this will attache the data to view
+                        [
+                            'project_titles' => $project_titles,
+                            'pt_show_disapproved'   => $pt_show_disapproved
+                        ]
+                    );
+            } catch (\Throwable $th) {
+                //throw $th;
+                return view('pages.error-500');
+            }
         }
 
         # this will show the My PPMP Page based on the provided department id by the logged in user
         public function show_by_year_created(Request $request) {
-           try {
+            try {
                 # this will get all the data form the ppmp table based on the given department_id
                 $project_titles = \DB::table('project_titles')
-                ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
-                // ->join('departments', 'departments.immediate_supervisor', 'project_titles.department_id')
-                ->join('users', 'users.id', 'project_titles.immediate_supervisor')
-                ->where('project_titles.campus', session('campus'))
-                ->where('project_titles.department_id', session('department_id'))
-                ->where('project_titles.employee_id', session('employee_id'))
-                ->where('project_titles.year_created', (new AESCipher)->decrypt($request->year_created))
-                ->whereNull('project_titles.deleted_at')
-                ->get([
-                    'project_titles.*',
-                    'fund_sources.fund_source',
-                    'users.name as immediate_supervisor' 
-                ]);
+                    ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
+                    // ->join('departments', 'departments.immediate_supervisor', 'project_titles.department_id')
+                    ->join('users', 'users.id', 'project_titles.immediate_supervisor')
+                    ->where('project_titles.campus', session('campus'))
+                    ->where('project_titles.department_id', session('department_id'))
+                    ->where('project_titles.employee_id', session('employee_id'))
+                    ->where('project_titles.year_created', (new AESCipher)->decrypt($request->year_created))
+                    ->whereNull('project_titles.deleted_at')
+                    ->get([
+                        'project_titles.*',
+                        'fund_sources.fund_source',
+                        'users.name as immediate_supervisor' 
+                    ]);
+                # from project titles table | disapproved project titles
+                    $pt_show_disapproved = \DB::table('project_titles')
+                        ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
+                        ->join('users', 'users.id', 'project_titles.immediate_supervisor')
+                        ->where('project_titles.campus', session('campus'))
+                        ->where('project_titles.department_id', session('department_id'))
+                        ->where('project_titles.employee_id', session('employee_id'))
+                        ->where('project_titles.year_created', (new AESCipher)->decrypt($request->year_created))
+                        ->where(function($query) {
+                            $query->where('project_titles.status', 3)
+                                ->orWhere('project_titles.status', 5);
+                        })
+                        ->whereNull('project_titles.deleted_at')
+                        ->get([
+                            'project_titles.*',
+                            'fund_sources.fund_source',
+                            'users.name as immediate_supervisor' 
+                        ]);
                 # this is for affixing header links above the card directoryyy
-                $pageConfigs = ['pageHeader' => true];
-                $breadcrumbs = [
-                ["link" => "/", "name" => "Home"],
-                ["name" => "My PPMP"]
-                ];
-                # this will return the department.my-PPMP
-                return view('pages.department.my-ppmp-status',
-                    ['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs], 
-                    # this will attache the data to view
-                    [
-                        'project_titles' => $project_titles
-                    ]
-                );
-           } catch (\Throwable $th) {
-                // throw $th;
-                return view('pages.error-500');
-           }
+                    $pageConfigs = ['pageHeader' => true];
+                    $breadcrumbs = [
+                    ["link" => "/", "name" => "Home"],
+                    ["name" => "My PPMP"]
+                    ];
+                    # this will return the department.my-PPMP
+                    return view('pages.department.my-ppmp-status',
+                        ['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs], 
+                        # this will attache the data to view
+                        [
+                            'project_titles' => $project_titles,
+                            'pt_show_disapproved' => $pt_show_disapproved
+                        ]
+                    );
+            } catch (\Throwable $th) {
+                    // throw $th;
+                    return view('pages.error-500');
+            }
         }
 
         # this will show the status of the project
         public function showProjectStatus(Request $request) {
             try {
                 $project_titles = \DB::table('project_titles')
-                ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
-                // ->join('departments', 'departments.immediate_supervisor', 'project_titles.department_id')
-                ->join('users', 'users.id', 'project_titles.immediate_supervisor')
-                ->where('project_titles.id', intval((new AESCipher)->decrypt($request->id)))
-                ->where('project_titles.campus', session('campus'))
-                ->where('project_titles.department_id', session('department_id'))
-                ->where('project_titles.employee_id', session('employee_id'))
-                ->where('project_titles.status', '!=', '0')
-                ->whereNull('project_titles.deleted_at')
-                ->get([
-                    'project_titles.*',
-                    'fund_sources.fund_source',
-                    'users.name as immediate_supervisor' 
-                ]);
-                $ppmp_response = (new PpmpController)->show($request->id);
+                    ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
+                    // ->join('departments', 'departments.immediate_supervisor', 'project_titles.department_id')
+                    ->join('users', 'users.id', 'project_titles.immediate_supervisor')
+                    ->where('project_titles.id', intval((new AESCipher)->decrypt($request->id)))
+                    ->where('project_titles.campus', session('campus'))
+                    ->where('project_titles.department_id', session('department_id'))
+                    ->where('project_titles.employee_id', session('employee_id'))
+                    ->where('project_titles.status', '!=', '0')
+                    ->whereNull('project_titles.deleted_at')
+                    ->get([
+                        'project_titles.*',
+                        'fund_sources.fund_source',
+                        'users.name as immediate_supervisor' 
+                    ]);
+                $ppmp_response = \DB::table('ppmps')
+                    ->where('department_id', session('department_id'))
+                    ->where('employee_id', intval(session('employee_id')))
+                    ->where('project_code', (new AESCipher)->decrypt($request->id))
+                    ->whereNull('deleted_at')
+                    ->get();
+
                 $project_timeline = (new ProjectTimelineController)->index($request->id);
                 # this will check if all required data is not null 
-                    if(count($project_titles) <= 0) {
+                    if((count($ppmp_response) <= 0) || $ppmp_response == null) {
                         # if there are null data this will retur na page maintenance page
-                        return view('pages.page-maintenance');
+                        return back()->with([
+                            'failed'    => 'This Project doesn\' contain any items. Please add items using the Create PPMP Tab.'
+                        ]);
                     } 
-
-                    if(count($ppmp_response['data']) <= 0) {
-                        # if there are null data this will retur na page maintenance page
-                        return view('pages.page-maintenance');
-                    } 
-                
                 # this is for affixing header links above the card directoryyy
                 $pageConfigs = ['pageHeader' => true];
                 $breadcrumbs = [
@@ -375,11 +403,12 @@ class DepartmentPagesController extends Controller
                     # this will attache the data to view
                     [
                         'project_titles' => $project_titles,
-                        'ppmp_response' => $ppmp_response['data'],
+                        'ppmp_response' => $ppmp_response,
                         'project_timeline'  => $project_timeline['data']
                     ]
                 );
             } catch (\Throwable $th) {
+                // throw $th;
                 return view('pages.error-500');
             }
         }
