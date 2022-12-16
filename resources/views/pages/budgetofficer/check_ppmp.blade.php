@@ -67,7 +67,7 @@
             <div class="col-md-12 mb-1 text-left">
                 {{-- <a href = "{{ route('view_ppmp') }}" class = "btn btn-primary round mr-1 mb-1"><i class="bx bx-left-arrow"></i> Back</a> --}}
                 <a href = "{{ route('view_ppmp') }}"><button type="button" class="btn btn-primary  mt-1">Back</button></a>
-                @if($data[0]->status == 4 || $data[0]->status == 5)
+                @if($data[0]->status == 2 || $data[0]->status == 4 || $data[0]->status == 5)
                     <button type="button" class="btn btn-success  mt-1 accept_all" value="4"  data-id="{{ $data[0]->pt_id }}">Accept All</button></a>
                     <button type="button" class="btn btn-danger  mt-1 reject_all" value="5"  data-id="{{ $data[0]->pt_id }}">Reject All</button>
                 @endif

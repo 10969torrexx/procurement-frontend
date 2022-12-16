@@ -56,8 +56,9 @@ class APPNONCSEController extends Controller
         ->get();
 
     $ppmps = DB::table("ppmps as p")
-          ->select("pt.project_title", "d.department_name", "p.*", "pt.fund_source","pt.project_code as ProjectCode","ab.allocated_budget","ab.remaining_balance","fs.fund_source")
+          ->select("pt.project_title", "d.department_name", "p.*", "pt.fund_source","pt.project_code as ProjectCode","ab.allocated_budget","ab.remaining_balance","fs.fund_source","m.mode_of_procurement as procurementName")
           ->join("project_titles as pt", "p.project_code", "=", "pt.id")
+          ->join('mode_of_procurement as m','m.id','=','p.mode_of_procurement')
           ->join("departments as d", "pt.department_id", "=", "d.id")
           ->join('allocated__budgets as ab','pt.allocated_budget','=','ab.id')
           ->join('fund_sources as fs','fs.id','=','ab.fund_source_id')
