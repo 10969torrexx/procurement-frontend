@@ -257,7 +257,7 @@ class SupervisorController extends Controller
     public function accept_reject_all(Request $request){
       // dd($request->all());
       $budget = DB::table("project_titles as pt")
-              ->select("ab.remaining_balance")
+              ->select("ab.remaining_balance","pt.year_created")
               ->join('allocated__budgets as ab','pt.allocated_budget','=','ab.id')
               ->whereNull("pt.deleted_at")
               ->whereNull("ab.deleted_at")
@@ -322,6 +322,38 @@ class SupervisorController extends Controller
           $compute = $total + $itemtotal;
         }
         // dd($compute);
+        // dd($ppmp);
+
+        #creation of project_code of project_titles table
+          $status = DB::table("project_titles")
+              ->where(function ($query) {
+                $query->where('status', 2)
+                  ->orWhere('status', 4)
+                  ->orWhere('status', 5);
+                })
+              ->where('department_id',  session('department_id'))
+              ->where('campus', session('campus'))
+              ->where('year_created',$budget->year_created)
+              ->whereNull('deleted_at')
+              ->get();
+
+          $pt_year_created = DB::table('project_titles')
+                ->where('id', $request->id)
+                ->whereNull('deleted_at')
+                ->first();
+            
+          if(empty($status)){
+            # this will get the project based on project id
+            $project_code = "" ;
+            # end
+
+          }else{
+            # this will get the project based on project id
+            $project_code = $pt_year_created->year_created . '-'. (count($status) + 1);
+            # end
+          }
+        #end
+        
         $ppmp = DB::table("project_titles as pt")
               ->join('ppmps as p','p.project_code','=','pt.id')
               ->join('allocated__budgets as ab','pt.allocated_budget','=','ab.id')
@@ -329,11 +361,11 @@ class SupervisorController extends Controller
               ->where("pt.id",$request->id)
               ->update([
                 'pt.status' => $request->value,
+                'pt.project_code' => $project_code,
                 'p.status' => $request->value,
                 'p.remarks' => $request->remarks,
                 'ab.remaining_balance' => $compute,
               ]);
-        // dd($ppmp);
 
             if($request->value == 2 ){
               $timeline = DB::table("project_timeline")

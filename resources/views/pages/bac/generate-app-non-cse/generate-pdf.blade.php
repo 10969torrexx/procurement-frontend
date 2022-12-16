@@ -239,7 +239,7 @@
                                   <td>{{ $row->project_title}}</td>
                                   <td>{{ $row->department_name}}</td>
                                   <td >No</td>
-                                  <td >{{ $row->mode_of_procurement}}</td>
+                                  <td >{{ $row->procurementName}}</td>
                                   <td >1st to 4th Quarter</td>
                                   <td >1st to 4th Quarter</td>
                                   <td >1st to 4th Quarter</td>
