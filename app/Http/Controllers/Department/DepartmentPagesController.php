@@ -241,7 +241,8 @@ class DepartmentPagesController extends Controller
                     );
                 # end
            } catch (\Throwable $th) {
-               throw $th;
+            //    throw $th;
+             return view('pages.error-500');
            }
         }
 
@@ -418,7 +419,7 @@ class DepartmentPagesController extends Controller
             $id = $this->aes->decrypt($request->id);
             try {
                 # this will grab the specific title based department id, employee id, campus, project year
-                    $ProjectTitleResponse = Project_Titles::
+                        $ProjectTitleResponse = Project_Titles::
                         join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
                         ->join('users', 'users.id', 'project_titles.immediate_supervisor')
                         ->where('project_titles.id', $id)
@@ -434,17 +435,17 @@ class DepartmentPagesController extends Controller
                 # end
                 # this will get the item based on the project code, department id, employee id 
                     $ppmp_response = \DB::table('ppmps')
-                        ->where('project_code', $id)
-                        ->where('campus', session('campus'))
-                        ->where('department_id', session('department_id'))
-                        ->where('employee_id', session('employee_id'))
-                        // ->whereRaw("status = '3' OR status = '5'")
-                        ->where(function($query) {
-                            $query->where('status', 3)
-                                ->orWhere('status', 5);
-                        })
-                        ->whereNull('deleted_at')
-                        ->get();
+                        ->join('mode_of_procurement', 'mode_of_procurement.id', 'ppmps.mode_of_procurement')
+                        ->where('ppmps.project_code', $id)
+                        ->where('ppmps.campus', session('campus'))
+                        ->where('ppmps.department_id', session('department_id'))
+                        ->where('ppmps.employee_id', session('employee_id'))
+                        ->whereNull('ppmps.deleted_at')
+                        ->get([
+                            'ppmps.*',
+                            'mode_of_procurement.*',
+                            'ppmps.id as ppmps_id'
+                        ]);
                 # end
                 # this will get data from database
                     # for allocated budgets table
@@ -462,7 +463,7 @@ class DepartmentPagesController extends Controller
                             }
                     # for mode of procurement
                         $mode_of_procurements = \DB::table('mode_of_procurement')
-                            ->where('campus', session('campus'))
+                            // ->where('campus', session('campus'))
                             ->whereNull('deleted_at')
                             ->get();
                         # return if null
@@ -473,7 +474,7 @@ class DepartmentPagesController extends Controller
                             }
                     # for unit of measure
                         $unit_of_measurement = \DB::table('unit_of_measurements')
-                            ->where('campus', session('campus'))
+                            // ->where('campus', session('campus'))
                             ->whereNull('deleted_at')
                             ->get();
                         # return if null
@@ -484,9 +485,11 @@ class DepartmentPagesController extends Controller
                             }
                     # for items
                         $items = \DB::table('items')
-                            ->where('campus', session('campus'))
-                            ->whereNull('deleted_at')
+                            ->join('mode_of_procurement', 'mode_of_procurement.id', 'items.mode_of_procurement_id')
+                            ->whereNull('mode_of_procurement.deleted_at')
+                            ->whereNull('items.deleted_at')
                             ->get();
+
                         # return if null
                             if((count($items) <= 0) || $items == null) {
                                 return back()->with([

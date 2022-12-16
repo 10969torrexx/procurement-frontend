@@ -255,6 +255,8 @@
             </div>
         </div>
     {{-- edit|  view templates modal --}}
+
+    
     <div class="row">
         <div class="col-12">
                 <div class="card">
