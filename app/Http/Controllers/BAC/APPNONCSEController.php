@@ -460,25 +460,25 @@ class APPNONCSEController extends Controller
 
       $signatures = DB::table("signatories_app_non_cse")
           ->where("campus",session('campus'))
-          ->where("Year",2022)
+          ->where("Year",$request->year)
           ->get();
           
 
       $prepared_by = DB::table("signatories_app_non_cse")
           ->where("campus",session('campus'))
-          ->where("Year",2022)
+          ->where("Year",$request->year)
           ->where("Role","=",1)
           ->get();
 
       $recommending_approval = DB::table("signatories_app_non_cse")
           ->where("campus",session('campus'))
-          ->where("Year",2022)
+          ->where("Year",$request->year)
           ->where("Role","=",3)
           ->get();
 
       $approved_by = DB::table("signatories_app_non_cse")
           ->where("campus",session('campus'))
-          ->where("Year",2022)
+          ->where("Year",$request->year)
           ->where("Role","=",2)
           ->get();
           
