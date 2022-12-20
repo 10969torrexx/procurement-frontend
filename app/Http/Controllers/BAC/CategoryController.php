@@ -160,7 +160,7 @@ class CategoryController extends Controller
       ];
 
       $category = DB::table("categories")
-                ->where("campus", session('campus'))
+                // ->where("campus", session('campus'))
                 ->whereNull("deleted_at")
                 ->get();
 

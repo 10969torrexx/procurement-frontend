@@ -32,7 +32,7 @@
       "icon": "users"
     },
     {
-      "url": "admin/expenditure_index",
+      "url": "admin/expenditures_index",
       "name": "Mandatory",
       "i18n": "User",
       "icon": "shoppingcart"
