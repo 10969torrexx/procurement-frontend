@@ -139,7 +139,9 @@ class PurchaseRequestController extends Controller
                     ->where('for_pr',1)
                     ->where('mode_of_procurement',"!=","Public Bidding")
                     ->get();
-
+          $itemsCount = count($items);
+          $itemsForPRCount = count($itemsForPR);
+          // dd($itemsForPRCount);
           $ppmps = DB::table("ppmps as p")
                     ->select("pt.project_title", "d.department_name", "p.*","fs.fund_source","pt.project_code as ProjectCode")
                     ->join("project_titles as pt", "p.project_code", "=", "pt.id")
@@ -174,7 +176,7 @@ class PurchaseRequestController extends Controller
         //   if(count($ppmps) == 0){
         //     $error=$items['message'];
         // }
-          return view('pages.department.create-purchase-request',compact('items','itemsForPR','ppmps','date','details','fund_source','project_code'),
+          return view('pages.department.create-purchase-request',compact('items','itemsForPR','itemsForPRCount','itemsCount','ppmps','date','details','fund_source','project_code'),
               ['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs], 
               # this will attache the data to view
               [
@@ -316,7 +318,15 @@ class PurchaseRequestController extends Controller
 
     $id = (new AESCipher())->decrypt($request->id);
 
-    return view('pages.department.view_status_page', [
+    $purchase_request = DB::table("purchase_request as pr")
+                        ->select("pr.*","fs.fund_source","d.department_name","u.name")
+                        ->join("fund_sources as fs","pr.fund_source_id","fs.id")
+                        ->join("departments as d","pr.department_id","d.id")
+                        ->join("users as u","pr.printed_name","u.id")
+                        ->where("pr.id",$id)
+                        ->get();
+
+    return view('pages.department.view_status_page',compact('purchase_request'),  [
                 'pageConfigs'=>$pageConfigs,
                 'breadcrumbs'=>$breadcrumbs,
                 // 'error' => $error,
@@ -363,4 +373,27 @@ class PurchaseRequestController extends Controller
                 // 'error' => $error,
             ]); 
   }
+
+  public function remove_item(Request $request){
+    $id = (new AESCipher())->decrypt($request->id);
+    $item = DB::table('ppmps')
+            ->where('id',$id)
+            ->update([
+                'for_pr' => 0,
+            ]);
+    if($item)
+    {
+        return response()->json([
+            'status'=>200,
+            'message'=>'Item Removed Successfully!'
+        ]);
+    }
+    else
+    {
+        return response()->json([
+            'status'=>400,
+            'message'=>'No Item Found!'
+        ]);
+    }
+}
 }

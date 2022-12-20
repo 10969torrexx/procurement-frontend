@@ -61,21 +61,20 @@
                 </div>
                 <div class="card-content">
                     <div class="card-body card-dashboard">
-
-                        {{-- <a href = "#" class = "btn btn-success round mr-1 mb-1" data-flag = "{{ $aes->encrypt('accounts')}}" data-button = "{{ $aes->encrypt('add')}}" data-id = "{{ $aes->encrypt('0')}}" data-toggle = "modal" data-target = "#allModal"><i class="bx bx-plus"></i> New Account</a> --}}
-                        {{-- <a href = "#" class = "AllocateBudget btn btn-success round mr-1 mb-1" data-toggle = "modal" data-target = "#AllocateBudgetModal"><i class="bx bx-plus"></i>Allocate Budget</a> --}}
                         
-                        
+                        @if($itemsCount != 0)
+                            <a href = "#" class = "PR_button btn btn-success round mr-1 mb-1"><i class="bx bx-cart"></i> ADD TO PR</a>
+                        @endif
 
-                        <a href = "#" class = "PR_button btn btn-success round mr-1 mb-1"><i class="bx bx-cart"></i> ADD TO PR</a>
-
-                        {{-- {{ session('department_id') }} --}}
                         <p class="card-text"></p>
                         <div class="table-responsive">
+
                             <table class="table nowrap zero-configuration" id="account-table">
                                 <thead>
                                     <tr>
-                                        <th>Select</th>
+                                        <th>
+                                            <div>Select All <input class="select-all" type="checkbox" value=""></div>
+                                        </th>
                                         <th>Item Name</th>
                                         <th>Item Description</th>
                                         <th>Quantity</th>
@@ -92,23 +91,8 @@
                                         <?php $ctr=1; ?>
                                         @foreach($items as $data)
                                             <tr id = "{{$ctr}}">
-                                                <td>
-                                                    <input class="form-check-input" type="checkbox" value="<?=$aes->encrypt($data->id)?>" name="itemCheckbox[]" required>
-                                                    {{-- <div class="dropdown">
-                                                        <span
-                                                            class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
-                                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu"></span>
-                                                        <div class="dropdown-menu dropdown-menu-left"> --}}
-                                                            {{-- <a class="dropdown-item editbutton" ctr = "<?=$ctr?>" href = "<?=$aes->encrypt($data['id'])?>" >
-                                                                <i class="bx bx-edit-alt mr-1"></i> edit</a>
-                                                            <a class="dropdown-item hrefdelete" ctr = "<?=$ctr?>" href = "<?=$aes->encrypt($data['id'])?>">
-                                                                <i class="bx bx-trash mr-1"></i> delete </a> --}}
-                                                            {{-- <a class="dropdown-item" ctr = "<?=$ctr?>" href = "{{ route('createPR', ['id' => $aes->encrypt($data['id'])]) }}">
-                                                                <i class="fa fa-plus mr-2"></i> Create PR </a> --}}
-                                                            {{-- <a href = "{{ route('department-addItem', ['id' => $aes->encrypt($data['id']) => $aes->encrypt($ProjectTitleResponse[$i]['allocated_budget']) ]) }}" class="dropdown-item">
-                                                                <i class = "fa fa-plus mr-2"></i>Add Item</a> --}}
-                                                        {{-- </div>
-                                                    </div>    --}}
+                                                <td style="text-align:center;">
+                                                    <input class="form-check-input" type="checkbox" value="<?=$aes->encrypt($data->id)?>" required>
                                                 </td>
                                                 <td>{{ $data->item_name }}</td>
                                                 <td>{{$data->item_description}}</td>
@@ -137,13 +121,6 @@
                                 </fieldset>
                                 </div> 
                             </div>
-                            {{-- <div id="add_to_me">
-                                <script>
-                                    function createPR() {
-                                        document.getElementById("add_to_me").innerHTML +=
-                                        "<h3>This is the text which has been inserted by JS</h3>";
-                                    }
-                                </script> --}}
                         </div>
                     </div>
                 </div>
@@ -155,17 +132,15 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title">PURCHASE REQUEST DRAFT</h4>
+                    <h4 class="card-title">DRAFT PURCHASE REQUEST</h4>
                 </div>
                 <div class="card-content">
                     <div class="card-body card-dashboard">
 
-                        {{-- <a href = "#" class = "btn btn-success round mr-1 mb-1" data-flag = "{{ $aes->encrypt('accounts')}}" data-button = "{{ $aes->encrypt('add')}}" data-id = "{{ $aes->encrypt('0')}}" data-toggle = "modal" data-target = "#allModal"><i class="bx bx-plus"></i> New Account</a> --}}
-                        {{-- <a href = "#" class = "AllocateBudget btn btn-success round mr-1 mb-1" data-toggle = "modal" data-target = "#AllocateBudgetModal"><i class="bx bx-plus"></i>Allocate Budget</a> --}}
-                        {{-- <a href = "allocate_budget1" class = "AllocateBudget1 btn btn-success round mr-1 mb-1"><i class="bx bx-cart"></i> ADD TO PR</a> --}}
-                        <a href = "#" class = "btn btn-success round mr-1 mb-1" data-toggle = "modal" data-target = "#PreviewPRModal"><i class="bx bx-check"></i> PREVIEW PR</a>
+                        @if($itemsForPRCount != 0)
+                            <a href = "#" class = "btn btn-success round mr-1 mb-1" data-toggle = "modal" data-target = "#PreviewPRModal"><i class="bx bx-check"></i> PREVIEW PR</a>
+                        @endif
 
-                        {{-- {{ session('department_id') }} --}}
                         <p class="card-text"></p>
                         <div class="table-responsive">
                             <table class="table nowrap zero-configuration" id="account-table">
@@ -177,8 +152,6 @@
                                         <th>Quantity</th>
                                         <th>Unit Price</th>
                                         <th>Estimated Price</th>
-                                        {{-- <th>Mode of Procurement</th> --}}
-                                        {{-- <th>Fund Source</th> --}}
                                     </tr>
                                 </thead>
                                 <tbody id="table-account-tbody">
@@ -189,7 +162,6 @@
                                         @foreach($itemsForPR as $data)
                                             <tr id = "{{$ctr}}">
                                                 <td>
-                                                    {{-- <input type="checkbox" value="<?=$data['id']?>"> --}}
                                                     <div class="dropdown">
                                                         <span
                                                             class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
@@ -197,12 +169,8 @@
                                                         <div class="dropdown-menu dropdown-menu-left">
                                                             <a class="dropdown-item editbutton" ctr = "<?=$ctr?>" href = "<?=$aes->encrypt($data->id)?>" >
                                                                 <i class="bx bx-edit-alt mr-1"></i> edit</a>
-                                                            <a class="dropdown-item hrefdelete" ctr = "<?=$ctr?>" href = "<?=$aes->encrypt($data->id)?>" >
-                                                                <i class="bx bx-trash mr-1"></i> delete </a>
-                                                            {{-- <a class="dropdown-item" ctr = "<?=$ctr?>" href = "{{ route('createPR', ->id' => $aes->encrypt($data->id)]) }}">
-                                                                <i class="fa fa-plus mr-2"></i> Create PR </a>
-                                                            <a href = "{{ route('department-addItem', ->id' => $aes->encrypt($data->id) => $aes->encrypt($ProjectTitleResponse[$i]->allocated_budget) ]) }}" class="dropdown-item">
-                                                                <i class = "fa fa-plus mr-2"></i>Add Item</a> --}}
+                                                            <a class="dropdown-item removebutton" ctr = "<?=$ctr?>" href = "<?=$aes->encrypt($data->id)?>" >
+                                                                <i class="bx bx-trash mr-1"></i> remove </a>
                                                         </div>
                                                     </div>   
                                                 </td>

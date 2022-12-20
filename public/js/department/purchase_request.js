@@ -1,12 +1,25 @@
 $(document).on('click', '.create-PR-button', function (e) {
     e.preventDefault();
-    var id = $(this).attr("href");
+    var id = $(this).attr("href"); 
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
 });
+
+$('.select-all').click(function(event) {   
+  if(this.checked) {
+      // Iterate each checkbox
+      $(':checkbox').each(function() {
+          this.checked = true;                        
+      });
+  } else {
+      $(':checkbox').each(function() {
+          this.checked = false;                       
+      });
+  }
+}); 
 
 $(document).on('click', '.PR_button', function (e) {
     e.preventDefault();
@@ -31,7 +44,6 @@ $(document).on('click', '.PR_button', function (e) {
                 'items': itemArray,
                 // 'itemCount': itemCount
                 }
-                // console.log(data);
 
                 $.ajaxSetup({
                     headers: {
@@ -45,7 +57,6 @@ $(document).on('click', '.PR_button', function (e) {
                     data: data,
                     dataType: "json",
                     success: function (response) {
-                      console.log(response);
                         if (response.status == 200) {
                                 Swal.fire({
                                   title: 'Added',
@@ -66,7 +77,6 @@ $(document).on('click', '.PR_button', function (e) {
                                 }).then((result) => {
                                   if (result.dismiss === Swal.DismissReason.timer) {
                                     location.reload();
-                                    console.log('I was closed by the timer')
                                   }
                                 })
                             
@@ -137,7 +147,6 @@ $(document).on('click', '.btnCompletePR', function (e) {
             data: data,
             dataType: "json",
             success: function (response) {
-              console.log(response);
                 if (response.status == 200) {
                         Swal.fire({
                           title: 'Saved',
@@ -158,7 +167,6 @@ $(document).on('click', '.btnCompletePR', function (e) {
                         }).then((result) => {
                           if (result.dismiss === Swal.DismissReason.timer) {
                             location.reload();
-                            console.log('I was closed by the timer')
                           }
                         })
                     
@@ -227,4 +235,61 @@ $(document).on('click', '.saveButton', function (e) {
         $('.selectEmployee').append(
           '<i class="fa-solid fa-pen-to-square employeeEdit" value="" style="margin-left:5px;">')
       }
+});
+
+$(document).on('click', '.removebutton', function (e) {
+  e.preventDefault();
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    var id = $(this).attr("href");
+    $.ajax({
+      type: "POST",
+      url: "/department/purchaseRequest/createPR/remove_item",
+      data:{'id':id},
+      success: function (response) {
+        
+        if(response['status'] == 200) {
+        }
+            if(response['status'] == 200) {
+              Swal.fire({
+                title: 'Removed!',
+                html: response.message,
+                icon: 'success',
+                timer: 1000,
+                timerProgressBar: true,
+                didOpen: () => {
+                  Swal.showLoading()
+                  const b = Swal.getHtmlContainer().querySelector('b')
+                  timerInterval = setInterval(() => {
+                    b.textContent = Swal.getTimerLeft()
+                  }, 100)
+                },
+                willClose: () => {
+                  clearInterval(timerInterval)
+                }
+              }).then((result) => {
+                if (result.dismiss === Swal.DismissReason.timer) {
+                  location.reload();
+                  // $('#UpdateAllocateBudgetModal').modal('hide');
+                  // console.log('I was closed by the timer')
+            }
+          })
+          }if(response.status == 400){
+            Swal.fire({ 
+              icon: 'error',
+              title: 'Error',
+              text: response.message,
+            })
+              // $('#AddUserModal').find('input').val('');
+              // $('.updatebutton').text('Update');
+              // $('#AddUserModal').modal('hide');
+          }
+
+      }
+  });
 });

@@ -466,7 +466,7 @@ $(document).on('click', '.editbutton', function (e) {
           var department_index = array_department.indexOf(department_id);
           var fundsource_index = array_fundsources.indexOf(parseInt(fund_source_id));
           var year_index = array_years.indexOf(year.toString());
-// console.log(department_index);
+          // console.log(array_department);
           
             document.getElementById('update_type').getElementsByTagName('option')[type_index+1].selected = 'selected';
             document.getElementById('update_department').getElementsByTagName('option')[department_index+1].selected = 'selected';

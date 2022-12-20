@@ -293,7 +293,7 @@ Route::group(['prefix' => 'admin','middleware' => ['authuser']], function() {
     #END CRUD DEPARTMENT ROUTES
 
     #START CRUD EXPENDITURES ROUTES
-    Route::get('/mandatory_expenditures', 'Admin\AdminController@mandatory_expenditures_index');
+    Route::get('/expenditures_index', 'Admin\AdminController@mandatory_expenditures_index');
     Route::post('/save_mandatory_expenditure', 'Admin\AdminController@save_mandatory_expenditure')->name('save_mandatory_expenditure');
     Route::post('/delete_mandatory_expenditure', 'Admin\AdminController@delete_mandatory_expenditure')->name('delete_mandatory_expenditure');
     Route::post('/edit_mandatory_expenditure', 'Admin\AdminController@edit_mandatory_expenditure')->name('edit_mandatory_expenditure');
@@ -583,13 +583,13 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
     Route::get('/purchaseRequest', 'Department\PurchaseRequestController@PurchaseRequestIndex');
     Route::post('/purchaseRequest/add_Items_To_PR', 'Department\PurchaseRequestController@add_Items_To_PR');
     Route::get('/purchaseRequest/createPR', 'Department\PurchaseRequestController@createPR')->name('createPR');
+    Route::post('/purchaseRequest/createPR/remove_item', 'Department\PurchaseRequestController@remove_item')->name('remove_item');
     Route::get('/purchaseRequest/getEmployees', 'Department\PurchaseRequestController@getEmployees');
     Route::post('/purchaseRequest/savePR', 'Department\PurchaseRequestController@savePR');
 
     Route::get('/trackPR', 'Department\PurchaseRequestController@TrackPRIndex')->name('trackPR');
     Route::get('/trackPR/view_status', 'Department\PurchaseRequestController@view_status')->name('view_status');
     Route::get('/trackPR/view_pr', 'Department\PurchaseRequestController@view_pr')->name('view_pr');
-    // Route::get('/trackPR/viewPR', 'Department\PurchaseRequestController@viewPR')->name('viewPR');
 
     //END PURCHASE REQUEST ROUTES
     
