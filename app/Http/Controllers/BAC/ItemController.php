@@ -137,14 +137,13 @@ class ItemController extends Controller
 
     // $item =  Http::withToken(session('token'))->get(env('APP_API'). "/api/item/index")->json();
     $category = DB::table("categories")
-              ->where("campus", session('campus'))
+              // ->where("campus", session('campus'))
               ->whereNull("deleted_at")
               ->get();
 
     $item = DB::table("items as i")
               ->select("i.*","m.id as mid", "m.mode_of_procurement")
               ->join("mode_of_procurement as m","m.id","=", "i.mode_of_procurement_id" )
-              ->where("i.campus", session('campus'))
               ->whereNull("i.deleted_at")
               ->get();
 

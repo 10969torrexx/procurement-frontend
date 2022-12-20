@@ -133,7 +133,7 @@ class UnitofMeasurementController extends Controller
     ];
 
     $unitofmeasurement = DB::table("unit_of_measurements")
-              ->where("campus", session('campus'))
+              // ->where("campus", session('campus'))
               ->whereNull("deleted_at")
               ->get();
 
