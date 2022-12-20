@@ -293,7 +293,7 @@ Route::group(['prefix' => 'admin','middleware' => ['authuser']], function() {
     #END CRUD DEPARTMENT ROUTES
 
     #START CRUD EXPENDITURES ROUTES
-    Route::get('/mandatory_expenditures', 'Admin\AdminController@mandatory_expenditures_index');
+    Route::get('/expenditure_index', 'Admin\AdminController@mandatory_expenditures_index');
     Route::post('/save_mandatory_expenditure', 'Admin\AdminController@save_mandatory_expenditure')->name('save_mandatory_expenditure');
     Route::post('/delete_mandatory_expenditure', 'Admin\AdminController@delete_mandatory_expenditure')->name('delete_mandatory_expenditure');
     Route::post('/edit_mandatory_expenditure', 'Admin\AdminController@edit_mandatory_expenditure')->name('edit_mandatory_expenditure');

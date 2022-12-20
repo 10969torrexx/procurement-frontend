@@ -67,6 +67,7 @@ class SupervisorController extends Controller
                 // ->orwhere("p.status","=", 3)   
                 -> get();
       // $title = $data->title;
+      // dd($data);
       $pageConfigs = ['pageHeader' => true];
       $breadcrumbs = [
         ["link" => "/", "name" => "Home"],["link" => "/bac/supervisor","name" =>"Supervisor"],["name" =>"PPMP"]

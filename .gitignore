@@ -1,6 +1,7 @@
 /node_modules
 /vendor
 /frest-shell-scripts
+.env
 .env.backup
 .phpunit.result.cache
 Homestead.json
