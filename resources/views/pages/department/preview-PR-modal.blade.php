@@ -5,8 +5,8 @@
     $aes = new AESCipher();
     $global = new GlobalDeclare();
 ?>
-<div class="modal fade text-left" id="PreviewPRModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel160" style="display: none;" aria-hidden="true">
-  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document" >
+<div class="modal fade text-left " id="PreviewPRModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel160" style="display: none;" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered " role="document" >
       
     <div class="modal-content">
       <div class="modal-header text-center" id = "headModal">
@@ -22,7 +22,6 @@
       <div class="modal-body">
         <style>
           table.PR{
-            
             width: 100%;
             border-collapse: collapse;
             height: 200px;
@@ -111,7 +110,7 @@
               </tr>
             </thead>
             <tbody>
-              <?php $i=0; $counter=15; $total = 0;?>
+              <?php $i=0; $counter=10; $total = 0;?>
               @foreach($ppmps as $ppmps)
               <?php $i++; $counter--; $total+=$ppmps->estimated_price?>
               <tr>

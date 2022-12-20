@@ -575,7 +575,11 @@ class BudgetOfficerController extends Controller
 
     public function getDepartments(Request $request){
         try {
-            $departments =  DB::table('departments')->where('campus',session('campus'))->whereNull('deleted_at')->get();
+            $departments =  DB::table('departments')
+            ->where('campus',session('campus'))
+            ->whereNull('deleted_at')
+            ->orderBy('department_name')
+            ->get();
           return $departments;
         } catch (\Throwable $th) {
             dd($th);
@@ -584,7 +588,10 @@ class BudgetOfficerController extends Controller
 
     public function getFundSources(Request $request){
         try {
-            $fundsources =  DB::table('fund_sources')->whereNull('deleted_at')->get();
+            $fundsources =  DB::table('fund_sources')
+            ->whereNull('deleted_at')
+            ->orderBy('fund_source')
+            ->get();
         //   dd($departments);
           return $fundsources;
         } catch (\Throwable $th) {
@@ -597,6 +604,7 @@ class BudgetOfficerController extends Controller
             $expenditures =  DB::table('mandatory_expenditures_list')
                                 // ->where('campus',session('campus'))
                                 ->whereNull('deleted_at')
+                                ->orderBy('expenditure')
                                 ->get();
         //   dd($expenditures);
           return $expenditures;
@@ -612,6 +620,7 @@ class BudgetOfficerController extends Controller
                     ->where('campus',session('campus'))
                     ->whereNull('deleted_at')
                     ->groupBy('year')
+                    ->orderBy('year')
                     ->get();
 
           return $years;
@@ -755,8 +764,13 @@ class BudgetOfficerController extends Controller
                             ->select('id')
                             ->where('campus',session('campus'))
                             ->whereNull('deleted_at')
+                            ->orderBy('department_name')
                             ->get();
-        $fund_source_ids = DB::table('fund_sources')->select('id')->whereNull('deleted_at')->get();
+        $fund_source_ids = DB::table('fund_sources')
+                            ->select('id')
+                            ->whereNull('deleted_at')
+                            ->orderBy('fund_source')
+                            ->get();
         $years = DB::table('ppmp_deadline')
                     ->select('year','id')
                     ->where('campus',session('campus'))

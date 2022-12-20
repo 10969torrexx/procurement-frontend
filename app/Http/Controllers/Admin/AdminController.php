@@ -380,6 +380,7 @@ class AdminController extends Controller
         
         $mandatory_expenditures = DB::table('mandatory_expenditures_list')
                             ->whereNull('deleted_at')
+                            ->orderBy('expenditure')
                             ->get();
         // dd($mandatory_expenditures);
         return view('pages.admin.mandatory_expenditures_index',compact('mandatory_expenditures'), [

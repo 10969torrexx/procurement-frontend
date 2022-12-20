@@ -50,8 +50,8 @@
                       <tr>
                         <th>Action</th>
                         <th>Unit of Measurements</th>
-                        {{-- <th>Campus</th> --}}
                         <th>Added By</th>
+                        <th>Campus</th>
                         <th>Date Added</th>
                         <th>Date Updated</th>
                       </tr>
@@ -74,8 +74,8 @@
                             </div> 
                           </td> 
                           <td maxlength="6">{{ $data1->unit_of_measurement }}</td>
-                          <td>{{ (new GlobalDeclare)->Campus($data1->campus) }} Campus</td>
-                          {{-- <td>{{ $data1->campus }}</td> --}}
+                          <td>{{ $data1->name }}</td>
+                          <td>{{ (new GlobalDeclare)->Campus($data1->campus) }}</td>
                           <td>{{ explode('-', date('j F, Y- g:i a', strtotime($data1->created_at)))[0] }}</td>
                           <td>{{ explode('-', date('j F, Y- g:i a', strtotime($data1->updated_at)))[0] }}</td>
                           

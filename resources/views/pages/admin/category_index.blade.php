@@ -43,8 +43,8 @@
                             <tr>
                                 <th>Action</th>
                                 <th>Category</th>
-                                {{-- <th>Campus</th> --}}
                                 <th>Added By</th>
+                                <th>Campus</th>
                                 <th>Date Added</th>
                                 <th>Date Updated</th>
                             </tr>
@@ -66,8 +66,9 @@
                                     </div> 
                                 </td> 
                                 <td>{{ $data->category }}</td>
+                                <td>{{ $data->name }}</td>
                                 {{-- <td>{{ (new GlobalDeclare)->Campus(IntVal($data1->campus)) }}</td> --}}
-                                <td>{{ (new GlobalDeclare())->Campus($data->campus)}} Campus</td>
+                                <td>{{ (new GlobalDeclare())->Campus($data->campus)}}</td>
                                 <td>{{ explode('-', date('j F, Y- g:i a', strtotime($data->created_at)))[0] }}</td>
                                 <td>{{ explode('-', date('j F, Y- g:i a', strtotime($data->updated_at)))[0] }}</td>
                             </tr>

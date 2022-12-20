@@ -237,7 +237,7 @@ $(document).on('click', '.delete-item', function (e) {
                   if (response.status == 200) {
                     Swal.fire({
                       title: 'Deleted!!!',
-                      html: 'Account Deleted Successfully!',
+                      html: 'Item Deleted Successfully!',
                       icon: 'success',
                       timer: 1000,
                       timerProgressBar: true,
