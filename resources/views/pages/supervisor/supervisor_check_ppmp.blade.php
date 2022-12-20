@@ -63,7 +63,6 @@
             
             
         <div class="table-responsive">
-            {{-- <?php $overalltotal = 0 ;?> --}}
                 <a href="/bac/supervisor"><<- {{ $data[0]->title }}</a>
             <div class="col-md-12 mb-1 text-left">
                 @if($data[0]->status == 1 || $data[0]->status == 2 || $data[0]->status == 3 || $data[0]->status == 6)

@@ -177,6 +177,7 @@ class DepartmentPagesController extends Controller
                             ->where('department_id', session('department_id'))
                             ->whereNull('deleted_at')
                             ->get();
+
                         # return if allocated budget is null
                             if((count($allocated_budgets) <= 0) || $allocated_budgets == null) {
                                 return back()->with([

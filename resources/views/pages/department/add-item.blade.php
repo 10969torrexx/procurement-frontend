@@ -8,6 +8,7 @@
     $total_estimated_price = 0.0;
     $allocated_budget = $allocated_budgets[0]->allocated_budget;
     $remaining_balance = doubleVal($allocated_budgets[0]->remaining_balance);
+
 @endphp
 
 {{-- calculations  --}}
@@ -265,6 +266,7 @@
                         <div class="form-group col-6 text-left">
                             <h4 class="text-primary"><strong>Add Item to PPMP</strong></h4>
                         </div>
+
                         <div class="form-group col-6 text-right">
                             <h4 class=""><strong class="text-danger">Deadline of Submission:</strong> {{ explode('-', date('F j, Y', strtotime($allocated_budgets[0]->deadline_of_submission)))[0] }}  </h4>
                             

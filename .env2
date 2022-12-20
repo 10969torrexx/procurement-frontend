@@ -1,27 +1,64 @@
-APP_NAME=PMIS
+4APP_NAME=PMIS
 APP_ENV=local
 APP_KEY=base64:ZIkhXAQXZGdSqfkbxWLssBjZhCgGVqQQRX0CQqYZhuo=
 APP_DEBUG=true
-APP_URL=http://localhost
-APP_API=http://localhost:9000
-# APP_API=http://192.168.3.100:9000
+
+APP_URL=https://procurement.southernleytestateu.edu.ph
+ APP_API=https://procurementapi.southernleytestateu.edu.ph
+
+#APP_URL=http://localhost
+#APP_API=http://localhost:9000
 
 # HRMIS 
-APP_HRMIS_API=http://192.168.0.11/hrmis
-Auth_HRMIS_Token=800|4fVkxADAZJkcqHZR94yYLLq5itCN3kXCXwoQAevA
+APP_HRMIS_API=https://api.southernleytestateu.edu.ph
+Auth_HRMIS_Token=14240|DCz8jRB7WZUZswmk7tlIfYcQwkdNUiwYJcjC0F7z
+
+#APP_HRMIS_API=http://192.168.0.11/hrmis
+#Auth_HRMIS_Token=800|4fVkxADAZJkcqHZR94yYLLq5itCN3kXCXwoQAevA
 # End HRMIS 
-GOOGLE_CLIENT_ID=516167264367-0a93ih0a548vsn2bmmo7t0e1k16mmn80.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=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
-GOOGLE_REDIRECT=http://localhost:8000/auth/google/callback
+
+#GOOGLE_CLIENT_ID=516167264367-0a93ih0a548vsn2bmmo7t0e1k16mmn80.apps.googleusercontent.com
+#GOOGLE_CLIENT_SECRET=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
+#GOOGLE_REDIRECT=http://localhost:8000/auth/google/callback
+
+GOOGLE_CLIENT_ID=405895328613-3mt1cl5sjn3imfndl3cfrcmqj8mnnja4.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=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
+GOOGLE_REDIRECT=https://procurement.southernleytestateu.edu.ph/auth/google/callback
+
+# GOOGLE_CLIENT_ID=516167264367-0a93ih0a548vsn2bmmo7t0e1k16mmn80.apps.googleusercontent.com
+# GOOGLE_CLIENT_SECRET=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
+# GOOGLE_REDIRECT=http://localhost:8000/auth/google/callback
 
 LOG_CHANNEL=stack
 
+# DB_CONNECTION=mysql
+# DB_HOST=192.168.0.11
+# DB_PORT=3306
+# DB_DATABASE=procurement
+# DB_USERNAME=root
+# DB_PASSWORD=
+
+# DB_CONNECTION_SECOND=mysql
+# DB_HOST_SECOND=192.168.0.11
+# DB_PORT_SECOND=3306
+# DB_DATABASE_SECOND=db_hrmis
+
+# DB_USERNAME_SECOND=root
+# DB_PASSWORD_SECOND=
+
 DB_CONNECTION=mysql
-DB_HOST=192.168.0.11
+DB_HOST=localhost
 DB_PORT=3306
 DB_DATABASE=procurement
-DB_USERNAME=root
-DB_PASSWORD=
+DB_USERNAME=procurement
+DB_PASSWORD=AwuQdeFI4mV9vqZh
+
+DB_CONNECTION_SECOND=mysql
+DB_HOST_SECOND=localhost
+DB_PORT_SECOND=3306
+DB_DATABASE_SECOND=db_hrmis
+DB_USERNAME_SECOND=procurement
+DB_PASSWORD_SECOND=AwuQdeFI4mV9vqZh
 
 BROADCAST_DRIVER=log
 CACHE_DRIVER=file
