@@ -634,7 +634,10 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
                 Route::post('/re-sumbit/ppmp', [DepartmentController::class, 'resubmitPPMP'])->name('department-re_submit-ppmp');
                 # this route will display the disapproved items
                 Route::get('/disapproved-items', [DepartmentPagesController::class, 'show_disapproved_items'])->name('dept_disapproved-items');
-            /** END */
+
+            # submit all project titles on checkbox
+            Route::get('submit-all-project', [DepartmentController::class, 'submit_all_projects'])->name('submit_all_projects');
+        /** END */
 
         /** Gettin data from the database */
             # this will get the databa by unit of measure per item fron the unit measure from the dabase

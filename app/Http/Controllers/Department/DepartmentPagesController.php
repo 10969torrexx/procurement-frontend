@@ -17,6 +17,8 @@ use App\Models\Departments;
 
 use App\Models\Project_Titles;
 
+use Carbon\Carbon;
+
 class DepartmentPagesController extends Controller
 {
         protected $aes;
@@ -51,12 +53,13 @@ class DepartmentPagesController extends Controller
                     
                     $mandatory_expeditures = \DB::table("mandatory_expenditures as me")
                         ->select("me.year", "me.fund_source_id", \DB::raw('sum(me.price) as SumMandatory'))
-                        ->where("me.department_id", $departmentID)
-                        ->where("me.campus", session('campus'))
+                        ->where('me.campus', session('campus'))
+                        ->where('me.department_id', session('department_id'))
+                        ->where('me.year', Carbon::now()->addYears(1)->format('Y'))
+                        ->whereNull('me.deleted_at')
                         ->groupBy("me.year")
                         ->groupBy("me.fund_source_id")
                         ->get();
-
                 /** This will return table and page configs */
                     $pageConfigs = ['pageHeader' => true];
                     $breadcrumbs = [
