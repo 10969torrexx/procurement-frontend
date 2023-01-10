@@ -42,6 +42,9 @@ class DepartmentController extends Controller
      */
     public function createProjectTitle(Request $request)
     {
+        // dd($request->all());
+        // dd((new AESCipher)->decrypt($request->project_category));
+        
         # form fields validation
         $this->validate($request, [
             # field validation | disabled
@@ -64,7 +67,7 @@ class DepartmentController extends Controller
                 'fund_source'   => (new AESCipher)->decrypt(explode('**',$request->fund_source)[0]),
                 'allocated_budget' => (new AESCipher)->decrypt($request->allocated_budget),
                 'immediate_supervisor' => session('immediate_supervisor'),
-                'project_category'  =>  1, // soon to be dynamic
+                'project_category'  =>  (new AESCipher)->decrypt($request->project_category), 
                 'project_type'  => $request->project_type,
                 'status'    => 0,
                 'year_created'  => Carbon::now()->format('Y'),
@@ -159,9 +162,7 @@ class DepartmentController extends Controller
                     'expected_month'    =>  'required',
                     'unit_of_measurement'  =>  'required',
             ]); 
-            // dd($request->estimated_price);
             $__total_estimated_price = $request->total_estimated_price + doubleval($request->estimated_price);
-        //    dd( doubleval($request->remaining_balance));
             # comparing total estimated price to remaining balance
             if($__total_estimated_price > doubleval($request->remaining_balance)) {
                 return back()->with([
@@ -259,7 +260,6 @@ class DepartmentController extends Controller
                     'expected_month'    =>  'required',
                     'unit_of_measurement'  =>  'required',
             ]); 
-           
             # update ppmps
             $response = \DB::table('ppmps')
                 ->where('id', $request->id)
@@ -279,7 +279,6 @@ class DepartmentController extends Controller
                     'expected_month'    => $request->expected_month,
                     'updated_at'    => Carbon::now()
                 ]);
-
             return back()->with([
                 'success'   => 'Item details updated successfully!'
             ]);
@@ -329,6 +328,7 @@ class DepartmentController extends Controller
      */
     public function submitPPMP(Request $request)
     {
+        // dd($request->all());
         try {
             $_deadline_of_submission = Carbon::parse($request->deadline_of_submission)->format('Y-m-d');
             $current_date = Carbon::now()->format('Y-m-d');
@@ -361,11 +361,11 @@ class DepartmentController extends Controller
                         'f_remaining_balance' => ( doubleval($request->remaining_balance) - doubleval($total_estimated_price) )
                     ]);
                     $response = (new PPMPController)->submitPPMP($request);
+                    // this will update the procurement type of the allocated budget
                     return redirect(route('department-showCreatetPPMP'))->with([
                         'success' => $response['message']
                     ]);
                } 
-
         } catch (\Throwable $th) {
             return view('pages.error-500');
         }
@@ -374,6 +374,7 @@ class DepartmentController extends Controller
     # get ppmps for edit
     public function resubmitPPMP(Request $request)
     {
+        // dd($request->all());
         try {
             $_deadline_of_submission = Carbon::parse($request->deadline_of_submission)->format('Y-m-d');
             $current_date = Carbon::now()->format('Y-m-d');
@@ -470,84 +471,139 @@ class DepartmentController extends Controller
     * - this will enable submission of multiple projects
     */
     public function submit_all_projects(Request $request) {
-        $total_estimated_price = 0.0;
-        $final_remaining_balance = 0.0;
-        $__total_estimated_price = array();
-        foreach ($request->project_titles as $item) {
-            # check if project has items
-                $ppmps = \DB::table('ppmps')
-                    ->where('project_code', $item)
-                    ->where('campus', session('campus'))
-                    ->where('department_id', session('department_id'))
-                    ->where('status', 0)
-                    ->get();
-            # return if project doesn't have items
-                if(count($ppmps) <= 0) {
-                    return ([
-                        'status'    => 400,
-                        'message'   => 'Some of the projects doen\'t contain any items!'
-                    ]);
-                }
-            # testing if submittted project is beyond deadline of submission
-                $allocated_budgets = \DB::table('project_titles')
-                        ->join('allocated__budgets', 'allocated__budgets.id', 'project_titles.allocated_budget')
-                        ->where('project_titles.id', $item)
-                        ->where('project_titles.campus', session('campus'))
-                        ->where('project_titles.department_id', session('department_id'))
-                        ->where('project_titles.employee_id', session('employee_id'))
-                        ->get([
-                            'allocated__budgets.id',
-                            'allocated__budgets.deadline_of_submission',
-                            'allocated__budgets.remaining_balance'
+        try {
+            $total_estimated_price = 0.0;
+            $final_remaining_balance = 0.0;
+            $__total_estimated_price = array();
+            foreach ($request->project_titles as $item) {
+                # check if project has items
+                    $ppmps = \DB::table('ppmps')
+                        ->where('project_code', $item)
+                        ->where('campus', session('campus'))
+                        ->where('department_id', session('department_id'))
+                        ->where('status', 0)
+                        ->get();
+                # return if project doesn't have items
+                    if(count($ppmps) <= 0) {
+                        return ([
+                            'status'    => 400,
+                            'message'   => 'Some of the projects doen\'t contain any items!'
                         ]);
-                if(Carbon::now()->format('Y-m-d') > Carbon::parse($allocated_budgets[0]->deadline_of_submission)->format('Y-m-d')) {
-                    return ([
-                        'status'    => 400,
-                        'message'   => 'You\'ve exceeded the alloted deadline of submission!'
-                    ]);
-                }
-            # comparing total of estimated price per project to remaining balance
-                foreach ($ppmps as $estimated_price) {
-                    array_push($__total_estimated_price, $estimated_price->estimated_price);
-                    $total_estimated_price +=  $estimated_price->estimated_price;
-                }
-                if($total_estimated_price > $allocated_budgets[0]->remaining_balance) {
-                    return ([
-                        'status'    => 400,
-                        'message'   => 'Some of the projects have exceeded the remaining balance!'
-                    ]);
-                }
-            # get the final remaining balance
-                $final_remaining_balance = $allocated_budgets[0]->remaining_balance - $total_estimated_price;
-            # updating statuses of project titles | PPMPS | remaining balance
-                \DB::table('project_titles')
-                    ->where('id', $item)
-                    ->where('department_id', session('department_id'))
-                    ->where('employee_id', session('employee_id'))
-                    ->where('campus', session('campus'))
-                    ->update([
-                        'status'    => 1,
-                        'updated_at'    => Carbon::now()
-                    ]);
-                \DB::table('ppmps')
-                    ->where('project_code', $item)
-                    ->where('department_id', session('department_id'))
-                    ->where('employee_id', session('employee_id'))
-                    ->where('campus', session('campus'))
-                    ->update([
-                        'status'    => 1,
-                        'updated_at'    => Carbon::now()
-                    ]);
-                \DB::table('allocated__budgets')
-                    ->where('id', $allocated_budgets[0]->id)
-                    ->update([
-                        'remaining_balance' => $final_remaining_balance
-                    ]);
+                    }
+                # testing if submittted project is beyond deadline of submission
+                    $allocated_budgets = \DB::table('project_titles')
+                            ->join('allocated__budgets', 'allocated__budgets.id', 'project_titles.allocated_budget')
+                            ->where('project_titles.id', $item)
+                            ->where('project_titles.campus', session('campus'))
+                            ->where('project_titles.department_id', session('department_id'))
+                            ->where('project_titles.employee_id', session('employee_id'))
+                            ->get([
+                                'allocated__budgets.id',
+                                'allocated__budgets.deadline_of_submission',
+                                'allocated__budgets.remaining_balance'
+                            ]);
+                    if(Carbon::now()->format('Y-m-d') > Carbon::parse($allocated_budgets[0]->deadline_of_submission)->format('Y-m-d')) {
+                        return ([
+                            'status'    => 400,
+                            'message'   => 'You\'ve exceeded the alloted deadline of submission!'
+                        ]);
+                    }
+                # comparing total of estimated price per project to remaining balance
+                    foreach ($ppmps as $estimated_price) {
+                        array_push($__total_estimated_price, $estimated_price->estimated_price);
+                        $total_estimated_price +=  $estimated_price->estimated_price;
+                    }
+                    if($total_estimated_price > $allocated_budgets[0]->remaining_balance) {
+                        return ([
+                            'status'    => 400,
+                            'message'   => 'Some of the projects have exceeded the remaining balance!'
+                        ]);
+                    }
+                # get the final remaining balance
+                    $final_remaining_balance = $allocated_budgets[0]->remaining_balance - $total_estimated_price;
+                # updating statuses of project titles | PPMPS | remaining balance
+                    \DB::table('project_titles')
+                        ->where('id', $item)
+                        ->where('department_id', session('department_id'))
+                        ->where('employee_id', session('employee_id'))
+                        ->where('campus', session('campus'))
+                        ->update([
+                            'status'    => 1,
+                            'updated_at'    => Carbon::now()
+                        ]);
+                    \DB::table('ppmps')
+                        ->where('project_code', $item)
+                        ->where('department_id', session('department_id'))
+                        ->where('employee_id', session('employee_id'))
+                        ->where('campus', session('campus'))
+                        ->update([
+                            'status'    => 1,
+                            'updated_at'    => Carbon::now()
+                        ]);
+                    \DB::table('allocated__budgets')
+                        ->where('id', $allocated_budgets[0]->id)
+                        ->update([
+                            'remaining_balance' => $final_remaining_balance,
+                            'procurement_type' => 'Supplemental',
+                            'updated_at'    => Carbon::now()
+                        ]);
+                    \DB::table('project_timeline')
+                        ->insert([
+                            'employee_id'   => session('employee_id'),
+                            'department_id' => session('department_id'),
+                            'role'  =>  \session('role'),
+                            'campus'  => \session('campus'),
+                            'project_id'    => $item,
+                            'status'    => intval(1),
+                            'remarks'   =>   'Your PPMP is currently Pending of Immediates Supervisor\'s Acceptance.',
+                            'created_at'    =>  Carbon::now(),
+                            'updated_at'    =>  Carbon::now(),
+                        ]);
+            }
+            return ([
+                'status'    => 200,
+                'message'   => 'Project(s) submitted for Supervisor\'s Acceptance!'
+            ]);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return view('pages.error-500');
         }
+    }
 
-        return ([
-            'status'    => 200,
-            'message'   => 'Project(s) submitted for Supervisor\'s Acceptance!'
-        ]);
+    /* Generate or Export PPMP File
+     * PDF
+     */
+    public function export_approved_ppmp(Request $request) {
+       try {
+            # project title
+                $project_title = \DB::table('project_titles')
+                    ->where('campus', session('campus'))
+                    ->where('employee_id', session('employee_id'))
+                    ->where('department_id', session('department_id'))
+                    ->where('id', (new AESCipher)->decrypt($request->id))
+                    ->where('status', 4)
+                    ->whereNull('deleted_at')
+                    ->get();
+            # ppmps
+                $ppmps = \DB::table('ppmps')
+                    ->join('mode_of_procurement', 'mode_of_procurement.id', 'ppmps.mode_of_procurement')
+                    ->where('ppmps.campus', session('campus'))
+                    ->where('ppmps.employee_id', session('employee_id'))
+                    ->where('ppmps.department_id', session('department_id'))
+                    ->where('ppmps.project_code', (new AESCipher)->decrypt($request->id))
+                    ->where('ppmps.status', 4)
+                    ->whereNull('ppmps.deleted_at')
+                    ->get([
+                        'ppmps.*',
+                        'mode_of_procurement.abbreviation'
+                    ]);
+           
+            $pdf = \Pdf::loadView('pages.department.export-ppmp', compact('project_title', 'ppmps'))->setPaper('a4', 'portrait');
+            return $pdf->download('PPMP_' . Carbon::now() . '.pdf'); 
+            // return view('pages.department.export-ppmp', compact('project_title', 'ppmps'));
+       } catch (\Throwable $th) {
+            // throw $th;
+            return view('pages.error-500');
+       }
     }
 }

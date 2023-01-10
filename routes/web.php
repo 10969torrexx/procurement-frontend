@@ -637,6 +637,9 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
 
             # submit all project titles on checkbox
             Route::get('submit-all-project', [DepartmentController::class, 'submit_all_projects'])->name('submit_all_projects');
+
+            # export approved ppmp | this will generate PDF file of the Approved PPMP data
+            Route::get('export-ppmp', [DepartmentController::class, 'export_approved_ppmp'])->name('export_ppmp');
         /** END */
 
         /** Gettin data from the database */

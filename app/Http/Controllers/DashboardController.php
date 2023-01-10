@@ -29,7 +29,6 @@ class DashboardController extends Controller
                     ->get([
                         'fund_sources.id as fund_source_id', 'allocated__budgets.*', 'fund_sources.fund_source', \DB::raw('sum(allocated__budgets.allocated_budget) as SumBudget')
                     ]); 
-
                 $mandatory_expeditures = \DB::table("mandatory_expenditures as me")
                     ->select("me.year", "me.fund_source_id", \DB::raw('sum(me.price) as SumMandatory'))
                     ->where('me.campus', session('campus'))
@@ -39,7 +38,6 @@ class DashboardController extends Controller
                     ->groupBy("me.year")
                     ->groupBy("me.fund_source_id")
                     ->get();
-                
                 $ppmp_expenses = \DB::table('project_titles')
                     ->join('ppmps', 'ppmps.project_code', 'project_titles.id')
                     ->where('project_titles.department_id', session('department_id'))
@@ -52,8 +50,7 @@ class DashboardController extends Controller
                         'ppmps.estimated_price',
                         'project_titles.fund_source as f_source'
                     ]);
-
-                    return view('pages.users-dashboard', compact('mandatory_expeditures',  'response', 'ppmp_expenses'));
+                return view('pages.users-dashboard', compact('mandatory_expeditures',  'response', 'ppmp_expenses'));
         } 
         else if(session('role') == 11) {
             //

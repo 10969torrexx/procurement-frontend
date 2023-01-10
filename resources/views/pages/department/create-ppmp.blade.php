@@ -6,6 +6,7 @@
     $aes = new AESCipher();
     $immediate_supervisor = '';
     $current_year = Carbon::now();
+    // dd((new AESCipher)->decrypt($project_type));
 @endphp
 @extends('layouts.contentLayoutMaster')
 {{-- title --}}
@@ -106,13 +107,7 @@
                                         <div class="col-sm-3">
                                             <div class="form-group">
                                                 <label for=""> Project Title</label>
-                                                <input type="text" class="form-control @error('project_title') is-invalid @enderror"
-                                                name="project_title" autocomplete="project_title" autofocus required>
-                                                    @error('project_title')
-                                                        <span class="invalid-feedback" role="alert">
-                                                            <strong>{{ $message }}</strong>
-                                                        </span>
-                                                    @enderror
+                                                <textarea name="project_title" class="form-control" id="" cols="30" rows="1"></textarea>
                                             </div>
                                         </div>
                                         <div class="col-sm-4">

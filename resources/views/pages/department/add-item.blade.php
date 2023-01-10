@@ -698,7 +698,7 @@
 
                             $('#edit-item-category').val(element.item_category);
                             $('#edit-app-type').val(element.app_type);
-                            $('#app-type-p').text(element.app_type);
+                            $('#edit-app-type-p').text(element.app_type);
 
                             $('#edit-default-unit-of-measurement').text(element.unit_of_measurement);
                             $('#edit-default-unit-of-measurement').val(element.unit_of_measurement);
