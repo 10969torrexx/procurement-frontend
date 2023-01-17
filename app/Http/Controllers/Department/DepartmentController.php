@@ -632,8 +632,9 @@ class DepartmentController extends Controller
                 if (!\Storage::exists($destination_path)) {
                     \Storage::makeDirectory($destination_path);
                 }
-                // $file->storeAs($destination_path, $file_name.'.'.$extension);
-                \Storage::put($destination_path, $file_name.'.'.$extension);
+                $file->storeAs($destination_path, $file_name.'.'.$extension);
+                // \Storage::put($destination_path, $file_name.'.'.$extension);
+                // $file->move($destination_path, $file_name.'.'.$extension);
                 \DB::table('signed_ppmp')
                 ->insert([
                     'employee_id'   => session('employee_id'),

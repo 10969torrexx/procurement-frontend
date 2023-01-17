@@ -27,7 +27,7 @@
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title">Choose from items</h5>
+              <h5 class="modal-title">Preview File:</h5>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
               </button>
@@ -319,10 +319,10 @@
           data: {
             'id' : $(this).data('id')
           }, success: function(response) {
-              console.log(response);
-              response['data'].forEach(element => {
-                $('#content').append('<iframe src="'+ element.file_directory +'" frameborder="0" height="600" width="200"></iframe>');
-              });
+              console.log();
+              // response['data'].forEach(element => {
+                $('#content').append('<iframe src="{{ asset("storage/app/department_upload/signed_ppmp/Supplemental-1673924953.pdf") }}" frameborder="0" height="600" width="200"></iframe>');
+              // });
           }
         });
       });
