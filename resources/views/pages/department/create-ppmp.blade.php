@@ -418,8 +418,6 @@
                     }
                 });
             }
-
-            
         });
 
         $('#select-all').click(function(event) {   

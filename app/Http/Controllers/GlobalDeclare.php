@@ -311,13 +311,13 @@ public function FundSource($id) {
                 $out = "Pending for Immediate Supervisor's Approval";
                 break;
             case 2:
-                $out = "Approved by Immediate Supervisor";
+                $out = "Accepted by Immediate Supervisor";
                 break;  
             case 3:
                 $out = "Disapproved by Immediate Supervisor";
                 break;
             case 4:
-                $out = "Approved by Budget Officer";
+                $out = "Accepted by Budget Officer";
                 break;
             case 5:
                 $out = "Dispproved by Budget Officer";

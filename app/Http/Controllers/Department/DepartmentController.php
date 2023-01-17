@@ -8,10 +8,13 @@ use App\Http\Controllers\Department\PpmpController;
 use App\Http\Controllers\Department\ItemsController;
 use App\Http\Controllers\Department\ProjectsController;
 use App\Http\Controllers\Department\AllocatedBudgetsController;
+use App\Http\Controllers\GlobalDeclare;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
 use DB;
+use Validator;
+
 class DepartmentController extends Controller
 {
     /**
@@ -374,7 +377,6 @@ class DepartmentController extends Controller
     # get ppmps for edit
     public function resubmitPPMP(Request $request)
     {
-        // dd($request->all());
         try {
             $_deadline_of_submission = Carbon::parse($request->deadline_of_submission)->format('Y-m-d');
             $current_date = Carbon::now()->format('Y-m-d');
@@ -467,7 +469,7 @@ class DepartmentController extends Controller
         return \json_decode($ppmp_response);
     }
 
-   /* Submit All projects 
+   /* Submit All projects .
     * - this will enable submission of multiple projects
     */
     public function submit_all_projects(Request $request) {
@@ -605,5 +607,157 @@ class DepartmentController extends Controller
             // throw $th;
             return view('pages.error-500');
        }
+    }
+
+    /* Upload Signed PPMP
+     * - Creating files for Signed PPMP 
+     * - Downloadable PPMP
+    */
+    public function upload_ppmp(Request $request) {
+        try {
+            $validate = Validator::make($request->all(), [
+                'project_category'  => ['required'],
+                'year_created'  =>  ['required'],
+                'file_name' => ['required'],
+                'signed_ppmp'   => ['required', 'mimes:pdf', 'max:2048']
+            ]);
+            if($request->hasFile('signed_ppmp')) {
+                $file = $request->file('signed_ppmp');
+                $extension = $request->file('signed_ppmp')->getClientOriginalExtension();
+                // $file_name = $file->getClientOriginalName();
+                $file_name = (new GlobalDeclare)->project_category((new AESCipher)->decrypt($request->project_category)) .'-'. time();
+                // $destination_path = '/public/signed_ppmp/';
+                $destination_path = '\\department_upload\\signed_ppmp\\';
+
+                if (!\Storage::exists($destination_path)) {
+                    \Storage::makeDirectory($destination_path);
+                }
+                // $file->storeAs($destination_path, $file_name.'.'.$extension);
+                \Storage::put($destination_path, $file_name.'.'.$extension);
+                \DB::table('signed_ppmp')
+                ->insert([
+                    'employee_id'   => session('employee_id'),
+                    'department_id'   => session('department_id'),
+                    'campus'   => session('campus'),
+                    'year_created'   => (new AESCipher)->decrypt($request->year_created),
+                    'project_category'  => (new AESCipher)->decrypt($request->project_category),
+                    'file_name'   => $request->file_name,
+                    'file_directory'    => $destination_path .''. $file_name.'.'.$extension,
+                    'signed_ppmp' =>  $file_name.'.'.$extension,
+                    'created_at'    => Carbon::now(),
+                    'updated_at'    => Carbon::now()
+                ]);
+
+                # storing data to signed_ppmp table
+                return back()->with([
+                    'success' => 'PPMP uploaded successfully!'
+                ]);
+            } else {
+                return back()->with([
+                    'error' => 'Please fill the form accordingly!'
+                ]);
+            }
+        } catch (\Throwable $th) {
+            throw $th;
+            return view('pages.error-500');
+        }
+    }
+
+    /* Download Uplooded PPMP
+     * - this will enable downlaod uploade PPMP
+     * - based on: Employee id, campus, department_id
+     * - get file from storage upload id search
+     */
+    public function download_PPMP(Request $request) {
+        try {
+            $response = \DB::table('signed_ppmp')
+                ->where('employee_id', session('employee_id'))
+                ->where('department_id', session('department_id'))
+                ->where('campus', session('campus'))
+                ->where('id', (new AESCipher)->decrypt($request->id))
+                ->whereNull('deleted_at')
+                ->get([
+                    'signed_ppmp'
+                ]);
+            return \Storage::download('/public/signed_ppmp/'.$response[0]->signed_ppmp);
+
+        } catch (\Throwable $th) {
+            throw $th;
+            return view('pages.error-500');
+        }
+    }
+
+    /* Delete Uploaded Signed PPMP
+     * - this will delete the uploaded PPMP
+     * - based on: Employee id, campus, department_id
+     */
+    public function delete_ppmp(Request $request) {
+        try {
+            $response = \DB::table('signed_ppmp')
+            ->where('employee_id', session('employee_id'))
+            ->where('department_id', session('department_id'))
+            ->where('campus', session('campus'))
+            ->where('id', (new AESCipher)->decrypt($request->id))
+            ->whereNull('deleted_at')
+            ->update([
+                'updated_at'    => Carbon::now(),
+                'deleted_at'    => Carbon::now()
+            ]);
+
+            return back()->with([
+                'success'   => 'Uploaded PPMP successfully deleted!'
+            ]);
+        } catch (\Throwable $th) {
+            return view('pages.error-500');
+            // throw $th;
+        }
+    }
+
+    /* View uploaded PPMP
+     * - this will allow preview of the uploaded PPMP
+     */
+    public function view_ppmp(Request $request) {
+        try {
+            $response = \DB::table('signed_ppmp')
+            ->where('employee_id', session('employee_id'))
+            ->where('department_id', session('department_id'))
+            ->where('campus', session('campus'))
+            ->where('id', (new AESCipher)->decrypt($request->id))
+            ->whereNull('deleted_at')
+            ->get([
+                'file_directory'
+            ]);
+
+            // dd($response);
+            return response ([
+                'status'    => 200,
+                'data'  => $response
+            ]);
+        } catch (\Throwable $th) {
+            return view('pages.error-500');
+            throw $th;
+        }
+    }
+
+    /* Live search item
+     * - this will enable search item on textchange
+     */
+    public function live_search_item(Request $request) {
+        try {
+            $response = \DB::table('items')
+            ->join('mode_of_procurement', 'mode_of_procurement.id', 'items.mode_of_procurement_id')
+            ->whereNull('mode_of_procurement.deleted_at')
+            ->whereNull('items.deleted_at')
+            ->where('item_name', 'like', '%'.$request->item_name.'%')
+            ->get();
+
+            if(count($response) > 0) {
+                return $response;
+            } 
+            # return error or zero item(s) found
+            return 400;
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 }

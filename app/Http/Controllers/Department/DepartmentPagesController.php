@@ -598,4 +598,58 @@ class DepartmentPagesController extends Controller
                 return view('pages.error-500');
            }
         }
+
+        # request ppmp submission
+        public function show_ppmp_submission() {
+            try {
+                return view('pages.page-coming-soon');
+            } catch (\Throwable $th) {
+                //throw $th;
+                return view('pages.error-500');
+            }
+        }
+
+        # upload ppmp | signed ppmp
+        public function show_upload_ppmp() {
+            try {
+                # get uplpaded ppmp
+                $response = \DB::table('signed_ppmp')
+                    ->where('employee_id', session('employee_id'))
+                    ->where('department_id', session('department_id'))
+                    ->where('campus', session('campus'))
+                    ->whereNull('deleted_at')
+                    ->get();
+                # return page
+                return view('pages.department.upload-ppmp', compact('response'));
+            } catch (\Throwable $th) {
+                //throw $th;
+                return view('pages.error-500');
+            }
+        }
+        # upload ppmp | signed ppmp
+         public function get_upload_ppmp(Request $request) {
+            try {
+                $this->validate($request, [
+                    'project_category'  => ['required'],
+                    'year_created'  =>  ['required'],
+                    'file_name' => ['required'],
+                ]);
+                # get uplpaded ppmp
+                $response = \DB::table('signed_ppmp')
+                    ->where('employee_id', session('employee_id'))
+                    ->where('department_id', session('department_id'))
+                    ->where('campus', session('campus'))
+                    ->where('project_category', (new AESCipher)->decrypt($request->project_category))
+                    ->where('year_created', (new AESCipher)->decrypt($request->year_created))
+                    ->where('file_name', 'like', '%'. $request->file_name .'%')
+                    ->whereNull('deleted_at')
+                    ->get();
+                # return page
+                return view('pages.department.upload-ppmp', compact('response'));
+            } catch (\Throwable $th) {
+                throw $th;
+                return view('pages.error-500');
+            }
+        }
+
 }

@@ -21,6 +21,11 @@
 <link rel="stylesheet" type="text/css" href="{{asset('css/plugins/extensions/toastr.css')}}">
 @endsection
 @section('content')
+<style>
+    table {
+        font-size: 13px !important;
+    }
+</style>
 <!-- Zero configuration table -->
 <section id="horizontal-vertical">
     <div class="row">
@@ -259,13 +264,13 @@
                                                         <tr>
                                                             <td>{{ ($i) + 1 }}</td>
                                                             <!-- <td>{{ json_decode($project_titles)[$i]->project_code }}</td> -->
-                                                            <td>{{ json_decode($project_titles)[$i]->project_title }}</td>
+                                                            <td  class="text-nowrap">{{ json_decode($project_titles)[$i]->project_title }}</td>
                                                             <td>{{ json_decode($project_titles)[$i]->project_year }}</td>
                                                             <td>{{ json_decode($project_titles)[$i]->immediate_supervisor }}</td>
                                                             <td>{{ json_decode($project_titles)[$i]->project_type }}</td>
                                                             <td>{{ (new GlobalDeclare)->project_category(json_decode($project_titles)[$i]->project_category) }}</td>
-                                                            <td>{{ json_decode($project_titles)[$i]->fund_source }}</td>
-                                                            <td>{{ (new GlobalDeclare)->status(json_decode($project_titles)[$i]->status) }}</td>
+                                                            <td class="text-nowrap">{{ json_decode($project_titles)[$i]->fund_source }}</td>
+                                                            <td class="text-nowrap">{{ (new GlobalDeclare)->status(json_decode($project_titles)[$i]->status) }}</td>
                                                             <td class="text-nowrap"> {{ explode('-', date('j F, Y-', strtotime($project_titles[$i]->updated_at)))[0] }}</td>
                                                             <td>
                                                                 <form action="{{ route('department-showProjectStatus') }}" method="post"> @csrf @method('POST')
@@ -366,13 +371,13 @@
                                                     @foreach ($pt_show_approved as $item)
                                                         <tr>
                                                             <td>{{ $loop->iteration }}</td>
-                                                            <td>{{ $item->project_title }}</td>
+                                                            <td class="text-nowrap">{{ $item->project_title }}</td>
                                                             <td>{{ $item->year_created }}</td>
-                                                            <td>{{ Str::ucfirst((new GlobalDeclare)->status($item->status)) }}</td>
-                                                            <td>{{ $item->immediate_supervisor }}</td>
-                                                            <td>{{ $item->project_type }}</td>
+                                                            <td  class="text-nowrap">{{ Str::ucfirst((new GlobalDeclare)->status($item->status)) }}</td>
+                                                            <td  class="text-nowrap">{{ $item->immediate_supervisor }}</td>
+                                                            <td  class="text-nowrap">{{ $item->project_type }}</td>
                                                             <td>{{ (new GlobalDeclare)->project_category($item->project_category) }}</td>
-                                                            <td>{{ $item->fund_source }}</td>
+                                                            <td  class="text-nowrap">{{ $item->fund_source }}</td>
                                                             <td class="text-nowrap">{{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0]  }}</td>
                                                             <td>
                                                                 <div class="dropdown">

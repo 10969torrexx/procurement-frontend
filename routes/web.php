@@ -569,9 +569,7 @@ Route::group(['prefix' => 'supply_custodian','middleware' => ['authuser']], func
 // });
 
 });
-#sdfghsh
 
-//j-rald
 # route for department-group
 Route::group(['prefix' => 'department','middleware' => ['authuser']], function() {
     
@@ -640,6 +638,22 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
 
             # export approved ppmp | this will generate PDF file of the Approved PPMP data
             Route::get('export-ppmp', [DepartmentController::class, 'export_approved_ppmp'])->name('export_ppmp');
+
+            # ppmp submission | request for PPMP Submission
+            Route::get('ppmp-submission', [DepartmentPagesController::class, 'show_ppmp_submission'])->name('show_ppmp_submission');
+
+            # upload ppmp | upload signed ppmp
+            Route::get('upload-ppmp', [DepartmentPagesController::class, 'show_upload_ppmp'])->name('show_upload_ppmp');
+            # upload PPMP
+            Route::post('upload-ppmp', [DepartmentController::class, 'upload_ppmp'])->name('upload_ppmp');
+            Route::post('get-upload-ppmp', [DepartmentPagesController::class, 'get_upload_ppmp'])->name('get_upload_ppmp');
+            # delete uploaded PPMP
+            Route::get('delete-uploaded-ppmp', [DepartmentController::class, 'delete_ppmp'])->name('delete_ppmp');
+            # download uploaded PPMP
+            Route::get('download-uploaded-ppmp', [DepartmentController::class, 'download_ppmp'])->name('download_ppmp');
+            # previw uploaded ppmp
+            Route::get('view-uploaded-ppmp', [DepartmentController::class, 'view_ppmp'])->name('view_ppmp');
+            
         /** END */
 
         /** Gettin data from the database */
@@ -653,6 +667,9 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
             Route::get('/get-mode-of-procurement', [DepartmentController::class, 'get_mode_of_procurement'])->name('get_mode_of_procurement');
             # get ppmps
             Route::get('/get-ppms', [DepartmentController::class, 'get_ppmps'])->name('get_ppmps');
+            # live search item(s)
+            Route::post('live-search-item', [DepartmentController::class, 'live_search_item'])->name('live_search_item');
+    /** END | TORREXX */
 });
 
 // Route::group(['prefix' => 'employee','middleware' => ['authuser']], function() {
