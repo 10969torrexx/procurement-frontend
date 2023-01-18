@@ -117,6 +117,7 @@ class AuthenticationController extends Controller
          // if($checkEmail){
           //  if($checkEmail['status'] == 200){
                 $employee_id = $checkEmail->id;
+                $position = $checkEmail->EmploymentStatus;
                
                 $middle_name = $checkEmail->MiddleName;
                 $middle_initial = substr($middle_name, 0, 1).'.';
@@ -128,6 +129,7 @@ class AuthenticationController extends Controller
                   'email' => $email,
                   'photo' => $photo,
                   'employee_id' =>$employee_id,
+                  'position' =>$position,
                   'campus' => $checkEmail->Campus
                   ])->json();
                 //  dd($login);
@@ -144,6 +146,7 @@ class AuthenticationController extends Controller
                         'department_id' => $login['department_id'],
                         'user_id' => $login['user_id'],
                         'employee_id' =>  $login['employee_id'],
+                        'position' =>  $login['position'],
                         'immediate_supervisor'  =>   $login['immediate_supervisor'],
                     ]);
   

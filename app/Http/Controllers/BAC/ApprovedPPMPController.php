@@ -29,7 +29,7 @@ class ApprovedPPMPController extends Controller
         ->where('pt.status','=', 4)
         ->where('pt.deleted_at','=', NULL)
         // ->where('p.campus','=',session('campus'))
-        ->where('p.is_supplemental','=', 0)
+        ->where('pt.project_category','=', 1)
         ->groupBy('p.project_code')
         -> get();
 

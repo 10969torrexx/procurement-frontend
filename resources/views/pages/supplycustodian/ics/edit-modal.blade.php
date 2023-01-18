@@ -70,7 +70,14 @@
                 <div class="col-xs-6 col-lg-4 col-sm-4">
                     <div class="form-group">
                         <label for="Unit">Unit *</label>
-                        <input type="text" name="Unit" id="Unit" class="form-control EditUnit" value="">
+                        {{-- <input type="text" name="Unit" id="Unit" class="form-control EditUnit" value=""> --}}
+                        <select name="EditUnit" class="form-control EditUnit" id="EditUnit">
+                            <option id="EditUnitSelected" value=""></option>
+                            <option disabled>---------------------</option>
+                            @foreach($unit as $units)
+                            <option value="{{ $units->id }}">{{ $units->unit_of_measurement }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
         
@@ -84,7 +91,7 @@
         
             <div class="row ">
         
-                <div class="col-xs-6 col-lg-8 col-sm-8">
+                <div class="col-xs-6 col-lg-4 col-sm-4">
                     <div class="form-group">
                         <label for="Issuedby">Issued by *</label>
                         <select name="Issuedby" class="form-control EditIssuedby" id="Issuedby">
@@ -93,6 +100,13 @@
                             <option value="{{  $issuedby->id }}">{{ $issuedby->name }}</option>
                             @endforeach
                         </select>
+                    </div>
+                </div>
+
+                <div class="col-xs-6 col-lg-4 col-sm-4">
+                    <div class="form-group">
+                        <label for="EditICSNo">ICS Number *</label>
+                        <input type="text" name="EditICSNo" id="EditICSNo" class="form-control EditICSNo" value="">
                     </div>
                 </div>
         

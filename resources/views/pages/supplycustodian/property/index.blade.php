@@ -43,7 +43,7 @@
                                 
                             </div>
                             <div class="table-responsive">
-                                <table class="table nowrap zero-configuration">
+                                <table class="table nowrap zero-configuration table-sm">
                                     <thead>
                                         <tr>
                                             <th>Action</th>
@@ -89,9 +89,11 @@
                                                         </div>    
                                                         
                                                         @else
-                                                        <a href = "#" data-flag = "<?=$aes->encrypt('property')?>" data-button = "<?=$aes->encrypt('transfer')?>" data-id = "<?=$aes->encrypt($property->id)?>" data-toggle = "modal" data-target = "#allModal" title = "Transfer of item"><i class="bx bx-transfer-alt mr-1"></i></a>
+                                                        <a href = "#" class="transferto" {{-- data-flag = "<?=$aes->encrypt('property')?>" data-button = "<?=$aes->encrypt('transfer')?>" --}} data-id = "<?=$aes->encrypt($property->id)?>" data-toggle = "modal" data-target = "#transferModal" title = "Transfer of item"><i class="bx bx-transfer-alt mr-1"></i></a>
                                                         <a href = "#" class="finaldeletepar" {{-- data-flag = "<?=$aes->encrypt('property')?>" data-button = "<?=$aes->encrypt('dispose')?>" --}} data-id = "<?=$aes->encrypt($property->id)?>" data-toggle = "modal" data-target = "#deleteModal" title = "Dispose of item"><i class="bx bx-trash mr-1 text-danger"></i></a>
-                                                        <a href = "/property/print/{{urlencode($aes->encrypt($property->id))}}/{{$property->FundCluster}}/{{$property->EmployeeID}}"><i class="bx bx-printer text-success"></i></a>
+                                                        {{-- <form action="{{ route('print-par') }}" method="POST"> --}}
+                                                            <a href = "#" class="print" data-id = "<?=$aes->encrypt($property->id)?>" data-toggle = "modal" data-target = "#printModal"><i class="bx bx-printer text-success"></i></a>
+                                                        {{-- </form>  --}}
                                                         
                                                         @endif 
                                                     {{-- <input type="text" name="parNum" id="parNum" class="form-control parNum" value="{{ $par }}" hidden>
@@ -103,14 +105,15 @@
                                                     <input type="text" name="DateReceived" id="DateReceived" class="form-control DateReceived" value="{{ $property->DateReceived }}" hidden>
                                                     <input type="text" name="StoreName" id="StoreName" class="form-control StoreName" value="{{ $property->StoreName }}" hidden> --}}
                                                     </td>
-                                                    <td>{{$par}}</td>
+                                                    {{-- <td>{{$par}}</td> --}}
+                                                    <td>{{$property->PARNo}}</td>
                                                     <td>{{$property->name}}</td>
                                                     <td>{{$property->FundCluster}}</td>  
                                                     <td>{{$property->PONumber}}</td>  
                                                     <td>{{$property->DateAcquired}}</td> 
                                                     <td>{{$property->SupplierName}}</td> 
                                                     <td>{{$property->ItemName}}</td>
-                                                    <td>{{$property->Quantity . " " .$property->Unit}}</td>
+                                                    <td>{{$property->Quantity . " " .$property->unit}}</td>
                                                     <td>{{number_format(str_replace(",","",$property->UnitPrice),2,'.',',') }}</td>
                                                     <td>{{number_format(str_replace(",","",$property->UnitPrice)*$property->Quantity,2,'.',',') }}</td>
                                                     <td>{{$property->remarks}}</td>
@@ -132,7 +135,9 @@
 @include('pages.supplycustodian.property.property-modal')
 @include('pages.supplycustodian.property.edit-modal')
 @include('pages.supplycustodian.property.add-modal')
+@include('pages.supplycustodian.property.print-modal')
 @include('pages.supplycustodian.property.delete-modal')
+@include('pages.supplycustodian.property.transfer-modal')
 </section>
 <!-- Dashboard Ecommerce ends -->
 @endsection

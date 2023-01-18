@@ -50,7 +50,7 @@ class SupplierController extends Controller
     }
 
     public function add_supplier(Request $request){
-            // dd($request->all());
+            // dd( session('campus'));
         try{
             $supplier = DB::table("store")
                         ->insert([
@@ -58,7 +58,7 @@ class SupplierController extends Controller
                             'Address'     => $request->Address,
                             'ContactNo'   => $request->ContactNumber,
                             'SupplierName'=> $request->SupplierName,
-                            'campus', session('campus'),
+                            'campus'      => session('campus'),
                             'created_at' => Carbon::now(),
                             'updated_at' => Carbon::now(),
                         ]);

@@ -16,7 +16,7 @@
                 <input type="number" class="form-control balance" name="balance" value="" hidden>
 
                 <label>REMARKS:  </label>
-                <input type="text" class="form-control remarks" placeholder="--Enter--" value="">
+                <input type="text" class="form-control remarks" placeholder="--Enter--" value="" required>
             </div>
             <div class="modal-footer" id = "footModal">
                 <h5 class="modal-title" id="exampleModalLongTitle"></h5>

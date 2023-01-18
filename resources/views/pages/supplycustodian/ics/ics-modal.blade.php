@@ -68,7 +68,13 @@
                 <div class="col-xs-6 col-lg-4 col-sm-4">
                     <div class="form-group">
                         <label for="Unit">Unit *</label>
-                        <input type="text" name="Unit" id="Unit" class="form-control Unit" value="">
+                        {{-- <input type="text" name="Unit" id="Unit" class="form-control Unit" value=""> --}}
+                        <select name="Unit" class="form-control Unit" id="Unit">
+                            <option selected>Choose...</option>
+                            @foreach($unit as $unit)
+                            <option value="{{ $unit->id }}">{{ $unit->unit_of_measurement }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
         
@@ -82,7 +88,7 @@
         
             <div class="row ">
         
-                <div class="col-xs-6 col-lg-8 col-sm-8">
+                <div class="col-xs-6 col-lg-4 col-sm-4">
                     <div class="form-group">
                         <label for="Issuedby">Issued by *</label>
                         <select name="Issuedby" class="form-control Issuedby" id="Issuedby">
@@ -91,6 +97,13 @@
                             <option value="{{  $issuedby->id }}">{{ $issuedby->name }}</option>
                             @endforeach
                         </select>
+                    </div>
+                </div>
+
+                <div class="col-xs-6 col-lg-4 col-sm-4">
+                    <div class="form-group">
+                        <label for="ICSNumber">ICS Number *</label>
+                        <input type="number" name="ICSNumber" id="ICSNumber" class="form-control ICSNumber" value="">
                     </div>
                 </div>
         

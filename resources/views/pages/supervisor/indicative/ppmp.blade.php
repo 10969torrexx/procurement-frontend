@@ -97,7 +97,7 @@
                                         }
                                         ?>
                                         <td>
-                                            <form action="{{ route('show-ppmp') }}" method="post">
+                                            <form action="{{ route('show-indicative-ppmp') }}" method="post">
                                                 @csrf
                                                 <input type="text" id="project_code12" class=" form-control d-none" name="project_code" value="<?=$aes->encrypt($data->id)?>">
                                                 {{-- <input type="text" class="form-control d-none" name="employee_id" value="<?=$aes->encrypt($data->employee_id)?>">
@@ -145,7 +145,7 @@
 <script src="{{asset('vendors/js/tables/datatable/dataTables.bootstrap4.min.js')}}"></script>
 <script src="{{asset('vendors/js/tables/datatable/dataTables.buttons.min.js')}}"></script>
 
-<script src="{{asset('js/bac/supervisor.js')}}"></script>
+<script src="{{asset('js/supervisor/supervisorSupplemental.js')}}"></script>
 @endsection
 
 @section('page-scripts')

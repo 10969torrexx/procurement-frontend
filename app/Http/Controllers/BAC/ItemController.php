@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\BAC;
 
-use App\Http\Controllers\AESCipher;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\AESCipher;
 use App\Http\Controllers\GlobalDeclare;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -138,7 +138,7 @@ class ItemController extends Controller
     // $item =  Http::withToken(session('token'))->get(env('APP_API'). "/api/item/index")->json();
     $category = DB::table("categories")
               // ->where("campus", session('campus'))
-              ->whereNull("deleted_at")
+              ->whereNull("deleted_at") 
               ->get();
 
     $item = DB::table("items as i")
@@ -150,7 +150,7 @@ class ItemController extends Controller
     $mode = DB::table("mode_of_procurement")
               ->whereNull("deleted_at")
               ->orderBy("mode_of_procurement","ASC")
-              ->get();
+              ->get();      
 
     $mode2 = DB::table("mode_of_procurement")
               ->whereNull("deleted_at")
