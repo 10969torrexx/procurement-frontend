@@ -648,12 +648,13 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
             Route::post('upload-ppmp', [DepartmentController::class, 'upload_ppmp'])->name('upload_ppmp');
             Route::post('get-upload-ppmp', [DepartmentPagesController::class, 'get_upload_ppmp'])->name('get_upload_ppmp');
             # delete uploaded PPMP
-            Route::get('delete-uploaded-ppmp', [DepartmentController::class, 'delete_ppmp'])->name('delete_ppmp');
+            Route::get('delete-uploaded-ppmp', [DepartmentController::class, 'delete_uploaded_ppmp'])->name('delete_ppmp');
             # download uploaded PPMP
-            Route::get('download-uploaded-ppmp', [DepartmentController::class, 'download_ppmp'])->name('download_ppmp');
+            Route::get('download-uploaded-ppmp', [DepartmentController::class, 'download_uploaded_ppmp'])->name('download_ppmp');
             # previw uploaded ppmp
-            Route::get('view-uploaded-ppmp', [DepartmentController::class, 'view_ppmp'])->name('view_ppmp');
-            
+            Route::get('view-uploaded-ppmp', [DepartmentController::class, 'view_uploaded_ppmp'])->name('view_ppmp');
+            # edit upload
+            Route::get('edit-uploaded-ppmp', [DepartmentController::class, 'edit_uploaded_ppmp'])->name('edit_ppmp');
         /** END */
 
         /** Gettin data from the database */

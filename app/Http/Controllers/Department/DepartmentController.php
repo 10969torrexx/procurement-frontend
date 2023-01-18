@@ -627,14 +627,14 @@ class DepartmentController extends Controller
                 // $file_name = $file->getClientOriginalName();
                 $file_name = (new GlobalDeclare)->project_category((new AESCipher)->decrypt($request->project_category)) .'-'. time();
                 // $destination_path = '/public/signed_ppmp/';
-                $destination_path = '\\department_upload\\signed_ppmp\\';
+                $destination_path = env('APP_NAME').'\\department_upload\\signed_ppmp\\';
 
                 if (!\Storage::exists($destination_path)) {
                     \Storage::makeDirectory($destination_path);
                 }
                 $file->storeAs($destination_path, $file_name.'.'.$extension);
                 // \Storage::put($destination_path, $file_name.'.'.$extension);
-                // $file->move($destination_path, $file_name.'.'.$extension);
+                $file->move('storage/'. $destination_path, $file_name.'.'.$extension);
                 \DB::table('signed_ppmp')
                 ->insert([
                     'employee_id'   => session('employee_id'),
@@ -669,21 +669,23 @@ class DepartmentController extends Controller
      * - based on: Employee id, campus, department_id
      * - get file from storage upload id search
      */
-    public function download_PPMP(Request $request) {
+    public function download_uploaded_PPMP(Request $request) {
         try {
             $response = \DB::table('signed_ppmp')
-                ->where('employee_id', session('employee_id'))
-                ->where('department_id', session('department_id'))
-                ->where('campus', session('campus'))
-                ->where('id', (new AESCipher)->decrypt($request->id))
-                ->whereNull('deleted_at')
-                ->get([
-                    'signed_ppmp'
-                ]);
-            return \Storage::download('/public/signed_ppmp/'.$response[0]->signed_ppmp);
+            ->where('employee_id', session('employee_id'))
+            ->where('department_id', session('department_id'))
+            ->where('campus', session('campus'))
+            ->where('id', (new AESCipher)->decrypt($request->id))
+            ->whereNull('deleted_at')
+            ->get([
+                'signed_ppmp'
+            ]);
+
+            // dd($response);
+            return \Storage::download(env('APP_NAME').'\\department_upload\\signed_ppmp\\'.$response[0]->signed_ppmp);
 
         } catch (\Throwable $th) {
-            throw $th;
+            // throw $th;
             return view('pages.error-500');
         }
     }
@@ -692,7 +694,7 @@ class DepartmentController extends Controller
      * - this will delete the uploaded PPMP
      * - based on: Employee id, campus, department_id
      */
-    public function delete_ppmp(Request $request) {
+    public function delete_uploaded_ppmp(Request $request) {
         try {
             $response = \DB::table('signed_ppmp')
             ->where('employee_id', session('employee_id'))
@@ -704,7 +706,7 @@ class DepartmentController extends Controller
                 'updated_at'    => Carbon::now(),
                 'deleted_at'    => Carbon::now()
             ]);
-
+            
             return back()->with([
                 'success'   => 'Uploaded PPMP successfully deleted!'
             ]);
@@ -717,23 +719,46 @@ class DepartmentController extends Controller
     /* View uploaded PPMP
      * - this will allow preview of the uploaded PPMP
      */
-    public function view_ppmp(Request $request) {
+    public function view_uploaded_ppmp(Request $request) {
         try {
             $response = \DB::table('signed_ppmp')
-            ->where('employee_id', session('employee_id'))
-            ->where('department_id', session('department_id'))
-            ->where('campus', session('campus'))
-            ->where('id', (new AESCipher)->decrypt($request->id))
-            ->whereNull('deleted_at')
-            ->get([
-                'file_directory'
-            ]);
-
-            // dd($response);
+                ->where('employee_id', session('employee_id'))
+                ->where('department_id', session('department_id'))
+                ->where('campus', session('campus'))
+                ->where('id', (new AESCipher)->decrypt($request->id))
+                ->whereNull('deleted_at')
+                ->get([
+                    'file_directory',
+                    'signed_ppmp'
+                ]);
             return response ([
                 'status'    => 200,
                 'data'  => $response
             ]);
+        } catch (\Throwable $th) {
+            return view('pages.error-500');
+            throw $th;
+        }
+    }
+
+    /* Edit Uploaded PPMP
+     * - edit uploaded ppmp
+     */
+    public function edit_uploaded_ppmp(Request $request) {
+        try {
+            $response = \DB::table('signed_ppmp')
+                ->where('employee_id', session('employee_id'))
+                ->where('department_id', session('department_id'))
+                ->where('campus', session('campus'))
+                ->where('id', (new AESCipher)->decrypt($request->id))
+                ->whereNull('deleted_at')
+                ->get();
+
+            return ([
+                'status'    => 200,
+                'data'  => $response
+            ]);
+           
         } catch (\Throwable $th) {
             return view('pages.error-500');
             throw $th;
