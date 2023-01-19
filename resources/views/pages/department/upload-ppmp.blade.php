@@ -57,8 +57,10 @@
             <div class="" id="uploaded-ppmp-content">
               <div class="row justify-content-center">
                     <div class="col-12 col-sm-12 col-md-12 col-lg-12">
-                      <form action="#" method="POST" enctype="multipart/form-data"> @csrf
+                      <form action="{{ route('edit_ppmp') }}" method="POST" enctype="multipart/form-data"> 
+                        @csrf
                         <div class="form-group row">
+                            <input type="text" name="id" id="default-id" class="form-control d-none">
                             <div class="col-sm-6 col-md-6 col-lg-6 col-12">
                                 <label for="">PPMP / Project Category</label>
                                 <select name="project_category" id="project-category" class="form-control" required>
@@ -87,10 +89,10 @@
                         </div>
                         <div class="form-group">
                           <label for="">Signed PPMP File</label>
-                          <input type="file" name="signed_ppmp" id="signed-ppmp" class="form-control" required>
-                          <p class="card-text alert bg-rgba-info">Place new file here! (.PDF File only)</p>
+                          <input type="file" name="signed_ppmp" id="default-signed-ppmp" class="form-control">
+                          <p class="card-text alert bg-rgba-info">Attach desired file here (.pdf, .jpeg, .jpg, .png) files</p>
                         </div>
-                        <button type="submit" class="btn btn-success text-white" id="upload-signed-ppmp">Upload Signed PPMP</button>
+                        <button type="submit" class="btn btn-success text-white" id="update-ppmp">Update PPMP</button>
                       </form>
                     </div>
                 </div>
@@ -105,7 +107,7 @@
 {{-- end --}}
 
 <section id="dropzone-examples">
-  <!-- single file upload starts -->
+  <!-- Upload signed ppmp starts -->
     <div class="row">
       <div class="col-12">
         <div class="card">
@@ -149,7 +151,7 @@
                         <div class="form-group">
                           <label for="">Signed PPMP File</label>
                           <input type="file" name="signed_ppmp" id="signed-ppmp" class="form-control" required>
-                          <p class="card-text alert bg-rgba-info">This can only process .pdf files</p>
+                          <p class="card-text alert bg-rgba-info">This can only process (.pdf, .jpeg, .jpg, .png) files</p>
                         </div>
                         <button type="submit" class="btn btn-success text-white" id="upload-signed-ppmp">Upload Signed PPMP</button>
                       </form>
@@ -160,7 +162,7 @@
         </div>
       </div>
     </div>
-  <!-- single file upload ends -->
+  <!-- single file upload starts -->
   <div class="row">
     <div class="col-12">
       <div class="card">
@@ -205,7 +207,6 @@
                     </div>
                 </form>
               {{-- search uploaded ppmp --}}
-
               {{-- list of uploaded ppmp --}}
                   <div class="table-responsive col-12 container">
                       <table class="table zero-configuration item-table" id="item-table">
@@ -235,9 +236,9 @@
                                                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu">
                                               </span>
                                               <div class="btn dropdown-menu dropdown-menu-left">
-                                                  {{-- <a href = "" id="edit-uploaded-ppmp" data-id="{{ (new AESCipher)->encrypt($item->id) }}" class="dropdown-item">
+                                                  <a href = "" id="edit-uploaded-ppmp-btn" data-id="{{ (new AESCipher)->encrypt($item->id) }}" class="dropdown-item">
                                                       <i class="bx bx-edit-alt mr-1"></i>Edit
-                                                  </a> --}}
+                                                  </a>
                                                   <a href = "" data-id="{{ (new AESCipher)->encrypt($item->id) }}" id="preview-ppmp-btn"  class="dropdown-item">
                                                     <i class="fa-solid fa-eye mr-1"></i>View
                                                   </a>
@@ -264,7 +265,6 @@
     </div>
   </div>
 </section>
-
 {{-- Torrexx | Code not mine --}}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     @section('vendor-scripts')
@@ -279,87 +279,35 @@
     {{-- <script src="{{asset('vendors/js/extensions/sweetalert2.all.min.js')}}"></script>
     <script src="{{asset('vendors/js/extensions/polyfill.min.js')}}"></script> --}}
 {{-- Torrexx | Code not mine --}}
-
 {{-- message --}}
   @if(Session::has('success'))
-  <script>
-    Swal.fire({
-      title: 'Success',
-      icon: 'success',
-      html: "{{ Session::get('success') }}",
-      timer: 1000,
-      timerProgressBar: true,
-      didOpen: () => {
-        Swal.showLoading()
-        const b = Swal.getHtmlContainer().querySelector('b')
-        timerInterval = setInterval(() => {
-          b.textContent = Swal.getTimerLeft()
-        }, 100)
-      },
-      willClose: () => {
-        clearInterval(timerInterval)
-      }
-    }).then((result) => {
-          if (result.dismiss === Swal.DismissReason.timer) {
-            location.reload();
-            console.log('I was closed by the timer')
-          }
-    });
-  </script>
+    <script>
+      Swal.fire({
+        title: 'Success',
+        icon: 'success',
+        html: "{{ Session::get('success') }}",
+      });
+    </script>
   @endif
 
   @if(Session::has('error'))
-  <script>
-    Swal.fire({
-      title: 'Error',
-      icon: 'error',
-      html: "{{ Session::get('error') }}",
-      timer: 1000,
-      timerProgressBar: true,
-      didOpen: () => {
-        Swal.showLoading()
-        const b = Swal.getHtmlContainer().querySelector('b')
-        timerInterval = setInterval(() => {
-          b.textContent = Swal.getTimerLeft()
-        }, 100)
-      },
-      willClose: () => {
-        clearInterval(timerInterval)
-      }
-    }).then((result) => {
-          if (result.dismiss === Swal.DismissReason.timer) {
-            location.reload();
-            console.log('I was closed by the timer')
-          }
-    });
-  </script>
+    <script>
+      Swal.fire({
+        title: 'Error',
+        icon: 'error',
+        html: "{{ Session::get('error') }}",
+      });
+    </script>
   @endif
 
   @if($errors->all())
-  <script>
-    Swal.fire({
-      title: 'Error',
-      icon: 'error',
-      html: "Please make sure fields are accounted for!",
-      timer: 1000,
-      timerProgressBar: true,
-      didOpen: () => {
-        Swal.showLoading()
-        const b = Swal.getHtmlContainer().querySelector('b')
-        timerInterval = setInterval(() => {
-          b.textContent = Swal.getTimerLeft()
-        }, 100)
-      },
-      willClose: () => {
-        clearInterval(timerInterval)
-      }
-    }).then((result) => {
-          if (result.dismiss === Swal.DismissReason.timer) {
-            location.reload();
-            console.log('I was closed by the timer')
-          }
-    });
-  </script>
+    <script>
+      Swal.fire({
+        title: 'Error',
+        icon: 'error',
+        html: "Please make sure fields are accounted for!",
+      });
+    </script>
   @endif
 {{-- end message --}}
 {{-- script --}}
@@ -387,22 +335,26 @@
         });
       // preview files
       // edit uploaded ppmp
-        $(document).on('click', '#edit-uploaded-ppmp', function(e) {
+        $(document).on('click', '#edit-uploaded-ppmp-btn', function(e) {
             e.preventDefault();
-            console.log($(this).data('id'));
             $('#edit-uploaded-ppmp').modal('show');
             // appending content
             $.ajax({
               headers: {
-                'X-CSRF-TOKEN': $("meta[name='csrf-token']").attr('content')
+                'X-CSRF-TOKEN': $("meta[name='csrf-token']").attr('content'),
+
               },
-              url: "{{ route('edit_ppmp') }}",
+              url: "{{ route('get_edit_ppmp') }}",
               method: 'GET',
               data: {
                 'id' : $(this).data('id')
               }, success: function(response) {
-                 console.log(response);
+                  console.log(response);
                   response['data'].forEach(element => {
+                    // console.log(element.id);
+                    // response id
+                      $('#default-id').val(element.id);
+                      // $('#default-id').val(`{{ (new AESCipher)->encrypt(`+ element.id +`) }}`);
                     // project category
                       $('#default-project-category').text(`{{ (new GlobalDeclare)->project_category(`+ element.project_category +`) }}`);
                       $('#default-project-category').val(`{{ (new AESCipher)->encrypt(`+ element.project_category +`) }}`);

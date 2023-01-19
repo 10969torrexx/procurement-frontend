@@ -654,7 +654,8 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
             # previw uploaded ppmp
             Route::get('view-uploaded-ppmp', [DepartmentController::class, 'view_uploaded_ppmp'])->name('view_ppmp');
             # edit upload
-            Route::get('edit-uploaded-ppmp', [DepartmentController::class, 'edit_uploaded_ppmp'])->name('edit_ppmp');
+            Route::get('get-uploaded-ppmp', [DepartmentController::class, 'get_edit_ppmp'])->name('get_edit_ppmp');
+            Route::post('edit-uploaded-ppmp', [DepartmentController::class, 'edit_uploaded_ppmp'])->name('edit_ppmp');
         /** END */
 
         /** Gettin data from the database */

@@ -619,16 +619,28 @@ class DepartmentController extends Controller
                 'project_category'  => ['required'],
                 'year_created'  =>  ['required'],
                 'file_name' => ['required'],
-                'signed_ppmp'   => ['required', 'mimes:pdf', 'max:2048']
+                'signed_ppmp'   => ['required', 'mimes:pdf, jpeg, jpg, png', 'max:2048']
             ]);
             if($request->hasFile('signed_ppmp')) {
                 $file = $request->file('signed_ppmp');
                 $extension = $request->file('signed_ppmp')->getClientOriginalExtension();
-                // $file_name = $file->getClientOriginalName();
+               
+                $is_valid = false;
+                # validate extension
+                    $allowed_extensions = ['pdf', 'jpeg', 'jpg', 'png'];
+                    for ($i = 0; $i < count($allowed_extensions) ; $i++) { 
+                       if($allowed_extensions[$i] == $extension) {
+                            $is_valid = true;
+                       }
+                    }
+                    if($is_valid == false) {
+                        return back()->with([
+                            'error' => 'Invalid file format!'
+                        ]);
+                    }
+                # end
                 $file_name = (new GlobalDeclare)->project_category((new AESCipher)->decrypt($request->project_category)) .'-'. time();
-                // $destination_path = '/public/signed_ppmp/';
                 $destination_path = env('APP_NAME').'\\department_upload\\signed_ppmp\\';
-
                 if (!\Storage::exists($destination_path)) {
                     \Storage::makeDirectory($destination_path);
                 }
@@ -659,7 +671,7 @@ class DepartmentController extends Controller
                 ]);
             }
         } catch (\Throwable $th) {
-            throw $th;
+            // throw $th;
             return view('pages.error-500');
         }
     }
@@ -741,10 +753,10 @@ class DepartmentController extends Controller
         }
     }
 
-    /* Edit Uploaded PPMP
-     * - edit uploaded ppmp
+    /* GET Edit Uploaded PPMP
+     * - get uploaded ppmp for edit feature
      */
-    public function edit_uploaded_ppmp(Request $request) {
+    public function get_edit_ppmp(Request $request) {
         try {
             $response = \DB::table('signed_ppmp')
                 ->where('employee_id', session('employee_id'))
@@ -762,6 +774,67 @@ class DepartmentController extends Controller
         } catch (\Throwable $th) {
             return view('pages.error-500');
             throw $th;
+        }
+    }
+
+    /* GET Edit Uploaded PPMP
+     * - edit / update uploaded ppmp
+     */
+    public function edit_uploaded_ppmp(Request $request) {
+        try {
+            $validate = Validator::make($request->all(), [
+                'project_category'  => ['required'],
+                'year_created'  =>  ['required'],
+                'file_name' => ['required'],
+                'signed_ppmp'   => ['required', 'mimes:pdf, jpeg, jpg, png', 'max:2048']
+            ]);
+            if($request->hasFile('signed_ppmp')) {
+                $file = $request->file('signed_ppmp');
+                $extension = $request->file('signed_ppmp')->getClientOriginalExtension();
+                $is_valid = false;
+                # validate extension
+                    $allowed_extensions = ['pdf', 'jpeg', 'jpg', 'png'];
+                    for ($i = 0; $i < count($allowed_extensions) ; $i++) { 
+                       if($allowed_extensions[$i] == $extension) {
+                            $is_valid = true;
+                       }
+                    }
+                    if($is_valid == false) {
+                        return back()->with([
+                            'error' => 'Invalid file format!'
+                        ]);
+                    }
+                # end
+                $file_name = (new GlobalDeclare)->project_category((new AESCipher)->decrypt($request->project_category)) .'-'. time();
+                $destination_path = env('APP_NAME').'\\department_upload\\signed_ppmp\\';
+                if (!\Storage::exists($destination_path)) {
+                    \Storage::makeDirectory($destination_path);
+                }
+                $file->storeAs($destination_path, $file_name.'.'.$extension);
+                // \Storage::put($destination_path, $file_name.'.'.$extension);
+                $file->move('storage/'. $destination_path, $file_name.'.'.$extension);
+                \DB::table('signed_ppmp')
+                ->where('id', $request->id)
+                ->update([
+                    'year_created'   => (new AESCipher)->decrypt($request->year_created),
+                    'project_category'  => (new AESCipher)->decrypt($request->project_category),
+                    'file_name'   => $request->file_name,
+                    'file_directory'    => $destination_path .''. $file_name.'.'.$extension,
+                    'signed_ppmp' =>  $file_name.'.'.$extension,
+                    'updated_at'    => Carbon::now()
+                ]);
+                # storing data to signed_ppmp table
+                return back()->with([
+                    'success' => 'PPMP uploaded successfully!'
+                ]);
+            } else {
+                return back()->with([
+                    'error' => 'Please fill the form accordingly!'
+                ]);
+            }
+        } catch (\Throwable $th) {
+            // throw $th;
+            return view('pages.error-500');
         }
     }
 
