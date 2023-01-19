@@ -1,9 +1,5 @@
-    $(document).on('click', '.par_add', function (e) {
-    // console.log("ghsdcg");
-    // $('.editSupplierName').val("");
-    // $('.editAddress').val("");
-    // $('.editContactNumber').val("");
-    // $('.editDescription').val("");
+    $(document).on('click', '.parClosed', function (e) {
+      location.reload();
   });
   
   $(document).on('click', '.parSave', function (e) {
@@ -29,9 +25,9 @@
       // 'id': $(this).val(),
     }
     console.log(data);
-    if(data.EmployeeName == "" || data.Type == "" || data.FundCluster == "" || data.ItemName == "" || 
-       data.Description == "" || data.Quantity == "" || data.Unit == "" || data.UnitPrice == "" || 
-       data.Issuedby == "" || data.DateIssued == "" || data.DateAcquired == "" || data.DateAcquired == "" || 
+    if(data.EmployeeName == "Choose..." || data.Type == "" || data.FundCluster == "Choose..." || data.ItemName == "" || 
+       data.Description == "" || data.Quantity == "" || data.Unit == "Choose..." || data.UnitPrice == "" || 
+       data.Issuedby == "Choose..." || data.DateIssued == "" || data.DateAcquired == "" || data.DateAcquired == "" || 
        data.PONumber == "" || data.PANumber == "" ||data.DateReceived == "" || data.Supplier == "" /* || data.Estimatedusefullife == ""   */ ){
       Swal.fire('Complete the needed data', '', 'info')
     }else{
@@ -69,25 +65,26 @@
                 /* Read more about handling dismissals below */
                 if (result.dismiss === Swal.DismissReason.timer) {
                   // location.reload();
-                  // $('#allmodal').
+                  // $('#allModal').modal('hide');
+                  // $('#allModal').modal('show');
                   console.log('I was closed by the timer')
                 }
               })
-              $(".EmployeeName").text("Choose..."),
-              $('.FundCluster').text(""),
-              $('.ItemName').text(""),
-              $('.Description').text(""),
-              $('.Quantity').text(""),
-              $('.Unit').text(""),
-              $('.UnitPrice').text(""),
-              $('.Issuedby').text(""),
-              $('.DateIssued').text(""),
-              $('.DateAcquired').text(""),
-              $('.PANumber').text(""),
-              $('.PONumber').text(""),
-              $('.DateReceived').text(""),
-              $('.Supplier').text(""),
-              $('.Estimatedusefullife').text("")
+              $(".EmployeeName").val("Choose...");
+              $('.FundCluster').val("Choose...");
+              $('.ItemName').val("");
+              $('.Description').val("");
+              $('.Quantity').val("");
+              $('.Unit').val("Choose...");
+              $('.UnitPrice').val("");
+              $('.Issuedby').val("");
+              $('.DateIssued').val("");
+              $('.DateAcquired').val("");
+              $('.PANumber').val("");
+              $('.PONumber').val("");
+              $('.DateReceived').val("");
+              $('.Supplier').val("");
+              $('.Estimatedusefullife').val("");
           }else if(response['status'] == 400){
             Swal.fire({
               icon: 'error',
@@ -587,6 +584,7 @@ $(document).on('click', '.deletefinal', function (e) {
 
 $(document).on('click', '.transferto', function (e) {
   var id = $(this).attr('data-id');
+  console.log(id);
   $('.transfertoEmployeeName').html("");
   $.ajaxSetup({
     headers: {

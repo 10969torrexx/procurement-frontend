@@ -20,6 +20,7 @@ class ICSController extends Controller
      */
 
     public function index(){
+        $check = 1;
         // $propertys = DB::table('item as i')
         //     ->select('i.*',DB::raw("Concat(e2.FirstName , ' ', e2.LastName) as IssuedBy"), 's.SupplierName as SupplierNameSTR')
         //     ->leftjoin('employee as e2','i.IssuedBy','=','e2.id')
@@ -46,7 +47,7 @@ class ICSController extends Controller
             ->where("p.propertytype", "ICS")
             ->where("p.campus", session('campus'))
             ->orderBy('p.DateIssued', "desc")
-            ->get();
+            ->paginate(10);
             
         $unit = DB::table("unit_of_measurements")
             ->whereNull("deleted_at")
@@ -75,7 +76,7 @@ class ICSController extends Controller
             ["link" => "/", "name" => "Home"],["link" => "#", "name" => "Property Custodian"]
         ];
         
-        return view('pages.supplycustodian.ics.index',compact('propertys'/* ,'propertysubs' */,'users','issuedby', 'supplier','unit'),[
+        return view('pages.supplycustodian.ics.index',compact('propertys'/* ,'propertysubs' */,'check','users','issuedby', 'supplier','unit'),[
             'pageConfigs'=>$pageConfigs,
             'breadcrumbs'=>$breadcrumbs,
         ]);
@@ -161,6 +162,115 @@ class ICSController extends Controller
     
     }
 
+    public function search(Request $request){
+       try {
+         // $search = $request->Search;
+         $employees = "";
+         $employee = DB::table("users")
+             ->where("name",$request->Search)
+             ->whereNull("deleted_at")
+             ->where("campus", session('campus'))
+             ->get();
+             // dd($employee);
+         if(count($employee)>0){
+             foreach($employee as $employee){
+                 $employees = $employee->id;
+             }
+         }else{
+             $employees = $request->Search;
+         }
+ 
+         $stores = "";
+         $store = DB::table("store")
+             ->where("SupplierName",$request->Search)
+             ->whereNull("deleted_at")
+             ->where("campus", session('campus'))
+             ->get();
+             // dd($employee);
+         if(count($store)>0){
+             foreach($store as $store){
+                 $stores = $store->id;
+             }
+         }else{
+             $stores = $request->Search;
+         }
+         $check = 2;/* DB::table("property as p")
+             ->select('p.*','u.name','s.SupplierName','um.unit_of_measurement as unit')
+             ->join('users as u','u.id','=','p.EmployeeID')
+             ->join('store as s','s.id','=','p.StoreName')
+             ->join('unit_of_measurements as um','um.id','=','p.Unit')
+             ->whereNull('p.deleted_at')
+             ->where("p.propertytype", "PAR")
+             ->where("p.campus", session('campus'))
+             ->orderBy('p.DateIssued', "desc")
+             ->get(); */
+ 
+         $propertys = DB::table("property as p")
+             ->select('p.*','u.name','s.SupplierName','um.unit_of_measurement as unit')
+             ->join('users as u','u.id','=','p.EmployeeID')
+             ->join('store as s','s.id','=','p.StoreName')
+             ->join('unit_of_measurements as um','um.id','=','p.Unit')
+             ->where("p.propertytype", "ICS")
+             ->whereNull("p.deleted_at")
+             ->where(function ($query) use ($request,$stores,$employees){
+                 $query->where("p.PONumber",$request->Search)
+                    ->orwhere("p.PropertyNumber",$request->Search)
+                    ->orwhere("p.IssuedBy",$employees)
+                    ->orwhere("p.PARNo",$request->Search)
+                    ->orwhere("p.StoreName",$stores)
+                    ->orwhere("p.Unit",$request->Search)
+                    ->orwhere("p.ItemName",$request->Search)
+                    ->orwhere("p.EmployeeID",$employees);
+              })
+             // ->where("p.PONumber",$request->Search)
+             // ->orwhere("p.PropertyNumber",$request->Search)
+             // // ->orwhere("p.IssuedBy",$request->Search)
+             // ->orwhere("p.PARNo",$request->Search)
+             // ->orwhere("p.StoreName",$stores)
+             // ->orwhere("p.Unit",$request->Search)
+             // ->orwhere("p.ItemName",$request->Search)
+             // ->orwhere("p.EmployeeID",$employees)
+             ->where("p.campus", session('campus'))
+             ->orderBy('p.DateIssued', "desc")
+             ->paginate(10);
+ 
+             // dd($propertys);
+ 
+         $supplier = DB::table('store')
+         ->whereNull('deleted_at')
+         ->where("campus", session('campus'))
+         // ->where("campus",session('campus'))
+         ->get();
+ 
+         $users = DB::table("users")
+             ->where("campus",session('campus'))
+             ->whereNull("username")
+             ->whereNull("deleted_at")
+             ->get();
+ 
+         $unit = DB::table("unit_of_measurements")
+             ->whereNull("deleted_at")
+             ->get();
+ 
+         $issuedby = DB::table("users")
+             ->where("campus",session('campus'))
+             ->whereNull("deleted_at")
+             ->whereNull("username")
+             ->get();
+ 
+         $pageConfigs = ['pageHeader' => true];
+         $breadcrumbs = [
+             ["link" => "/", "name" => "Home"],["link" => "#", "name" => "Property Custodian"]
+         ];
+         
+         return view('pages.supplycustodian.ics.index',compact('propertys'/* ,'propertysubs' */,'check','users','issuedby', 'supplier','unit'),[
+             'pageConfigs'=>$pageConfigs,
+             'breadcrumbs'=>$breadcrumbs,
+         ]);
+       } catch (\Throwable $th) {
+        throw $th;
+       }
+    }
     public function finalize_ics(Request $request){
         $aes = new AESCipher();
         $global = new GlobalDeclare();
@@ -532,6 +642,7 @@ class ICSController extends Controller
                     'Quantity'              => $request->Quantity,
                     'Unit'                  => $check->Unit,
                     'ItemName'              => $check->ItemName,
+                    'ItemStatus'            => 1,
                     'Description'           => $check->Description,
                     'UnitPrice'             => $check->UnitPrice,
                     'TotalAmount'           => ($request->Quantity * $check->UnitPrice),
@@ -561,7 +672,7 @@ class ICSController extends Controller
             ->where("id",$request->id)
             ->update([
                 'Quantity'              => $calc,
-                'remarks'               => $request->Remarks,
+                // 'remarks'               => $request->Remarks,
                 'updated_at'            => Carbon::now(),
             ]);
         }

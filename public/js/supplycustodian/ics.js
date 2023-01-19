@@ -1,9 +1,5 @@
-$(document).on('click', '.par_add', function (e) {
-    // console.log("ghsdcg");
-    // $('.editSupplierName').val("");
-    // $('.editAddress').val("");
-    // $('.editContactNumber').val("");
-    // $('.editDescription').val("");
+$(document).on('click', '.ics_closed', function (e) {
+  location.reload();
   });
   
   $(document).on('click', '.parSave', function (e) {
@@ -29,9 +25,9 @@ $(document).on('click', '.par_add', function (e) {
       // 'id': $(this).val(),
     }
     console.log(data);
-    if(data.EmployeeName == "" || data.Type == "" || data.FundCluster == "" || data.ItemName == "" || 
-       data.Description == "" || data.Quantity == "" || data.Unit == "" || data.UnitPrice == "" || 
-       data.Issuedby == "" || data.DateIssued == "" || data.DateAcquired == "" || data.DateAcquired == "" || 
+    if(data.EmployeeName == "Choose..." || data.Type == "" || data.FundCluster == "Choose..." || data.ItemName == "" || 
+       data.Description == "" || data.Quantity == "" || data.Unit == "Choose..." || data.UnitPrice == "" || 
+       data.Issuedby == "Choose..." || data.DateIssued == "" || data.DateAcquired == "" || data.DateAcquired == "" || 
        data.PONumber == "" || data.ICSNumber == "" || data.DateReceived == "" || data.Supplier == "" /* || data.Estimatedusefullife == "" */   ){
       Swal.fire('Complete the needed data', '', 'info')
     }else{
@@ -68,10 +64,25 @@ $(document).on('click', '.par_add', function (e) {
               }).then((result) => {
                 /* Read more about handling dismissals below */
                 if (result.dismiss === Swal.DismissReason.timer) {
-                  location.reload();
+                  // location.reload();
                   console.log('I was closed by the timer')
                 }
               })
+              $(".EmployeeName").val("Choose...");
+              $('.FundCluster').val("Choose...");
+              $('.ItemName').val("");
+              $('.Description').val("");
+              $('.Quantity').val("");
+              $('.Unit').val("Choose...");
+              $('.UnitPrice').val("");
+              $('.Issuedby').val("");
+              $('.DateIssued').val("");
+              $('.DateAcquired').val("");
+              $('.ICSNumber').val("");
+              $('.PONumber').val("");
+              $('.DateReceived').val("");
+              $('.Supplier').val("");
+              $('.Estimatedusefullife').val("");
           }else if(response['status'] == 400){
             Swal.fire({
               icon: 'error',

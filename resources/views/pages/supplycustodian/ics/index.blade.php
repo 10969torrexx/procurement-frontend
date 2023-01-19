@@ -43,12 +43,34 @@
                                 
                             </div>
                             <div class="table-responsive">
+                                <form action="{{ route('searchICS') }}" method="post">
+                                    @csrf
+                                    <div class="{{-- col-md-12 text-right  --}} mb-1 row" >
+                                            {{-- <input type="text" name="" id="" class="col-sm-2 " placeholder="Search">
+                                            <button type="button"  class="btn btn-success col-md-1 mt-1 ppmpDone" >Done</button> --}}
+                                            <div class="col-sm-4 text-left" {{-- style="background: black" --}}> 
+                                                @if($check != 1 )
+                                                    <a href="{{ route('ics_index') }}" ><button type="button"  class="btn btn-outline-primary col-md-3 " >Show All</button></a>
+                                                @else
+                                                @endif
+                                            </div>
+                                            <div class="col-sm-4"></div>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control Search" name="Search" placeholder="Search" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                                <div class="input-group-append">
+                                                <button class="btn btn-success" type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+                                                </div>
+                                            </div>
+                                    </div>
+                                </form>
                                 <table class="table nowrap zero-configuration table-sm">
                                     <thead>
                                         <tr>
-                                            <th>Action</th>
+                                            <th class="col-sm-1">Action</th>
                                             <th>ICS #</th>
                                             <th>Name</th>
+                                            {{-- <th>Issued To</th> --}}
+                                            {{-- <th>Issued By</th> --}}
                                             <th>Fund Cluster</th>
                                             <th>PO #</th>
                                             <th>Date Acquired</th>
@@ -89,16 +111,18 @@
                                                                 </div>    
                                                                 
                                                                 @else
-                                                                <a href = "#" class="transferto" {{-- data-flag = "<?=$aes->encrypt('property')?>" data-button = "<?=$aes->encrypt('transfer')?>" --}} data-id = "<?=$aes->encrypt($property->id)?>" data-toggle = "modal" data-target = "#transferModal" title = "Transfer of item"><i class="bx bx-transfer-alt mr-1"></i></a>
-                                                                <a href = "#" class="finaldeleteics" {{-- data-flag = "<?=$aes->encrypt('property')?>" data-button = "<?=$aes->encrypt('dispose')?>" --}} data-id = "<?=$aes->encrypt($property->id)?>" data-toggle = "modal" data-target = "#deleteModalics" title = "Dispose of item"><i class="bx bx-trash mr-1 text-danger"></i></a>
-                                                                <a href = "#" class="print" data-id = "<?=$aes->encrypt($property->id)?>" data-toggle = "modal" data-target = "#printModalics"><i class="bx bx-printer text-success"></i></a>
-
+                                                                <div class="ml-1">
+                                                                    <a href = "#" class="transferto" {{-- data-flag = "<?=$aes->encrypt('property')?>" data-button = "<?=$aes->encrypt('transfer')?>" --}} data-id = "<?=$aes->encrypt($property->id)?>" data-toggle = "modal" data-target = "#transferModal" title = "Transfer of item"><i class="bx bx-transfer-alt mr-1"></i></a>
+                                                                    <a href = "#" class="finaldeleteics" {{-- data-flag = "<?=$aes->encrypt('property')?>" data-button = "<?=$aes->encrypt('dispose')?>" --}} data-id = "<?=$aes->encrypt($property->id)?>" data-toggle = "modal" data-target = "#deleteModalics" title = "Dispose of item"><i class="bx bx-trash mr-1 text-danger"></i></a>
+                                                                    <a href = "#" class="print" data-id = "<?=$aes->encrypt($property->id)?>" data-toggle = "modal" data-target = "#printModalics"><i class="bx bx-printer text-success"></i></a>
+                                                                </div>
                                                                 
                                                             @endif 
                                                         </td>
                                                         {{-- <td>{{$par}}</td> --}}
                                                         <td>{{$property->PARNo}}</td>
                                                         <td>{{$property->name}}</td>
+                                                        {{-- <td>{{$property->name}}</td> --}}
                                                         <td>{{$property->FundCluster}}</td>  
                                                         <td>{{$property->PONumber}}</td>  
                                                         <td>{{$property->DateAcquired}}</td> 
@@ -107,7 +131,15 @@
                                                         <td>{{$property->Quantity . " " .$property->unit}}</td>
                                                         <td>{{number_format(str_replace(",","",$property->UnitPrice),2,'.',',') }}</td>
                                                         <td>{{number_format(str_replace(",","",$property->UnitPrice)*$property->Quantity,2,'.',',') }}</td>
-                                                        <td>{{$property->remarks}}</td>
+                                                        <td>
+                                                            <?php $transfer = "";
+                                                             if($property->ItemStatus == 1){
+                                                                echo $property->remarks.' ( Transfered )';
+                                                            }else{
+                                                                echo $property->remarks;
+                                                            }
+                                                            ?>
+                                                        </td>
                                                     </tr>
                                                     <?php $ctr = $ctr + 1 ?>
                                                 @endif
@@ -115,6 +147,7 @@
                                         @endif
                                     </tbody>
                                 </table>
+                                {{ $propertys->onEachSide(1)->links() }}
                             </div>
                         @endif
                     </div>
@@ -138,9 +171,9 @@
 {{-- <script src="{{asset('vendors/js/extensions/swiper.min.js')}}"></script> --}}
 
 
-<script src="{{asset('vendors/js/tables/datatable/datatables.min.js')}}"></script>
+{{-- <script src="{{asset('vendors/js/tables/datatable/datatables.min.js')}}"></script>
 <script src="{{asset('vendors/js/tables/datatable/dataTables.bootstrap4.min.js')}}"></script>
-<script src="{{asset('vendors/js/tables/datatable/dataTables.buttons.min.js')}}"></script>
+<script src="{{asset('vendors/js/tables/datatable/dataTables.buttons.min.js')}}"></script> --}}
 {{-- <script src="{{asset('vendors/js/tables/datatable/buttons.html5.min.js')}}"></script>
 <script src="{{asset('vendors/js/tables/datatable/buttons.print.min.js')}}"></script>
 <script src="{{asset('vendors/js/tables/datatable/buttons.bootstrap.min.js')}}"></script>

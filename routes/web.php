@@ -564,6 +564,7 @@ Route::group(['prefix' => 'supply_custodian','middleware' => ['authuser']], func
 
     Route::get('/property','SupplyCustodian\PropertyController@index');
     Route::post('/assign-par','SupplyCustodian\PropertyController@assign_par')->name('assign-par');
+    Route::post('/searchPAR','SupplyCustodian\PropertyController@search')->name('searchPAR');
     Route::post('/finalize-par','SupplyCustodian\PropertyController@finalize_par')->name('finalize-par');
     Route::post('/delete-par','SupplyCustodian\PropertyController@delete_par')->name('delete-par');
     Route::post('/edit-par','SupplyCustodian\PropertyController@edit_par')->name('edit-par');
@@ -578,20 +579,21 @@ Route::group(['prefix' => 'supply_custodian','middleware' => ['authuser']], func
     Route::post('/additem-par','SupplyCustodian\PropertyController@additem_par')->name('additem-par');
 
     
-    Route::get('/ics','SupplyCustodian\ICSController@index');
-    Route::post('/assign-ics','SupplyCustodian\icsController@assign_ics')->name('assign-ics');
-    Route::post('/finalize-ics','SupplyCustodian\icsController@finalize_ics')->name('finalize-ics');
-    Route::post('/delete-ics','SupplyCustodian\icsController@delete_ics')->name('delete-ics');
-    Route::post('/finaldelete-ics','SupplyCustodian\icsController@finaldelete_ics')->name('finaldelete-ics');
-    Route::post('/transfer-ics','SupplyCustodian\icsController@transfer_ics')->name('transfer-ics');
-    Route::post('/submittransfer-ics','SupplyCustodian\icsController@submittransfer_ics')->name('submittransfer-ics');
-    Route::post('/print-ics','SupplyCustodian\icsController@print_ics')->name('print-ics');
-    Route::post('/printics','SupplyCustodian\icsController@print')->name('printics');
-    Route::post('/submitdelete-ics','SupplyCustodian\icsController@submitdelete_ics')->name('submitdelete-ics');
-    Route::post('/edit-ics','SupplyCustodian\icsController@edit_ics')->name('edit-ics');
-    Route::post('/submitEdit-ics','SupplyCustodian\icsController@submitEdit_ics')->name('submitEdit-ics');
-    Route::post('/submitadd-ics','SupplyCustodian\icsController@submitadd_ics')->name('submitadd-ics');
-    Route::post('/additem-ics','SupplyCustodian\icsController@additem_ics')->name('additem-ics');
+    Route::get('/ics','SupplyCustodian\ICSController@index')->name('ics_index');
+    Route::post('/searchICS','SupplyCustodian\ICSController@search')->name('searchICS');
+    Route::post('/assign-ics','SupplyCustodian\ICSController@assign_ics')->name('assign-ics');
+    Route::post('/finalize-ics','SupplyCustodian\ICSController@finalize_ics')->name('finalize-ics');
+    Route::post('/delete-ics','SupplyCustodian\ICSController@delete_ics')->name('delete-ics');
+    Route::post('/finaldelete-ics','SupplyCustodian\ICSController@finaldelete_ics')->name('finaldelete-ics');
+    Route::post('/transfer-ics','SupplyCustodian\ICSController@transfer_ics')->name('transfer-ics');
+    Route::post('/submittransfer-ics','SupplyCustodian\ICSController@submittransfer_ics')->name('submittransfer-ics');
+    Route::post('/print-ics','SupplyCustodian\ICSController@print_ics')->name('print-ics');
+    Route::post('/printics','SupplyCustodian\ICSController@print')->name('printics');
+    Route::post('/submitdelete-ics','SupplyCustodian\ICSController@submitdelete_ics')->name('submitdelete-ics');
+    Route::post('/edit-ics','SupplyCustodian\ICSController@edit_ics')->name('edit-ics');
+    Route::post('/submitEdit-ics','SupplyCustodian\ICSController@submitEdit_ics')->name('submitEdit-ics');
+    Route::post('/submitadd-ics','SupplyCustodian\ICSController@submitadd_ics')->name('submitadd-ics');
+    Route::post('/additem-ics','SupplyCustodian\ICSController@additem_ics')->name('additem-ics');
 
 
     Route::get('/supplier','SupplyCustodian\SupplierController@index');

@@ -2,8 +2,8 @@
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <h5 class="modal-title" id="exampleModalLongTitle">ICS Property</h5>
+          <button type="button" class="close ics_closed" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -30,7 +30,7 @@
                     <div class="form-group">
                         <label for="FundCluster">Fund Cluster *</label>
                         <select name="FundCluster" class="form-control FundCluster" id="FundCluster" required>
-                            <option value = "0"></option>
+                            <option selected>Choose...</option>
                             <option value="RAF">Regular Agency Fund</option>
                             <option value = "IGF" >Internally Generated Funds</option>
                             <option value="BRF" >Business Related Funds</option>
@@ -159,7 +159,7 @@
             </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-secondary ics_closed" data-dismiss="modal">Close</button>
           <button type="button" class="btn btn-primary parSave">Save</button>
         </div>
       </div>

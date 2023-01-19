@@ -29,23 +29,17 @@ class PropertyController extends Controller
     // }
     
     public function index(){
-        // $propertys = DB::table('item as i')
-        //     ->select('i.*',DB::raw("Concat(e2.FirstName , ' ', e2.LastName) as IssuedBy"), 's.SupplierName as SupplierNameSTR')
-        //     ->leftjoin('employee as e2','i.IssuedBy','=','e2.id')
-        //     ->leftjoin('store as s','i.StoreName','=','s.id')
-        //     ->whereNull('i.deleted_at')
-        //     ->where("propertytype", "PAR")
-        //     ->orderBy('DateIssued', "desc")
-        //     ->get();
+        $check = 1;/* DB::table("property as p")
+            ->select('p.*','u.name','s.SupplierName','um.unit_of_measurement as unit')
+            ->join('users as u','u.id','=','p.EmployeeID')
+            ->join('store as s','s.id','=','p.StoreName')
+            ->join('unit_of_measurements as um','um.id','=','p.Unit')
+            ->whereNull('p.deleted_at')
+            ->where("p.propertytype", "PAR")
+            ->where("p.campus", session('campus'))
+            ->orderBy('p.DateIssued', "desc")
+            ->get(); */
 
-        // $propertysubs = DB::table('item as i')
-        //     ->select("isub.*",DB::raw("Concat(e1.FirstName , ' ', e1.LastName) as EmployeeName"))
-        //     ->leftjoin('items_sub as isub','i.id','=','isub.ItemID')
-        //     ->leftjoin('employee as e1','isub.EmployeeID','=','e1.id')
-        //     ->whereNull('isub.deleted_at')
-        //     ->where("i.propertytype", "PAR")
-        //     ->get();
-            
         $propertys = DB::table("property as p")
             ->select('p.*','u.name','s.SupplierName','um.unit_of_measurement as unit')
             ->join('users as u','u.id','=','p.EmployeeID')
@@ -55,7 +49,7 @@ class PropertyController extends Controller
             ->where("p.propertytype", "PAR")
             ->where("p.campus", session('campus'))
             ->orderBy('p.DateIssued', "desc")
-            ->get();
+            ->paginate(10);
             // dd($propertys );
 
         $supplier = DB::table('store')
@@ -85,7 +79,7 @@ class PropertyController extends Controller
             ["link" => "/", "name" => "Home"],["link" => "#", "name" => "Property Custodian"]
         ];
         
-        return view('pages.supplycustodian.property.index',compact('propertys'/* ,'propertysubs' */,'users','issuedby', 'supplier','unit'),[
+        return view('pages.supplycustodian.property.index',compact('propertys'/* ,'propertysubs' */,'check','users','issuedby', 'supplier','unit'),[
             'pageConfigs'=>$pageConfigs,
             'breadcrumbs'=>$breadcrumbs,
         ]);
@@ -99,11 +93,13 @@ class PropertyController extends Controller
         $check = DB::table("property")
             ->where("PONumber",$request->PONumber)
             ->where("propertytype", "PAR")
+            ->whereNull("deleted_at")
             ->where("campus", session('campus'))
             ->get();
 
         $check2 = DB::table("property")
             ->where("PARNo",$request->PANumber)
+            ->whereNull("deleted_at")
             ->where("propertytype", "PAR")
             ->where("campus", session('campus'))
             ->get();
@@ -171,6 +167,111 @@ class PropertyController extends Controller
             }
         }
     
+    }
+    public function search(Request $request){
+        // $search = $request->Search;
+        $employees = "";
+        $employee = DB::table("users")
+            ->where("name",$request->Search)
+            ->whereNull("deleted_at")
+            ->where("campus", session('campus'))
+            ->get();
+            // dd($employee);
+        if(count($employee)>0){
+            foreach($employee as $employee){
+                $employees = $employee->id;
+            }
+        }else{
+            $employees = $request->Search;
+        }
+
+        $stores = "";
+        $store = DB::table("store")
+            ->where("SupplierName",$request->Search)
+            ->whereNull("deleted_at")
+            ->where("campus", session('campus'))
+            ->get();
+            // dd($employee);
+        if(count($store)>0){
+            foreach($store as $store){
+                $stores = $store->id;
+            }
+        }else{
+            $stores = $request->Search;
+        }
+        $check = 2;/* DB::table("property as p")
+            ->select('p.*','u.name','s.SupplierName','um.unit_of_measurement as unit')
+            ->join('users as u','u.id','=','p.EmployeeID')
+            ->join('store as s','s.id','=','p.StoreName')
+            ->join('unit_of_measurements as um','um.id','=','p.Unit')
+            ->whereNull('p.deleted_at')
+            ->where("p.propertytype", "PAR")
+            ->where("p.campus", session('campus'))
+            ->orderBy('p.DateIssued', "desc")
+            ->get(); */
+
+        $propertys = DB::table("property as p")
+            ->select('p.*','u.name','s.SupplierName','um.unit_of_measurement as unit')
+            ->join('users as u','u.id','=','p.EmployeeID')
+            ->join('store as s','s.id','=','p.StoreName')
+            ->join('unit_of_measurements as um','um.id','=','p.Unit')
+            ->where("p.propertytype", "PAR")
+            ->whereNull("p.deleted_at")
+            ->where(function ($query) use ($request,$stores,$employees){
+                $query->where("p.PONumber",$request->Search)
+                   ->orwhere("p.PropertyNumber",$request->Search)
+                //    ->orwhere("p.IssuedBy",$employees)
+                   ->orwhere("p.PARNo",$request->Search)
+                   ->orwhere("p.StoreName",$stores)
+                   ->orwhere("p.Unit",$request->Search)
+                   ->orwhere("p.ItemName",$request->Search)
+                   ->orwhere("p.EmployeeID",$employees);
+             })
+            // ->where("p.PONumber",$request->Search)
+            // ->orwhere("p.PropertyNumber",$request->Search)
+            // // ->orwhere("p.IssuedBy",$request->Search)
+            // ->orwhere("p.PARNo",$request->Search)
+            // ->orwhere("p.StoreName",$stores)
+            // ->orwhere("p.Unit",$request->Search)
+            // ->orwhere("p.ItemName",$request->Search)
+            // ->orwhere("p.EmployeeID",$employees)
+            ->where("p.campus", session('campus'))
+            ->orderBy('p.DateIssued', "desc")
+            ->paginate(10);
+
+            // dd($propertys);
+
+        $supplier = DB::table('store')
+        ->whereNull('deleted_at')
+        ->where("campus", session('campus'))
+        // ->where("campus",session('campus'))
+        ->get();
+
+        $users = DB::table("users")
+            ->where("campus",session('campus'))
+            ->whereNull("username")
+            ->whereNull("deleted_at")
+            ->get();
+
+        $unit = DB::table("unit_of_measurements")
+            ->whereNull("deleted_at")
+            ->get();
+
+        $issuedby = DB::table("users")
+            ->where("campus",session('campus'))
+            ->whereNull("deleted_at")
+            ->whereNull("username")
+            ->get();
+
+        $pageConfigs = ['pageHeader' => true];
+        $breadcrumbs = [
+            ["link" => "/", "name" => "Home"],["link" => "#", "name" => "Property Custodian"]
+        ];
+        
+        return view('pages.supplycustodian.property.index',compact('propertys'/* ,'propertysubs' */,'check','users','issuedby', 'supplier','unit'),[
+            'pageConfigs'=>$pageConfigs,
+            'breadcrumbs'=>$breadcrumbs,
+        ]);
     }
 
     public function finalize_par(Request $request){
@@ -441,7 +542,8 @@ class PropertyController extends Controller
 
     public function transfer_par(Request $request){
         // dd($request->all());
-        $aes = new AESCipher();
+        try {
+            $aes = new AESCipher();
         $global = new GlobalDeclare();
         $id = $aes->decrypt($request->id);
         // dd($request->Employee_id);
@@ -473,6 +575,9 @@ class PropertyController extends Controller
         //     'data1' => $par,
         //     'data1' => $users,
         // ]); 
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 
     public function submittransfer_par(Request $request){
@@ -499,6 +604,7 @@ class PropertyController extends Controller
                     'Quantity'              => $request->Quantity,
                     'Unit'                  => $check->Unit,
                     'ItemName'              => $check->ItemName,
+                    'ItemStatus'            => 1,
                     'Description'           => $check->Description,
                     'UnitPrice'             => $check->UnitPrice,
                     'TotalAmount'           => ($request->Quantity * $check->UnitPrice),
@@ -528,7 +634,7 @@ class PropertyController extends Controller
             ->where("id",$request->id)
             ->update([
                 'Quantity'              => $calc,
-                'remarks'               => $request->Remarks,
+                // 'remarks'               => $request->Remarks,
                 'updated_at'            => Carbon::now(),
             ]);
         }
