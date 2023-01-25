@@ -734,7 +734,7 @@ $(document).on('click', '.endorse', function (e) {
   var data = {
     'year' :  $(".Year").val(),
     'endorse' : $(".endorse").val(),
-    'category' : $(".project_category").val()
+    'category' : $("#project_category").val()
   }
   console.log(data);
   $.ajaxSetup({
@@ -800,8 +800,9 @@ $(document).on('click', '.submittopresident', function (e) {
   var data = {
     'year' :  $(".Year").val(),
     'submit' : $(this).val(),
-    'category' : $(".project_category").val()
+    'category' : $(this).attr("data-id")
   }
+  console.log(data);
   $.ajaxSetup({
     headers: {
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -880,6 +881,54 @@ $(document).on('click', '.univ_wide', function (e) {
     success: function (response) {
     }
   })
+});
+
+
+$(document).on('click', '.print', function (e) {
+  var data = {
+      'year' :  $(".Year").val(),
+      'campusCheck' : $(".campusCheck").val(),
+      'category' : $(".project_category").val(),
+      'app_type' : $(".app_type").val(),
+      // 'value' : $(this).val()
+  };
+console.log(data);
+$.ajax({
+type: 'post',
+url: "app-non-cse-print",
+headers: {'X-CSRF-TOKEN' : $('meta[name="csrf-token"]').attr('content')},
+data: data,
+success: function(viewContent) {
+console.log(viewContent);
+  if(viewContent){
+      var css = '@page { size: Legal landscape; } .campus{background-color:blue;}',
+      head = document.head || document.getElementsByTagName('head')[0],
+      style = document.createElement('style');
+
+      style.type = 'text/css';
+      style.media = 'print';
+
+      if (style.styleSheet){
+      style.styleSheet.cssText = css;
+      } else {
+      style.appendChild(document.createTextNode(css));
+      }
+
+      head.appendChild(style);
+
+        var originalContents = document.body.innerHTML;
+        document.body.innerHTML = viewContent;
+        window.print();
+        document.body.innerHTML = originalContents;
+        location.reload();
+  }else{
+      toastr.error('Can\'t print. Error!')
+  }
+},
+error: function (data){
+  console.log(data);
+}
+});
 });
 
 //trigger edit new recommendingapproval modal

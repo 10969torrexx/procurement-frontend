@@ -485,9 +485,16 @@ Route::group(['prefix' => 'bac','middleware' => ['authuser']], function() {
     Route::post('/update-procurement', 'BAC\ModeofProcurementController@update')->name('update-procurement');
 
     //Approved PPMP
-    Route::get('/approved-ppmp', 'BAC\ApprovedPPMPController@index');
-    Route::post('/show-approved', 'BAC\ApprovedPPMPController@show');
-    
+    Route::get('/approvedIndicative', 'BAC\ApprovedPPMPController@Indicative_index');
+    Route::get('/approvedPPMP', 'BAC\ApprovedPPMPController@PPMP_index');
+    Route::get('/approvedSupplemental', 'BAC\ApprovedPPMPController@Supplemental_index');
+    Route::post('/show-approved-ppmp', 'BAC\ApprovedPPMPController@show')->name('show-approved-ppmp');
+    Route::get('/signedIndicative', 'BAC\ApprovedPPMPController@signed_indicative')->name('signed-indicative');
+    Route::get('/signedPPMP', 'BAC\ApprovedPPMPController@signed_ppmp')->name('signed-ppmp');
+    Route::get('/signedSupplemental', 'BAC\ApprovedPPMPController@signed_supplemental')->name('signed-supplemental');
+    Route::post('/view-signed-ppmp', 'BAC\ApprovedPPMPController@view_signed_ppmp')->name('view-signed-ppmp');
+    Route::get('/download-signed-ppmp', 'BAC\ApprovedPPMPController@download_signed_ppmp')->name('download-signed-ppmp');
+
     //Approved Supplemental
     Route::get('/approved-supplemental', 'BAC\ApprovedSupplementalController@index');
     Route::post('/show-supplemental', 'BAC\ApprovedSupplementalController@show');
@@ -513,6 +520,7 @@ Route::group(['prefix' => 'bac','middleware' => ['authuser']], function() {
     Route::post('/add-recommendingapproval', 'BAC\APPNONCSEController@add_recommendingapproval')->name('add-recommendingapproval');
     Route::post('/update-signatories', 'BAC\APPNONCSEController@update_signatories')->name('update-signatories');
     Route::get('/app-non-cse-year', 'BAC\APPNONCSEController@app_non_cse_year')->name('app-non-cse-year');
+    Route::post('/app-non-cse-print', 'President\PresidentHopeController@print')->name('app-non-cse-print');
     
     Route::post('/show-campusinfo', 'BAC\APPNONCSEController@show_campusinfo')->name('show-campusinfo');
     Route::post('/update-campusinfo', 'BAC\APPNONCSEController@update_campusinfo')->name('update-campusinfo');
@@ -554,8 +562,12 @@ Route::group(['prefix' => 'supervisor','middleware' => ['authuser']], function()
 
 Route::group(['prefix' => 'president','middleware' => ['authuser']], function() {
     //Supervisor Side
-    Route::get('/list', 'President\PresidentHopeController@list');
-    Route::get('/traditional', 'President\PresidentHopeController@Traditional_index');
+    Route::get('/list/{id}', 'President\PresidentHopeController@list');
+    // Route::get('/traditional', 'President\PresidentHopeController@Traditional_index');
+    Route::post('/pres_app_noncse', 'President\PresidentHopeController@index_app_noncse')->name('pres_app_noncse');
+    Route::post('/pres_generatepdf', 'President\PresidentHopeController@generatepdf')->name('pres_generatepdf');
+    Route::post('/pres_print', 'President\PresidentHopeController@print')->name('pres_print');
+    Route::post('/pres_decision', 'President\PresidentHopeController@pres_decision')->name('pres_decision');
     Route::get('/supplemental', 'President\PresidentHopeController@Supplemental_index');
     Route::get('/indicative', 'President\PresidentHopeController@indicative_index');
 });

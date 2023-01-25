@@ -46,28 +46,13 @@
                                 <tbody>
                                     <tr>
                                         <td>{{-- {{ $data->year_created }}- --}}{{ $loop->iteration  }}</td>
-                                        <td>University Annual Procurement Plan For FY {{ $data->year_created }}</td>
-                                        <?php
-                                        if($data->pres_status == 0)
-                                        {
-                                            ?>
-                                        <td style="text-align: left; color:blue;">Pending</td>
-                                        <?php
-                                        }
-                                        elseif ($data->pres_status == 2) {
-                                        ?>
-                                        <td style="text-align: left; color:green;">Approved</td>
-                                        <?php
-                                        }elseif($data->pres_status == 3){
-                                        ?>
-                                        <td style="text-align: left; color:red;">Need Revision</td>
-                                        <?php
-                                        }
-                                        ?>
+                                        <td>University Annual Procurement Plan For FY {{ $data->project_year }}</td>
+                                        <td style="text-align: left; color:{{ (new GlobalDeclare)->pres_status_color($data->pres_status) }}">{{ (new GlobalDeclare)->pres_status($data->pres_status) }}</td>
                                         <td>
-                                            <form action="/bac/app-non-cse" method="get">
+                                            <form action="{{ route('pres_app_noncse') }}" method="post">
                                                 @csrf
-                                                <input type="text" id="project_code12" class=" form-control d-none" name="project_code" value="<?=$aes->encrypt($data->id)?>">
+                                                <input type="text" class=" form-control d-none" name="year" value="<?=$aes->encrypt($data->project_year)?>">
+                                                <input type="text" class=" form-control d-none" name="category" value="<?=$aes->encrypt($data->project_category)?>">
                                                 <button type="submit" class="btn btn-outline-secondary view"  >view</button>
                                             </form>
                                         </td>

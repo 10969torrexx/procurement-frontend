@@ -86,7 +86,7 @@ class APPNONCSEController extends Controller
           ->get("pt.project_year");
 
     $campusCheck = DB::table("project_titles as pt")
-          ->select("pt.campus","pt.endorse","pt.pres_status","pt.project_category")
+          ->select("pt.campus","pt.endorse","pt.pres_status","pt.project_category","p.app_type")
           ->join("ppmps as p", "p.project_code", "=", "pt.id")
           ->whereNull("pt.deleted_at")
           ->where("p.app_type", 'Non-CSE')
@@ -794,25 +794,25 @@ class APPNONCSEController extends Controller
 
       $signatures = DB::table("signatories_app_non_cse")
           ->where("campus",session('campus'))
-          ->where("Year",2022)
+          ->where("Year",$request->year)
           ->get();
           
 
       $prepared_by = DB::table("signatories_app_non_cse")
           ->where("campus",session('campus'))
-          ->where("Year",2022)
+          ->where("Year",$request->year)
           ->where("Role","=",1)
           ->get();
 
       $recommending_approval = DB::table("signatories_app_non_cse")
           ->where("campus",session('campus'))
-          ->where("Year",2022)
+          ->where("Year",$request->year)
           ->where("Role","=",3)
           ->get();
 
       $approved_by = DB::table("signatories_app_non_cse")
           ->where("campus",session('campus'))
-          ->where("Year",2022)
+          ->where("Year",$request->year)
           ->where("Role","=",2)
           ->get();
           
@@ -1546,4 +1546,136 @@ class APPNONCSEController extends Controller
         ]);
     }
   } 
+
+  
+  public function print(Request $request){
+    // dd($request->all());
+    try{
+        $count = $request->campusCheck;
+        if($count  == 1){
+          $Categories = DB::table("ppmps as p")
+          ->join("project_titles as pt", "p.project_code", "=", "pt.id")
+          ->whereNull("p.deleted_at")
+          ->whereNull("pt.deleted_at")
+          ->where("pt.project_year","=",$request->year)
+          ->where("p.app_type","=",$request->app_type)
+          ->where("pt.project_category", "=", $request->category)
+          ->where("p.status", "=", 4)
+          ->where("pt.status", "=", 4)
+          ->where(function ($query) {
+              $query->where("pt.pres_status","=", 1)
+              ->orWhere("pt.pres_status","=", 2)
+              ->orWhere("pt.pres_status","=", 3);
+            })
+          ->where("p.campus", session('campus'))
+          ->groupBy("p.campus")
+          ->groupBy("p.item_category")
+          ->orderBy("p.campus","ASC")
+          ->get();
+          // dd($Categories);
+
+          $ppmps = DB::table("ppmps as p")
+            ->select("pt.project_title", "d.department_name", "p.*", "pt.fund_source","pt.project_code as ProjectCode","ab.allocated_budget","ab.remaining_balance","fs.fund_source","m.mode_of_procurement as procurementName")
+            ->join("project_titles as pt", "p.project_code", "=", "pt.id")
+            ->join('mode_of_procurement as m','m.id','=','p.mode_of_procurement')
+            ->join("departments as d", "pt.department_id", "=", "d.id")
+            ->join('allocated__budgets as ab','pt.allocated_budget','=','ab.id')
+            ->join('fund_sources as fs','fs.id','=','ab.fund_source_id')
+            ->where("p.app_type","=",$request->app_type)
+            ->whereNull("p.deleted_at")
+            ->where("p.campus", session('campus'))
+            ->where("pt.project_category", "=", $request->category)
+            ->where("pt.project_year","=",$request->year)
+            ->where("p.status", "=", 4)
+            ->where(function ($query) {
+                $query->where("pt.pres_status","=", 1)
+                ->orWhere("pt.pres_status","=", 2)
+                ->orWhere("pt.pres_status","=", 3);
+              })
+            ->where("pt.status", "=", 4)
+            ->orderBy("p.department_id", "ASC")
+            ->orderBy("p.project_code", "ASC")
+            ->get();
+            // dd($ppmps);
+
+        }else if($count  > 1){
+          $Categories = DB::table("ppmps as p")
+            ->join("project_titles as pt", "p.project_code", "=", "pt.id")
+            ->whereNull("p.deleted_at")
+            ->where("pt.project_year","=",$request->year)
+            ->where("p.app_type","=",$request->app_type)
+            ->where("pt.project_category", "=", $request->category)
+            ->where("p.status", "=", 4)
+            ->where("pt.status", "=", 4)
+            ->where(function ($query) {
+                $query->where("pt.pres_status","=", 1)
+                ->orWhere("pt.pres_status","=", 2)
+                ->orWhere("pt.pres_status","=", 3);
+              })
+            // ->where("p.campus", session('campus'))
+            ->groupBy("p.campus")
+            ->groupBy("p.item_category")
+            ->orderBy("p.campus","ASC")
+            ->get();
+          $ppmps = DB::table("ppmps as p")
+            ->select("pt.project_title", "d.department_name", "p.*", "pt.fund_source","pt.project_code as ProjectCode","ab.allocated_budget","ab.remaining_balance","fs.fund_source","m.mode_of_procurement as procurementName")
+            ->join("project_titles as pt", "p.project_code", "=", "pt.id")
+            ->join('mode_of_procurement as m','m.id','=','p.mode_of_procurement')
+            ->join("departments as d", "pt.department_id", "=", "d.id")
+            ->join('allocated__budgets as ab','pt.allocated_budget','=','ab.id')
+            ->join('fund_sources as fs','fs.id','=','ab.fund_source_id')
+            ->where("p.app_type","=",$request->app_type)
+            ->whereNull("p.deleted_at")
+            // ->where("p.campus", session('campus'))
+            ->where("pt.project_category", "=", $request->category)
+            ->where("pt.project_year","=",$request->year)
+            ->where(function ($query) {
+                $query->where("pt.pres_status","=", 1)
+                ->orWhere("pt.pres_status","=", 2)
+                ->orWhere("pt.pres_status","=", 3);
+              })
+            ->where("p.status", "=", 4)
+            ->where("pt.status", "=", 4)
+            ->orderBy("p.department_id", "ASC")
+            ->orderBy("p.project_code", "ASC")
+            ->get();
+          }
+
+      $signatures = DB::table("signatories_app_non_cse")
+          ->where("campus",session('campus'))
+          ->where("Year",$request->year)
+          ->get();
+          // dd($signatures);
+          
+
+      $prepared_by = DB::table("signatories_app_non_cse")
+          ->where("campus",session('campus'))
+          ->where("Year",$request->year)
+          ->where("Role","=",1)
+          ->get();
+          // dd($prepared_by);
+
+      $recommending_approval = DB::table("signatories_app_non_cse")
+          ->where("campus",session('campus'))
+          ->where("Year",$request->year)
+          ->where("Role","=",3)
+          ->get();
+          // dd($recommending_approval);
+
+      $approved_by = DB::table("signatories_app_non_cse")
+          ->where("campus",session('campus'))
+          ->where("Year",$request->year)
+          ->where("Role","=",2)
+          ->get();
+          // dd($approved_by);
+          
+        $campusinfo = DB::table("campusinfo")
+          ->where("campus",session('campus'))
+          ->get(); 
+        // dd($campusinfo);
+        return view('pages.bac.generate-app-non-cse.print', compact('Categories','ppmps','signatures','campusinfo','prepared_by','recommending_approval','approved_by'));
+    }catch (\Throwable $th) {
+        throw $th;
+    }
+  }
 }

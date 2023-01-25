@@ -2,10 +2,10 @@ $(document).on('click', '.view', function (e) {
    e.preventDefault();
    var data = {
       'project_code': $(this).attr("href"),
-      // 'employee_id': $(this).attr("data-toggle"),
+      'project_category': $('.project_category').val(),
       // 'department_id': $(this).attr("data-id"),
   }
-         // console.log(data);
+         console.log(data);
    $.ajaxSetup({
    headers: {
          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -14,7 +14,7 @@ $(document).on('click', '.view', function (e) {
 
    $.ajax({
       type: "post",
-      url: "show-approved",
+      url: "show-approved-ppmp",
       data:data,
       beforeSend : function(html){
       },
@@ -130,3 +130,6 @@ function format( number_input, decimals, dec_point, thousands_sep ) {
    }
    return number_output.join( decimal_pont );
 }
+
+
+// preview files

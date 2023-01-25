@@ -96,7 +96,7 @@
           "icon": "shoppingcart-in",
           "submenu": [
             {
-              "url": "#",
+              "url": "president/list/Indicative",
               "name": "View",
               "i18n": "User",
               "icon": "shoppingcart-in"
@@ -116,7 +116,7 @@
           "icon": "shoppingcart-in",
           "submenu": [
             {
-              "url": "president/list",
+              "url": "president/list/PPMP",
               "name": "View",
               "i18n": "User",
               "icon": "shoppingcart-in"
@@ -135,7 +135,7 @@
           "icon": "shoppingcart-in",
           "submenu": [
             {
-              "url": "#",
+              "url": "president/list/Supplemental",
               "name": "View",
               "i18n": "User",
               "icon": "shoppingcart-in"

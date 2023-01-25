@@ -93,6 +93,32 @@
             "icon": "shoppingcart-in"
           }
         ]
+      },
+      {
+        "url": "#",
+        "name": "Signed PPMPs",
+        "i18n": "User",
+        "icon": "list",
+        "submenu": [
+          {
+            "url": "bac/signedIndicative",
+            "name": "Indicative",
+            "i18n": "User",
+            "icon": "shoppingcart-in"
+          },
+          {
+            "url": "bac/signedPPMP",
+            "name": "PPMPS",
+            "i18n": "User",
+            "icon": "like"
+          },
+          {
+            "url": "bac/signedSupplemental",
+            "name": "Supplemental",
+            "i18n": "User",
+            "icon": "shoppingcart-in"
+          }
+        ]
       }
     ]
   }

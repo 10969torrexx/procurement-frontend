@@ -34,28 +34,37 @@
                             <thead>
                                 <tr>
                                     <th>Department</th>
-                                    <th>Project Code</th>
-                                    <th>Project Procurement</th>
-                                    <th>Total</th>
+                                    <th>File Name</th>
+                                    <th>Year Created</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
     
                             
                             @foreach ($data as $line)
-                            
-                            <input type="hidden" class="project_category" value="{{ $line->project_category }}">
                                     {{-- @for ($i = 0; $i < count($data->0); $i++) --}}
                             <tbody>
                                 <tr>
                                     <td>{{ $line->department_name }}</td>
-                                    <td>{{ $line->project_code }}</td>
-                                    <td>{{ $line->project_title }}</td>
-                                    <td>Php {{  number_format($line->Total,2,'.',',') }}</td>
+                                    <td>{{ $line->file_name }}</td>
+                                    <td>{{ $line->year_created }}</td>
                                     <td>
                                         {{-- <a href="" class="view" style="background-color: aquamarine"><i class="fa-regular fa-eye"  title="View" href=""></i> </a> --}}
-                                        <button type="button" class="btn btn-outline-secondary view"  href="<?=$aes->encrypt($line->id)?>" >view</button>
                                         {{-- <button class="btn-success view" data-toggle = "modal" id="view_modal"></button> --}}
+                                        
+                                        <div class="dropdown">
+                                            <span
+                                                class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
+                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu">
+                                            </span>
+                                            <div class="dropdown-menu dropdown-menu-left">
+                                                {{-- <button  type="button" class="dropdown-item print" ><i class="fa-solid fa-download"></i>&nbsp; Download</button> --}}
+                                                <a href= "{{ route('download-signed-ppmp', ['id' => (new AESCipher)->encrypt($line->id) ]) }}" class="dropdown-item">
+                                                  <i class="fa-solid fa-file-arrow-down mr-1"></i>Download
+                                                </a>
+                                                <button type="button" class="dropdown-item viewPPMP" value="{{ (new GlobalDeclare)->pres_status($line->project_category) }}" data-id="<?=$aes->encrypt($line->id)?>" data-toggle = "modal" data-target = "#preview-ppmp"> <i class="fa-solid fa-eye"></i>&nbsp; View</button>
+                                            </div>
+                                        </div> 
                                     </td>
                                     
                                 </tr>
@@ -80,6 +89,7 @@
         </section>
                             @include('pages.bac.ppmp.view-approved-modal')
                             @include('pages.bac.ppmp.loading')
+                            @include('pages.bac.ppmp.signed-ppmp-modal')
     </div>
 </section>
 <!-- Dashboard Ecommerce ends -->
@@ -92,6 +102,29 @@
 <script src="{{asset('vendors/js/tables/datatable/dataTables.bootstrap4.min.js')}}"></script>
 <script src="{{asset('vendors/js/tables/datatable/dataTables.buttons.min.js')}}"></script>
 
+<script>
+    $(document).on('click', '.viewPPMP', function(e) {
+       e.preventDefault();
+       $('#preview-ppmp').modal('show');
+       $('#content').html('');
+       // appending content
+       $.ajax({
+          headers: {
+             'X-CSRF-TOKEN': $("meta[name='csrf-token']").attr('content')
+          },
+          url: "view-signed-ppmp",
+          method: 'post',
+          data: {
+             'id' : $(this).attr('data-id')
+          }, success: function(response) {
+             console.log(response);
+             response['data'].forEach(element => {
+                   $('#content').append(`<iframe src="{{asset("storage/department_upload/signed_ppmp/`+ element.signed_ppmp +`")}}" style="width:100% !important;" height="750" frameborder="0"></iframe>`);
+             });
+          }
+       });
+    });
+</script>
 <script src="{{asset('js/bac/approvedppmp.js')}}"></script>
 @endsection
 
@@ -101,6 +134,7 @@
   
 <script src="{{asset('vendors/js/extensions/sweetalert2.all.min.js')}}"></script>
 <script src="{{asset('vendors/js/extensions/polyfill.min.js')}}"></script>
+
 
 
 

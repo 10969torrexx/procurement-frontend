@@ -239,18 +239,21 @@
     <!-- Greetings Content Starts -->
     <section id="basic-datatable">
       <div class="card-content" >
-        <?php $campuscount = count($campusCheck); $camp = 0; $endorse = 0; $submitpres = 0; $campusload = "";$project_category=0;?>
+        <?php $campuscount = count($campusCheck); $camp = 0; $endorse = 0; $pres_status = ""; $campusload = "";$project_category=""; $appType="";?>
             @foreach($campusCheck as $campusload)
-              <?php $project_category = $campusload->project_category;?>
+              <?php $project_category = $campusload->project_category; 
+                    $appType = $campusload->app_type; 
+                    $pres_status = $campusload->pres_status;
+                    $endorse = $campusload->endorse;?>
                 @if($campusload->campus == 1)
                     <?php $camp++;?>
                 @endif
-                @if($campusload->pres_status == 1)
-                    <?php $submitpres++;?>
-                @endif
-                @if($campusload->endorse == 1)
-                    <?php $endorse++;?>
-                @endif
+                {{-- @if($campusload->pres_status == 1)
+                    <?php /* $submitpres++; */?>
+                @endif --}}
+                {{-- @if($campusload->endorse == 1)
+                    <?php/*  $endorse++; */?>
+                @endif --}}
             @endforeach
           <div class="card-header" >
             {{-- <div class="" >
@@ -269,14 +272,16 @@
             @endif --}}
             <div class="generate" {{-- style="background-color: #bf5279" --}}>
               <input type="hidden" class="campusCheck" value="{{ $campuscount }}">
-              <button  type="button" class="btn btn-danger form-control col-sm-1 mt-1 generatepdf" value="{{ $campuscount }}">PDF</button>
+              <input type="hidden" name="app_type" class="app_type" value="{{ $appType }}">
+              <button  type="button" class="btn btn-danger form-control col-sm-1 mt-1 generatepdf" value="{{ $campuscount }}"><i class="fa-solid fa-file-pdf"></i> &nbsp; PDF</button>
               {{-- <form action="{{ route('app-non-cse-generate') }}" method="POST">
               @csrf
               <input type="hidden" class="Year" name="year" value="{{ $Project_title[0]->project_year }}">
               <button  type="submit" class="btn btn-danger form-control col-sm-1 mt-1 " >PDF</button>
               </form> --}}
               {{-- <button  type="submit" class="btn btn-success form-control col-sm-1 mt-1 generateexcel" id="downloadexcel" >EXCEL</button> --}}
-              <a href ="{{ route('app-non-cse-generate-excel') }}"><button  type="submit" class="btn btn-success form-control col-sm-1 mt-1 generate" disabled>EXCEL</button></a>
+              {{-- <a href ="{{ route('app-non-cse-generate-excel') }}"><button  type="submit" class="btn btn-success form-control col-sm-1 mt-1 generate" disabled>EXCEL</button></a> --}}
+              <button  type="submit" class="btn btn-primary form-control col-sm-1 mt-1 print"><i class="fa-solid fa-print"></i> &nbsp; Print</button>
 
               @if(count($campusCheck) == 1)
                 {{-- @if(session('role') == 10)
@@ -288,11 +293,12 @@
                   @endif
                 @endif --}}
                 @if(session('role') == 10)
-                  @if($submitpres == 0)
-                    <button  type="button" class="btn btn-primary form-control col-sm-1 mt-1 submittopresident " value="1">SUBMIT</button>
+                  @if($pres_status == 0)
+                    <button  type="button" class="btn btn-primary form-control col-sm-1 mt-1 submittopresident " value="1" data-id="{{ $project_category}}">SUBMIT</button>
                   @endif
-                  @if($submitpres > 0)
-                    <button  type="button" class="btn btn-primary form-control col-sm-1 mt-1 submittopresident " value="0"><i class="fa-solid fa-rotate-left"></i></button>
+                      <input type="hidden" name="project_category" id="project_category" value="{{ $project_category}}">
+                  @if($pres_status == 1)
+                    <button  type="button" class="btn btn-primary form-control col-sm-1 mt-1 submittopresident " value="0" data-id="{{ $project_category}}"><i class="fa-solid fa-rotate-left"></i></button>
                   @endif
                 @endif
               @endif
@@ -305,7 +311,7 @@
                     @if($camp > 0)
                       <form action="{{ route('show-all') }}" method="post">
                         @csrf
-                      <input type="hidden" name="project_category" class="project_category" value="{{ $project_category }}">
+                      <input type="hidden" name="project_category" class="project_category" id="project_category" value="{{ $project_category}}">
                       <button type="submit" class="dropdown-item {{-- univ_wide --}}" id="{{-- univ_wide --}}"> University Wide</button>
                       </form>
                       <?php $Pcategory = ""; 
@@ -427,19 +433,9 @@
                         @if(count($campusCheck) == 1)
                           <div class="col-sm-7" style="float: left;">
                             <label style="float: left;padding-top:10px;" > Status: </label>
-                            @if($submitpres == 0)
-                              <label class="ml-1" style="font-size:15px;float: left;padding-top:6px;text-transform: capitalize;color:blue" > Pending </label>
-                            @endif
-                            @if($submitpres > 0)
-                              <label class="ml-1" style="font-size:15px;float: left;padding-top:6px;text-transform: capitalize;color:coral" > Submitted </label>
-                            @endif
-                              <label class="ml-1"  style="font-size:15px;float: left;padding-top:6px;text-transform: capitalize;color:black;">|</label>
-                            @if($endorse == 0)
-                              <label class="ml-1" style="font-size:15px;float: left;padding-top:6px;text-transform: capitalize;color:blue" >Pending </label>
-                            @endif
-                            @if($endorse > 0)
-                              <label class="ml-1" style="font-size:15px;float: left;padding-top:6px;text-transform: capitalize;color:coral" >Endorsed </label>
-                            @endif
+                            <label class="ml-1" style="font-size:15px;float: left;padding-top:6px;text-transform: capitalize;color:{{ (new GlobalDeclare)->pres_status_color($pres_status) }}" > {{ (new GlobalDeclare)->pres_status($pres_status) }} </label>
+                            <label class="ml-1"  style="font-size:15px;float: left;padding-top:6px;text-transform: capitalize;color:black;">|</label>
+                            <label class="ml-1" style="font-size:15px;float: left;padding-top:6px;text-transform: capitalize;color:{{ (new GlobalDeclare)->endorse_color($endorse) }}" >{{ (new GlobalDeclare)->endorse($endorse) }} </label>
                           </div>
                         @endif
                       </div>
