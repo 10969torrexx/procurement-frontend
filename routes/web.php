@@ -14,10 +14,16 @@ use App\Http\Controllers\BAC\NewPPMPRequestController;
 use App\Http\Controllers\BAC\RequestforAmendmentsController;
 use App\Http\Controllers\BAC\UnitofMeasurementController;
 /* Torrexx Additionals */
-    # the following imports the controller under Deparments Directory
-    use App\Http\Controllers\Department\DepartmentPagesController;
-    use App\Http\Controllers\Department\DepartmentController;
-    use App\Http\Controllers\BudgetOfficer\BudgetOfficerController;
+    // ! departments controller imports
+        use App\Http\Controllers\Department\DepartmentPagesController;
+        use App\Http\Controllers\Department\DepartmentController;
+        use App\Http\Controllers\BudgetOfficer\BudgetOfficerController;
+    // ! END
+    // ! BOR Secretary imports
+        use App\Http\Controllers\BOR_Secretary\BOR_SecretaryPagesController;
+        use App\Http\Controllers\BOR_Secretary\BOR_SecretaryController;
+    // ! END
+    
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -572,7 +578,6 @@ Route::group(['prefix' => 'supply_custodian','middleware' => ['authuser']], func
 
 # route for department-group
 Route::group(['prefix' => 'department','middleware' => ['authuser']], function() {
-    
     //MY PROPERTY MENU ROUTES
     Route::get('/my_par','Employee\EmployeeController@my_par');
     Route::get('/my_ics','Employee\EmployeeController@my_ics');
@@ -673,6 +678,34 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
             Route::post('live-search-item', [DepartmentController::class, 'live_search_item'])->name('live_search_item');
     /** END | TORREXX */
 });
+
+/** TORREXX Additionals
+ * ! BOR Secretary
+ * ? this will show routes under BOR Secretary
+ */
+    Route::group(['prefix' => 'bor-secetary', 'middleware' => ['authuser']], function() {
+        # show announcements page
+            Route::get('/announcements', [BOR_SecretaryPagesController::class, 'show_announcements'])->name('bor_sec_announcements');
+        // ? BOR Resolution
+            // ! show upload BOR resolution
+                Route::get('/upload-bor-resolution', [BOR_SecretaryPagesController::class, 'show_bor_resolution'])->name('bor_sec_bor_resolution');
+            // ! upload BOR resolution
+                Route::post('/upload-bor-resolution', [BOR_SecretaryController::class, 'upload_bor_resolution'])->name('upload_bor_resolution');
+            // ! download BOR resolution
+                Route::get('/download-bor-resolution', [BOR_SecretaryController::class, 'download_bor_resolution'])->name('download_bor_resolution');
+            // ! Delete BOR resolution
+                Route::get('/delete-bor-resolution', [BOR_SecretaryController::class, 'delete_bor_resolution'])->name('delete_bor_resolution');
+            // ! View BOR resolution
+                Route::get('/view-bor-resolution', [BOR_SecretaryController::class, 'view_bor_resolution'])->name('view_bor_resolution');
+            // ! search uploaded bor resolution
+                Route::post('/search-bor-resolution', [BOR_SecretaryController::class, 'search_bor_resolution'])->name('search_bor_resolution');
+            // ! get bor resolution
+                Route::get('/get-bor-resolution', [BOR_SecretaryController::class, 'get_bor_resolution'])->name('get_bor_resolution');
+            // ! submit edit bor resolution
+                Route::post('/edit-bor-resolution', [BOR_SecretaryController::class, 'edit_bor_resolution'])->name('edit_bor_resolution');
+        // ? END
+    });
+/** END */
 
 // Route::group(['prefix' => 'employee','middleware' => ['authuser']], function() {
 //     Route::get('/','finalControllers\EmployeeController@index')->name('employeelist');

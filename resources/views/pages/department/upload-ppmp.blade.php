@@ -250,7 +250,7 @@
                                                   </a>
                                               </div>
                                           </div> 
-                                      </td>
+                                        </td>
                                       </tr>
                                  @endforeach
                               {{-- showing ppmp data based on department and user --}}
