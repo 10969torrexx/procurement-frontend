@@ -86,7 +86,7 @@ class APPNONCSEController extends Controller
           ->get("pt.project_year");
 
     $campusCheck = DB::table("project_titles as pt")
-          ->select("pt.campus","pt.endorse","pt.pres_status","pt.project_category","p.app_type")
+          ->select("pt.campus","pt.endorse","pt.pres_status","pt.bac_committee_status","pt.project_category","p.app_type")
           ->join("ppmps as p", "p.project_code", "=", "pt.id")
           ->whereNull("pt.deleted_at")
           ->where("p.app_type", 'Non-CSE')
@@ -209,7 +209,7 @@ class APPNONCSEController extends Controller
           ->get("pt.project_year");
 
     $campusCheck = DB::table("project_titles as pt")
-          ->select("pt.campus","pt.endorse","pt.pres_status","pt.project_category")
+          ->select("pt.campus","pt.endorse","pt.pres_status","pt.bac_committee_status","pt.project_category")
           ->join("ppmps as p", "p.project_code", "=", "pt.id")
           ->whereNull("pt.deleted_at")
           ->where("p.app_type", 'Non-CSE')
@@ -332,7 +332,7 @@ class APPNONCSEController extends Controller
           ->get("pt.project_year");
 
     $campusCheck = DB::table("project_titles as pt")
-          ->select("pt.campus","pt.endorse","pt.pres_status","pt.project_category")
+          ->select("pt.campus","pt.endorse","pt.pres_status","pt.bac_committee_status","pt.project_category")
           ->join("ppmps as p", "p.project_code", "=", "pt.id")
           ->whereNull("pt.deleted_at")
           ->where("p.app_type", 'Non-CSE')
@@ -446,7 +446,7 @@ class APPNONCSEController extends Controller
         // dd($ppmps);
           
     $campusCheck = DB::table("project_titles as pt")
-          ->select("pt.campus","pt.endorse","pt.pres_status","pt.project_category")
+          ->select("pt.campus","pt.endorse","pt.pres_status","pt.bac_committee_status","pt.project_category")
           ->join("ppmps as p", "p.project_code", "=", "pt.id")
           ->whereNull("pt.deleted_at")
           ->where("p.app_type", 'Non-CSE')

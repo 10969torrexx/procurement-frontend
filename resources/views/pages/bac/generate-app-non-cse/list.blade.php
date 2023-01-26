@@ -239,10 +239,11 @@
     <!-- Greetings Content Starts -->
     <section id="basic-datatable">
       <div class="card-content" >
-        <?php $campuscount = count($campusCheck); $camp = 0; $endorse = 0; $pres_status = ""; $campusload = "";$project_category=""; $appType="";?>
+        <?php $campuscount = count($campusCheck); $camp = 0; $endorse = 0; $pres_status = ""; $bac_committee_status = ""; $campusload = "";$project_category=""; $appType="";?>
             @foreach($campusCheck as $campusload)
               <?php $project_category = $campusload->project_category; 
                     $appType = $campusload->app_type; 
+                    $bac_committee_status = $campusload->bac_committee_status;
                     $pres_status = $campusload->pres_status;
                     $endorse = $campusload->endorse;?>
                 @if($campusload->campus == 1)
@@ -567,7 +568,7 @@
                   ?>
                   <tr>
                     <td colspan="2" class="last" style="border-bottom : none;"><div class="child">Prepared by:</div></td>
-                    <td colspan="8" class="last" style="border-bottom : none;"><div class="child">Recommending Approval:</div></td>
+                    <td colspan="8" class="last" style="border-bottom : none;"><div class="child">Recommending Approval: </div></td>
                     <td colspan="4" class="last" style="border-bottom : none; border-right:1px solid black;"><div class="child" style="height:10px">Approved by:</div></td>
                   </tr>
                   <tr>
@@ -666,8 +667,8 @@
                   ?>
                     <tr>
                       <td colspan="2" class="last" style="border-bottom : none;"><div class="child">Prepared by:</div></td>
-                      <td colspan="8" class="last" style="border-bottom : none;"><div class="child">Recommending Approval:</div></td>
-                      <td colspan="4" class="last" style="border-bottom : none; border-right:1px solid black;"><div class="child" style="height:10px">Approved by:</div></td>
+                      <td colspan="8" class="last" style="border-bottom : none;"><div class="child">Recommending Approval: &nbsp;<span style="color: {{ (new GlobalDeclare)->bac_committee_status_color($bac_committee_status) }};text-transform: uppercase;">{{ (new GlobalDeclare)->bac_committee_status($bac_committee_status) }}</span></div></td>
+                      <td colspan="4" class="last" style="border-bottom : none; border-right:1px solid black;"><div class="child" style="height:10px">Approved by: &nbsp;<span style="color: {{ (new GlobalDeclare)->pres_status_color($pres_status) }};text-transform: uppercase;">{{ (new GlobalDeclare)->pres_status($pres_status) }}</span></div></td>
                     </tr>
                     <tr >
                       <td colspan="2" class="last" style="border-top : none;">

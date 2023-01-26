@@ -433,4 +433,40 @@ class GlobalDeclare extends Controller
         
         return $out;
     }
+
+    
+    # this will determine the app is recommended or disaaproved
+    public function bac_committee_status($id) {
+        $out = '';
+        switch ($id) {
+            case 0:
+                $out = 'Pending';
+            break;
+            case 1:
+                $out = 'Recommended';
+            break;
+            case 2:
+                $out = 'Disapproved';
+            break;
+        }
+        return $out;
+    }
+
+    # this will determine the color of status
+    public function bac_committee_status_color($id) {
+        $out = '';
+        switch ($id) {
+            case 0:
+                $out = 'blue';
+            break;
+            case 1:
+                $out = 'green';
+            break;
+            case 2:
+                $out = 'red';
+            break;
+        }
+        
+        return $out;
+    }
 }

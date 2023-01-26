@@ -572,6 +572,18 @@ Route::group(['prefix' => 'president','middleware' => ['authuser']], function() 
     Route::get('/indicative', 'President\PresidentHopeController@indicative_index');
 });
 
+Route::group(['prefix' => 'baccommittee','middleware' => ['authuser']], function() {
+    //Supervisor Side
+    Route::get('/list/{id}', 'BACCommittee\BACCommitteeController@list');
+    // Route::get('/traditional', 'BACCommittee\BACCommitteeController@Traditional_index');
+    Route::post('/bac_committee_app_noncse', 'BACCommittee\BACCommitteeController@index_app_noncse')->name('bac_committee_app_noncse');
+    Route::post('/bac_committee_generatepdf', 'BACCommittee\BACCommitteeController@generatepdf')->name('bac_committee_generatepdf');
+    Route::post('/bac_committee_print', 'BACCommittee\BACCommitteeController@print')->name('bac_committee_print');
+    Route::post('/bac_committee_decision', 'BACCommittee\BACCommitteeController@bac_committee_decision')->name('bac_committee_decision');
+    Route::get('/supplemental', 'BACCommittee\BACCommitteeController@Supplemental_index');
+    Route::get('/indicative', 'BACCommittee\BACCommitteeController@indicative_index');
+});
+
 Route::group(['prefix' => 'supply_custodian','middleware' => ['authuser']], function() {
 
     Route::get('/property','SupplyCustodian\PropertyController@index');
