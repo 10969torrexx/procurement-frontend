@@ -468,7 +468,7 @@ class AdminController extends Controller
             return response()->json([
                 'status' => 400, 
                 'message' => 'Mandatory Expenditure Already Exist!',
-            ]); 
+            ]);  
         }else if(count($check1) == 1){
             return response()->json([
                 'status' => 400, 

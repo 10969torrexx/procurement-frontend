@@ -62,8 +62,9 @@
                                         @foreach($ppmps as $data)
                                             <tr id = "{{$ctr}}">
                                                 <td>
-                                                    <a class = "btn btn-success round mr-1 mb-1" ctr = "<?=$ctr?>" href = "{{ route('createPR', ['id' => $aes->encrypt($data->id)]) }}">
-                                                        <i class="fa fa-plus mr-2"></i>Create PR</a>
+                                                    <a class = "btn btn-success mr-1 mb-1" ctr = "<?=$ctr?>" href = "{{ route('createPR', ['id' => $aes->encrypt($data->id)]) }}">
+                                                        {{-- <i class="fa fa-plus mr-2"></i>Create PR</a> --}}
+                                                        <i class="bx bx-plus"></i> Create PR</a>
                                                     {{-- <div class="dropdown">
                                                         <span
                                                             class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
@@ -80,7 +81,7 @@
                                                         {{-- </div>
                                                     </div>    --}}
                                                 </td>
-                                                <td>{{ $data->project_title }}</td>
+                                                <td>{{$data->project_title }}</td>
                                                 <td>{{$data->project_year}}</td>
                                                 <td>{{$data->fund_source}}</td>
                                             </tr>

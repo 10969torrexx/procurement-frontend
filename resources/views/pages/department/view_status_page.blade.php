@@ -31,6 +31,9 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
+                <div class="col-md-12" style="padding-top:30px;padding-left:30px">
+                    <a href = "{{ route('trackPR') }}" class = "btn btn-primary mr-1 mb-1"><i class="bx bx-left-arrow"></i> Back</a>
+                </div>
                 <div class="card-header">
                     <h4 class="card-title" style="text-align: center; font-weight: bold;">ROUTING SLIP (PROCUREMENT PROCESS)</h4>
                 </div>
@@ -500,10 +503,6 @@
                             </tr> --}}
                         </tbody>
                     </table>
-                    <div class="col-md-12 text-right" style="padding-right: 100px">
-                        <a href = "{{ route('trackPR') }}" class = "btn btn-primary round mr-1 mb-1"><i class="bx bx-left-arrow"></i> Back</a>
-                    </div>
-
                 </div>
             </div>
         </div>

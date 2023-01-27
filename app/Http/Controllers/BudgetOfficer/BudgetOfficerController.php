@@ -1048,24 +1048,13 @@ class BudgetOfficerController extends Controller
 
     public function get_procurement_type(Request $request){
         try {
-        //   dd($request->all());
-
             $type = (new AESCipher())->decrypt($request->type);
-        // $response = Http::withToken(env('Auth_HRMIS_Token'))->post(env('APP_HRMIS_API'). "/api/auth/employeelist", [
-        //     'department' => $department,
-        //   ])->json();
             $response = DB::table('ppmp_deadline')
                         ->select('year')
                         ->where('campus', session('campus'))
                         ->where('procurement_type', $type)
                         ->groupBy('year')
                         ->get();
-            // dd($response);
-            // if(count($response)==0){
-            //     session(['globalerror' => "Please set deadline first for ".$type]);
-            // }else{
-            //     Session::forget('globalerror');
-            // }
             if($response){
                 return response()->json([
                     'status' => 200,
