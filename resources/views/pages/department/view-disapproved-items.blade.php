@@ -119,7 +119,7 @@
                                                 <label for=""> APP Type</label>
                                                 <input type="text" class="form-control d-none" name="item_category" id="edit-item-category">
                                                 <input type="text" class="form-control d-none" name="app_type" id="edit-app-type">
-                                                <p class="form-control" id="edit-app-type-p">-- None --</p>
+                                                <p class="form-control" id="edit-app-type-p">-- SSS --</p>
                                             </div>
                                             <div class="form-group">
                                                 <label for="">Unit of Measure</label>
@@ -562,6 +562,7 @@
                     'id' : $(this).data('id')
                 }, success: function(response) { 
                     console.log(response);
+                    console.log(response[0].app_type);
                     if( (response.length > 0) || (response == null)) {
                         var month = [
                             'January',
@@ -585,7 +586,7 @@
 
                             $('#edit-item-category').val(element.item_category);
                             $('#edit-app-type').val(element.app_type);
-                            $('#app-type-p').text(element.app_type);
+                            $('#edit-app-type-p').text(element.app_type);
 
                             $('#edit-default-unit-of-measurement').text(element.unit_of_measurement);
                             $('#edit-default-unit-of-measurement').val(element.unit_of_measurement);

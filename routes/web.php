@@ -14,10 +14,16 @@ use App\Http\Controllers\BAC\NewPPMPRequestController;
 use App\Http\Controllers\BAC\RequestforAmendmentsController;
 use App\Http\Controllers\BAC\UnitofMeasurementController;
 /* Torrexx Additionals */
-    # the following imports the controller under Deparments Directory
-    use App\Http\Controllers\Department\DepartmentPagesController;
-    use App\Http\Controllers\Department\DepartmentController;
-    use App\Http\Controllers\BudgetOfficer\BudgetOfficerController;
+    // ! departments controller imports
+        use App\Http\Controllers\Department\DepartmentPagesController;
+        use App\Http\Controllers\Department\DepartmentController;
+        use App\Http\Controllers\BudgetOfficer\BudgetOfficerController;
+    // ! END
+    // ! BOR Secretary imports
+        use App\Http\Controllers\BOR_Secretary\BOR_SecretaryPagesController;
+        use App\Http\Controllers\BOR_Secretary\BOR_SecretaryController;
+    // ! END
+    
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -569,12 +575,9 @@ Route::group(['prefix' => 'supply_custodian','middleware' => ['authuser']], func
 // });
 
 });
-#sdfghsh
 
-//j-rald
 # route for department-group
 Route::group(['prefix' => 'department','middleware' => ['authuser']], function() {
-    
     //MY PROPERTY MENU ROUTES
     Route::get('/my_par','Employee\EmployeeController@my_par');
     Route::get('/my_ics','Employee\EmployeeController@my_ics');
@@ -634,7 +637,31 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
                 Route::post('/re-sumbit/ppmp', [DepartmentController::class, 'resubmitPPMP'])->name('department-re_submit-ppmp');
                 # this route will display the disapproved items
                 Route::get('/disapproved-items', [DepartmentPagesController::class, 'show_disapproved_items'])->name('dept_disapproved-items');
-            /** END */
+
+            # submit all project titles on checkbox
+            Route::get('submit-all-project', [DepartmentController::class, 'submit_all_projects'])->name('submit_all_projects');
+
+            # export approved ppmp | this will generate PDF file of the Approved PPMP data
+            Route::get('export-ppmp', [DepartmentController::class, 'export_approved_ppmp'])->name('export_ppmp');
+
+            # ppmp submission | request for PPMP Submission
+            Route::get('ppmp-submission', [DepartmentPagesController::class, 'show_ppmp_submission'])->name('show_ppmp_submission');
+
+            # upload ppmp | upload signed ppmp
+            Route::get('upload-ppmp', [DepartmentPagesController::class, 'show_upload_ppmp'])->name('show_upload_ppmp');
+            # upload PPMP
+            Route::post('upload-ppmp', [DepartmentController::class, 'upload_ppmp'])->name('upload_ppmp');
+            Route::post('get-upload-ppmp', [DepartmentPagesController::class, 'get_upload_ppmp'])->name('get_upload_ppmp');
+            # delete uploaded PPMP
+            Route::get('delete-uploaded-ppmp', [DepartmentController::class, 'delete_uploaded_ppmp'])->name('delete_ppmp');
+            # download uploaded PPMP
+            Route::get('download-uploaded-ppmp', [DepartmentController::class, 'download_uploaded_ppmp'])->name('download_ppmp');
+            # previw uploaded ppmp
+            Route::get('view-uploaded-ppmp', [DepartmentController::class, 'view_uploaded_ppmp'])->name('view_ppmp');
+            # edit upload
+            Route::get('get-uploaded-ppmp', [DepartmentController::class, 'get_edit_ppmp'])->name('get_edit_ppmp');
+            Route::post('edit-uploaded-ppmp', [DepartmentController::class, 'edit_uploaded_ppmp'])->name('edit_ppmp');
+        /** END */
 
         /** Gettin data from the database */
             # this will get the databa by unit of measure per item fron the unit measure from the dabase
@@ -647,7 +674,38 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
             Route::get('/get-mode-of-procurement', [DepartmentController::class, 'get_mode_of_procurement'])->name('get_mode_of_procurement');
             # get ppmps
             Route::get('/get-ppms', [DepartmentController::class, 'get_ppmps'])->name('get_ppmps');
+            # live search item(s)
+            Route::post('live-search-item', [DepartmentController::class, 'live_search_item'])->name('live_search_item');
+    /** END | TORREXX */
 });
+
+/** TORREXX Additionals
+ * ! BOR Secretary
+ * ? this will show routes under BOR Secretary
+ */
+    Route::group(['prefix' => 'bor-secetary', 'middleware' => ['authuser']], function() {
+        # show announcements page
+            Route::get('/announcements', [BOR_SecretaryPagesController::class, 'show_announcements'])->name('bor_sec_announcements');
+        // ? BOR Resolution
+            // ! show upload BOR resolution
+                Route::get('/upload-bor-resolution', [BOR_SecretaryPagesController::class, 'show_bor_resolution'])->name('bor_sec_bor_resolution');
+            // ! upload BOR resolution
+                Route::post('/upload-bor-resolution', [BOR_SecretaryController::class, 'upload_bor_resolution'])->name('upload_bor_resolution');
+            // ! download BOR resolution
+                Route::get('/download-bor-resolution', [BOR_SecretaryController::class, 'download_bor_resolution'])->name('download_bor_resolution');
+            // ! Delete BOR resolution
+                Route::get('/delete-bor-resolution', [BOR_SecretaryController::class, 'delete_bor_resolution'])->name('delete_bor_resolution');
+            // ! View BOR resolution
+                Route::get('/view-bor-resolution', [BOR_SecretaryController::class, 'view_bor_resolution'])->name('view_bor_resolution');
+            // ! search uploaded bor resolution
+                Route::post('/search-bor-resolution', [BOR_SecretaryController::class, 'search_bor_resolution'])->name('search_bor_resolution');
+            // ! get bor resolution
+                Route::get('/get-bor-resolution', [BOR_SecretaryController::class, 'get_bor_resolution'])->name('get_bor_resolution');
+            // ! submit edit bor resolution
+                Route::post('/edit-bor-resolution', [BOR_SecretaryController::class, 'edit_bor_resolution'])->name('edit_bor_resolution');
+        // ? END
+    });
+/** END */
 
 // Route::group(['prefix' => 'employee','middleware' => ['authuser']], function() {
 //     Route::get('/','finalControllers\EmployeeController@index')->name('employeelist');

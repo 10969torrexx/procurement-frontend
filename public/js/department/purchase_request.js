@@ -28,7 +28,7 @@ $(document).on('click', '.PR_button', function (e) {
     var itemChecked = document.getElementsByClassName('form-check-input');
     var itemArray = [];
         for (let i = 0; i < itemCount; i++) {
-                if(itemChecked[i].checked){
+            if(itemChecked[i].checked){
                 itemArray.push(itemChecked[i].value); 
             }
         }

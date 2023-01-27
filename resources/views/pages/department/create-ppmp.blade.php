@@ -6,6 +6,7 @@
     $aes = new AESCipher();
     $immediate_supervisor = '';
     $current_year = Carbon::now();
+    // dd((new AESCipher)->decrypt($project_type));
 @endphp
 @extends('layouts.contentLayoutMaster')
 {{-- title --}}
@@ -106,13 +107,7 @@
                                         <div class="col-sm-3">
                                             <div class="form-group">
                                                 <label for=""> Project Title</label>
-                                                <input type="text" class="form-control @error('project_title') is-invalid @enderror"
-                                                name="project_title" autocomplete="project_title" autofocus required>
-                                                    @error('project_title')
-                                                        <span class="invalid-feedback" role="alert">
-                                                            <strong>{{ $message }}</strong>
-                                                        </span>
-                                                    @enderror
+                                                <textarea name="project_title" class="form-control" id="" cols="30" rows="1"></textarea>
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
@@ -224,6 +219,7 @@
                                     <table class="table zero-configuration item-table" id="item-table">
                                         <thead>
                                             <tr>
+                                                <th><input type="checkbox" name="" id="select-all"></th>
                                                 <th>#</th>
                                                 {{-- <th>Project Code</th> --}}
                                                 <th>Project Title</th>
@@ -237,9 +233,11 @@
                                             </tr>
                                         </thead>
                                         <tbody>
+                                            <input type="text" id="item-count" value="{{ count($project_titles) }}" class="form-control d-none">
                                             {{-- showing ppmp data based on department and user --}}
                                                 @foreach ($project_titles as $item)
                                                     <tr>
+                                                        <td><input type="checkbox" name="" class="project-checkbox" value="{{ $item->id }}" data-status="{{ $item->status }}"></td>
                                                         <td>{{ $loop->iteration }}</td>
                                                         <td>{{ $item->project_title }}</td>
                                                         <td>{{ $item->project_year }}</td>
@@ -278,6 +276,10 @@
                                             {{-- showing ppmp data based on department and user --}}
                                         </tbody>
                                     </table>
+
+                                    <div class="form-group row justify-content-center">
+                                        <a class="btn btn-success text-white col-5 col-sm-5 col-md-5" id="submit-projects-btn">Submit Project(s)</a>
+                                    </div>
                                 </div>
                             {{-- creating data tables for the list of project titles --}}
                         </div>
@@ -329,5 +331,106 @@
             } 
         });
     });
+
+    // function for submitting all projects
+        $(document).on('click', '#submit-projects-btn', function(e) {
+            e.preventDefault();
+            var _project_checkbox = $('.project-checkbox');
+            // var _project_checkbox = document.getElementsByClassName('project-checkbox');
+            var _checked_project = [];
+            var _checked_status = [];
+            for (let index = 0; index < $('#item-count').val(); index++) {
+               if(_project_checkbox[index].checked) {
+                    _checked_project.push(_project_checkbox[index].value);
+                    _checked_status.push(_project_checkbox[index].dataset.status);
+               }
+            }
+            if(_checked_project == null || _checked_project.length <= 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Please select project title(s) for submissions!',
+                });
+            } else {
+                $.ajax({
+                    type: "GET",
+                    url: "{{ route('submit_all_projects') }}",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    data: {
+                        'project_titles'    :   _checked_project,
+                        'project_status'    :   _checked_status
+                    },
+                    dataType: "json",
+                    success: function (response) {
+                        console.log(response);
+                        if(response['status'] == 400) {
+                            Swal.fire({
+                                  title: 'Error',
+                                  icon: 'error',
+                                  html: response['message'],
+                                  timer: 1000,
+                                  timerProgressBar: true,
+                                  didOpen: () => {
+                                    Swal.showLoading()
+                                    const b = Swal.getHtmlContainer().querySelector('b')
+                                    timerInterval = setInterval(() => {
+                                      b.textContent = Swal.getTimerLeft()
+                                    }, 100)
+                                  },
+                                  willClose: () => {
+                                    clearInterval(timerInterval)
+                                  }
+                            }).then((result) => {
+                                  if (result.dismiss === Swal.DismissReason.timer) {
+                                    location.reload();
+                                    console.log('I was closed by the timer')
+                                  }
+                            });
+                        } 
+
+                        if(response['status'] == 200) {
+                            Swal.fire({
+                                  title: 'Success',
+                                  icon: 'success',
+                                  html: response['message'],
+                                  timer: 1000,
+                                  timerProgressBar: true,
+                                  didOpen: () => {
+                                    Swal.showLoading()
+                                    const b = Swal.getHtmlContainer().querySelector('b')
+                                    timerInterval = setInterval(() => {
+                                      b.textContent = Swal.getTimerLeft()
+                                    }, 100)
+                                  },
+                                  willClose: () => {
+                                    clearInterval(timerInterval)
+                                  }
+                            }).then((result) => {
+                                  if (result.dismiss === Swal.DismissReason.timer) {
+                                    location.reload();
+                                    console.log('I was closed by the timer')
+                                  }
+                            });
+                        } 
+                        
+                    }
+                });
+            }
+        });
+
+        $('#select-all').click(function(event) {   
+            if(this.checked) {
+                // Iterate each checkbox
+                $(':checkbox').each(function() {
+                    this.checked = true;                        
+                });
+            } else {
+                $(':checkbox').each(function() {
+                    this.checked = false;                       
+                });
+            }
+        });
 </script>
 @endsection

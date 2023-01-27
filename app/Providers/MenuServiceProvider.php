@@ -72,6 +72,14 @@ class MenuServiceProvider extends ServiceProvider
                 $verticalMenuJson = file_get_contents(base_path('resources/data/menus/supervisor-menu.json'));
                 $verticalMenuData = json_decode($verticalMenuJson);
             }   
+                /**
+                 * ! Torrexx additonals 
+                 * ? BOR Secretary
+                 * */ 
+                elseif ($role == 13) {
+                    $verticalMenuJson = file_get_contents(base_path('resources/data/menus/bor-secretary-menu.json'));
+                    $verticalMenuData = json_decode($verticalMenuJson);
+                }
 
             $horizontalMenuJson = file_get_contents(base_path('resources/data/menus/horizontal-menu.json'));
             $horizontalMenuData = json_decode($horizontalMenuJson);

@@ -311,13 +311,13 @@ public function FundSource($id) {
                 $out = "Pending for Immediate Supervisor's Approval";
                 break;
             case 2:
-                $out = "Approved by Immediate Supervisor";
+                $out = "Accepted by Immediate Supervisor";
                 break;  
             case 3:
                 $out = "Disapproved by Immediate Supervisor";
                 break;
             case 4:
-                $out = "Approved by Budget Officer";
+                $out = "Accepted by Budget Officer";
                 break;
             case 5:
                 $out = "Dispproved by Budget Officer";
@@ -329,19 +329,20 @@ public function FundSource($id) {
         return $out;
     }
 
-# this will determine the project category
+# this will determine the project category | tagging of project type
     public function project_category($id) {
         $out = '';
         switch ($id) {
             case 0:
-                $out = 'Indicative PPMP';
+                $out = 'Indicative';
             break;
             case 1:
-                $out = 'Traditional PPMP';
+                $out = 'PPMP';
             break;
             case 2:
-                $out = 'Supplemental PPMP';
+                $out = 'Supplemental';
             break;
         }
+        return $out;
     }
 }

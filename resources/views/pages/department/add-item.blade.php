@@ -41,21 +41,54 @@
     <link rel="stylesheet" type="text/css" href="{{asset('css/plugins/extensions/toastr.css')}}">
 @endsection
 @section('content')
+<style>
+    #t-table, #t-th, #t-td  {
+        border: 1px solid;
+        font-size: 11px;
+        padding: 5px;
+        text-align: center;
+    }
+    #t-table{
+        width: 100%;
+    }
+
+    .tbg-secondary {
+        background-color: rgba(71, 95, 123, 0.9) !important;
+    }
+</style>
 <!-- Zero configuration table -->
 <section id="horizontal-vertical">
     {{-- item names modal --}}
         <div class="modal fade" id="items-modal" tabindex="-1" role="dialog">
-            <div class="modal-dialog modal-dialog-scrollable" role="document">
+            <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Choose from items</h5>
+                        <h5 class="modal-title">Choose items</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                         </div>
                         <div class="modal-body">
-                            <div class="p-1" id="item-result">
-                                {{-- appended buttons will be placed here --}}
+                            <div class="form-group p-1 row">
+                                <div class="col-sm-6 col-md-6 col-6"></div>
+                                <div class="col-sm-6 col-md-6 col-6">
+                                    <input type="text" name="item_name" placeholder="Item name here" id="item-name-text" class="col-12" style="font-size: 11px; padding:4px;">
+                                </div>
+                            </div>
+                            <div class="">
+                                <table class="table" id="t-table">
+                                    <tr id="t-tr">
+                                        <th id="t-td">#</th>
+                                        <th id="t-td">Item Name</th>
+                                        <th id="t-td">App Type</th>
+                                        <th id="t-td">Mode of Procurement</th>
+                                        <th id="t-td">Item Category</th>
+                                        <th id="t-td"></th>
+                                    </tr>
+                                    <tbody id="table-body">
+                                        {{--  appended data goes here --}}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     <div class="modal-footer">
@@ -76,16 +109,22 @@
                         </button>
                     </div>
                         <div class="modal-body p-1">
+                            <div class="form-group col-sm-12 col-md-12 col-lg-12 col-12">
+                               <p class="text-secondary"> 
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
+                                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+                                </svg>
+                                    Click the desired item description
+                                </p>
+                            </div>
                             <div id="templates-container">
                                 {{-- appended buttons will be placed here --}}
-                                
                             </div>
                         </div>
                 </div>
             </div>
         </div>
     {{-- view templates modal --}}
-
     {{-- edit ppmps modal --}}
         <div class="modal fade" id="edit-ppmps-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
@@ -211,20 +250,37 @@
             </div>
         </div>
     {{-- edit ppmps modal --}}
-    
     {{-- edit item names modal --}}
         <div class="modal fade" id="edit-items-modal" tabindex="-1" role="dialog">
-            <div class="modal-dialog modal-dialog-scrollable" role="document">
+            <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Choose from items</h5>
+                        <h5 class="modal-title">Choose items</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                         </div>
                         <div class="modal-body">
-                            <div class="p-1" id="edit-item-result">
-                                {{-- appended buttons will be placed here --}}
+                            <div class="form-group p-1 row">
+                                <div class="col-sm-6 col-md-6 col-6"></div>
+                                <div class="col-sm-6 col-md-6 col-6">
+                                    <input type="text" name="item_name" placeholder="Item name here" id="edit-item-name-text" class="col-12" style="font-size: 11px; padding:4px;">
+                                </div>
+                            </div>
+                            <div class="">
+                                <table class="table" id="t-table">
+                                    <tr id="t-tr">
+                                        <th id="t-td">#</th>
+                                        <th id="t-td">Item Name</th>
+                                        <th id="t-td">App Type</th>
+                                        <th id="t-td">Mode of Procurement</th>
+                                        <th id="t-td">Item Category</th>
+                                        <th id="t-td"></th>
+                                    </tr>
+                                    <tbody id="edit-table-body">
+                                        {{--  appended data goes here --}}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     <div class="modal-footer">
@@ -234,7 +290,6 @@
             </div>
         </div>
     {{-- end --}}
-
 
     {{-- edit| view templates modal --}}
         <div class="modal fade" id="edit-templates-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -246,12 +301,19 @@
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                        <div class="modal-body p-1">
-                            <div id="edit-templates-container">
-                                {{-- appended buttons will be placed here --}}
-                                
-                            </div>
+                    <div class="modal-body p-1">
+                        <div class="form-group col-sm-12 col-md-12 col-lg-12 col-12">
+                            <p class="text-secondary"> 
+                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
+                                 <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+                             </svg>
+                                 Click the desired item description
+                             </p>
+                         </div>
+                        <div id="edit-templates-container">
+                            {{-- appended buttons will be placed here --}}
                         </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -604,7 +666,7 @@
     @endsection
 {{-- Torrexx | Code not mine --}}
 <script>
-    // this will enable view templates modal upon button click
+    // item description | templates
         $('#view-templates-btn').click(function() {
             $('#templates-modal').modal('show');
                 // // this will get all the item descriptions based on the given item name
@@ -626,26 +688,26 @@
                                 var _unit_price_format = "₱" + element.unit_price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                                 var _estimated_price_format = "₱" + element.estimated_price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                                 $('#templates-container').append('\
-                                \<div id="selected-template" class="p-1 btn btn-secondary bg-secondary col-sm-12 col-md-12 col-12 mb-1"\
+                                \<div id="selected-template" class="p-1 btn btn-secondary tbg-secondary col-sm-12 col-md-12 col-12 mb-1"\
                                     data-unit-price="'+ element.unit_price +'"\
                                     data-estimated-price="'+ element.estimated_price +'"\
                                     data-quantity="'+ element.quantity +'"\
                                     data-item-description="'+ element.item_description +'"\
                                 >\
                                     <div class="form-group">\
-                                        <p class="text-white text-left">\
+                                        <p class="text-white text-left" style="margin:-2px !important;">\
                                            <strong>Author:</strong> ' + element.name +'\
                                         </p>\
-                                        <p class="text-white text-left">\
+                                        <p class="text-white text-left" style="margin:-2px !important; color: yellow !important;">\
                                             <strong>Unit Price:</strong> '+ _unit_price_format +'\
                                         </p>\
-                                        <p class="text-white text-left">\
+                                        <p class="text-white text-left" style="margin:-2px !important;">\
                                             <strong>Quantity:</strong> '+ element.quantity +' '+ element.unit_of_measurement +'s\
                                         </p>\
-                                        <p class="text-white text-left">\
+                                        <p class="text-white text-left" style="margin:-2px !important;">\
                                             <strong>Estimated Price:</strong> '+ _estimated_price_format +'\
                                         </p>\
-                                        <p class="text-white text-left">\
+                                        <p class="text-white text-left" style="margin:-2px !important;">\
                                             <strong>Item Description:</strong>\
                                         </p>\
                                         <p class="text-white text-left">\
@@ -662,6 +724,64 @@
                     }
                 });
         });
+        // -- edit --
+            $('#edit-view-templates-btn').click(function() {
+                $('#edit-templates-modal').modal('show');
+                    // // this will get all the item descriptions based on the given item name
+                    $('#edit-templates-container').html('');
+                    $.ajax({
+                        headers: {
+                            'X-CSRF-TOKEN': $("meta[name='csrf-token']").attr('content')
+                        },
+                        url: "{{ route('department-item-description') }}",
+                        method: 'POST',
+                        data: {
+                            'item_name' : $('#edit-selected-item-name').text()
+                        }, success: function(response) { 
+                            console.log($('#edit-selected-item-name').text());
+                            $('#edit-item-name-template').text($('#edit-selected-item-name').text());
+                            if(response.length > 0) {
+                                // console.log(response);
+                                response.forEach(element => {
+                                    var _unit_price_format = "₱" + element.unit_price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                    var _estimated_price_format = "₱" + element.estimated_price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                    $('#edit-templates-container').append('\
+                                    \<div id="edit-selected-template" class="p-1 btn btn-secondary bg-gradient-primary col-sm-12 col-md-12 col-12 mb-1"\
+                                        data-unit-price="'+ element.unit_price +'"\
+                                        data-estimated-price="'+ element.estimated_price +'"\
+                                        data-quantity="'+ element.quantity +'"\
+                                        data-item-description="'+ element.item_description +'"\
+                                    >\
+                                        <div class="form-group">\
+                                            <p class="text-white text-left" style="margin:-2px !important;">\
+                                            <strong>Author:</strong> ' + element.name +'\
+                                            </p>\
+                                            <p class="text-white text-left" style="margin:-2px !important; color: yellow !important;">\
+                                                <strong>Unit Price:</strong > '+ _unit_price_format +'\
+                                            </p>\
+                                            <p class="text-white text-left" style="margin:-2px !important;">\
+                                                <strong>Quantity:</strong> '+ element.quantity +' '+ element.unit_of_measurement +'s\
+                                            </p>\
+                                            <p class="text-white text-left" style="margin:-2px !important;">\
+                                                <strong>Estimated Price:</strong> '+ _estimated_price_format +'\
+                                            </p>\
+                                            <p class="text-white text-left" style="margin:-2px !important;">\
+                                                <strong>Item Description:</strong>\
+                                            </p>\
+                                            <p class="text-white text-left" style="margin:-2px !important;">\
+                                            '+ element.item_description +'\
+                                            </p>\
+                                        </div>\
+                                    </div>\
+                                    ');
+                                });
+                            } 
+                            if(response.length <= 0) {
+                                $('#edit-templates-container').append('<p class="col-12 text-center m-1" >Failed to fetch item descriptions</p>');
+                            }
+                        }
+                    });
+            });
     // end
     // edit ppmps modal
        $(document).on('click', '#edit-ppmp-btn', function(e) {
@@ -700,7 +820,7 @@
 
                             $('#edit-item-category').val(element.item_category);
                             $('#edit-app-type').val(element.app_type);
-                            $('#app-type-p').text(element.app_type);
+                            $('#edit-app-type-p').text(element.app_type);
 
                             $('#edit-default-unit-of-measurement').text(element.unit_of_measurement);
                             $('#edit-default-unit-of-measurement').val(element.unit_of_measurement);
@@ -778,10 +898,10 @@
        });
     // end
     // item modal
-    // 
+    // item name
         $(document).on('click', '#item-name-btn', function () {
             $('#items-modal').modal('show');
-            $('#item-result').html(' ');
+            $('#table-body').html(' ');
             $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $("meta[name='csrf-token']").attr('content')
@@ -791,16 +911,23 @@
                 success: function(response) { 
                     console.log(response);
                     if(response.length > 0) {
-                        response.forEach(element => {
-                            $('#item-result').append('<button class="btn btn-light col-12 m-1" type="button" id="item-btn"\
-                            data-public-bidding="'+ element.public_bidding +'" \
-                            data-mode-of-procurement="'+ element.mode_of_procurement +'"\
-                            data-procurement-id="'+ element.mode_of_procurement_id +'"\
-                            data-app-type="'+ element.app_type +'" \
-                            data-item-category="'+ element.item_category +'" \
-                            data-item="'+ element.item_name +'"\
-                            data-dismiss="modal" aria-label="Close"\>' 
-                            + element.item_name  + '</button>');
+                        response.forEach((element, index) => {
+                            $('#table-body').append('<tr><td id="t-td">'+[ index + 1 ]+'</td> <td id="t-td">' + element.item_name +'</td> \
+                                <td id="t-td">' + element.app_type +'</td> \
+                                <td id="t-td">' + element.mode_of_procurement +'</td> \
+                                <td id="t-td">' + element.item_category +'</td> \
+                                <td id="t-td"><button class="btn btn-primary" style="padding:4px;" type="button" id="item-btn"\
+                                    data-public-bidding="'+ element.public_bidding +'" \
+                                    data-mode-of-procurement="'+ element.mode_of_procurement +'"\
+                                    data-procurement-id="'+ element.mode_of_procurement_id +'"\
+                                    data-app-type="'+ element.app_type +'" \
+                                    data-item-category="'+ element.item_category +'" \
+                                    data-item="'+ element.item_name +'"\
+                                    data-dismiss="modal" aria-label="Close"\>\
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart-fill" viewBox="0 0 16 16">\
+                                    <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>\
+                                    </svg>\
+                                </tr>');
                         });
                     } else {
                         $('#item-result').append('<p>Nothing to show</p>');
@@ -811,7 +938,7 @@
         // --- edit --
         $(document).on('click', '#edit-item-name-btn', function () {
             $('#edit-items-modal').modal('show');
-            $('#edit-item-result').html(' ');
+            $('#edit-table-body').html(' ');
             $.ajax({
                 headers: {
                     'X-CSRF-TOKEN': $("meta[name='csrf-token']").attr('content')
@@ -821,16 +948,23 @@
                 success: function(response) { 
                     console.log(response);
                     if(response.length > 0) {
-                        response.forEach(element => {
-                            $('#edit-item-result').append('<button class="btn btn-light col-12 m-1" type="button" id="edit-item-btn"\
-                            data-public-bidding="'+ element.public_bidding +'" \
-                            data-mode-of-procurement="'+ element.mode_of_procurement +'"\
-                            data-procurement-id="'+ element.mode_of_procurement_id +'"\
-                            data-app-type="'+ element.app_type +'" \
-                            data-item-category="'+ element.item_category +'" \
-                            data-item="'+ element.item_name +'"\
-                            data-dismiss="modal" aria-label="Close"\>' 
-                            + element.item_name  + '</button>');
+                        response.forEach((element, index) => {
+                            $('#edit-table-body').append('<tr><td id="t-td">'+[ index + 1 ]+'</td> <td id="t-td">' + element.item_name +'</td> \
+                                <td id="t-td">' + element.app_type +'</td> \
+                                <td id="t-td">' + element.mode_of_procurement +'</td> \
+                                <td id="t-td">' + element.item_category +'</td> \
+                                <td id="t-td"><button class="btn btn-primary" style="padding:4px;" type="button" id="edit-item-btn"\
+                                    data-public-bidding="'+ element.public_bidding +'" \
+                                    data-mode-of-procurement="'+ element.mode_of_procurement +'"\
+                                    data-procurement-id="'+ element.mode_of_procurement_id +'"\
+                                    data-app-type="'+ element.app_type +'" \
+                                    data-item-category="'+ element.item_category +'" \
+                                    data-item="'+ element.item_name +'"\
+                                    data-dismiss="modal" aria-label="Close"\>\
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart-fill" viewBox="0 0 16 16">\
+                                    <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>\
+                                    </svg>\
+                                </tr>');
                         });
                     } else {
                         $('#item-result').append('<p>Nothing to show</p>');
@@ -966,66 +1100,6 @@
             $(this).val($('#edit-final-unit-price').val());
         });
     //end
-
-    // edit | view templates btn
-        $('#edit-view-templates-btn').click(function() {
-            $('#edit-templates-modal').modal('show');
-                // // this will get all the item descriptions based on the given item name
-                $('#edit-templates-container').html('');
-                $.ajax({
-                    headers: {
-                        'X-CSRF-TOKEN': $("meta[name='csrf-token']").attr('content')
-                    },
-                    url: "{{ route('department-item-description') }}",
-                    method: 'POST',
-                    data: {
-                        'item_name' : $('#edit-selected-item-name').text()
-                    }, success: function(response) { 
-                        console.log($('#edit-selected-item-name').text());
-                        $('#edit-item-name-template').text($('#edit-selected-item-name').text());
-                        if(response.length > 0) {
-                            // console.log(response);
-                            response.forEach(element => {
-                                var _unit_price_format = "₱" + element.unit_price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                var _estimated_price_format = "₱" + element.estimated_price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                $('#edit-templates-container').append('\
-                                \<div id="edit-selected-template" class="p-1 btn btn-secondary bg-secondary col-sm-12 col-md-12 col-12 mb-1"\
-                                    data-unit-price="'+ element.unit_price +'"\
-                                    data-estimated-price="'+ element.estimated_price +'"\
-                                    data-quantity="'+ element.quantity +'"\
-                                    data-item-description="'+ element.item_description +'"\
-                                >\
-                                    <div class="form-group">\
-                                        <p class="text-white text-left">\
-                                           <strong>Author:</strong> ' + element.name +'\
-                                        </p>\
-                                        <p class="text-white text-left">\
-                                            <strong>Unit Price:</strong> '+ _unit_price_format +'\
-                                        </p>\
-                                        <p class="text-white text-left">\
-                                            <strong>Quantity:</strong> '+ element.quantity +' '+ element.unit_of_measurement +'s\
-                                        </p>\
-                                        <p class="text-white text-left">\
-                                            <strong>Estimated Price:</strong> '+ _estimated_price_format +'\
-                                        </p>\
-                                        <p class="text-white text-left">\
-                                            <strong>Item Description:</strong>\
-                                        </p>\
-                                        <p class="text-white text-left">\
-                                           '+ element.item_description +'\
-                                        </p>\
-                                    </div>\
-                                </div>\
-                                ');
-                            });
-                        } 
-                        if(response.length <= 0) {
-                            $('#edit-templates-container').append('<p class="col-12 text-center m-1" >Failed to fetch item descriptions</p>');
-                        }
-                    }
-                });
-        });
-    // end
     
     // edit | selected template
         $(document).on('click', '#edit-selected-template', function(e) {
@@ -1083,5 +1157,87 @@
             }
         });
     // end
+
+    // choose item on text change item-name-text
+        $(document).on('keyup', '#item-name-text', function() {
+            $('#table-body').html(' ');
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $("meta[name='csrf-token']").attr('content')
+                },
+                url: "{{ route('live_search_item') }}",
+                method: 'POST', 
+                data: {
+                    'item_name' : $(this).val()
+                },
+                success: function(response) { 
+                    console.log(response);
+                    if(response != 400) {
+                        $('#table-body').html(' ');
+                        response.forEach((element, index) => {
+                            $('#table-body').append('<tr><td id="t-td">'+[ index + 1 ]+'</td> <td id="t-td">' + element.item_name +'</td> \
+                                <td id="t-td">' + element.app_type +'</td> \
+                                <td id="t-td">' + element.mode_of_procurement +'</td> \
+                                <td id="t-td">' + element.item_category +'</td> \
+                                <td id="t-td"><button class="btn btn-primary" style="padding:4px;" type="button" id="item-btn"\
+                                    data-public-bidding="'+ element.public_bidding +'" \
+                                    data-mode-of-procurement="'+ element.mode_of_procurement +'"\
+                                    data-procurement-id="'+ element.mode_of_procurement_id +'"\
+                                    data-app-type="'+ element.app_type +'" \
+                                    data-item-category="'+ element.item_category +'" \
+                                    data-item="'+ element.item_name +'"\
+                                    data-dismiss="modal" aria-label="Close"\>\
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart-fill" viewBox="0 0 16 16">\
+                                    <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>\
+                                    </svg>\
+                            </tr>');
+                        });
+                    } else {
+                        console.log('erri');
+                    }
+                } 
+            });
+        });
+        // -- edit --
+            $(document).on('keyup', '#edit-item-name-text', function() {
+                $('#edit-table-body').html(' ');
+                $.ajax({
+                    headers: {
+                        'X-CSRF-TOKEN': $("meta[name='csrf-token']").attr('content')
+                    },
+                    url: "{{ route('live_search_item') }}",
+                    method: 'POST', 
+                    data: {
+                        'item_name' : $(this).val()
+                    },
+                    success: function(response) { 
+                        console.log(response);
+                        if(response != 400) {
+                            $('#edit-table-body').html(' ');
+                            response.forEach((element, index) => {
+                                $('#edit-table-body').append('<tr><td id="t-td">'+[ index + 1 ]+'</td> <td id="t-td">' + element.item_name +'</td> \
+                                    <td id="t-td">' + element.app_type +'</td> \
+                                    <td id="t-td">' + element.mode_of_procurement +'</td> \
+                                    <td id="t-td">' + element.item_category +'</td> \
+                                    <td id="t-td"><button class="btn btn-primary" style="padding:4px;" type="button" id="edit-item-btn"\
+                                        data-public-bidding="'+ element.public_bidding +'" \
+                                        data-mode-of-procurement="'+ element.mode_of_procurement +'"\
+                                        data-procurement-id="'+ element.mode_of_procurement_id +'"\
+                                        data-app-type="'+ element.app_type +'" \
+                                        data-item-category="'+ element.item_category +'" \
+                                        data-item="'+ element.item_name +'"\
+                                        data-dismiss="modal" aria-label="Close"\>\
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart-fill" viewBox="0 0 16 16">\
+                                        <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>\
+                                        </svg>\
+                                </tr>');
+                            });
+                        } else {
+                            console.log('erri');
+                        }
+                    } 
+                });
+            });
+    //end
 </script>
 @endsection
