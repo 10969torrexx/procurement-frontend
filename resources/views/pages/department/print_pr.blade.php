@@ -6,9 +6,6 @@
     $global = new GlobalDeclare();
 ?>
 
-@extends('layouts.contentLayoutMaster')
-{{-- title --}}
-@section('title','Purchase Request')
 
 {{-- vendor style --}}
 @section('vendor-styles')
@@ -24,7 +21,7 @@
 
 @endsection
 
-@section('content')
+
     
 <!-- Scroll - horizontal and vertical table -->
 <section id="horizontal-vertical">
@@ -34,7 +31,7 @@
                 {{-- <div class="card-header">
                     <h4 class="card-title" style="text-align: center; font-weight: bold;">ROUTING SLIP (PROCUREMENT PROCESS)</h4>
                 </div> --}}
-                <div class="card-content" style="margin:300px;margin-top:50px;margin-bottom:50px">
+                <div class="card-content" style="margin:50px">
                     {{-- <table class="top">
                         <thead>
                             <tr class="topp" style="text-align: left;line-height:22px;font-size:15px">
@@ -54,9 +51,7 @@
                     </table> --}}
                     <style>
                         table.PR{
-                          margin-top: 20px;
-                          margin-bottom: 20px;
-                          /* margin-right: 50px; */
+                          
                           width:100%;
                           border-collapse: collapse;
                           height: 200px;
@@ -94,20 +89,7 @@
                           border: none;
                         }
                       </style>
-                      {{-- @foreach($id as $id)
-                      @endforeach --}}
-                      <div class="row" hidden>
-                        <fieldset class="form-group">
-                            <input type="text" class="id form-control"  placeholder="" value="<?=$aes->encrypt($id)?>">
-                        </fieldset>
-                    </div>
-                      <div class="col-md-12 text-left">
-                        {{-- {{ route('department-delete-item', ['id'=> (new AESCipher)->encrypt($item->ppmps_id)]) }} --}}
-                        {{-- <button type="submit" class="btn btn-primary form-control col-sm-1 mt-1"><i class="fa-solid fa-print"></i> &nbsp; Print</button> --}}
-                        {{-- <a href = "{{ route('printPR', ['id'=> (new AESCipher)->encrypt($id)])  }}" class = "btn btn-primary mr-1 mb-1"><i class="bx bx-printer"></i> Print</a> --}}
-                        <a href = "{{ route('trackPR') }}" class = "btn btn-primary mr-1 mb-1"><i class="bx bx-left-arrow"></i> Back</a>
-                        <a href = "#" class = "print btn btn-success mr-1 mb-1"><i class="bx bx-printer"></i> Print</a>
-                    </div>
+                      <div style="padding-top:50px"></div>
                       <div class="table-responsive">
                         <table class="PR">
                           <thead class="head1">
@@ -119,17 +101,17 @@
                             <tr>
                               <td style="font-weight:bold;border-left:1px solid black;border-bottom : none;border-top : none;border-right : none;text-align:left;padding-left:10px;">Entity Name:</td>
                               <td colspan="2" style="border-bottom : none;border-top : none;border-right : none"><div class="" style="margin-top:1%;border-bottom:1px solid black;text-align:left;padding-left:10px"> Southern Leyte State University - {{ (new GlobalDeclare())->Campus(session('campus')) }} Campus</div></td>
-                              <td colspan="2" style="font-weight:bold;border-bottom : none;border-top : none;border-right : none;padding-left:50px;" class="fund_cluster">Fund Cluster:</td>
+                              <td colspan="2" style="font-weight:bold;border-bottom : none;border-top : none;border-right : none;padding-left:50px;">Fund Cluster:</td>
                               <td style="border-top: none"><div class="fund_source_input" value="" style="margin-top:2%;border-bottom:1px solid black;text-align:left">{{ $data->fund_source }}</div></td>
                             </tr>
                             <tr>
                               <td style="font-weight:bold;border-left:1px solid black;border-bottom : none;border-top : none;border-right : none;text-align:left;padding-left:10px"> Office/Section:</td>
                               <td colspan="4" style="border-bottom : none;border-top : none;text-align:left;">
                                 {{-- <div class="col-sm-12" > --}}
-                                  <div style="float:left;height:100%;width:50%;text-align:left;padding-left:10px" class="department_name">{{ $data->department_name }}</div>
+                                  <div style="float:left;height:100%;width:50%;text-align:left;padding-left:10px">{{ $data->department_name }}</div>
                                   {{-- <div style="float:right;width:50%"> --}}
                                       <div style="width:20%;float:left;font-weight:bold;padding-left:10px" >PR No.</div>
-                                      <div style="width:30%;float:left;border-bottom:1px solid black" class="pr_no">{{ $data->pr_no }}</div>
+                                      <div style="width:30%;float:left;border-bottom:1px solid black">{{ $data->pr_no }}</div>
                                   {{-- </div> --}}
                                 {{-- </div> --}}
                               </td>
@@ -198,12 +180,12 @@
                           <tfoot>
                             
 
-                            <tr style="">
+                            <tr>
                               <td class="purpose" style="height:30px;border-right:none;border-bottom:none;text-align:left;text-align:left;font-weight:bold;padding-left:10px;padding-top:10px">Purpose: </td>
                               <td colspan="5" style="padding-top:10px">{{ $data->purpose }}</td>
                             </tr>
                             <tr>
-                              <td class="purpose" style="border-right:none;border-top:none;text-align:left;text-align:left;font-weight:bold;padding-left:10px;height:15px"></td>
+                              <td class="purpose" style="border-right:none;border-top:none;text-align:left;text-align:left;font-weight:bold;padding-left:10px;height:20px"></td>
                               <td colspan="5"  style="border-bottom:1px solid black;"></td>
                             </tr>
                             <tr >
@@ -230,9 +212,6 @@
                             
                           </tfoot>
                         </table>
-                        {{-- <div class="col-md-12 text-right" style="padding-top: 30px;padding-right: 100px">
-                          <a href = "{{ route('trackPR') }}" class = "btn btn-primary round mr-1 mb-1"><i class="bx bx-left-arrow"></i> Back</a>
-                      </div> --}}
                 </div>
             </div>
         </div>
@@ -250,7 +229,7 @@
 
 
 <!--/ Scroll - horizontal and vertical table -->
-@endsection
+{{-- @endsection --}}
 {{-- vendor scripts --}}
 @section('vendor-scripts')
 

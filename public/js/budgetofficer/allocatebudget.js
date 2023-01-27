@@ -6,23 +6,11 @@ $("#AllocateBudgetModal").on("hidden.bs.modal", function(e){
       $('.budget').val('');
       $('.mandatory_expenditures').val('');
 })
+
 $("#UpdateAllocateBudgetModal").on("hidden.bs.modal", function(e){
   // location.reload();
 })
-// $("#AllocateBudgetModal").on("show.bs.modal", function(e){
-//   // $("#bodyModal").html('<i class="bx bx-loader-circle"></i> Please wait...');
-//   $.ajax({
-//     cache      : false,
-//     beforeSend : function(){
-//       $('.modal-body').html('<i class="spinner-border spinner-border-sm"></i> Loading... ');
 
-//     },
-//     success: function(result){
-//       $('.modal-body').show();
-//     },
-//   });
-//   // $("#bodyModalImage").html('<i class="bx bx-loader-circle"></i> Please wait...');
-// })
 $(document).ready(function() {
   $('.mandatory_expenditures').select2({
     theme: 'bootstrap-5',
