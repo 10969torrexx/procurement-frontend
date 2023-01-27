@@ -13,7 +13,7 @@
                 <input type="text" class="form-control reject_id" name="reject_id" value="" hidden>
 
                 <label>REMARKS:  </label>
-                <input type="text" class="form-control reject_remarks" placeholder="--Enter--" value="">
+                <input type="text" class="form-control reject_remarks" placeholder="--Enter--" value="" required>
             </div>
             <div class="modal-footer" id = "footModal">
                 <h5 class="modal-title" id="exampleModalLongTitle"></h5>

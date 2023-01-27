@@ -63,10 +63,15 @@
             
             
         <div class="table-responsive">
-                <a href="/bac/supervisor"><<- {{ $data[0]->title }}</a>
+                <a href="/supervisor/traditional"><<- {{ $data[0]->title }}</a>
             <div class="col-md-12 mb-1 text-left">
                 @if($data[0]->status == 1 || $data[0]->status == 2 || $data[0]->status == 3 || $data[0]->status == 6)
-                    <button type="button" class="btn btn-success  mt-1 accept_all" value="2"  data-id="{{ $data[0]->pt_id }}">Accept All</button></a>
+                @if($data[0]->projectStatus == 2)
+                    <button type="button" class="btn btn-success  mt-1 accept_all" value="2"  data-id="{{ $data[0]->pt_id }}" disabled>Accept All</button></a>
+                @endif
+                @if($data[0]->projectStatus == 3 || $data[0]->projectStatus == 1)
+                    <button type="button" class="btn btn-success  mt-1 accept_all" value="2"  data-id="{{ $data[0]->pt_id }}" >Accept All</button></a>
+                @endif
                     <button type="button" class="btn btn-danger  mt-1 reject_all" value="3"  data-id="{{ $data[0]->pt_id }}">Reject All</button>
                 @endif
             </div>
@@ -351,8 +356,8 @@
         </div>
     </div>
     </div>
-    @include('pages.supervisor.supervisor_reject_all_ppmp_modal')
-    @include('pages.supervisor.supervisor_disapproved_ppmp_modal')
+    @include('pages.supervisor.traditional.supervisor_reject_all_ppmp_modal')
+    @include('pages.supervisor.traditional.supervisor_disapproved_ppmp_modal')
 </section>
 <!-- Dashboard Ecommerce ends -->
 @endsection
@@ -364,7 +369,7 @@
 <script src="{{asset('vendors/js/tables/datatable/dataTables.bootstrap4.min.js')}}"></script>
 <script src="{{asset('vendors/js/tables/datatable/dataTables.buttons.min.js')}}"></script>
 
-<script src="{{asset('js/bac/supervisor.js?id=7')}}"></script>
+<script src="{{asset('js/supervisor/supervisor.js?id=7')}}"></script>
 @endsection
 
 @section('page-scripts')

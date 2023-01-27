@@ -23,17 +23,17 @@
     
     table.Appnoncse_table thead {
       text-align: center;
-      font-size: 10px;
+      font-size: 14px;
     }
     tr.body{
-        font-size: 8px;
+        font-size: 12px;
     }
     .est{
       width:50px;
     }
     td.campus {
       font-style: italic;
-      font-size: 10px;
+      font-size: 12px;
       background-color:rgb(190, 225, 247);
       text-align:left;
       text-transform: capitalize;
@@ -77,7 +77,7 @@
     }
     div.image2{
       /* background-color:yellow; */
-      width:70px;
+      width:80px;
       float: left;
       margin-left: 3px;
       height:100%;
@@ -117,7 +117,7 @@
     }
     div.logo{
       width: 90%;
-      height: 90%;
+      height: 100%;
     }
 
 </style>
@@ -136,7 +136,8 @@
 
     <div class="header">
         <div class="image">
-          <div class="logo"><img src="">
+          <div class="logo">
+            <img class="logo" src="{{ public_path("images/logo/".$campusinfo[0]->slsu_logo) }}" alt="">
             {{-- <img src="{{{asset('storage/PMIS/APPNONCSE/image/logo/'.$campusinfo[0]->slsu_logo)}}}" class="logo"> --}}
           </div>
         </div>
@@ -152,7 +153,9 @@
             Contact Number: <label class="link">{{ $campusinfo[0]->contact_number }}</label>
           </div>
           </div>
-        <div class="image2"><img src=""></div>
+        <div class="image2">
+          <img class="logo" src="{{ public_path("images/logo/".$campusinfo[0]->logo2) }}" alt="">
+        </div>
     </div>
     <div class="header2">
       <div class="Title">

@@ -217,10 +217,10 @@ Route::group(['prefix' => 'superadmin','middleware' => ['authuser']], function()
     
     Route::group(['prefix' => 'supervisor','middleware' => ['authuser']], function() {
         //Supervisor Side
-        Route::get('/', 'SupervisorController@index');
-        Route::post('/show-ppmp', 'SupervisorController@show')->name('show-ppmp');
-        Route::post('/supervisor-ppmp-approved', 'SupervisorController@status')->name('supervisor-ppmp-approved');
-        Route::post('/supervisor-ppmp-disapproved', 'SupervisorController@status')->name('supervisor-ppmp-disapproved');
+        Route::get('/', 'Supervisor\SupervisorControllerTraditional@index');
+        Route::post('/show-ppmp', 'Supervisor\SupervisorControllerTraditional@show')->name('show-ppmp');
+        Route::post('/supervisor-ppmp-approved', 'Supervisor\SupervisorControllerTraditional@status')->name('supervisor-ppmp-approved');
+        Route::post('/supervisor-ppmp-disapproved', 'Supervisor\SupervisorControllerTraditional@status')->name('supervisor-ppmp-disapproved');
     });
     
     //Ammendments
@@ -491,9 +491,16 @@ Route::group(['prefix' => 'bac','middleware' => ['authuser']], function() {
     Route::post('/update-procurement', 'BAC\ModeofProcurementController@update')->name('update-procurement');
 
     //Approved PPMP
-    Route::get('/approved-ppmp', 'BAC\ApprovedPPMPController@index');
-    Route::post('/show-approved', 'BAC\ApprovedPPMPController@show');
-    
+    Route::get('/approvedIndicative', 'BAC\ApprovedPPMPController@Indicative_index');
+    Route::get('/approvedPPMP', 'BAC\ApprovedPPMPController@PPMP_index');
+    Route::get('/approvedSupplemental', 'BAC\ApprovedPPMPController@Supplemental_index');
+    Route::post('/show-approved-ppmp', 'BAC\ApprovedPPMPController@show')->name('show-approved-ppmp');
+    Route::get('/signedIndicative', 'BAC\ApprovedPPMPController@signed_indicative')->name('signed-indicative');
+    Route::get('/signedPPMP', 'BAC\ApprovedPPMPController@signed_ppmp')->name('signed-ppmp');
+    Route::get('/signedSupplemental', 'BAC\ApprovedPPMPController@signed_supplemental')->name('signed-supplemental');
+    Route::post('/view-signed-ppmp', 'BAC\ApprovedPPMPController@view_signed_ppmp')->name('view-signed-ppmp');
+    Route::get('/download-signed-ppmp', 'BAC\ApprovedPPMPController@download_signed_ppmp')->name('download-signed-ppmp');
+
     //Approved Supplemental
     Route::get('/approved-supplemental', 'BAC\ApprovedSupplementalController@index');
     Route::post('/show-supplemental', 'BAC\ApprovedSupplementalController@show');
@@ -504,11 +511,14 @@ Route::group(['prefix' => 'bac','middleware' => ['authuser']], function() {
 
     
     //generate APP - NONCSE
-    Route::get('/app-non-cse', 'BAC\APPNONCSEController@index');
+    Route::get('/app-non-cse-traditional', 'BAC\APPNONCSEController@traditional_index');
+    Route::get('/app-non-cse-indicative', 'BAC\APPNONCSEController@indicative_index');
+    Route::get('/app-non-cse-supplemental', 'BAC\APPNONCSEController@supplemental_index');
     Route::get('/try', 'BAC\APPNONCSEController@try');
     Route::post('/app-non-cse-done', 'BAC\APPNONCSEController@endorse_to_main')->name('app-non-cse-done');
+    Route::post('/app-non-cse-submitpres', 'BAC\APPNONCSEController@submit_to_president')->name('app-non-cse-submitpres');
     Route::post('/app-non-cse-generate', 'BAC\APPNONCSEController@generatepdf')->name('app-non-cse-generate');
-    Route::get('/show-all', 'BAC\APPNONCSEController@university_wide')->name('show-all');
+    Route::post('/show-all', 'BAC\APPNONCSEController@university_wide')->name('show-all');
     Route::get('/app-non-cse-generate-excel', 'BAC\APPNONCSEController@generateexcel')->name('app-non-cse-generate-excel');
     Route::post('/show-signatories', 'BAC\APPNONCSEController@show_signatories')->name('show-signatories');
     Route::post('/add-preparedby', 'BAC\APPNONCSEController@add_preparedby')->name('add-preparedby');
@@ -516,6 +526,7 @@ Route::group(['prefix' => 'bac','middleware' => ['authuser']], function() {
     Route::post('/add-recommendingapproval', 'BAC\APPNONCSEController@add_recommendingapproval')->name('add-recommendingapproval');
     Route::post('/update-signatories', 'BAC\APPNONCSEController@update_signatories')->name('update-signatories');
     Route::get('/app-non-cse-year', 'BAC\APPNONCSEController@app_non_cse_year')->name('app-non-cse-year');
+    Route::post('/app-non-cse-print', 'President\PresidentHopeController@print')->name('app-non-cse-print');
     
     Route::post('/show-campusinfo', 'BAC\APPNONCSEController@show_campusinfo')->name('show-campusinfo');
     Route::post('/update-campusinfo', 'BAC\APPNONCSEController@update_campusinfo')->name('update-campusinfo');
@@ -523,18 +534,10 @@ Route::group(['prefix' => 'bac','middleware' => ['authuser']], function() {
     Route::post('/update-campuslogo', 'BAC\APPNONCSEController@update_campuslogo')->name('update-campuslogo');
     Route::post('/update-logo', 'BAC\APPNONCSEController@update_logo')->name('update-logo');
 
-    // Route::post('/supervisor-ppmp-done', 'SupervisorController@done')->name('supervisor-ppmp-done');
+    // Route::post('/supervisor-ppmp-done', 'Supervisor\SupervisorControllerTraditional@done')->name('supervisor-ppmp-done');
 
     
-    Route::group(['prefix' => 'supervisor','middleware' => ['authuser']], function() {
-        //Supervisor Side
-        Route::get('/', 'SupervisorController@index');
-        Route::post('/show-ppmp', 'SupervisorController@show')->name('show-ppmp');
-        Route::post('/supervisor-ppmp-approved', 'SupervisorController@status')->name('supervisor-ppmp-approved');
-        Route::post('/supervisor-ppmp-disapproved', 'SupervisorController@status')->name('supervisor-ppmp-disapproved');
-        Route::post('/supervisor-ppmp-done', 'SupervisorController@done')->name('supervisor-ppmp-done');
-        Route::post('/accept-reject-all', 'SupervisorController@accept_reject_all')->name('accept-reject-all');
-    });
+    
     
     //Ammendments
     Route::get('/request-for-amendments', 'BAC\RequestforAmendmentsController@index');
@@ -544,27 +547,83 @@ Route::group(['prefix' => 'bac','middleware' => ['authuser']], function() {
     
 });
 
+Route::group(['prefix' => 'supervisor','middleware' => ['authuser']], function() {
+    //Supervisor Side
+    Route::get('/traditional', 'Supervisor\SupervisorController@Traditional_index');
+    Route::post('/show-traditional-ppmp', 'Supervisor\SupervisorController@show_Traditional')->name('show-traditional-ppmp');
+    Route::get('/supplemental', 'Supervisor\SupervisorController@Supplemental_index');
+    Route::post('/show-supplemental-ppmp', 'Supervisor\SupervisorController@show_Supplemental')->name('show-supplemental-ppmp');
+    Route::get('/indicative', 'Supervisor\SupervisorController@indicative_index');
+    Route::post('/show-indicative-ppmp', 'Supervisor\SupervisorController@show_indicative')->name('show-indicative-ppmp');
+    Route::post('/supervisor-ppmp-approved', 'Supervisor\SupervisorController@status')->name('supervisor-ppmp-approved');
+    Route::post('/supervisor-ppmp-disapproved', 'Supervisor\SupervisorController@status')->name('supervisor-ppmp-disapproved');
+    Route::post('/supervisor-ppmp-done', 'Supervisor\SupervisorController@done')->name('supervisor-ppmp-done');
+    Route::post('/accept-reject-all', 'Supervisor\SupervisorController@accept_reject_all')->name('accept-reject-all');
+
+    // Route::post('/supervisor-ppmp-approved', 'Supervisor\SupervisorControllerSupplemental@status')->name('supervisor-ppmp-approved');
+    // Route::post('/supervisor-ppmp-disapproved', 'Supervisor\SupervisorControllerSupplemental@status')->name('supervisor-ppmp-disapproved');
+    // Route::post('/supervisor-ppmp-done', 'Supervisor\SupervisorControllerSupplemental@done')->name('supervisor-ppmp-done');
+    // Route::post('/accept-reject-all', 'Supervisor\SupervisorControllerSupplemental@accept_reject_all')->name('accept-reject-all');
+});
+
+Route::group(['prefix' => 'president','middleware' => ['authuser']], function() {
+    //Supervisor Side
+    Route::get('/list/{id}', 'President\PresidentHopeController@list');
+    // Route::get('/traditional', 'President\PresidentHopeController@Traditional_index');
+    Route::post('/pres_app_noncse', 'President\PresidentHopeController@index_app_noncse')->name('pres_app_noncse');
+    Route::post('/pres_generatepdf', 'President\PresidentHopeController@generatepdf')->name('pres_generatepdf');
+    Route::post('/pres_print', 'President\PresidentHopeController@print')->name('pres_print');
+    Route::post('/pres_decision', 'President\PresidentHopeController@pres_decision')->name('pres_decision');
+    Route::get('/supplemental', 'President\PresidentHopeController@Supplemental_index');
+    Route::get('/indicative', 'President\PresidentHopeController@indicative_index');
+});
+
+Route::group(['prefix' => 'baccommittee','middleware' => ['authuser']], function() {
+    //Supervisor Side
+    Route::get('/list/{id}', 'BACCommittee\BACCommitteeController@list');
+    // Route::get('/traditional', 'BACCommittee\BACCommitteeController@Traditional_index');
+    Route::post('/bac_committee_app_noncse', 'BACCommittee\BACCommitteeController@index_app_noncse')->name('bac_committee_app_noncse');
+    Route::post('/bac_committee_generatepdf', 'BACCommittee\BACCommitteeController@generatepdf')->name('bac_committee_generatepdf');
+    Route::post('/bac_committee_print', 'BACCommittee\BACCommitteeController@print')->name('bac_committee_print');
+    Route::post('/bac_committee_decision', 'BACCommittee\BACCommitteeController@bac_committee_decision')->name('bac_committee_decision');
+    Route::get('/supplemental', 'BACCommittee\BACCommitteeController@Supplemental_index');
+    Route::get('/indicative', 'BACCommittee\BACCommitteeController@indicative_index');
+});
+
 Route::group(['prefix' => 'supply_custodian','middleware' => ['authuser']], function() {
 
     Route::get('/property','SupplyCustodian\PropertyController@index');
     Route::post('/assign-par','SupplyCustodian\PropertyController@assign_par')->name('assign-par');
+    Route::post('/searchPAR','SupplyCustodian\PropertyController@search')->name('searchPAR');
     Route::post('/finalize-par','SupplyCustodian\PropertyController@finalize_par')->name('finalize-par');
     Route::post('/delete-par','SupplyCustodian\PropertyController@delete_par')->name('delete-par');
     Route::post('/edit-par','SupplyCustodian\PropertyController@edit_par')->name('edit-par');
     Route::post('/finaldelete-par','SupplyCustodian\PropertyController@finaldelete_par')->name('finaldelete-par');
+    Route::post('/transfer-par','SupplyCustodian\PropertyController@transfer_par')->name('transfer-par');
+    Route::post('/submittransfer-par','SupplyCustodian\PropertyController@submittransfer_par')->name('submittransfer-par');
+    Route::post('/print-par','SupplyCustodian\PropertyController@print_par')->name('print-par');
+    Route::post('/print','SupplyCustodian\PropertyController@print')->name('print');
     Route::post('/submitdelete-par','SupplyCustodian\PropertyController@submitdelete_par')->name('submitdelete-par');
     Route::post('/submitEdit-par','SupplyCustodian\PropertyController@submitEdit_par')->name('submitEdit-par');
     Route::post('/submitadd-par','SupplyCustodian\PropertyController@submitadd_par')->name('submitadd-par');
     Route::post('/additem-par','SupplyCustodian\PropertyController@additem_par')->name('additem-par');
 
-    Route::get('/ics','SupplyCustodian\ICSController@index');
-    Route::post('/assign-ics','SupplyCustodian\icsController@assign_ics')->name('assign-ics');
-    Route::post('/finalize-ics','SupplyCustodian\icsController@finalize_ics')->name('finalize-ics');
-    Route::post('/delete-ics','SupplyCustodian\icsController@delete_ics')->name('delete-ics');
-    Route::post('/edit-ics','SupplyCustodian\icsController@edit_ics')->name('edit-ics');
-    Route::post('/submitEdit-ics','SupplyCustodian\icsController@submitEdit_ics')->name('submitEdit-ics');
-    Route::post('/submitadd-ics','SupplyCustodian\icsController@submitadd_ics')->name('submitadd-ics');
-    Route::post('/additem-ics','SupplyCustodian\icsController@additem_ics')->name('additem-ics');
+    
+    Route::get('/ics','SupplyCustodian\ICSController@index')->name('ics_index');
+    Route::post('/searchICS','SupplyCustodian\ICSController@search')->name('searchICS');
+    Route::post('/assign-ics','SupplyCustodian\ICSController@assign_ics')->name('assign-ics');
+    Route::post('/finalize-ics','SupplyCustodian\ICSController@finalize_ics')->name('finalize-ics');
+    Route::post('/delete-ics','SupplyCustodian\ICSController@delete_ics')->name('delete-ics');
+    Route::post('/finaldelete-ics','SupplyCustodian\ICSController@finaldelete_ics')->name('finaldelete-ics');
+    Route::post('/transfer-ics','SupplyCustodian\ICSController@transfer_ics')->name('transfer-ics');
+    Route::post('/submittransfer-ics','SupplyCustodian\ICSController@submittransfer_ics')->name('submittransfer-ics');
+    Route::post('/print-ics','SupplyCustodian\ICSController@print_ics')->name('print-ics');
+    Route::post('/printics','SupplyCustodian\ICSController@print')->name('printics');
+    Route::post('/submitdelete-ics','SupplyCustodian\ICSController@submitdelete_ics')->name('submitdelete-ics');
+    Route::post('/edit-ics','SupplyCustodian\ICSController@edit_ics')->name('edit-ics');
+    Route::post('/submitEdit-ics','SupplyCustodian\ICSController@submitEdit_ics')->name('submitEdit-ics');
+    Route::post('/submitadd-ics','SupplyCustodian\ICSController@submitadd_ics')->name('submitadd-ics');
+    Route::post('/additem-ics','SupplyCustodian\ICSController@additem_ics')->name('additem-ics');
 
 
     Route::get('/supplier','SupplyCustodian\SupplierController@index');

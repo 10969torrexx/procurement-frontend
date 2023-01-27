@@ -233,7 +233,8 @@ class GlobalDeclare extends Controller
         }
         return $out;
     }    
-# this will determine the month
+
+    # this will determine the month
     public function MonthString($id) {
         $out = $id;
         switch ($id){
@@ -277,30 +278,30 @@ class GlobalDeclare extends Controller
         return $out;
     }    
 
-# this will determine the fund source or source of fund
-public function FundSource($id) {
-    $out = "";
-    switch ($id){
-        case 1:
-            $out = "GoP";
-            break;
-        case 2:
-            $out = "Foreign";
-            break;  
-        case 3:
-            $out = "Corporate Budget";
-            break;
-        case 4:
-            $out = "Income";
-            break;
-        case 5:
-            $out = "RA";
-            break;
+    # this will determine the fund source or source of fund
+    public function FundSource($id) {
+        $out = "";
+        switch ($id){
+            case 1:
+                $out = "GoP";
+                break;
+            case 2:
+                $out = "Foreign";
+                break;  
+            case 3:
+                $out = "Corporate Budget";
+                break;
+            case 4:
+                $out = "Income";
+                break;
+            case 5:
+                $out = "RA";
+                break;
+        }
+        return $out;
     }
-    return $out;
-}
 
-# this will determine the statuses of the ppmp, Project title
+    # this will determine the statuses of the ppmp, Project title
     public function Status($id) {
         $out = '';
         switch($id) {
@@ -329,7 +330,11 @@ public function FundSource($id) {
         return $out;
     }
 
+<<<<<<< HEAD
+    # this will determine the project category
+=======
 # this will determine the project category | tagging of project type
+>>>>>>> 583ec9f227f658641b90981c368ee903f9258e9e
     public function project_category($id) {
         $out = '';
         switch ($id) {
@@ -344,5 +349,131 @@ public function FundSource($id) {
             break;
         }
         return $out;
+<<<<<<< HEAD
+    }
+
+    # this will determine the project category
+    public function project_category_num($id) {
+        $out = '';
+        switch ($id) {
+            case 'Indicative':
+                $out = 0;
+            break;
+            case 'PPMP':
+                $out = 1;
+            break;
+            case 'Supplemental':
+                $out = 2;
+            break;
+        }
+        return $out;
+    }
+
+    # this will determine the app is approved or disaaproved
+    public function pres_status($id) {
+        $out = '';
+        switch ($id) {
+            case 1:
+                $out = 'Pending';
+            break;
+            case 2:
+                $out = 'Approved';
+            break;
+            case 3:
+                $out = 'Disapproved';
+            break;
+        }
+        return $out;
+    }
+
+    # this will determine the color of status
+    public function pres_status_color($id) {
+        $out = '';
+        switch ($id) {
+            case 1:
+                $out = 'blue';
+            break;
+            case 2:
+                $out = 'green';
+            break;
+            case 3:
+                $out = 'red';
+            break;
+        }
+        
+        return $out;
+    }
+
+    # this will determine the app is approved or disaaproved
+    public function endorse($id) {
+        $out = '';
+        switch ($id) {
+            case 0:
+                $out = 'Pending';
+            break;
+            case 1:
+                $out = 'Endorsed';
+            break;
+            // case 3:
+            //     $out = 'Disapproved';
+            // break;
+        }
+        return $out;
+    }
+
+    # this will determine the color of status
+    public function endorse_color($id) {
+        $out = '';
+        switch ($id) {
+            case 0:
+                $out = 'blue';
+            break;
+            case 1:
+                $out = 'coral';
+            break;
+            // case 3:
+            //     $out = 'red';
+            // break;
+        }
+        
+        return $out;
+    }
+
+    
+    # this will determine the app is recommended or disaaproved
+    public function bac_committee_status($id) {
+        $out = '';
+        switch ($id) {
+            case 0:
+                $out = 'Pending';
+            break;
+            case 1:
+                $out = 'Recommended';
+            break;
+            case 2:
+                $out = 'Disapproved';
+            break;
+        }
+        return $out;
+    }
+
+    # this will determine the color of status
+    public function bac_committee_status_color($id) {
+        $out = '';
+        switch ($id) {
+            case 0:
+                $out = 'blue';
+            break;
+            case 1:
+                $out = 'green';
+            break;
+            case 2:
+                $out = 'red';
+            break;
+        }
+        
+        return $out;
+=======
+>>>>>>> 583ec9f227f658641b90981c368ee903f9258e9e
     }
 }
