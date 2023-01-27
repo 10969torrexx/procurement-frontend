@@ -71,28 +71,20 @@ class MenuServiceProvider extends ServiceProvider
             }   elseif($role == 11){  
                 $verticalMenuJson = file_get_contents(base_path('resources/data/menus/supervisor-menu.json'));
                 $verticalMenuData = json_decode($verticalMenuJson);
-<<<<<<< HEAD
             }  elseif($role == 12){      
                 $verticalMenuJson = file_get_contents(base_path('resources/data/menus/president-menu.json'));
                 $verticalMenuData = json_decode($verticalMenuJson);
-            // }    elseif($role == 13){      
-            //     $verticalMenuJson = file_get_contents(base_path('resources/data/menus/bor-secretary-menu.json'));
-            //     $verticalMenuData = json_decode($verticalMenuJson);
-            }   elseif($role == 14){      
+            }  elseif ($role == 13) {
+                $verticalMenuJson = file_get_contents(base_path('resources/data/menus/bor-secretary-menu.json'));
+                $verticalMenuData = json_decode($verticalMenuJson);
+            }  elseif($role == 14){      
                 $verticalMenuJson = file_get_contents(base_path('resources/data/menus/bac-committee-menu.json'));
                 $verticalMenuData = json_decode($verticalMenuJson);
             } 
-=======
-            }   
                 /**
                  * ! Torrexx additonals 
                  * ? BOR Secretary
                  * */ 
-                elseif ($role == 13) {
-                    $verticalMenuJson = file_get_contents(base_path('resources/data/menus/bor-secretary-menu.json'));
-                    $verticalMenuData = json_decode($verticalMenuJson);
-                }
->>>>>>> 583ec9f227f658641b90981c368ee903f9258e9e
 
             $horizontalMenuJson = file_get_contents(base_path('resources/data/menus/horizontal-menu.json'));
             $horizontalMenuData = json_decode($horizontalMenuJson);
