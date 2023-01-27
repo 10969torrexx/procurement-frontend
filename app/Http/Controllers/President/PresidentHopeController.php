@@ -169,13 +169,13 @@ class PresidentHopeController extends Controller
           ->whereNull("deleted_at")
           ->where("project_category","=", $category)
           ->where("status","=", 4)  
-          // ->where("pres_status","=", 1)
-          ->where(function ($query) {
-              $query->where("pres_status","=", 1)
-              ->orWhere("pres_status","=", 2)
-              ->orWhere("pres_status","=", 3);
-            })
-          ->whereDate('created_at', Carbon::now()/* ->subDays(7) */)
+          ->where("project_year",$year)
+          // ->where(function ($query) {
+          //     $query->where("pres_status","=", 1)
+          //     ->orWhere("pres_status","=", 2)
+          //     ->orWhere("pres_status","=", 3);
+          //   })
+          ->whereDate('created_at', Carbon::now()->subDays(7))
           ->get();
 
           // dd($expired);

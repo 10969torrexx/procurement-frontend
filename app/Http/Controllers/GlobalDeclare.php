@@ -329,12 +329,9 @@ class GlobalDeclare extends Controller
         }
         return $out;
     }
-
-<<<<<<< HEAD
     # this will determine the project category
-=======
-# this will determine the project category | tagging of project type
->>>>>>> 583ec9f227f658641b90981c368ee903f9258e9e
+    
+    # this will determine the project category | tagging of project type
     public function project_category($id) {
         $out = '';
         switch ($id) {
@@ -349,7 +346,6 @@ class GlobalDeclare extends Controller
             break;
         }
         return $out;
-<<<<<<< HEAD
     }
 
     # this will determine the project category
@@ -473,7 +469,5 @@ class GlobalDeclare extends Controller
         }
         
         return $out;
-=======
->>>>>>> 583ec9f227f658641b90981c368ee903f9258e9e
     }
 }
