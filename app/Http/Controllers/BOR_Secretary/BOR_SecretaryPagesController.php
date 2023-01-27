@@ -16,11 +16,11 @@ class BOR_SecretaryPagesController extends Controller
                 return view('pages.error-500');
            }
         }
-     /** 
-      * ! BOR Resolution
-      * ? TODO - 1 get departments list based on campus
-      * ? TODO - 2 get determine the departemnt type / department scope of BOR resolution
-      */
+    /** 
+     * ! BOR Resolution
+     * ? TODO - 1 get departments list based on campus
+     * ? TODO - 2 get determine the departemnt type / department scope of BOR resolution
+     */
         public function show_bor_resolution() {
            try {
                 // ? TODO list 1
@@ -64,5 +64,19 @@ class BOR_SecretaryPagesController extends Controller
                 return view('pages.error-500');
            }
         }
-    
+    /**
+     * ! Recommended APP
+     * ? TODO - get all recommended app by bac secretariat
+     * 
+     */
+    public function show_recommended_app() {
+        try {
+            // ? TODO list - 1
+                
+            // ? END 
+        } catch (\Throwable $th) {
+                return view('pages.error-500');
+                //throw $th;
+        }
+    }
 }

@@ -704,6 +704,10 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
             // ! submit edit bor resolution
                 Route::post('/edit-bor-resolution', [BOR_SecretaryController::class, 'edit_bor_resolution'])->name('edit_bor_resolution');
         // ? END
+        // ? Recommended APP
+            // ! show recommmended APP
+            Route::get('/recomemnded-app', [BOR_SecretaryPagesController::class, 'show_recommended_app'])->name('show_recommended_app');
+        // ? END
     });
 /** END */
 
