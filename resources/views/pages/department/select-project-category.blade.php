@@ -46,7 +46,7 @@
                                         style="width:250px;height:250px">
                                     </lord-icon>
                                 </div>
-                                <a href="" class="btn btn-primary col-12">
+                                <a href="{{ route('department-showCreatetPPMP', ['project_category' => (new AESCipher)->encrypt(0)]) }}" class="btn btn-primary col-12">
                                     <strong class="text-white">Indicative PPMP</strong>
                                 </a>
                             </div>
@@ -79,7 +79,7 @@
                                         style="width:250px;height:250px">
                                     </lord-icon>
                                 </div>
-                                <a href="" class="btn btn-primary col-12">
+                                <a href="{{ route('department-showCreatetPPMP', ['project_category' => (new AESCipher)->encrypt(2)]) }}" class="btn btn-primary col-12">
                                     <strong class="text-white">Supplemental PPMP</strong>
                                 </a>
                             </div>

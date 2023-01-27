@@ -1,0 +1,220 @@
+{
+  "menu": [
+    {
+      "url": "/",
+      "name": "Dashboard",
+      "i18n": "Dashboard",
+      "slug": "dashboard",
+      "icon": "desktop"
+    },
+    {
+      "navheader": "My Property"
+    },
+    {
+      "url": "department/my_par",
+      "name": "PAR",
+      "i18n": "User",
+      "icon": "list"
+    },
+    {
+      "url": "department/my_ics",
+      "name": "ICS",
+      "i18n": "User",
+      "icon": "gears"
+    },
+    {
+      "navheader": "End-User"
+    },
+    {
+      "url": "department/announcements", 
+      "name": "Announcement",
+      "i18n": "Calendar",
+      "icon": "calendar"
+    },
+    {
+      "url": "department/project-category",
+      "name": "Create PPMP",
+      "i18n": "User",
+      "icon": "users"
+      
+    },
+    {
+      "url": "department/myPPMP",
+      "name": "MY PPMP",
+      "i18n": "Notebook",
+      "icon": "notebook"
+      
+    },
+    {
+      "navheader": "Supervisor"
+    },
+    {
+      "url": "#",
+      "name": "Pending PPMPs",
+      "i18n": "User",
+      "icon": "list",
+      "submenu": [
+        {
+          "url": "supervisor/indicative",
+          "name": "Indicative",
+          "i18n": "User",
+          "icon": "shoppingcart-in"
+        },
+        {
+          "url": "supervisor/traditional",
+          "name": "PPMPS",
+          "i18n": "User",
+          "icon": "like"
+        },
+        {
+          "url": "supervisor/supplemental",
+          "name": "Supplemental",
+          "i18n": "User",
+          "icon": "shoppingcart-in"
+        }
+      ]
+    },
+    {
+      "navheader": "President"
+    },
+    {
+      "url": "#", 
+      "name": "BOR Resolution",
+      "i18n": "Calendar",
+      "icon": "calendar"
+    },
+    {
+      "url": "#",
+      "name": "APP NON-CSE",
+      "i18n": "User",
+      "icon": "users",
+      "submenu": [
+        {
+          "url": "#",
+          "name": "Indicative",
+          "i18n": "User",
+          "icon": "shoppingcart-in",
+          "submenu": [
+            {
+              "url": "president/list/Indicative",
+              "name": "View",
+              "i18n": "User",
+              "icon": "shoppingcart-in"
+            },
+            {
+              "url": "#",
+              "name": "Signed APP",
+              "i18n": "User",
+              "icon": "shoppingcart-in"
+            }]
+            
+        },
+        {
+          "url": "#",
+          "name": "Traditional",
+          "i18n": "User",
+          "icon": "shoppingcart-in",
+          "submenu": [
+            {
+              "url": "president/list/PPMP",
+              "name": "View",
+              "i18n": "User",
+              "icon": "shoppingcart-in"
+            },
+            {
+              "url": "#",
+              "name": "Signed APP",
+              "i18n": "User",
+              "icon": "shoppingcart-in"
+            }]
+        },
+        {
+          "url": "#",
+          "name": "Supplemental",
+          "i18n": "User",
+          "icon": "shoppingcart-in",
+          "submenu": [
+            {
+              "url": "president/list/Supplemental",
+              "name": "View",
+              "i18n": "User",
+              "icon": "shoppingcart-in"
+            },
+            {
+              "url": "#",
+              "name": "Signed APP",
+              "i18n": "User",
+              "icon": "shoppingcart-in"
+            }]
+        }
+      ]
+    },
+    {
+      "url": "#",
+      "name": "APP CSE",
+      "i18n": "User",
+      "icon": "users",
+      "submenu": [
+        {
+          "url": "#",
+          "name": "Indicative",
+          "i18n": "User",
+          "icon": "shoppingcart-in",
+          "submenu": [
+            {
+              "url": "#",
+              "name": "View",
+              "i18n": "User",
+              "icon": "shoppingcart-in"
+            },
+            {
+              "url": "#",
+              "name": "Signed APP",
+              "i18n": "User",
+              "icon": "shoppingcart-in"
+            }]
+            
+        },
+        {
+          "url": "#",
+          "name": "Traditional",
+          "i18n": "User",
+          "icon": "shoppingcart-in",
+          "submenu": [
+            {
+              "url": "#",
+              "name": "View",
+              "i18n": "User",
+              "icon": "shoppingcart-in"
+            },
+            {
+              "url": "#",
+              "name": "Signed APP",
+              "i18n": "User",
+              "icon": "shoppingcart-in"
+            }]
+        },
+        {
+          "url": "#",
+          "name": "Supplemental",
+          "i18n": "User",
+          "icon": "shoppingcart-in",
+          "submenu": [
+            {
+              "url": "#",
+              "name": "View",
+              "i18n": "User",
+              "icon": "shoppingcart-in"
+            },
+            {
+              "url": "#",
+              "name": "Signed APP",
+              "i18n": "User",
+              "icon": "shoppingcart-in"
+            }]
+        }
+      ]
+      
+    }
+  ]
+}

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use DB;
+use Carbon\Carbon;
 class DashboardController extends Controller
 {
     //users
@@ -102,22 +103,22 @@ class DashboardController extends Controller
                     ->join('fund_sources', 'allocated__budgets.fund_source_id', 'fund_sources.id')
                     ->where('allocated__budgets.department_id', $departmentID)
                     ->where('allocated__budgets.campus', session('campus'))
+                    ->where('allocated__budgets.year', Carbon::now()->addYears(1)->format('Y'))
                     ->whereNull('allocated__budgets.deleted_at')
                     ->groupBy('fund_sources.fund_source', 'allocated__budgets.year')
                     ->orderBy('allocated__budgets.year')
                     ->get([
                         'fund_sources.id as fund_source_id', 'allocated__budgets.*', 'fund_sources.fund_source', \DB::raw('sum(allocated__budgets.allocated_budget) as SumBudget')
                     ]); 
-
                 $mandatory_expeditures = \DB::table("mandatory_expenditures as me")
                     ->select("me.year", "me.fund_source_id", \DB::raw('sum(me.price) as SumMandatory'))
-                    ->where("me.department_id", $departmentID)
+                    ->where('me.campus', session('campus'))
+                    ->where('me.department_id', session('department_id'))
+                    ->where('me.year', Carbon::now()->addYears(1)->format('Y'))
                     ->whereNull('me.deleted_at')
-                    ->where("me.campus", session('campus'))
                     ->groupBy("me.year")
                     ->groupBy("me.fund_source_id")
                     ->get();
-                
                 $ppmp_expenses = \DB::table('project_titles')
                     ->join('ppmps', 'ppmps.project_code', 'project_titles.id')
                     ->where('project_titles.department_id', session('department_id'))
@@ -130,8 +131,7 @@ class DashboardController extends Controller
                         'ppmps.estimated_price',
                         'project_titles.fund_source as f_source'
                     ]);
-
-                    return view('pages.users-dashboard', compact('mandatory_expeditures',  'response', 'ppmp_expenses'));
+                return view('pages.users-dashboard', compact('mandatory_expeditures',  'response', 'ppmp_expenses'));
         } 
         else if(session('role') == 11) {
             //

@@ -2,8 +2,8 @@
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <h5 class="modal-title" id="exampleModalLongTitle">PAR Property</h5>
+          <button type="button" class="close parClosed" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -13,7 +13,7 @@
                     <div class="form-group">
                         <label for="EmployeeName">Employee Name *</label>
                         <select name="EmployeeName" class="form-control EmployeeName" id="EmployeeName">
-                            <option selected>Choose...</option>
+                            <option id="selected" selected>Choose...</option>
                             @foreach($users as $users)
                             <option value="{{ $users->id }}">{{ $users->name }}</option>
                             @endforeach
@@ -30,7 +30,7 @@
                     <div class="form-group">
                         <label for="FundCluster">Fund Cluster *</label>
                         <select name="FundCluster" class="form-control FundCluster" id="FundCluster" required>
-                            <option value = "0"></option>
+                            <option id="selected" selected>Choose...</option>
                             <option value="RAF">Regular Agency Fund</option>
                             <option value = "IGF" >Internally Generated Funds</option>
                             <option value="BRF" >Business Related Funds</option>
@@ -68,7 +68,13 @@
                 <div class="col-xs-6 col-lg-4 col-sm-4">
                     <div class="form-group">
                         <label for="Unit">Unit *</label>
-                        <input type="text" name="Unit" id="Unit" class="form-control Unit" value="">
+                        {{-- <input type="text" name="Unit" id="Unit" class="form-control Unit" value=""> --}}
+                        <select name="Unit" class="form-control Unit" id="Unit">
+                            <option selected>Choose...</option>
+                            @foreach($unit as $unit)
+                            <option value="{{ $unit->id }}">{{ $unit->unit_of_measurement }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
         
@@ -82,7 +88,7 @@
         
             <div class="row ">
         
-                <div class="col-xs-6 col-lg-8 col-sm-8">
+                <div class="col-xs-6 col-lg-4 col-sm-4">
                     <div class="form-group">
                         <label for="Issuedby">Issued by *</label>
                         <select name="Issuedby" class="form-control Issuedby" id="Issuedby">
@@ -94,6 +100,13 @@
                     </div>
                 </div>
         
+                <div class="col-xs-6 col-lg-4 col-sm-4">
+                    <div class="form-group">
+                        <label for="PANumber">PA Number *</label>
+                        <input type="text" name="PANumber" id="PANumber" class="form-control PANumber" value="">
+                    </div>
+                </div>
+
                 <div class="col-xs-6 col-lg-4 col-sm-4">
                     <div class="form-group">
                         <label for="DateIssued">Date Issued *</label>
@@ -140,13 +153,13 @@
                 <div class="col-4">
                     <div class="form-group">
                         <label for="Estimatedusefullife">Estimated useful life *</label>
-                        <input type="text" name="Estimatedusefullife" id="Estimatedusefullife" class="form-control Estimatedusefullife" value="">
+                        <input type="text" name="Estimatedusefullife" id="Estimatedusefullife" class="form-control Estimatedusefullife" value="" >
                     </div>
                 </div>
             </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-secondary parClosed" data-dismiss="modal">Close</button>
           <button type="button" class="btn btn-primary parSave">Save</button>
         </div>
       </div>

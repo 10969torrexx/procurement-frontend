@@ -216,6 +216,7 @@ $(document).on('click', '.PR_button', function (e) {
 // $(document).on('click', '.PR_button', function (e) {
 //     e.preventDefault();
     
+
 //     var item = $(".item").val();
 //     var quantity = $(".quantity").val();
 //     alert(quantity);
@@ -227,6 +228,16 @@ $(document).on('click', '.PR_button', function (e) {
 //                 itemArray.push(itemChecked[i].value); 
 //             }
 //         }
+
+ //   var itemCount = $(".itemCount").val();
+ //   var itemChecked = document.getElementsByClassName('form-check-input');
+ //   var itemArray = [];
+  //      for (let i = 0; i < itemCount; i++) {
+ //           if(itemChecked[i].checked){
+ //              itemArray.push(itemChecked[i].value); 
+  //          }
+ //       }
+
         
 //         if(itemArray==''){
 //             Swal.fire({

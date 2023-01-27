@@ -3,11 +3,16 @@
 // });
 
 $(document).on('click', '.generatepdf', function (e) {
-  var year = $(".Year").val();
-  var campusCheck = $(".campusCheck").val();
+  // var year = $(".Year").val();
+  // var campusCheck = $(".campusCheck").val();
+  var data = {
+    'year' :  $(".Year").val(),
+    'campusCheck' : $(".campusCheck").val(),
+    'category' : $(".project_category").val()
+  }
 
-  console.log(year);
-  if(year == ""){
+  console.log(data);
+  if(data.year == ""){
     Swal.fire('Complete the needed data', '', 'info')
   }
   else{
@@ -20,7 +25,7 @@ $(document).on('click', '.generatepdf', function (e) {
     $.ajax({
       type: "post",
       url: "app-non-cse-generate",
-      data:{'year': year,'campusCheck': campusCheck},
+      data:data,
       xhrFields: {
         responseType: 'blob'
       },
@@ -641,71 +646,6 @@ $(document).on('click', '.submitapproval', function (e) {
   }
       
 });
-
-//allowed main campus to view
-$(document).on('click', '.endorse', function (e) {
-  var year = $(".Year").val();
-  var data = {
-    'year' :  $(".Year").val(),
-    'endorse' : $(this).val()
-  }
-  $.ajaxSetup({
-    headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-    }
-  });
-
-  $.ajax({
-    type: "POST",
-    url: "app-non-cse-done",
-    data: data,
-    dataType: "json",
-    success: function (response) {
-      // console.log(response);
-      if(response['status'] == 200) {
-        Swal.fire({
-          title: '',
-          html: 'Loading...',
-          icon: 'success',
-          timer: 1000,
-          timerProgressBar: true,
-          didOpen: () => {
-            Swal.showLoading()
-            const b = Swal.getHtmlContainer().querySelector('b')
-            timerInterval = setInterval(() => {
-              b.textContent = Swal.getTimerLeft()
-            }, 100)
-          },
-          willClose: () => {
-            clearInterval(timerInterval)
-          }
-          }).then((result) => {
-            /* Read more about handling dismissals below */
-            if (result.dismiss === Swal.DismissReason.timer) {
-              location.reload();
-              console.log('I was closed by the timer')
-            }
-            location.reload();
-          })
-      }else{
-        Swal.fire({
-          icon: 'error',
-          title: 'Oops...',
-          text: 'Already Exist',
-        })
-        // $(this).text('Shared');
-      }
-    }
-  })
-});
-
-//trigger edit new recommendingapproval modal
-// $(document).on('click', '.newrecommendingapproval', function (e) {
-//   $("#edit_newrecommendingapproval").modal('show');  
-//   $(".year").val($(".Year").val());
-// });
-
-
 $(document).on('click', '.newrecommendingapproval', function (e) {
   // $(".recommending_approval_add").show();
 
@@ -788,3 +728,213 @@ $(document).on('click', '.submitrecommendingapproval', function (e) {
       
 });
   
+//allowed main campus to view
+$(document).on('click', '.endorse', function (e) {
+  var year = $(".Year").val();
+  var data = {
+    'year' :  $(".Year").val(),
+    'endorse' : $(".endorse").val(),
+    'category' : $("#project_category").val()
+  }
+  console.log(data);
+  $.ajaxSetup({
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+  });
+
+  $.ajax({
+    type: "POST",
+    url: "app-non-cse-done",
+    data: data,
+    dataType: "json",
+    success: function (response) {
+      // console.log(response);
+      if(response['status'] == 200) {
+        Swal.fire({
+          title: '',
+          html: 'Loading...',
+          icon: 'success',
+          timer: 1000,
+          timerProgressBar: true,
+          didOpen: () => {
+            Swal.showLoading()
+            const b = Swal.getHtmlContainer().querySelector('b')
+            timerInterval = setInterval(() => {
+              b.textContent = Swal.getTimerLeft()
+            }, 100)
+          },
+          willClose: () => {
+            clearInterval(timerInterval)
+          }
+          }).then((result) => {
+            /* Read more about handling dismissals below */
+            if (result.dismiss === Swal.DismissReason.timer) {
+              location.reload();
+              console.log('I was closed by the timer')
+            }
+            location.reload();
+          })
+      }else if(response['status'] == 500){
+        Swal.fire({
+          icon: 'info',
+          title: 'Oops...',
+          text: 'Incomplete Signatories',
+        })
+        // $(this).text('Shared');
+      }else{ 
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Already Exist',
+        })
+        // $(this).text('Shared');
+      }
+    }
+  })
+});
+
+//submit to university president
+$(document).on('click', '.submittopresident', function (e) {
+  var year = $(".Year").val();
+  var data = {
+    'year' :  $(".Year").val(),
+    'submit' : $(this).val(),
+    'category' : $(this).attr("data-id")
+  }
+  console.log(data);
+  $.ajaxSetup({
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+  });
+
+  $.ajax({
+    type: "POST",
+    url: "app-non-cse-submitpres",
+    data: data,
+    dataType: "json",
+    success: function (response) {
+      // console.log(response);
+      if(response['status'] == 200) {
+        Swal.fire({
+          title: '',
+          html: 'Loading...',
+          icon: 'success',
+          timer: 1000,
+          timerProgressBar: true,
+          didOpen: () => {
+            Swal.showLoading()
+            const b = Swal.getHtmlContainer().querySelector('b')
+            timerInterval = setInterval(() => {
+              b.textContent = Swal.getTimerLeft()
+            }, 100)
+          },
+          willClose: () => {
+            clearInterval(timerInterval)
+          }
+          }).then((result) => {
+            /* Read more about handling dismissals below */
+            if (result.dismiss === Swal.DismissReason.timer) {
+              location.reload();
+              console.log('I was closed by the timer')
+            }
+            location.reload();
+          })
+      }else if(response['status'] == 500){
+        Swal.fire({
+          icon: 'info',
+          title: 'Oops...',
+          text: 'Incomplete Signatories',
+        })
+        // $(this).text('Shared');
+      }else{
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Already Exist',
+        })
+        // $(this).text('Shared');
+      }
+    }
+  })
+});
+
+$(document).on('click', '.univ_wide', function (e) {
+  // var year = $(".Year").val();
+  var data = {
+    // 'year' :  $(".Year").val(),
+    // 'submit' : $(this).val(),
+    'category' : $(".project_category").val()
+  }
+  $.ajaxSetup({
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+  });
+
+  $.ajax({
+    type: "POST",
+    url: "show-all",
+    data: data,
+    dataType: "json",
+    success: function (response) {
+    }
+  })
+});
+
+
+$(document).on('click', '.print', function (e) {
+  var data = {
+      'year' :  $(".Year").val(),
+      'campusCheck' : $(".campusCheck").val(),
+      'category' : $(".project_category").val(),
+      'app_type' : $(".app_type").val(),
+      // 'value' : $(this).val()
+  };
+console.log(data);
+$.ajax({
+type: 'post',
+url: "app-non-cse-print",
+headers: {'X-CSRF-TOKEN' : $('meta[name="csrf-token"]').attr('content')},
+data: data,
+success: function(viewContent) {
+console.log(viewContent);
+  if(viewContent){
+      var css = '@page { size: Legal landscape; } .campus{background-color:blue;}',
+      head = document.head || document.getElementsByTagName('head')[0],
+      style = document.createElement('style');
+
+      style.type = 'text/css';
+      style.media = 'print';
+
+      if (style.styleSheet){
+      style.styleSheet.cssText = css;
+      } else {
+      style.appendChild(document.createTextNode(css));
+      }
+
+      head.appendChild(style);
+
+        var originalContents = document.body.innerHTML;
+        document.body.innerHTML = viewContent;
+        window.print();
+        document.body.innerHTML = originalContents;
+        location.reload();
+  }else{
+      toastr.error('Can\'t print. Error!')
+  }
+},
+error: function (data){
+  console.log(data);
+}
+});
+});
+
+//trigger edit new recommendingapproval modal
+// $(document).on('click', '.newrecommendingapproval', function (e) {
+//   $("#edit_newrecommendingapproval").modal('show');  
+//   $(".year").val($(".Year").val());
+// });
+
+

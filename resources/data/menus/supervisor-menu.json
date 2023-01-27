@@ -69,10 +69,56 @@
         "navheader": "Supervisor"
       },
       {
-        "url": "bac/supervisor",
+        "url": "#",
         "name": "Pending PPMPs",
         "i18n": "User",
-        "icon": "list"
+        "icon": "list",
+        "submenu": [
+          {
+            "url": "supervisor/indicative",
+            "name": "Indicative",
+            "i18n": "User",
+            "icon": "shoppingcart-in"
+          },
+          {
+            "url": "supervisor/traditional",
+            "name": "PPMPS",
+            "i18n": "User",
+            "icon": "like"
+          },
+          {
+            "url": "supervisor/supplemental",
+            "name": "Supplemental",
+            "i18n": "User",
+            "icon": "shoppingcart-in"
+          }
+        ]
+      },
+      {
+        "url": "#",
+        "name": "Signed PPMPs",
+        "i18n": "User",
+        "icon": "list",
+        "submenu": [
+          {
+            "url": "bac/signedIndicative",
+            "name": "Indicative",
+            "i18n": "User",
+            "icon": "shoppingcart-in"
+          },
+          {
+            "url": "bac/signedPPMP",
+            "name": "PPMPS",
+            "i18n": "User",
+            "icon": "like"
+          },
+          {
+            "url": "bac/signedSupplemental",
+            "name": "Supplemental",
+            "i18n": "User",
+            "icon": "shoppingcart-in"
+          }
+        ]
       }
     ]
   }

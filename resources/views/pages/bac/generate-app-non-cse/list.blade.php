@@ -83,7 +83,7 @@
     }
    div.image2{
        /* background-color:yellow;  */
-      width:90px;
+      width:110px;
       float: left;
       margin-left: 3px;
       height:100%;
@@ -212,7 +212,7 @@
     height: 200px;
     display: none;
   }
-    </style>
+</style>
 
 @extends('layouts.contentLayoutMaster')
 {{-- page Title --}}
@@ -239,15 +239,22 @@
     <!-- Greetings Content Starts -->
     <section id="basic-datatable">
       <div class="card-content" >
-        <?php $campuscount = count($campusCheck); $camp = 0; $endorse = 0; $campusload = "";?>
+        <?php $campuscount = count($campusCheck); $camp = 0; $endorse = 0; $pres_status = ""; $bac_committee_status = ""; $campusload = "";$project_category=""; $appType="";?>
             @foreach($campusCheck as $campusload)
-              <?php/* $campuscount++ */;?>
+              <?php $project_category = $campusload->project_category; 
+                    $appType = $campusload->app_type; 
+                    $bac_committee_status = $campusload->bac_committee_status;
+                    $pres_status = $campusload->pres_status;
+                    $endorse = $campusload->endorse;?>
                 @if($campusload->campus == 1)
                     <?php $camp++;?>
                 @endif
-                @if($campusload->endorse == 1)
-                    <?php $endorse++;?>
-                @endif
+                {{-- @if($campusload->pres_status == 1)
+                    <?php /* $submitpres++; */?>
+                @endif --}}
+                {{-- @if($campusload->endorse == 1)
+                    <?php/*  $endorse++; */?>
+                @endif --}}
             @endforeach
           <div class="card-header" >
             {{-- <div class="" >
@@ -256,38 +263,86 @@
             </div>
             <div class="mt-1" style="border-bottom:1px solid black;"></div> --}}
             
-
+            {{-- @if(session('role') == 12)
+              <div class="row col-sm-4" style="background: #bf5279">
+                <button href="/bac/app-non-cse" type="button" class="btn btn-outline-secondary form-control col-sm-4  generatepdf" value="{{ $campuscount }}" active>Indicative</button>
+                <button  type="button" class="btn btn-outline-secondary form-control col-sm-4  generatepdf" value="{{ $campuscount }}">PPMP</button>
+                <button  type="button" class="btn btn-outline-secondary form-control col-sm-4  generatepdf" value="{{ $campuscount }}">Supplemental</button>
+              </div>
+              <hr>
+            @endif --}}
             <div class="generate" {{-- style="background-color: #bf5279" --}}>
               <input type="hidden" class="campusCheck" value="{{ $campuscount }}">
-              <button  type="button" class="btn btn-danger form-control col-sm-1 mt-1 generatepdf" value="{{ $campuscount }}">PDF</button>
+              <input type="hidden" name="app_type" class="app_type" value="{{ $appType }}">
+              <button  type="button" class="btn btn-danger form-control col-sm-1 mt-1 generatepdf" value="{{ $campuscount }}"><i class="fa-solid fa-file-pdf"></i> &nbsp; PDF</button>
               {{-- <form action="{{ route('app-non-cse-generate') }}" method="POST">
               @csrf
               <input type="hidden" class="Year" name="year" value="{{ $Project_title[0]->project_year }}">
               <button  type="submit" class="btn btn-danger form-control col-sm-1 mt-1 " >PDF</button>
               </form> --}}
               {{-- <button  type="submit" class="btn btn-success form-control col-sm-1 mt-1 generateexcel" id="downloadexcel" >EXCEL</button> --}}
-              <a href ="{{ route('app-non-cse-generate-excel') }}"><button  type="submit" class="btn btn-success form-control col-sm-1 mt-1 generate" >EXCEL</button></a>
+              {{-- <a href ="{{ route('app-non-cse-generate-excel') }}"><button  type="submit" class="btn btn-success form-control col-sm-1 mt-1 generate" disabled>EXCEL</button></a> --}}
+              <button  type="submit" class="btn btn-primary form-control col-sm-1 mt-1 print"><i class="fa-solid fa-print"></i> &nbsp; Print</button>
+
               @if(count($campusCheck) == 1)
-                @if($endorse == 0)
-                  <button  type="button" class="btn btn-primary form-control col-sm-1 mt-1 endorse" value="1">ENDORSE</button>
-                @endif
-                @if($endorse > 0)
-                  <button  type="button" class="btn btn-primary form-control col-sm-1 mt-1 endorse" value="0"><i class="fa-solid fa-rotate-left"></i></button>
+                {{-- @if(session('role') == 10)
+                  @if($endorse == 0)
+                    <button  type="button" class="btn btn-primary form-control col-sm-1 mt-1 endorse" value="1">ENDORSE</button>
+                  @endif
+                  @if($endorse > 0)
+                    <button  type="button" class="btn btn-primary form-control col-sm-1 mt-1 endorse" value="0"><i class="fa-solid fa-rotate-left"></i></button>
+                  @endif
+                @endif --}}
+                @if(session('role') == 10)
+                  @if($pres_status == 0)
+                    <button  type="button" class="btn btn-primary form-control col-sm-1 mt-1 submittopresident " value="1" data-id="{{ $project_category}}">SUBMIT</button>
+                  @endif
+                      <input type="hidden" name="project_category" id="project_category" value="{{ $project_category}}">
+                  @if($pres_status == 1)
+                    <button  type="button" class="btn btn-primary form-control col-sm-1 mt-1 submittopresident " value="0" data-id="{{ $project_category}}"><i class="fa-solid fa-rotate-left"></i></button>
+                  @endif
                 @endif
               @endif
-              @if($camp > 0)
-                <div class="dropdown" style="float: right">
-                  <span
-                    class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu"></span>
-                  <div class="dropdown-menu dropdown-menu-left">
-                    <a class="dropdown-item {{-- univ_wide --}}" id="{{-- univ_wide --}}" href = "{{ route('show-all') }}"> University Wide</a>
-                    <a class="dropdown-item main" href = "/bac/app-non-cse">
-                      Main Campus Only
-                    </a>
-                  </div>
-                </div> 
-              @endif
+
+              <div class="dropdown" style="float: right">
+                <span
+                  class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
+                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu"></span>
+                <div class="dropdown-menu dropdown-menu-left">
+                    @if($camp > 0)
+                      <form action="{{ route('show-all') }}" method="post">
+                        @csrf
+                      <input type="hidden" name="project_category" class="project_category" id="project_category" value="{{ $project_category}}">
+                      <button type="submit" class="dropdown-item {{-- univ_wide --}}" id="{{-- univ_wide --}}"> University Wide</button>
+                      </form>
+                      <?php $Pcategory = ""; 
+                      if($project_category==0){
+                        $Pcategory = "indicative";
+                      }else if($project_category==1){
+                        $Pcategory = "traditional";
+                      }else if($project_category==2){
+                        $Pcategory = "Supplemental";
+                      }
+                      ?>
+                        <a class="dropdown-item main" href = "/bac/app-non-cse-{{ $Pcategory }}">
+                            Main Campus Only
+                        </a>
+                    @endif
+                  @if(count($campusCheck) == 1)
+                    @if(session('role') == 10)
+                      @if($endorse == 0)
+                        <input type="hidden" class="endorse" value="1">
+                        <a class="dropdown-item endorse" value="1">ENDORSE</a>
+                      @endif
+                      @if($endorse > 0)
+                        <input type="hidden" class="endorse" value="0">
+                        <a class="dropdown-item endorse" value="0">DISALLOW</a>
+                      @endif
+                    @endif
+                  @endif
+                </div>
+              </div> 
+
             </div>
           </div>
         <div class="card-body card-dashboard" >
@@ -296,68 +351,72 @@
             <table class="zero-configuration Appnoncse_table" id="table">
                 <thead >
                   <tr class="head" style="text-align: center;color:black;">
-                    <div class="header" >
-                      @foreach($campusinfo as $campusinfo)
-                        <div class="image">
-                          <i class="fa-solid fa-pen-to-square campuslogo" value="<?=$aes->encrypt($campusinfo->id)?>" style="margin-left:5px;float:right;"></i>
-                          <div class="logo">
-                            <img src="{{{asset('storage/PMIS/APPNONCSE/image/logo/'.$campusinfo->slsu_logo)}}}" class="logo">
+                    <td colspan="14" style="border: none">
+                      <div class="header" >
+                        @foreach($campusinfo as $campusinfo)
+                          <div class="image">
+                            <i class="fa-solid fa-pen-to-square campuslogo" value="<?=$aes->encrypt($campusinfo->id)?>" style="margin-left:5px;float:right;"></i>
+                            <div class="logo">
+                              <img src="{{{asset('images/logo/'.$campusinfo->slsu_logo)}}}" class="logo">
+                              {{-- <img src="{{('public/images/logo/'.$campusinfo->slsu_logo)}}" class="logo"> --}}
+                            </div>
                           </div>
-                        </div>
-                        <div class="slsu">
-                          <div class="">
-                            Republic of the Philippines
-                            <i class="fa-solid fa-pen-to-square campusinfoEdit" value="<?=$aes->encrypt($campusinfo->id)?>" style="margin-left:5px;"></i><br>
-                            SOUTHERN LEYTE STATE UNIVERSITY<br>
-                            {{ $campusinfo->address }}<br>
+                          <div class="slsu">
+                            <div class="">
+                              Republic of the Philippines
+                              <i class="fa-solid fa-pen-to-square campusinfoEdit" value="<?=$aes->encrypt($campusinfo->id)?>" style="margin-left:5px;"></i><br>
+                              SOUTHERN LEYTE STATE UNIVERSITY<br>
+                              {{ $campusinfo->address }}<br>
+                            </div>
+                            <div class="site">
+                              Website: <label class="link">{{ $campusinfo->website }}</label><br>
+                              Email: <label class="link">{{ $campusinfo->email }}</label><br>
+                              Contact Number: <label class="link">{{ $campusinfo->contact_number }}</label>
+                            </div>
+                            </div>
+                          <div class="image2">
+                            <i class="fa-solid fa-pen-to-square logoEdit" value="<?=$aes->encrypt($campusinfo->id)?>" style="margin-left:5px;float:right;"></i>
+                            <div class="logo">
+                              <img src="{{{asset('images/logo/'.$campusinfo->logo2)}}}" class="logo">
+                            </div> 
                           </div>
-                          <div class="site">
-                            Website: <label class="link">{{ $campusinfo->website }}</label><br>
-                            Email: <label class="link">{{ $campusinfo->email }}</label><br>
-                            Contact Number: <label class="link">{{ $campusinfo->contact_number }}</label>
-                          </div>
-                          </div>
-                        <div class="image2">
-                          <i class="fa-solid fa-pen-to-square logoEdit" value="<?=$aes->encrypt($campusinfo->id)?>" style="margin-left:5px;float:right;"></i>
-                          <div class="logo">
-                            <img src="{{{asset('storage/PMIS/APPNONCSE/image/logo/'.$campusinfo->logo2)}}}" class="logo">
-                          </div> 
-                        </div>
-                      @endforeach
-                    </div>
-                    <div class="header2" style="margin-top:2%;">
-                      <div class="Title" >
-                        University Annual Procurement Plan for FY 
-                        <?php 
-                          $val = []; 
-                        ?>
-                        @foreach($Project_title as $Project_title)
-                          {{-- {{ $Project_title->project_year 
-                          }} --}}
-                          <?php 
-                          array_push($val, $Project_title->project_year); 
-                          ?>
                         @endforeach
-                        {{ reset($val) }}
-                        {{-- <?php
-                        // if($Project_title[0]->project_year != null){
-                        ?>
-                          {{ $Project_title[0]->project_year }}
-                        <?php
-                        // }else{
-                        ?>
-                        (Year)
-                        <?php
-                        // }
-                        ?> --}}
                       </div>
-                    </div>
+                      <div class="header2" style="margin-top:2%;">
+                        <div class="Title" >
+                          University Annual Procurement Plan for FY 
+                          <?php 
+                            $val = []; 
+                          ?>
+                          @foreach($Project_title as $Project_title)
+                            {{-- {{ $Project_title->project_year 
+                            }} --}}
+                            <?php 
+                            array_push($val, $Project_title->project_year); 
+                            ?>
+                          @endforeach
+                          {{ reset($val) }}
+                          {{-- <?php
+                          // if($Project_title[0]->project_year != null){
+                          ?>
+                            {{ $Project_title[0]->project_year }}
+                          <?php
+                          // }else{
+                          ?>
+                          (Year)
+                          <?php
+                          // }
+                          ?> --}}
+                        </div>
+                      </div>
+                    </td>
                   </tr>
                   <tr>
-                    <div class="col-sm-4" >
-                      <div class="row">
-                        <label for="year" style="padding-top:10px;"> Year: </label>
-                        <div class="btn-group dropright ml-1">
+                    <td colspan="14" style="border: none">
+                    {{-- <div class="col-sm-12"  style="background: #bf5279"> --}}
+                      <div class="row ml-1" {{-- style="background: #bf5279" --}}>
+                        <label for="year" style="padding-top:10px;float: left;"> Year: </label>
+                        <div class="btn-group dropright ml-1" style="float: left;">
                           <input type="hidden" class="Year" value="{{ reset($val) }}">
                           <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             {{ reset($val) }}
@@ -373,18 +432,15 @@
                           </div>
                         </div>
                         @if(count($campusCheck) == 1)
-                          <div class="col-sm-4">
+                          <div class="col-sm-7" style="float: left;">
                             <label style="float: left;padding-top:10px;" > Status: </label>
-                            @if($endorse == 0)
-                              <label class="ml-1" style="font-size:15px;float: left;padding-top:6px;text-transform: capitalize;color:blue" > Pending </label>
-                            @endif
-                            @if($endorse > 0)
-                              <label class="ml-1" style="font-size:15px;float: left;padding-top:6px;text-transform: capitalize;color:coral" > Endorsed </label>
-                            @endif
+                            <label class="ml-1" style="font-size:15px;float: left;padding-top:6px;text-transform: capitalize;color:{{ (new GlobalDeclare)->pres_status_color($pres_status) }}" > {{ (new GlobalDeclare)->pres_status($pres_status) }} </label>
+                            <label class="ml-1"  style="font-size:15px;float: left;padding-top:6px;text-transform: capitalize;color:black;">|</label>
+                            <label class="ml-1" style="font-size:15px;float: left;padding-top:6px;text-transform: capitalize;color:{{ (new GlobalDeclare)->endorse_color($endorse) }}" >{{ (new GlobalDeclare)->endorse($endorse) }} </label>
                           </div>
                         @endif
                       </div>
-                    </div>
+                    {{-- </div> --}}</td>
                   </tr>
                   <tr style=" border-right: 1px solid black">
                       <td  rowspan="2"  class="code">CODE (PAP)</td>
@@ -412,6 +468,10 @@
                       $oldCampus = "";
                   ?>
                   @foreach($Categories as $category)
+                  <?php
+                        // $project_category = $category->project_category;
+                  ?>
+                    {{-- <input type="hidden" class="project_category" value="{{ $project_category }}"> --}}
                   <?php
                         if ($oldCampus != $category->campus){
                   ?>
@@ -456,7 +516,6 @@
                                     foreach($ppmps as $row){
                                       if ($row->item_category == $cat->item_category && $row->campus == $cat->campus){
                                         if ($oldProject != $row->project_code){
-                                          
                   ?>
                                         <tr class="body">
                                           <td>{{ $row->ProjectCode}}</td>
@@ -484,9 +543,9 @@
                                                       }
                                                   }
                                               ?>
-                                          <td >{{ $total}}</td>
-                                          <td >{{ $totalMOOE}}</td>
-                                          <td >{{ $totalCO}}</td>
+                                          <td >{{ number_format(str_replace(",","",$total),2,'.',',')}}</td>
+                                          <td >{{ number_format(str_replace(",","",$totalMOOE),2,'.',',')}}</td>
+                                          <td >{{ number_format(str_replace(",","",$totalCO),2,'.',',')}}</td>
                                           <td  class="remarks"></td>
                                         </tr>
                   <?php
@@ -509,7 +568,7 @@
                   ?>
                   <tr>
                     <td colspan="2" class="last" style="border-bottom : none;"><div class="child">Prepared by:</div></td>
-                    <td colspan="8" class="last" style="border-bottom : none;"><div class="child">Recommending Approval:</div></td>
+                    <td colspan="8" class="last" style="border-bottom : none;"><div class="child">Recommending Approval: </div></td>
                     <td colspan="4" class="last" style="border-bottom : none; border-right:1px solid black;"><div class="child" style="height:10px">Approved by:</div></td>
                   </tr>
                   <tr>
@@ -608,8 +667,8 @@
                   ?>
                     <tr>
                       <td colspan="2" class="last" style="border-bottom : none;"><div class="child">Prepared by:</div></td>
-                      <td colspan="8" class="last" style="border-bottom : none;"><div class="child">Recommending Approval:</div></td>
-                      <td colspan="4" class="last" style="border-bottom : none; border-right:1px solid black;"><div class="child" style="height:10px">Approved by:</div></td>
+                      <td colspan="8" class="last" style="border-bottom : none;"><div class="child">Recommending Approval: &nbsp;<span style="color: {{ (new GlobalDeclare)->bac_committee_status_color($bac_committee_status) }};text-transform: uppercase;">{{ (new GlobalDeclare)->bac_committee_status($bac_committee_status) }}</span></div></td>
+                      <td colspan="4" class="last" style="border-bottom : none; border-right:1px solid black;"><div class="child" style="height:10px">Approved by: &nbsp;<span style="color: {{ (new GlobalDeclare)->pres_status_color($pres_status) }};text-transform: uppercase;">{{ (new GlobalDeclare)->pres_status($pres_status) }}</span></div></td>
                     </tr>
                     <tr >
                       <td colspan="2" class="last" style="border-top : none;">
