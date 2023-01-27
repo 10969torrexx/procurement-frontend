@@ -312,13 +312,13 @@ class GlobalDeclare extends Controller
                 $out = "Pending for Immediate Supervisor's Approval";
                 break;
             case 2:
-                $out = "Approved by Immediate Supervisor";
+                $out = "Accepted by Immediate Supervisor";
                 break;  
             case 3:
                 $out = "Disapproved by Immediate Supervisor";
                 break;
             case 4:
-                $out = "Approved by Budget Officer";
+                $out = "Accepted by Budget Officer";
                 break;
             case 5:
                 $out = "Dispproved by Budget Officer";
@@ -330,7 +330,11 @@ class GlobalDeclare extends Controller
         return $out;
     }
 
+<<<<<<< HEAD
     # this will determine the project category
+=======
+# this will determine the project category | tagging of project type
+>>>>>>> 583ec9f227f658641b90981c368ee903f9258e9e
     public function project_category($id) {
         $out = '';
         switch ($id) {
@@ -345,6 +349,7 @@ class GlobalDeclare extends Controller
             break;
         }
         return $out;
+<<<<<<< HEAD
     }
 
     # this will determine the project category
@@ -468,5 +473,7 @@ class GlobalDeclare extends Controller
         }
         
         return $out;
+=======
+>>>>>>> 583ec9f227f658641b90981c368ee903f9258e9e
     }
 }

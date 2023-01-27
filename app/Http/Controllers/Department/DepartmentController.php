@@ -8,10 +8,14 @@ use App\Http\Controllers\Department\PpmpController;
 use App\Http\Controllers\Department\ItemsController;
 use App\Http\Controllers\Department\ProjectsController;
 use App\Http\Controllers\Department\AllocatedBudgetsController;
+use App\Http\Controllers\HistoryLogController;
+use App\Http\Controllers\GlobalDeclare;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
 use DB;
+use Validator;
+
 class DepartmentController extends Controller
 {
     /**
@@ -42,20 +46,21 @@ class DepartmentController extends Controller
      */
     public function createProjectTitle(Request $request)
     {
-        # form fields validation
-        $this->validate($request, [
-            # field validation | disabled
+        try {
+           # form fields validation
+            $this->validate($request, [
+                # field validation | disabled
                 'project_title'     =>  'required',
                 'fund_source'  =>  'required',
                 'project_type'  =>  'required',
-        ]); 
-        $request->merge([
-            'project_year'  => explode('**',$request->fund_source)[1],
-            'allocated_budget' => explode('**', $request->fund_source)[2]
-        ]);
-        // this will create data to project titles table
-           $project_titles = \DB::table('project_titles')
-           ->insert([
+            ]); 
+            $request->merge([
+                'project_year'  => explode('**',$request->fund_source)[1],
+                'allocated_budget' => explode('**', $request->fund_source)[2]
+            ]);
+            // this will create data to project titles table
+            $project_titles = \DB::table('project_titles')
+            ->insert([
                 'employee_id'   => session('employee_id'),
                 'project_title' => $request->project_title,
                 'department_id' => session('department_id'),
@@ -64,22 +69,39 @@ class DepartmentController extends Controller
                 'fund_source'   => (new AESCipher)->decrypt(explode('**',$request->fund_source)[0]),
                 'allocated_budget' => (new AESCipher)->decrypt($request->allocated_budget),
                 'immediate_supervisor' => session('immediate_supervisor'),
-                'project_category'  =>  1, // soon to be dynamic
+                'project_category'  =>  (new AESCipher)->decrypt($request->project_category), 
                 'project_type'  => $request->project_type,
                 'status'    => 0,
                 'year_created'  => Carbon::now()->format('Y'),
                 'created_at'    => Carbon::now(),
                 'updated_at'    => Carbon::now()
-           ]);
-        // this will be returned if status was successful
+            ]);
+
+            # this will created history_log
+                (new HistoryLogController)->store(
+                    session('department_id'),
+                    session('employee_id'),
+                    session('campus_id'),
+                    null,
+                    'Created Project Title as draft! No Items!',
+                    'Create',
+                    $request->ip(),
+                );
+            # end
+
+            # this will be returned if status was successful
             if($project_titles == true) {
                 return back()->with([
                     'success'   => 'Project Title Created Succesfully!'
                 ]);
             } 
-              return back()->with([
+            return back()->with([
                 'error'   => 'Project Title Created Failed'
             ]);
+        } catch (\Throwable $th) {
+            // throw $th;
+            return view('pages.error-500');
+        }
     }
 
     /* Store a newly created resource in storage for the Project Titles Table.
@@ -89,7 +111,9 @@ class DepartmentController extends Controller
     */
    public function destoryProjectTitle(Request $request)
    {
-        $project_titles = \DB::table('project_titles')
+        try {
+            # delete project title
+            $project_titles = \DB::table('project_titles')
             ->where('id', (new AESCipher)->decrypt($request->id))
             ->where('campus', session('campus'))
             ->where('employee_id', session('employee_id'))
@@ -97,7 +121,8 @@ class DepartmentController extends Controller
             ->update([
                 'deleted_at' => Carbon::now()
             ]);
-        $ppmps = \DB::table('ppmps')
+            # delete ppmps table
+            $ppmps = \DB::table('ppmps')
             ->where('project_code', (new AESCipher)->decrypt($request->id))
             ->where('campus', session('campus'))
             ->where('employee_id', session('employee_id'))
@@ -105,9 +130,25 @@ class DepartmentController extends Controller
             ->update([
                 'deleted_at' => Carbon::now()
             ]);
-        return back()->with([
-            'success'   => 'Project Successfully deleted!'
-        ]);
+
+            # this will created history_log
+                (new HistoryLogController)->store(
+                    session('department_id'),
+                    session('employee_id'),
+                    session('campus'),
+                    (new AESCipher)->decrypt($request->id),
+                    'Destroyed Project',
+                    'Destory',
+                    $request->ip(),
+                );
+            # end
+            return back()->with([
+                'success'   => 'Project Successfully deleted!'
+            ]);
+        } catch (\Throwable $th) {
+            throw $th;
+            return view('pages.error-500');
+        }
    }
 
    /* Updates a resource in storage for the Project Titles Table.
@@ -131,6 +172,17 @@ class DepartmentController extends Controller
                     'fund_source' => explode('**', $request->fund_source)[1],
                     'allocated_budget' => explode('**', $request->fund_source)[0],
                 ]);
+        # this will created history_log
+            (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                $request->id,
+                'Updated Project project title',
+                'update',
+                $request->ip(),
+            );
+        # end
         # return positive response
             return back()->with([
                 'success'   => 'Project Updated Successfully!'
@@ -159,9 +211,7 @@ class DepartmentController extends Controller
                     'expected_month'    =>  'required',
                     'unit_of_measurement'  =>  'required',
             ]); 
-            // dd($request->estimated_price);
             $__total_estimated_price = $request->total_estimated_price + doubleval($request->estimated_price);
-        //    dd( doubleval($request->remaining_balance));
             # comparing total estimated price to remaining balance
             if($__total_estimated_price > doubleval($request->remaining_balance)) {
                 return back()->with([
@@ -178,7 +228,7 @@ class DepartmentController extends Controller
                 ]);
             } 
             
-            // this will send data to project titles table using api
+            # this will send data to project titles table using api
                 $create_items = \DB::table('ppmps')
                     ->insert([
                         'employee_id' => session('employee_id'),
@@ -198,9 +248,22 @@ class DepartmentController extends Controller
                         'created_at'    =>  Carbon::now(),
                         'updated_at'    =>  Carbon::now(),
                     ]);
-                return back()->with([
-                    'success'   => 'Item added as Draft!'
-                ]);
+            
+            # this will created history_log
+                (new HistoryLogController)->store(
+                    session('department_id'),
+                    session('employee_id'),
+                    session('campus'),
+                    (new AESCipher)->decrypt($request->project_code),
+                    'Create PPMPs or add items on project',
+                    'create',
+                    $request->ip(),
+                );
+            # end
+            
+            return back()->with([
+                'success'   => 'Item added as Draft!'
+            ]);
         } catch (\Throwable $th) {
             throw $th;
             return view('pages.error-500');
@@ -259,7 +322,6 @@ class DepartmentController extends Controller
                     'expected_month'    =>  'required',
                     'unit_of_measurement'  =>  'required',
             ]); 
-           
             # update ppmps
             $response = \DB::table('ppmps')
                 ->where('id', $request->id)
@@ -279,7 +341,17 @@ class DepartmentController extends Controller
                     'expected_month'    => $request->expected_month,
                     'updated_at'    => Carbon::now()
                 ]);
-
+            # this will created history_log
+                (new HistoryLogController)->store(
+                    session('department_id'),
+                    session('employee_id'),
+                    session('campus'),
+                    $request->id,
+                    'Update PPMPs or add items on project',
+                    'Update',
+                    $request->ip(),
+                );
+            # end
             return back()->with([
                 'success'   => 'Item details updated successfully!'
             ]);
@@ -311,6 +383,17 @@ class DepartmentController extends Controller
                 ->update([
                     'deleted_at' => Carbon::now()
                 ]);
+            # this will created history_log
+                (new HistoryLogController)->store(
+                    session('department_id'),
+                    session('employee_id'),
+                    session('campus'),
+                    (new AESCipher)->decrypt($request->id),
+                    'Delete PPMPs or add items on project',
+                    'Delete',
+                    $request->ip(),
+                );
+            # end
             return back()->with([
                 'success' => 'Item deleted successfully!'
             ]);
@@ -329,6 +412,7 @@ class DepartmentController extends Controller
      */
     public function submitPPMP(Request $request)
     {
+        // dd($request->all());
         try {
             $_deadline_of_submission = Carbon::parse($request->deadline_of_submission)->format('Y-m-d');
             $current_date = Carbon::now()->format('Y-m-d');
@@ -361,13 +445,23 @@ class DepartmentController extends Controller
                         'f_remaining_balance' => ( doubleval($request->remaining_balance) - doubleval($total_estimated_price) )
                     ]);
                     $response = (new PPMPController)->submitPPMP($request);
+                     # this will created history_log
+                        (new HistoryLogController)->store(
+                            session('department_id'),
+                            session('employee_id'),
+                            session('campus'),
+                            (new AESCipher)->decrypt($request->current_project_code),
+                            'Submit PPMPs for Immediate\s supervisor acceptance',
+                            'Submit',
+                            $request->ip(),
+                        );
+                    # end
+                    // this will update the procurement type of the allocated budget
                     return redirect(route('department-showCreatetPPMP'))->with([
                         'success' => $response['message']
                     ]);
                } 
-
         } catch (\Throwable $th) {
-            //throw $th;
             return view('pages.error-500');
         }
     }
@@ -415,6 +509,17 @@ class DepartmentController extends Controller
                 ]);
                 # this will submit ppmp 
                     $response = (new PPMPController)->re_submitPPMP($request);
+                # this will created history_log
+                    (new HistoryLogController)->store(
+                        session('department_id'),
+                        session('employee_id'),
+                        session('campus'),
+                        (new AESCipher)->decrypt($request->current_project_code),
+                        'Re-submit PPMPs for Immediate\s supervisor acceptance',
+                        'Re-submit',
+                        $request->ip(),
+                    );
+                # end
                 return redirect(route('department-showCreatetPPMP'))->with([
                     'success' => $response['message']
                 ]);
@@ -465,5 +570,469 @@ class DepartmentController extends Controller
             ]);
 
         return \json_decode($ppmp_response);
+    }
+
+   /* Submit All projects .
+    * - this will enable submission of multiple projects
+    */
+    public function submit_all_projects(Request $request) {
+        try {
+            $total_estimated_price = 0.0;
+            $final_remaining_balance = 0.0;
+            $__total_estimated_price = array();
+            foreach ($request->project_titles as $item) {
+                # check if project has items
+                    $ppmps = \DB::table('ppmps')
+                        ->where('project_code', $item)
+                        ->where('campus', session('campus'))
+                        ->where('department_id', session('department_id'))
+                        ->where('status', 0)
+                        ->get();
+                # return if project doesn't have items
+                    if(count($ppmps) <= 0) {
+                        return ([
+                            'status'    => 400,
+                            'message'   => 'Some of the projects doen\'t contain any items!'
+                        ]);
+                    }
+                # testing if submittted project is beyond deadline of submission
+                    $allocated_budgets = \DB::table('project_titles')
+                            ->join('allocated__budgets', 'allocated__budgets.id', 'project_titles.allocated_budget')
+                            ->where('project_titles.id', $item)
+                            ->where('project_titles.campus', session('campus'))
+                            ->where('project_titles.department_id', session('department_id'))
+                            ->where('project_titles.employee_id', session('employee_id'))
+                            ->get([
+                                'allocated__budgets.id',
+                                'allocated__budgets.deadline_of_submission',
+                                'allocated__budgets.remaining_balance'
+                            ]);
+                    if(Carbon::now()->format('Y-m-d') > Carbon::parse($allocated_budgets[0]->deadline_of_submission)->format('Y-m-d')) {
+                        return ([
+                            'status'    => 400,
+                            'message'   => 'You\'ve exceeded the alloted deadline of submission!'
+                        ]);
+                    }
+                # comparing total of estimated price per project to remaining balance
+                    foreach ($ppmps as $estimated_price) {
+                        array_push($__total_estimated_price, $estimated_price->estimated_price);
+                        $total_estimated_price +=  $estimated_price->estimated_price;
+                    }
+                    if($total_estimated_price > $allocated_budgets[0]->remaining_balance) {
+                        return ([
+                            'status'    => 400,
+                            'message'   => 'Some of the projects have exceeded the remaining balance!'
+                        ]);
+                    }
+                # get the final remaining balance
+                    $final_remaining_balance = $allocated_budgets[0]->remaining_balance - $total_estimated_price;
+                # updating statuses of project titles | PPMPS | remaining balance
+                    \DB::table('project_titles')
+                        ->where('id', $item)
+                        ->where('department_id', session('department_id'))
+                        ->where('employee_id', session('employee_id'))
+                        ->where('campus', session('campus'))
+                        ->update([
+                            'status'    => 1,
+                            'updated_at'    => Carbon::now()
+                        ]);
+                    \DB::table('ppmps')
+                        ->where('project_code', $item)
+                        ->where('department_id', session('department_id'))
+                        ->where('employee_id', session('employee_id'))
+                        ->where('campus', session('campus'))
+                        ->update([
+                            'status'    => 1,
+                            'updated_at'    => Carbon::now()
+                        ]);
+                    \DB::table('allocated__budgets')
+                        ->where('id', $allocated_budgets[0]->id)
+                        ->update([
+                            'remaining_balance' => $final_remaining_balance,
+                            'procurement_type' => 'Supplemental',
+                            'updated_at'    => Carbon::now()
+                        ]);
+                    \DB::table('project_timeline')
+                        ->insert([
+                            'employee_id'   => session('employee_id'),
+                            'department_id' => session('department_id'),
+                            'role'  =>  \session('role'),
+                            'campus'  => \session('campus'),
+                            'project_id'    => $item,
+                            'status'    => intval(1),
+                            'remarks'   =>   'Your PPMP is currently Pending of Immediates Supervisor\'s Acceptance.',
+                            'created_at'    =>  Carbon::now(),
+                            'updated_at'    =>  Carbon::now(),
+                        ]);
+                # this will created history_log
+                    (new HistoryLogController)->store(
+                        session('department_id'),
+                        session('employee_id'),
+                        session('campus'),
+                        (new AESCipher)->decrypt($request->current_project_code),
+                        'Submit All Project for Immediate\s supervisor acceptance',
+                        'Submit',
+                        $request->ip(),
+                    );
+                # end
+            }
+            return ([
+                'status'    => 200,
+                'message'   => 'Project(s) submitted for Supervisor\'s Acceptance!'
+            ]);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return view('pages.error-500');
+        }
+    }
+
+    /* Generate or Export PPMP File
+     * PDF
+     */
+    public function export_approved_ppmp(Request $request) {
+       try {
+            # project title
+                $project_title = \DB::table('project_titles')
+                    ->where('campus', session('campus'))
+                    ->where('employee_id', session('employee_id'))
+                    ->where('department_id', session('department_id'))
+                    ->where('id', (new AESCipher)->decrypt($request->id))
+                    ->where('status', 4)
+                    ->whereNull('deleted_at')
+                    ->get();
+            # ppmps
+                $ppmps = \DB::table('ppmps')
+                    ->join('mode_of_procurement', 'mode_of_procurement.id', 'ppmps.mode_of_procurement')
+                    ->where('ppmps.campus', session('campus'))
+                    ->where('ppmps.employee_id', session('employee_id'))
+                    ->where('ppmps.department_id', session('department_id'))
+                    ->where('ppmps.project_code', (new AESCipher)->decrypt($request->id))
+                    ->where('ppmps.status', 4)
+                    ->whereNull('ppmps.deleted_at')
+                    ->get([
+                        'ppmps.*',
+                        'mode_of_procurement.abbreviation'
+                    ]);
+           
+            $pdf = \Pdf::loadView('pages.department.export-ppmp', compact('project_title', 'ppmps'))->setPaper('a4', 'portrait');
+            # this will created history_log
+                (new HistoryLogController)->store(
+                    session('department_id'),
+                    session('employee_id'),
+                    session('campus'),
+                    null,
+                    'Exported approved ppmp',
+                    'Export',
+                    $request->ip(),
+                );
+            # end
+            return $pdf->download('PPMP_' . Carbon::now() . '.pdf'); 
+            // return view('pages.department.export-ppmp', compact('project_title', 'ppmps'));
+       } catch (\Throwable $th) {
+            // throw $th;
+            return view('pages.error-500');
+       }
+    }
+
+    /* Upload Signed PPMP
+     * - Creating files for Signed PPMP 
+     * - Downloadable PPMP
+    */
+    public function upload_ppmp(Request $request) {
+        try {
+            $validate = Validator::make($request->all(), [
+                'project_category'  => ['required'],
+                'year_created'  =>  ['required'],
+                'file_name' => ['required'],
+                'signed_ppmp'   => ['required', 'mimes:pdf, jpeg, jpg, png', 'max:2048']
+            ]);
+            if($request->hasFile('signed_ppmp')) {
+                $file = $request->file('signed_ppmp');
+                $extension = $request->file('signed_ppmp')->getClientOriginalExtension();
+               
+                $is_valid = false;
+                # validate extension
+                    $allowed_extensions = ['pdf', 'jpeg', 'jpg', 'png'];
+                    for ($i = 0; $i < count($allowed_extensions) ; $i++) { 
+                       if($allowed_extensions[$i] == $extension) {
+                            $is_valid = true;
+                       }
+                    }
+                    if($is_valid == false) {
+                        return back()->with([
+                            'error' => 'Invalid file format!'
+                        ]);
+                    }
+                # end
+                $file_name = (new GlobalDeclare)->project_category((new AESCipher)->decrypt($request->project_category)) .'-'. time();
+                $destination_path = env('APP_NAME').'\\department_upload\\signed_ppmp\\';
+                if (!\Storage::exists($destination_path)) {
+                    \Storage::makeDirectory($destination_path);
+                }
+                $file->storeAs($destination_path, $file_name.'.'.$extension);
+                $file->move('storage/'. $destination_path, $file_name.'.'.$extension);
+                # storing data to signed_ppmp table
+                    \DB::table('signed_ppmp')
+                    ->insert([
+                        'employee_id'   => session('employee_id'),
+                        'department_id'   => session('department_id'),
+                        'campus'   => session('campus'),
+                        'year_created'   => (new AESCipher)->decrypt($request->year_created),
+                        'project_category'  => (new AESCipher)->decrypt($request->project_category),
+                        'file_name'   => $request->file_name,
+                        'file_directory'    => $destination_path .''. $file_name.'.'.$extension,
+                        'signed_ppmp' =>  $file_name.'.'.$extension,
+                        'created_at'    => Carbon::now(),
+                        'updated_at'    => Carbon::now()
+                    ]);
+                # this will created history_log
+                    (new HistoryLogController)->store(
+                        session('department_id'),
+                        session('employee_id'),
+                        session('campus'),
+                        null,
+                        'Uploaded sigend ppmp',
+                        'upload',
+                        $request->ip(),
+                    );
+                # end
+                return back()->with([
+                    'success' => 'PPMP uploaded successfully!'
+                ]);
+            } else {
+                return back()->with([
+                    'error' => 'Please fill the form accordingly!'
+                ]);
+            }
+        } catch (\Throwable $th) {
+            throw $th;
+            return view('pages.error-500');
+        }
+    }
+
+    /* Download Uplooded PPMP
+     * - this will enable downlaod uploade PPMP
+     * - based on: Employee id, campus, department_id
+     * - get file from storage upload id search
+     */
+    public function download_uploaded_PPMP(Request $request) {
+        try {
+            $response = \DB::table('signed_ppmp')
+            ->where('employee_id', session('employee_id'))
+            ->where('department_id', session('department_id'))
+            ->where('campus', session('campus'))
+            ->where('id', (new AESCipher)->decrypt($request->id))
+            ->whereNull('deleted_at')
+            ->get([
+                'signed_ppmp'
+            ]);
+            # this will created history_log
+                (new HistoryLogController)->store(
+                    session('department_id'),
+                    session('employee_id'),
+                    session('campus'),
+                    null,
+                    'Downloaded sigend ppmp',
+                    'Download',
+                    $request->ip(),
+                );
+            # end
+            return \Storage::download(env('APP_NAME').'\\department_upload\\signed_ppmp\\'.$response[0]->signed_ppmp);
+        } catch (\Throwable $th) {
+            throw $th;
+            return view('pages.error-500');
+        }
+    }
+
+    /* Delete Uploaded Signed PPMP
+     * - this will delete the uploaded PPMP
+     * - based on: Employee id, campus, department_id
+     */
+    public function delete_uploaded_ppmp(Request $request) {
+        try {
+            $response = \DB::table('signed_ppmp')
+            ->where('employee_id', session('employee_id'))
+            ->where('department_id', session('department_id'))
+            ->where('campus', session('campus'))
+            ->where('id', (new AESCipher)->decrypt($request->id))
+            ->whereNull('deleted_at')
+            ->update([
+                'updated_at'    => Carbon::now(),
+                'deleted_at'    => Carbon::now()
+            ]);
+            # this will created history_log
+                (new HistoryLogController)->store(
+                    session('department_id'),
+                    session('employee_id'),
+                    session('campus'),
+                    (new AESCipher)->decrypt($request->id),
+                    'Deleted sigend ppmp',
+                    'Delete',
+                    $request->ip(),
+                );
+            # end
+            return back()->with([
+                'success'   => 'Uploaded PPMP successfully deleted!'
+            ]);
+        } catch (\Throwable $th) {
+            return view('pages.error-500');
+            // throw $th;
+        }
+    }
+
+    /* View uploaded PPMP
+     * - this will allow preview of the uploaded PPMP
+     */
+    public function view_uploaded_ppmp(Request $request) {
+        try {
+            $response = \DB::table('signed_ppmp')
+                ->where('employee_id', session('employee_id'))
+                ->where('department_id', session('department_id'))
+                ->where('campus', session('campus'))
+                ->where('id', (new AESCipher)->decrypt($request->id))
+                ->whereNull('deleted_at')
+                ->get([
+                    'file_directory',
+                    'signed_ppmp'
+                ]);
+            # this will created history_log
+                (new HistoryLogController)->store(
+                    session('department_id'),
+                    session('employee_id'),
+                    session('campus'),
+                    (new AESCipher)->decrypt($request->id),
+                    'Viewed sigend ppmp',
+                    'View',
+                    $request->ip(),
+                );
+            # end
+            return response ([
+                'status'    => 200,
+                'data'  => $response
+            ]);
+        } catch (\Throwable $th) {
+            return view('pages.error-500');
+            throw $th;
+        }
+    }
+
+    /* GET Edit Uploaded PPMP
+     * - get uploaded ppmp for edit feature
+     */
+    public function get_edit_ppmp(Request $request) {
+        try {
+            $response = \DB::table('signed_ppmp')
+                ->where('employee_id', session('employee_id'))
+                ->where('department_id', session('department_id'))
+                ->where('campus', session('campus'))
+                ->where('id', (new AESCipher)->decrypt($request->id))
+                ->whereNull('deleted_at')
+                ->get();
+
+            return ([
+                'status'    => 200,
+                'data'  => $response
+            ]);
+           
+        } catch (\Throwable $th) {
+            return view('pages.error-500');
+            throw $th;
+        }
+    }
+
+    /* GET Edit Uploaded PPMP
+     * - edit / update uploaded ppmp
+     * ! wadwadaw
+     * ? awdawdaw
+     */
+    public function edit_uploaded_ppmp(Request $request) {
+        try {
+            $validate = Validator::make($request->all(), [
+                'project_category'  => ['required'],
+                'year_created'  =>  ['required'],
+                'file_name' => ['required'],
+                'signed_ppmp'   => ['required', 'mimes:pdf, jpeg, jpg, png', 'max:2048']
+            ]);
+            if($request->hasFile('signed_ppmp')) {
+                $file = $request->file('signed_ppmp');
+                $extension = $request->file('signed_ppmp')->getClientOriginalExtension();
+                $is_valid = false;
+                # validate extension
+                    $allowed_extensions = ['pdf', 'jpeg', 'jpg', 'png'];
+                    for ($i = 0; $i < count($allowed_extensions) ; $i++) { 
+                       if($allowed_extensions[$i] == $extension) {
+                            $is_valid = true;
+                       }
+                    }
+                    if($is_valid == false) {
+                        return back()->with([
+                            'error' => 'Invalid file format!'
+                        ]);
+                    }
+                # end
+                $file_name = (new GlobalDeclare)->project_category((new AESCipher)->decrypt($request->project_category)) .'-'. time();
+                $destination_path = env('APP_NAME').'\\department_upload\\signed_ppmp\\';
+                if (!\Storage::exists($destination_path)) {
+                    \Storage::makeDirectory($destination_path);
+                }
+                $file->storeAs($destination_path, $file_name.'.'.$extension);
+                // \Storage::put($destination_path, $file_name.'.'.$extension);
+                $file->move('storage/'. $destination_path, $file_name.'.'.$extension);
+                # storing data to signed_ppmp table
+                    \DB::table('signed_ppmp')
+                    ->where('id', $request->id)
+                    ->update([
+                        'year_created'   => (new AESCipher)->decrypt($request->year_created),
+                        'project_category'  => (new AESCipher)->decrypt($request->project_category),
+                        'file_name'   => $request->file_name,
+                        'file_directory'    => $destination_path .''. $file_name.'.'.$extension,
+                        'signed_ppmp' =>  $file_name.'.'.$extension,
+                        'updated_at'    => Carbon::now()
+                    ]);
+                # this will created history_log
+                    (new HistoryLogController)->store(
+                        session('department_id'),
+                        session('employee_id'),
+                        session('campus'),
+                        null,
+                        'Viewed sigend ppmp',
+                        'View',
+                        $request->ip(),
+                    );
+                # end
+                return back()->with([
+                    'success' => 'PPMP uploaded successfully!'
+                ]);
+            } else {
+                return back()->with([
+                    'error' => 'Please fill the form accordingly!'
+                ]);
+            }
+        } catch (\Throwable $th) {
+            // throw $th;
+            return view('pages.error-500');
+        }
+    }
+
+    /* Live search item
+     * - this will enable search item on textchange
+     */
+    public function live_search_item(Request $request) {
+        try {
+            $response = \DB::table('items')
+            ->join('mode_of_procurement', 'mode_of_procurement.id', 'items.mode_of_procurement_id')
+            ->whereNull('mode_of_procurement.deleted_at')
+            ->whereNull('items.deleted_at')
+            ->where('item_name', 'like', '%'.$request->item_name.'%')
+            ->get();
+
+            if(count($response) > 0) {
+                return $response;
+            } 
+            # return error or zero item(s) found
+            return 400;
+        } catch (\Throwable $th) {
+            throw $th;
+        }
     }
 }
