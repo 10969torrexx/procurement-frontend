@@ -30,7 +30,8 @@ class PresidentHopeController extends Controller
                 })
               ->groupBy("project_year")
               -> get();
-    // dd($app);
+
+    // dd($expired);
     $pageConfigs = ['pageHeader' => true];
     $breadcrumbs = [
       ["link" => "/", "name" => "Home"],["name" =>"APP NON CSE"]
@@ -154,10 +155,30 @@ class PresidentHopeController extends Controller
           ->where("pt.project_category", "=", $category)
           ->where("p.status", "=", 4)
           ->where("pt.status", "=", 4)
+          ->where(function ($query) {
+              $query->where("pt.pres_status","=", 1)
+              ->orWhere("pt.pres_status","=", 2)
+              ->orWhere("pt.pres_status","=", 3);
+            })
           ->where("pt.project_year",$year)
           ->where("pt.campus", session('campus'))
           ->groupBy("pt.campus")
           ->get();
+
+      $expired = DB::table("project_titles")
+          ->whereNull("deleted_at")
+          ->where("project_category","=", $category)
+          ->where("status","=", 4)  
+          // ->where("pres_status","=", 1)
+          ->where(function ($query) {
+              $query->where("pres_status","=", 1)
+              ->orWhere("pres_status","=", 2)
+              ->orWhere("pres_status","=", 3);
+            })
+          ->whereDate('created_at', Carbon::now()/* ->subDays(7) */)
+          ->get();
+
+          // dd($expired);
 
       // $ppmp =  Http::withToken(session('token'))->get(env('APP_API'). "/api/supervisor/index")->json();
       return view('pages.President.app', compact('ppmps'/* ,'item' */,'campusinfo'/* ,'Project' */,'Categories','campusCheck','Project_title','prepared_by','recommending_approval','approved_by'),
@@ -377,6 +398,7 @@ class PresidentHopeController extends Controller
 
   public function pres_decision(Request $request){
     // dd($request->all());
+    if($request->value == 2){
       $Project_title = DB::table("project_titles as pt")
         ->join("ppmps as p", "p.project_code", "=", "pt.id")
         ->whereNull("pt.deleted_at")
@@ -386,8 +408,23 @@ class PresidentHopeController extends Controller
         ->where("pt.project_category", "=", $request->category)
         ->where("p.status", "=", 4)
         ->update([
-          'pt.pres_status' => $request->value
+          'pt.pres_status' => $request->value,
+          'pt.pres_created_at' => Carbon::now(),
         ]);
+    }else{
+      $Project_title = DB::table("project_titles as pt")
+        ->join("ppmps as p", "p.project_code", "=", "pt.id")
+        ->whereNull("pt.deleted_at")
+        ->where("pt.project_year","=",$request->year)
+        ->where("p.app_type","=",$request->app_type)
+        ->where("pt.campus", session('campus'))
+        ->where("pt.project_category", "=", $request->category)
+        ->where("p.status", "=", 4)
+        ->update([
+          'pt.pres_status' => $request->value,
+          'pt.pres_updated_at'=> Carbon::now(),
+        ]);
+    }
               // dd($Project_title);
               
       if($Project_title){
