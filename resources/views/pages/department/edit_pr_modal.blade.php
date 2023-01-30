@@ -24,55 +24,55 @@
                     {{session("globalerror")}}
                 </div>
             @else
-            
-            <form action="{{ route('addItem') }}" method="POST" enctype="multipart/form-data"> @csrf
-                
-                <div class="col-sm" hidden>
-                    <fieldset class="form-group">
-                        <label for="">project code</label>
-                        <input type="text" id="project_code"  class="project_code form-control" placeholder="<?=($project_code)?>" name = "project_code" value="<?=($project_code)?>">
-                    </fieldset>
-                </div>
+                <form action="{{ route('update_purchase_request') }}" method="POST" enctype="multipart/form-data"> @csrf
+                    <div class="col-sm" hidden>
+                        <fieldset class="form-group">
+                            <label for="">project code</label>
+                            <input type="text" id="project_code"  class="project_code form-control" placeholder="<?=($project_code)?>" name = "project_code" value="<?=($project_code)?>">
+                        </fieldset>
+                    </div>
+                    <input type="text" id="default-id" name="id" value="" hidden class="form-control d-none">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <fieldset class="form-group">
+                                <label for="SelectItem" >Item</label>
+                                <select  id="item" name="item" class="item form-control" required autofocus>
+                                    <option value="" selected disabled>-- Select Item --</option>
+                                </select>
+                            </fieldset>
+                        </div>
+                        <div class="col-sm-6">
+                            <fieldset class="form-group">
+                                <label for="Quantity">Quantity</label>
+                                <input type="number" id="quantity"  class="quantity form-control" placeholder="Enter Quantity" name = "quantity" value = "" required>
+                            </fieldset>
+                        </div>
+                        
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <fieldset class="form-group" >
+                                    <label for="">Upload File</label>
+                                    <input type="file" name="file" class="file form-control" required>
+                            </fieldset>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <fieldset class="form-group">
+                                <label for="Specification">Specification</label>
+                                <textarea id="specification"  class="specification form-control" placeholder="Enter Specification" name = "specification" value = "" required></textarea>
+                            </fieldset>
+                        </div>
+                    </div>
 
-                <div class="row">
-                    <div class="col-sm-6">
-                        <fieldset class="form-group">
-                            <label for="SelectItem" >Item</label>
-                            <select  id="item" name="item" class="item form-control" required autofocus>
-                                <option value="" selected disabled>-- Select Item --</option>
-                            </select>
-                        </fieldset>
-                    </div>
-                    <div class="col-sm-6">
-                        <fieldset class="form-group">
-                            <label for="Quantity">Quantity</label>
-                            <input type="number" id="quantity"  class="quantity form-control" placeholder="Enter Quantity" name = "quantity" value = "" required>
-                        </fieldset>
-                    </div>
-                    
-                </div>
-                <div class="row">
-                    <div class="col-sm-12">
-                        <fieldset class="form-group" >
-                                <label for="">Upload File</label>
-                                <input type="file" name="file" class="file form-control" required>
-                        </fieldset>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-12">
-                        <fieldset class="form-group">
-                            <label for="Specification">Specification</label>
-                            <textarea id="specification"  class="specification form-control" placeholder="Enter Specification" name = "specification" value = "" required></textarea>
-                        </fieldset>
-                    </div>
-                </div>
-            </form>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </form>
             @endif
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
+         
         </div>
       </div>
     </div>

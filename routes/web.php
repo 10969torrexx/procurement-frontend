@@ -635,6 +635,21 @@ Route::group(['prefix' => 'supply_custodian','middleware' => ['authuser']], func
 
 });
 
+/** Torrexx Additionals
+ * ! Update Purchase request
+ * ? enble Purchase Request while on draft
+ * ? KEY route group contains functions for purchase request
+ * ? TODO enable CRUD, tracking of PR
+ */
+Route::group(['prefix' => 'purchase-request', 'middleware' => ['authuser']], function() {
+    # Update Purchase Request
+        // ! get specified item
+        Route::get('/get-item', 'Department\PurchaseRequestController@get_item')->name('get_item');
+        // ! update purchase request
+        Route::post('/update-purchase-request', 'Department\PurchaseRequestController@update_purchase_request')->name('update_purchase_request');
+});
+
+
 # route for department-group
 Route::group(['prefix' => 'department','middleware' => ['authuser']], function() {
     //MY PROPERTY MENU ROUTES
@@ -642,20 +657,20 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
     Route::get('/my_ics','Employee\EmployeeController@my_ics');
 
     //PURCHASE REQUEST ROUTES
-    Route::get('/purchaseRequest', 'Department\PurchaseRequestController@PurchaseRequestIndex')->name('purchaseRequest');
-    Route::post('/purchaseRequest/add_Items_To_PR', 'Department\PurchaseRequestController@add_Items_To_PR');
-    Route::post('/purchaseRequest/addItem', 'Department\PurchaseRequestController@addItem')->name('addItem');
-    Route::get('/purchaseRequest/createPR', 'Department\PurchaseRequestController@createPR')->name('createPR');
-    Route::post('/purchaseRequest/createPR/remove_item', 'Department\PurchaseRequestController@remove_item')->name('remove_item');
-    Route::get('/purchaseRequest/getEmployees', 'Department\PurchaseRequestController@getEmployees');
-    Route::get('/purchaseRequest/getItems', 'Department\PurchaseRequestController@getItems');
-    Route::get('/purchaseRequest/getItem', 'Department\PurchaseRequestController@getItem');
-    Route::post('/purchaseRequest/savePR', 'Department\PurchaseRequestController@savePR');
+        Route::get('/purchaseRequest', 'Department\PurchaseRequestController@PurchaseRequestIndex')->name('purchaseRequest');
+        Route::post('/purchaseRequest/add_Items_To_PR', 'Department\PurchaseRequestController@add_Items_To_PR');
+        Route::post('/purchaseRequest/addItem', 'Department\PurchaseRequestController@addItem')->name('addItem');
+        Route::get('/purchaseRequest/createPR', 'Department\PurchaseRequestController@createPR')->name('createPR');
+        Route::post('/purchaseRequest/createPR/remove_item', 'Department\PurchaseRequestController@remove_item')->name('remove_item');
+        Route::get('/purchaseRequest/getEmployees', 'Department\PurchaseRequestController@getEmployees');
+        Route::get('/purchaseRequest/getItems', 'Department\PurchaseRequestController@getItems');
+        Route::get('/purchaseRequest/getItem', 'Department\PurchaseRequestController@getItem');
+        Route::post('/purchaseRequest/savePR', 'Department\PurchaseRequestController@savePR');
 
-    Route::get('/trackPR', 'Department\PurchaseRequestController@TrackPRIndex')->name('trackPR');
-    Route::post('/trackPR/view_pr/printPR', 'Department\PurchaseRequestController@printPR')->name('printPR');
-    Route::get('/trackPR/view_status', 'Department\PurchaseRequestController@view_status')->name('view_status');
-    Route::get('/trackPR/view_pr', 'Department\PurchaseRequestController@view_pr')->name('view_pr');
+        Route::get('/trackPR', 'Department\PurchaseRequestController@TrackPRIndex')->name('trackPR');
+        Route::post('/trackPR/view_pr/printPR', 'Department\PurchaseRequestController@printPR')->name('printPR');
+        Route::get('/trackPR/view_status', 'Department\PurchaseRequestController@view_status')->name('view_status');
+        Route::get('/trackPR/view_pr', 'Department\PurchaseRequestController@view_pr')->name('view_pr');
 
     //END PURCHASE REQUEST ROUTES
     

@@ -55,25 +55,57 @@ class BACCommitteeController extends Controller
       $breadcrumbs = [
         ["link" => "/", "name" => "Home"],["link" => "/president/list/".$project_category,"name" => "APP NON CSE"],["link" => "/", "name" => $year]
       ];
-      $Categories = DB::table("ppmps as p")
-          ->join("project_titles as pt", "p.project_code", "=", "pt.id")
-          ->whereNull("p.deleted_at")
-          ->whereNull("pt.deleted_at")
-          ->where("pt.project_year","=",$year)
-          ->where("p.app_type", 'Non-CSE')
-          ->where("pt.project_category", "=", $category)
-          ->where("p.status", "=", 4)
-          ->where("pt.status", "=", 4)
-          ->where(function ($query) {
-              $query->where("pt.bac_committee_status","=", 0)
-              ->orWhere("pt.bac_committee_status","=", 1)
-              ->orWhere("pt.bac_committee_status","=", 2);
-            })
-          ->where("p.campus", session('campus'))
-          ->groupBy("p.campus")
-          ->groupBy("p.item_category")
-          ->orderBy("p.campus","ASC")
-          ->get();
+        if(session('role') != 13) {
+          $Categories = DB::table("ppmps as p")
+            ->join("project_titles as pt", "p.project_code", "=", "pt.id")
+            ->whereNull("p.deleted_at")
+            ->whereNull("pt.deleted_at")
+            ->where("pt.project_year","=",$year)
+            ->where("p.app_type", 'Non-CSE')
+            ->where("pt.project_category", "=", $category)
+            ->where("p.status", "=", 4)
+            ->where("pt.status", "=", 4)
+            ->where(function ($query) {
+                $query->where("pt.bac_committee_status","=", 0)
+                ->orWhere("pt.bac_committee_status","=", 1)
+                ->orWhere("pt.bac_committee_status","=", 2);
+              })
+            ->where("p.campus", session('campus'))
+            ->groupBy("p.campus")
+            ->groupBy("p.item_category")
+            ->orderBy("p.campus","ASC")
+            ->get();
+        } else {
+           /**
+           * ! Torrexx Addtionals
+           * ? TODO get all recommended app non cse
+           * ? TODO check if role is 13
+           * ? Key | bac commitee status is 1
+           */
+           $Categories = DB::table("ppmps as p")
+            ->join("project_titles as pt", "p.project_code", "=", "pt.id")
+            ->whereNull("p.deleted_at")
+            ->whereNull("pt.deleted_at")
+            ->where('pt.bac_committee_status', 1) // ! torrexx - change
+            ->where("pt.project_year","=",$year)
+            ->where("p.app_type", 'Non-CSE')
+            ->where("pt.project_category", "=", $category)
+            ->where("p.status", "=", 4)
+            ->where("pt.status", "=", 4)
+            ->where(function ($query) {
+                $query->where("pt.bac_committee_status","=", 0)
+                ->orWhere("pt.bac_committee_status","=", 1)
+                ->orWhere("pt.bac_committee_status","=", 2);
+              })
+            ->where("p.campus", session('campus'))
+            ->groupBy("p.campus")
+            ->groupBy("p.item_category")
+            ->orderBy("p.campus","ASC")
+            ->get();
+        }
+       
+        
+
           // dd($Categories);
 
       // $ppmps = DB::table("project_titles as pt")
