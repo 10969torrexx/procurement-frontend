@@ -35,18 +35,17 @@
                 </div>
 
                 <div class="row">
+                    
                     <div class="col-sm-6">
                         <fieldset class="form-group">
-                            <label for="SelectItem" >Item</label>
-                            <select  id="item" name="item" class="item form-control" required autofocus>
-                                <option value="" selected disabled>-- Select Item --</option>
-                            </select>
+                            <label for="Item">Item</label>
+                            <input style="border:1px solid rgb(233, 230, 230);" type="text" id="updatename"  class="updatename form-control" placeholder="Item" name = "updatename" value = "" required disabled>
                         </fieldset>
                     </div>
                     <div class="col-sm-6">
                         <fieldset class="form-group">
                             <label for="Quantity">Quantity</label>
-                            <input type="number" id="quantity"  class="quantity form-control" placeholder="Enter Quantity" name = "quantity" value = "" required>
+                            <input type="number" id="updatequantity"  class="updatequantity form-control" placeholder="Enter Quantity" name = "updatequantity" value = "" required>
                         </fieldset>
                     </div>
                     
@@ -55,7 +54,7 @@
                     <div class="col-sm-12">
                         <fieldset class="form-group" >
                                 <label for="">Upload File</label>
-                                <input type="file" name="file" class="file form-control" required>
+                                <input type="file" name="updatefile" id="updatefile" class="updatefile form-control" value="" required>
                         </fieldset>
                     </div>
                 </div>
@@ -63,17 +62,17 @@
                     <div class="col-sm-12">
                         <fieldset class="form-group">
                             <label for="Specification">Specification</label>
-                            <textarea id="specification"  class="specification form-control" placeholder="Enter Specification" name = "specification" value = "" required></textarea>
+                            <textarea id="updatespecification"  class="updatespecification form-control" placeholder="Enter Specification" name = "updatespecification" value = "" required></textarea>
                         </fieldset>
                     </div>
                 </div>
-            </form>
             @endif
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
+          <button type="submit" class="btn btn-primary">Update</button>
         </div>
+        </form>
       </div>
     </div>
   </div>

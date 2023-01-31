@@ -478,7 +478,72 @@ class PurchaseRequestController extends Controller
       dd('getItems FUNCTION '+$th);
     }
   }
+  public function editPRItem(Request $request){
+    try {
+      // dd($request->all()); 
+      $id = $this->aes->decrypt($request->item);
+      $project_code = $this->aes->decrypt($request->project_code);
+      // dd($this->aes->decrypt($request->item)); 
 
+      $response = DB::table("purchase_request_items as pri")
+                          ->select('pri.*','p.item_name')
+                          ->join("ppmps as p", "pri.item_id", "=", "p.id")
+                          ->where('pri.project_code',$project_code)
+                          ->where('pri.id',$id)
+                          ->get();
+      // dd($response);
+      // $item_name = "";                    
+      // $quantity = 0;                    
+      // $file_name = "";                    
+      // $specification = "";
+      foreach($response as $data){
+        $item_name = $data->item_name;
+        $quantity = $data->quantity;
+        $file_name = $data->file_name;
+        $specification = $data->specification;
+      }
+      if($response){
+          return response()->json([
+              'status' => 200,
+              'message' => 'Success',
+              'item_name' => $item_name,
+              'quantity' => $quantity,
+              'file_name' => $file_name,
+              'specification' => $specification,
+          ]);
+
+      }else{
+        return response()->json([
+                  'status' => 400,
+                  'message' => 'failed',
+          ]);
+      }
+      // $department_id = session('department_id');
+      // $item = DB::table('ppmps')
+      //               ->select('quantity','item_name')
+      //               ->where('project_code','=',$project_code)
+      //               ->where('id','=',$id)
+      //               ->get();
+                    // dd($quantity);  
+      // dd($item[0]->quantity);
+      // if($quantity == $item[0]->quantity){
+      //     return response()->json([
+      //         'status' => 400,
+      //         'message' => $item[0]->item_name.' are already consumed!',
+      //     ]); 
+      // }else{
+      //     return response()->json([
+      //         'status' => 200,
+      //         'message' => 'Success',
+      //         'data' => ($item[0]->quantity)-$quantity,
+      //     ]);
+      // }
+
+
+    } catch (\Throwable $th) {
+      dd('getItems FUNCTION '+$th);
+    }
+  }
   public function savePR(Request $request){
     try {
       // dd($request->all());  
@@ -491,40 +556,53 @@ class PurchaseRequestController extends Controller
       $fund_source = (new AESCipher)->decrypt($request->fund_source);
       $project_code = (new AESCipher)->decrypt($request->project_code);
       $date = $current->format('Y-m');
-      $purchaseRequestCount = DB::table('purchase_request as pr')
-                              ->select('pr.*')
-                              ->get();
-      $purchaseRequestCounts =  str_pad(count($purchaseRequestCount)+1,4,"0",STR_PAD_LEFT);
-      $pr_no = $date.'-'.$purchaseRequestCounts;
+      $pr_no_check = DB::table('purchase_request as pr')
+                        ->select('pr.*')
+                        ->orderBy('pr.pr_no')
+                        ->get();
+
+      #START Code For Replacing the Deleted PR                 
+      $count = 1;
+      foreach($pr_no_check as $data){
+        $pr_no = $date.'-'.str_pad(0000+$count,4,"0",STR_PAD_LEFT);
+        if($pr_no == $data->pr_no){
+          $count++;}
+      }
+      $pr_no = $date.'-'.str_pad(0000+$count,4,"0",STR_PAD_LEFT);
+      #END Code For Replacing the Deleted PR                 
+
+      // dd($pr_no);
 
       $purchaseRequest = DB::table('purchase_request')
-                        ->insert([
-                          'department_id' => $department_id,
-                          'pr_no' => $pr_no,
-                          'campus' => $campus,
-                          'fund_source_id' => $fund_source,
-                          'purpose' => $purpose,
-                          'printed_name' => $employee,
-                          'designation' => $designation,
-                          'created_at' =>  Carbon::now()
-                      ]);
+                            ->insert([
+                              'department_id' => $department_id,
+                              'pr_no' => $pr_no,
+                              'campus' => $campus,
+                              'fund_source_id' => $fund_source,
+                              'purpose' => $purpose,
+                              'printed_name' => $employee,
+                              'designation' => $designation,
+                              'created_at' =>  Carbon::now()
+                          ]);
       DB::table('purchase_request_items')
-                  ->where('project_code', $project_code)
-                  ->where('pr_no', 0)
-                  ->update([
-                    'pr_no' => $pr_no
-                  ]);
+          ->where('project_code', $project_code)
+          ->where('pr_no', 0)
+          ->update([
+            'pr_no' => $pr_no
+          ]);
 
       if($purchaseRequest){
         return response()->json([
-            'status' => 200,
-            'message' => 'Success',
+          'status' => 200,
+          'message' => 'Success',
         ]);
       }
       return response()->json([
-          'status' => 400,
-          'message' => 'Error'
+        'status' => 400,
+        'message' => 'Error'
       ]);
+
+      
     } catch (\Throwable $th) {
       dd('add_Items_To_PR FUNCTION '+$th);
     }
