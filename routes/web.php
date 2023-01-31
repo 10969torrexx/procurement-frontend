@@ -641,13 +641,13 @@ Route::group(['prefix' => 'supply_custodian','middleware' => ['authuser']], func
  * ? KEY route group contains functions for purchase request
  * ? TODO enable CRUD, tracking of PR
  */
-Route::group(['prefix' => 'purchase-request', 'middleware' => ['authuser']], function() {
-    # Update Purchase Request
-        // ! get specified item
-        Route::get('/get-item', 'Department\PurchaseRequestController@get_item')->name('get_item');
-        // ! update purchase request
-        Route::post('/update-purchase-request', 'Department\PurchaseRequestController@update_purchase_request')->name('update_purchase_request');
-});
+// Route::group(['prefix' => 'purchase-request', 'middleware' => ['authuser']], function() {
+//     # Update Purchase Request
+//         // ! get specified item
+//         Route::get('/get-item', 'Department\PurchaseRequestController@get_item')->name('get_item');
+//         // ! update purchase request
+//         Route::post('/update-purchase-request', 'Department\PurchaseRequestController@update_purchase_request')->name('update_purchase_request');
+// });
 
 
 # route for department-group
