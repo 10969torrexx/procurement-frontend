@@ -250,10 +250,16 @@
                     <?php $camp++;?>
                 @endif
             @endforeach
+
+            <?php $bac_stat = "";?>
+            @foreach($signatories as $sign)
+              <?php $bac_stat = $sign->status?>
+            @endforeach
+
           <div class="card-header" >
             @if (session('role') == 14)
               <div class="row col-sm-4" >
-                @if($bac_committee_status == 0 || $bac_committee_status == 2)
+                @if($bac_stat == 0 || $bac_stat == 2)
                   <button type="button" class="btn btn-success form-control col-sm-4  approve" value="1" active>Recommend</button>
                 @else
                   <button type="button" class="btn btn-success form-control col-sm-4  approve" value="0" active><i class="fa-solid fa-rotate-left"></i></button>
@@ -267,7 +273,7 @@
               </div>
               <hr>
               <div class="row col-sm-4">
-                <p>Status: <span style="color: {{ (new GlobalDeclare)->bac_committee_status_color($bac_committee_status) }};text-transform: uppercase;">{{ (new GlobalDeclare)->bac_committee_status($bac_committee_status) }}</span></p> 
+                <p>Status: <span style="color: {{ (new GlobalDeclare)->bac_committee_status_color($bac_stat) }};text-transform: uppercase;">{{ (new GlobalDeclare)->bac_committee_status($bac_stat) }}</span></p> 
               </div>
             @endif
             <div class="generate" {{-- style="background-color: #bf5279" --}}>

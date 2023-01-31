@@ -524,6 +524,7 @@ Route::group(['prefix' => 'bac','middleware' => ['authuser']], function() {
     Route::post('/add-preparedby', 'BAC\APPNONCSEController@add_preparedby')->name('add-preparedby');
     Route::post('/add-approvedby', 'BAC\APPNONCSEController@add_approvedby')->name('add-approvedby');
     Route::post('/add-recommendingapproval', 'BAC\APPNONCSEController@add_recommendingapproval')->name('add-recommendingapproval');
+    Route::post('/add_recommendingapproval_modal', 'BAC\APPNONCSEController@add_recommendingapproval_modal')->name('add_recommendingapproval_modal');
     Route::post('/update-signatories', 'BAC\APPNONCSEController@update_signatories')->name('update-signatories');
     Route::get('/app-non-cse-year', 'BAC\APPNONCSEController@app_non_cse_year')->name('app-non-cse-year');
     Route::post('/app-non-cse-print', 'President\PresidentHopeController@print')->name('app-non-cse-print');
@@ -635,6 +636,7 @@ Route::group(['prefix' => 'supply_custodian','middleware' => ['authuser']], func
 
 });
 
+
 /** Torrexx Additionals
  * ! Update Purchase request
  * ? enble Purchase Request while on draft
@@ -671,6 +673,35 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
         Route::post('/trackPR/view_pr/printPR', 'Department\PurchaseRequestController@printPR')->name('printPR');
         Route::get('/trackPR/view_status', 'Department\PurchaseRequestController@view_status')->name('view_status');
         Route::get('/trackPR/view_pr', 'Department\PurchaseRequestController@view_pr')->name('view_pr');
+
+Route::group(['prefix' => 'PR','middleware' => ['authuser']], function() {
+    Route::get('/purchaseRequest', 'Department\PurchaseRequestController@PurchaseRequestIndex')->name('purchaseRequest');
+    Route::post('/purchaseRequest/add_Items_To_PR', 'Department\PurchaseRequestController@add_Items_To_PR');
+    Route::post('/purchaseRequest/addItem', 'Department\PurchaseRequestController@addItem')->name('addItem');
+    Route::get('/purchaseRequest/createPR', 'Department\PurchaseRequestController@createPR')->name('createPR');
+    Route::post('/purchaseRequest/createPR/remove_item', 'Department\PurchaseRequestController@remove_item')->name('remove_item');
+    Route::get('/purchaseRequest/getEmployees', 'Department\PurchaseRequestController@getEmployees');
+    Route::get('/purchaseRequest/getItems', 'Department\PurchaseRequestController@getItems');
+    Route::get('/purchaseRequest/getItem', 'Department\PurchaseRequestController@getItem');
+    Route::get('/purchaseRequest/editPRItem', 'Department\PurchaseRequestController@editPRItem');
+    Route::post('/purchaseRequest/savePR', 'Department\PurchaseRequestController@savePR');
+
+    Route::get('/trackPR', 'Department\PurchaseRequestController@TrackPRIndex')->name('trackPR');
+    Route::post('/trackPR/view_pr/printPR', 'Department\PurchaseRequestController@printPR')->name('printPR');
+    Route::get('/trackPR/view_status', 'Department\PurchaseRequestController@view_status')->name('view_status');
+    Route::get('/trackPR/view_pr', 'Department\PurchaseRequestController@view_pr')->name('view_pr');
+
+
+});
+# route for department-group
+Route::group(['prefix' => 'department','middleware' => ['authuser']], function() {
+    //MY PROPERTY MENU ROUTES
+    Route::get('/my_par','Employee\EmployeeController@my_par');
+    Route::get('/my_ics','Employee\EmployeeController@my_ics');
+
+    //PURCHASE REQUEST ROUTES
+   
+
 
     //END PURCHASE REQUEST ROUTES
     

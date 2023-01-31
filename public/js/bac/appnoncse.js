@@ -74,10 +74,10 @@ $.ajaxSetup({
     url: "show-signatories",
     data:{'id' :id},
     success: function (response) {
-      console.log(response['data'][0]['Title']);
+      console.log(response);
       if(response['status'] == 200) {
           $("#edit_signatories").modal('show');
-          var value = response['data'][0]['Name'];
+          var value = response['data'][0]['users_id'];
 
           // $("#inputName").val(response['data'][0]['Name']);
           // $('#choose').text(value);
@@ -167,7 +167,8 @@ $.ajaxSetup({
 //update Signatories
 $(document).on('click', '.submitedit', function (e) {
   var data = {
-    'Name': $("#inputName").val(),
+    'Name': $("#inputName :selected").text(),
+    'users_id': $("#inputName").val(),
     'Profession': $('#inputProfession').val(),
     'Title': $('#edutitle').val(),
     'id': $(this).val(),
@@ -525,7 +526,8 @@ $(document).on('click', '.newpreparedby', function (e) {
 $(document).on('click', '.submitprepared', function (e) {
 
   var data = {
-    'Name': $("#preparedName").val(),
+    'Name': $("#preparedName :selected").text(),
+    'users_id': $("#preparedName").val(),
     'Profession': $('.preparedProfession').val(),
     'Title': $('.preparedtitle').val(),
     'Year': $(".year").val(),
@@ -591,7 +593,8 @@ $(document).on('click', '.newapprovedby', function (e) {
 $(document).on('click', '.submitapproval', function (e) {
 
   var data = {
-    'Name': $("#approvedName").val(),
+    'Name': $("#approvedName :selected").text(),
+    'users_id': $("#approvedName").val(),
     'Profession': $('.approvedProfession').val(),
     'Title': $('.approvededutitle').val(),
     'Year': $(".year").val(),
@@ -661,14 +664,49 @@ $(document).on('click', '.add_recommendingapproval', function (e) {
   $(".submitrecommendingapproval").val($(this).attr("value"));
   $("#edit_newrecommendingapproval").modal('show');  
   $(".year").val($(".Year").val());
-  console.log($(this).attr("value"));
+  // console.log($(this).attr("value"));
+  
+
+  // $.ajax({
+  //   type: 'post',
+  //   url: "add_recommendingapproval_modal",
+  //   headers: {'X-CSRF-TOKEN' : $('meta[name="csrf-token"]').attr('content')},
+  //   data: {'year' : $(".Year").val()},
+  //   success: function(response) {
+  //   // console.log(response);
+  //   // console.log(response['users']);
+  //     if(response['status'] == 200){
+  //       // var a = ;
+  //       $('.recommendingapprovalName').html("");
+  //       var b = document.createElement('option');
+  //           b.text = "Choose...";
+  //           b.value = "bisan";
+  //           b.disabled = true;
+  //           b.selected = true;
+  //           $('.recommendingapprovalName').append(b);
+  //         for (let i = 0; i < response['users'].length; i++){ 
+  //           var auth_option = document.createElement('option');
+  //           auth_option.value = response['users'][i]['id'];
+  //           auth_option.text = response['users'][i]['name']; 
+  //           $('.recommendingapprovalName').append(auth_option);
+  //         }
+  //     }else{
+
+  //     }
+  //   },
+  //   error: function (data){
+  //     console.log(data);
+  //   }
+  // });
+  
 });
 
 $(document).on('click', '.submitrecommendingapproval', function (e) {
 
   var data = {
     'Position': $(this).attr("value"),
-    'Name': $("#recommendingapprovalName").val(),
+    'users_id': $("#recommendingapprovalName").val(),
+    'Name': $(".recommendingapprovalName :selected").text(),
     'Profession': $('.recommendingapprovalProfession').val(),
     'Title': $('.recommendingapprovaltitle').val(),
     'Year': $(".year").val(),
@@ -676,7 +714,7 @@ $(document).on('click', '.submitrecommendingapproval', function (e) {
   
   console.log(data);
 
-  if(data.Name == "choose" || data.Profession == "" || data.Title == ""){
+  if(data.Name == "choose.." || data.Profession == "" || data.Title == ""){
     Swal.fire('Complete the needed data', '', 'info')
   }
   else{

@@ -13,7 +13,7 @@ $(document).ready(function() {
 
     $.ajax({
       type: "GET",
-      url: "/department/purchaseRequest/getItems",
+      url: "/PR/purchaseRequest/getItems",
       data: data,
       beforeSend : function(){
         $('.item').html('<option class="spinner-border spinner-border-sm">Please wait... </option>');
@@ -31,7 +31,7 @@ $(document).ready(function() {
 
     $.ajax({
       type: "GET",
-      url: "/department/purchaseRequest/getEmployees",
+      url: "/PR/purchaseRequest/getEmployees",
       beforeSend : function(){
         $('.selectEmployee').html('<option class="spinner-border spinner-border-sm">Please wait... </option>');
       },
@@ -73,7 +73,7 @@ $(function(){$(".item").change(function(){
     } 
   $.ajax({
     type: "GET",
-    url: "/department/purchaseRequest/getItem",
+    url: "/PR/purchaseRequest/getItem",
     data: data,
     success: function (response) {
       
@@ -171,7 +171,7 @@ $(document).on('click', '.PR_button', function (e) {
       
               $.ajax({
                   type: "POST",
-                  url: "/department/purchaseRequest/addItem",
+                  url: "/PR/purchaseRequest/addItem",
                   data: data,
                   dataType: "json",
                   success: function (response) {
@@ -259,7 +259,7 @@ $(document).on('click', '.PR_button', function (e) {
         
 //                 $.ajax({
 //                     type: "POST",
-//                     url: "/department/purchaseRequest/add_Items_To_PR",
+//                     url: "/PR/purchaseRequest/add_Items_To_PR",
 //                     data: data,
 //                     dataType: "json",
 //                     success: function (response) {
@@ -349,7 +349,7 @@ $(document).on('click', '.btnCompletePR', function (e) {
 
         $.ajax({
             type: "POST",
-            url: "/department/purchaseRequest/savePR",
+            url: "/PR/purchaseRequest/savePR",
             data: data,
             dataType: "json",
             success: function (response) {
@@ -400,7 +400,7 @@ $(document).on('click', '.employeeEdit', function (e) {
 
     $.ajax({
       type: "GET",
-      url: "/department/purchaseRequest/getEmployees",
+      url: "/PR/purchaseRequest/getEmployees",
 
       success: function (response) {
         $('.employee').empty()
@@ -468,7 +468,7 @@ $(document).on('click', '.removebutton', function (e) {
             if (result.isConfirmed) {
               $.ajax({
                 type: "POST",
-                url: "/department/purchaseRequest/createPR/remove_item",
+                url: "/PR/purchaseRequest/createPR/remove_item",
                 data:{'id':id},
                 success: function (response) {
                       if(response['status'] == 200) {
@@ -518,6 +518,7 @@ $(document).on('click', '.print', function (e) {
       // 'app_type' : $(".app_type").val(),
       // 'value' : $(this).val()
   };
+
 console.log(data);
     $.ajax({
     type: 'post',
@@ -555,12 +556,52 @@ console.log(data);
         console.log(data);
       }
     });
+
+// console.log(data);
+  $.ajax({
+  type: 'post',
+  url: "/PR/trackPR/view_pr/printPR",
+  headers: {'X-CSRF-TOKEN' : $('meta[name="csrf-token"]').attr('content')},
+  data: data,
+  success: function(viewContent) {
+  // console.log(viewContent);
+    if(viewContent){
+        var css = '@page { size: A4 portrait; }',
+        head = document.head || document.getElementsByTagName('head')[0],
+        style = document.createElement('style');
+
+        style.type = 'text/css';
+        style.media = 'print';
+
+        if (style.styleSheet){
+        style.styleSheet.cssText = css;
+        } else {
+        style.appendChild(document.createTextNode(css));
+        }
+
+        head.appendChild(style);
+
+          var originalContents = document.body.innerHTML;
+          document.body.innerHTML = viewContent;
+          window.print();
+          document.body.innerHTML = originalContents;
+          location.reload();
+    }else{
+        toastr.error('Can\'t print. Error!')
+    }
+  },
+  error: function (data){
+    console.log(data);
+  }
+  });
+
 });
 
 $(document).on('click', '.editbutton', function (e) {
   e.preventDefault();
-  $('#EditPRModal').modal('show');
+  var project_code = $(".project_code").val();
   var id = $(this).attr("href");
+
   // alert(id);
     $.ajax({
       type: 'GET',
@@ -587,6 +628,46 @@ $(document).on('click', '.editbutton', function (e) {
           }
       }
     });
+
+
+
+  // alert(project_code);
+  $.ajaxSetup({
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    } 
+  });
+  var data = {
+    'item': id,
+    'project_code': project_code,
+    } 
+  $.ajax({
+    type: "GET",
+    url: "/PR/purchaseRequest/editPRItem",
+    data: data,
+    success: function (response) {
+      console.log(response)
+      if (response.status == 200) {
+        
+        $('.updatename').val(response.item_name); 
+        $('.updatequantity').val(response.quantity); 
+        $('#updatefile').text(response.file_name); 
+        $('.updatespecification').val(response.specification); 
+        $('#EditPRModal').modal('show');
+
+      }
+      if (response.status == 400) {
+        $('.quantity').val(''); 
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: response.message,
+          })
+        document.getElementById('item').getElementsByTagName('option')[0].selected = 'selected';
+
+      }
+    }
+  });
 
 
 });

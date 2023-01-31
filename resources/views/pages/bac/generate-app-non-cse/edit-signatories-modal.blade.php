@@ -6,7 +6,7 @@
                 <select class="selectpicker form-control inputName" id="inputName" name="name" data-style="btn-light" data-live-search="true">
                     <option id="choose" selected></option>
                     @foreach($users as $users)
-                        <option value="{{ $users->name }}">{{ $users->name }}</option>
+                        <option value="{{ $users->id }}">{{ $users->name }}</option>
                     @endforeach
                 </select>
                 {{-- <input type="text" style="margin-bottom: 1%;" class="form-control inputName" id="inputName" value=""> --}}
