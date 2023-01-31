@@ -636,13 +636,7 @@ Route::group(['prefix' => 'supply_custodian','middleware' => ['authuser']], func
 
 });
 
-# route for department-group
-Route::group(['prefix' => 'department','middleware' => ['authuser']], function() {
-    //MY PROPERTY MENU ROUTES
-    Route::get('/my_par','Employee\EmployeeController@my_par');
-    Route::get('/my_ics','Employee\EmployeeController@my_ics');
-
-    //PURCHASE REQUEST ROUTES
+Route::group(['prefix' => 'PR','middleware' => ['authuser']], function() {
     Route::get('/purchaseRequest', 'Department\PurchaseRequestController@PurchaseRequestIndex')->name('purchaseRequest');
     Route::post('/purchaseRequest/add_Items_To_PR', 'Department\PurchaseRequestController@add_Items_To_PR');
     Route::post('/purchaseRequest/addItem', 'Department\PurchaseRequestController@addItem')->name('addItem');
@@ -651,12 +645,24 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
     Route::get('/purchaseRequest/getEmployees', 'Department\PurchaseRequestController@getEmployees');
     Route::get('/purchaseRequest/getItems', 'Department\PurchaseRequestController@getItems');
     Route::get('/purchaseRequest/getItem', 'Department\PurchaseRequestController@getItem');
+    Route::get('/purchaseRequest/editPRItem', 'Department\PurchaseRequestController@editPRItem');
     Route::post('/purchaseRequest/savePR', 'Department\PurchaseRequestController@savePR');
 
     Route::get('/trackPR', 'Department\PurchaseRequestController@TrackPRIndex')->name('trackPR');
     Route::post('/trackPR/view_pr/printPR', 'Department\PurchaseRequestController@printPR')->name('printPR');
     Route::get('/trackPR/view_status', 'Department\PurchaseRequestController@view_status')->name('view_status');
     Route::get('/trackPR/view_pr', 'Department\PurchaseRequestController@view_pr')->name('view_pr');
+
+});
+# route for department-group
+Route::group(['prefix' => 'department','middleware' => ['authuser']], function() {
+    //MY PROPERTY MENU ROUTES
+    Route::get('/my_par','Employee\EmployeeController@my_par');
+    Route::get('/my_ics','Employee\EmployeeController@my_ics');
+
+    //PURCHASE REQUEST ROUTES
+   
+
 
     //END PURCHASE REQUEST ROUTES
     

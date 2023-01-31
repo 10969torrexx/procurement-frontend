@@ -60,19 +60,19 @@
         
       },
       {
-        "url": "department/PR",
+        "url": "PR/purchaseRequest",
         "name": "Purchase Request",
         "i18n": "Shoppingcart",
         "icon": "shoppingcart",
         "submenu": [
           {
-            "url": "department/purchaseRequest",
+            "url": "PR/purchaseRequest",
             "name": "Create PR",
             "i18n": "User",
             "icon": "like"
           },
           {
-            "url": "department/trackPR",
+            "url": "PR/trackPR",
             "name": "Track PR",
             "i18n": "User",
             "icon": "shoppingcart-in"

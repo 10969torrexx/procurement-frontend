@@ -106,6 +106,7 @@
                         {{-- <button type="submit" class="btn btn-primary form-control col-sm-1 mt-1"><i class="fa-solid fa-print"></i> &nbsp; Print</button> --}}
                         {{-- <a href = "{{ route('printPR', ['id'=> (new AESCipher)->encrypt($id)])  }}" class = "btn btn-primary mr-1 mb-1"><i class="bx bx-printer"></i> Print</a> --}}
                         <a href = "{{ route('trackPR') }}" class = "btn btn-primary mr-1 mb-1"><i class="bx bx-left-arrow"></i> Back</a>
+                        <a href = "#" class = "btn btn-success mr-1 mb-1"><i class="bx bx-edit"></i> Edit</a>
                         <a href = "#" class = "print btn btn-success mr-1 mb-1"><i class="bx bx-printer"></i> Print</a>
                     </div>
                       <div class="table-responsive">
