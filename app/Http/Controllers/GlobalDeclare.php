@@ -369,13 +369,13 @@ class GlobalDeclare extends Controller
     public function pres_status($id) {
         $out = '';
         switch ($id) {
-            case 1:
+            case 0:
                 $out = 'Pending';
             break;
-            case 2:
+            case 1:
                 $out = 'Approved';
             break;
-            case 3:
+            case 2:
                 $out = 'Disapproved';
             break;
         }
@@ -386,13 +386,13 @@ class GlobalDeclare extends Controller
     public function pres_status_color($id) {
         $out = '';
         switch ($id) {
-            case 1:
+            case 0:
                 $out = 'blue';
             break;
-            case 2:
+            case 1:
                 $out = 'green';
             break;
-            case 3:
+            case 2:
                 $out = 'red';
             break;
         }

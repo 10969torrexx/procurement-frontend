@@ -30,7 +30,7 @@ class BACCommitteeController extends Controller
                 })
               ->groupBy("project_year")
               -> get();
-    // dd($app);
+    // dd(session('user_id'));
     $pageConfigs = ['pageHeader' => true];
     $breadcrumbs = [
       ["link" => "/", "name" => "Home"],["name" =>"APP NON CSE"]
@@ -64,11 +64,11 @@ class BACCommitteeController extends Controller
           ->where("pt.project_category", "=", $category)
           ->where("p.status", "=", 4)
           ->where("pt.status", "=", 4)
-          ->where(function ($query) {
-              $query->where("pt.bac_committee_status","=", 0)
-              ->orWhere("pt.bac_committee_status","=", 1)
-              ->orWhere("pt.bac_committee_status","=", 2);
-            })
+          // ->where(function ($query) {
+          //     $query->where("pt.bac_committee_status","=", 0)
+          //     ->orWhere("pt.bac_committee_status","=", 1)
+          //     ->orWhere("pt.bac_committee_status","=", 2);
+          //   })
           ->where("p.campus", session('campus'))
           ->groupBy("p.campus")
           ->groupBy("p.item_category")
@@ -142,6 +142,12 @@ class BACCommitteeController extends Controller
           ->where("Role","=",2)
           ->get();
 
+      $signatories = DB::table("signatories_app_non_cse")
+          ->where("campus",session('campus'))
+          ->where("Year",$year)
+          ->where("users_id",'=',session('user_id'))
+          ->get();
+
       $campusinfo = DB::table("campusinfo")
           ->where("campus",session('campus'))
           ->get();
@@ -160,7 +166,7 @@ class BACCommitteeController extends Controller
           ->get();
 
       // $ppmp =  Http::withToken(session('token'))->get(env('APP_API'). "/api/supervisor/index")->json();
-      return view('pages.BACCommitte.app', compact('ppmps'/* ,'item' */,'campusinfo'/* ,'Project' */,'Categories','campusCheck','Project_title','prepared_by','recommending_approval','approved_by'),
+      return view('pages.BACCommitte.app', compact('ppmps','signatories','campusinfo'/* ,'Project' */,'Categories','campusCheck','Project_title','prepared_by','recommending_approval','approved_by'),
       [
         'pageConfigs'=>$pageConfigs,
         'breadcrumbs'=>$breadcrumbs
@@ -377,29 +383,51 @@ class BACCommitteeController extends Controller
 
   public function bac_committee_decision(Request $request){
     // dd($request->all());
-      $Project_title = DB::table("project_titles as pt")
-        ->join("ppmps as p", "p.project_code", "=", "pt.id")
-        ->whereNull("pt.deleted_at")
-        ->where("pt.project_year","=",$request->year)
-        ->where("p.app_type","=",$request->app_type)
-        ->where("pt.campus", session('campus'))
-        ->where("pt.project_category", "=", $request->category)
-        ->where("p.status", "=", 4)
-        ->update([
-          'pt.bac_committee_status' => $request->value
-        ]);
-              // dd($Project_title);
-              
-      if($Project_title){
-        return response()->json([
-          'status' => 200, 
-          // 'data' => $supplier,
-      ]); 
-      }else{
-        return response()->json([
-          'status' => 400, 
-          'message' => 'Error!.',
+      try {
+        // $Project_title = DB::table("project_titles as pt")
+        //   ->join("ppmps as p", "p.project_code", "=", "pt.id")
+        //   ->whereNull("pt.deleted_at")
+        //   ->where("pt.project_year","=",$request->year)
+        //   ->where("p.app_type","=",$request->app_type)
+        //   ->where("pt.campus", session('campus'))
+        //   ->where("pt.project_category", "=", $request->category)
+        //   ->where("p.status", "=", 4)
+        //   ->update([
+        //     'pt.bac_committee_status' => $request->value
+        //   ]);
+          if ($request->value == 1) {
+            $signatories = DB::table("signatories_app_non_cse")
+              ->where("Year","=",$request->year)
+              ->where("users_id",'=',session('user_id'))
+              ->update([
+                'status' => $request->value,
+                'bac_committee_created_at' => Carbon::now()
+              ]);
+          }else{
+            $signatories = DB::table("signatories_app_non_cse")
+              ->where("Year","=",$request->year)
+              ->where("users_id",'=',session('user_id'))
+              ->update([
+                'status' => $request->value,
+                'bac_committee_updated_at' => Carbon::now()
+              ]);
+            
+          }
+                // dd($Project_title);
+                
+        if($signatories){
+          return response()->json([
+            'status' => 200, 
+            // 'data' => $supplier,
         ]); 
+        }else{
+          return response()->json([
+            'status' => 400, 
+            'message' => 'Error!.',
+          ]); 
+        }
+      } catch (\Throwable $th) {
+        throw $th;
       }
   }
 
