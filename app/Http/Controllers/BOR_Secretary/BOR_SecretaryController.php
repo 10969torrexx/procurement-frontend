@@ -95,8 +95,8 @@ class BOR_SecretaryController extends Controller
         try {
             $response = \DB::table('bor_resolution')
                 ->where('campus', session('campus'))
-                ->where('employee_id', session('employee_id'))
-                ->where('department_id', session('department_id'))
+                // ->where('employee_id', session('employee_id'))
+                // ->where('department_id', session('department_id'))
                 ->where('id', (new AESCipher)->decrypt($request->id))
                 ->whereNull('deleted_at')
                 ->get();
@@ -157,11 +157,12 @@ class BOR_SecretaryController extends Controller
      * ? TODO enable bor resolution deletion based given id
      */
     public function view_bor_resolution(Request $request) {
+        
         try {
             $response = \DB::table('bor_resolution')
                 ->where('campus', session('campus'))
-                ->where('employee_id', session('employee_id'))
-                ->where('department_id', session('department_id'))
+                // ->where('employee_id', session('employee_id'))
+                // ->where('department_id', session('department_id'))
                 ->where('id', (new AESCipher)->decrypt($request->id))
                 ->whereNull('deleted_at')
                 ->get([
@@ -169,6 +170,7 @@ class BOR_SecretaryController extends Controller
                     'file_directory',
                     'bor_file'
                 ]);
+                // dd($response);
             # this will created history_log
                 (new HistoryLogController)->store(
                     session('department_id'),

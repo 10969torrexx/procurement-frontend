@@ -250,12 +250,23 @@
                     <?php $camp++;?>
                 @endif
             @endforeach
+
+            <?php $bac_stat = "";?>
+            @foreach($signatories as $sign)
+              <?php $bac_stat = $sign->status?>
+            @endforeach
+
+
           <div class="card-header" >
               <div class="row col-sm-4" >
-                @if($pres_status == 1 || $pres_status == 3)
-                  <button type="button" class="btn btn-success form-control col-sm-4  approve" value="2" active>Approve</button>
+                @if($bac_stat == 0 || $bac_stat == 2)
+                  <button type="button" class="btn btn-success form-control col-sm-4  approve" value="1" active>Approve</button>
                 @else
-                  <button type="button" class="btn btn-success form-control col-sm-4  approve" value="1" active><i class="fa-solid fa-rotate-left"></i></button>
+                  @if(count($expired) > 0)
+                    <button type="button" class="btn btn-success form-control col-sm-4  approve" value="0" active><i class="fa-solid fa-rotate-left"></i></button>
+                  @else
+                    <div class="col-sm-12 p-1 bg-info text-white"><i class="fa-solid fa-circle-info"></i> &nbsp; Status can be changed after a day !</div>
+                  @endif
                 @endif
 
                 {{-- @if($Categories[0]->pres_status == 1 || $Categories[0]->pres_status == 2)
@@ -266,7 +277,8 @@
               </div>
               <hr>
               <div class="row col-sm-4">
-                <p>Status: <span style="color: {{ (new GlobalDeclare)->pres_status_color($pres_status) }};text-transform: uppercase;">{{ (new GlobalDeclare)->pres_status($pres_status) }}</span></p> 
+                <p>Status: <span style="color: {{ (new GlobalDeclare)->pres_status_color($bac_stat) }};text-transform: uppercase;">{{ (new GlobalDeclare)->pres_status($bac_stat) }}</span></p> 
+                {{-- <p>Status: <span style="color: {{ (new GlobalDeclare)->pres_status_color($pres_status) }};text-transform: uppercase;">{{ (new GlobalDeclare)->pres_status($pres_status) }}</span></p>  --}}
               </div>
             <div class="generate" {{-- style="background-color: #bf5279" --}}>
               {{-- <input type="hidden" name="project_category" class="project_category" value="{{ $project_category }}">

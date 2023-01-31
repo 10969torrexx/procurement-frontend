@@ -524,6 +524,7 @@ Route::group(['prefix' => 'bac','middleware' => ['authuser']], function() {
     Route::post('/add-preparedby', 'BAC\APPNONCSEController@add_preparedby')->name('add-preparedby');
     Route::post('/add-approvedby', 'BAC\APPNONCSEController@add_approvedby')->name('add-approvedby');
     Route::post('/add-recommendingapproval', 'BAC\APPNONCSEController@add_recommendingapproval')->name('add-recommendingapproval');
+    Route::post('/add_recommendingapproval_modal', 'BAC\APPNONCSEController@add_recommendingapproval_modal')->name('add_recommendingapproval_modal');
     Route::post('/update-signatories', 'BAC\APPNONCSEController@update_signatories')->name('update-signatories');
     Route::get('/app-non-cse-year', 'BAC\APPNONCSEController@app_non_cse_year')->name('app-non-cse-year');
     Route::post('/app-non-cse-print', 'President\PresidentHopeController@print')->name('app-non-cse-print');
