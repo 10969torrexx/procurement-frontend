@@ -75,16 +75,17 @@ class MenuServiceProvider extends ServiceProvider
                 $verticalMenuJson = file_get_contents(base_path('resources/data/menus/president-menu.json'));
                 $verticalMenuData = json_decode($verticalMenuJson);
             }  elseif ($role == 13) {
-                $verticalMenuJson = file_get_contents(base_path('resources/data/menus/bor-secretary-menu.json'));
-                $verticalMenuData = json_decode($verticalMenuJson);
+                /**
+                 * ! Torrexx additonals 
+                 * ? BOR Secretary
+                */ 
+                    $verticalMenuJson = file_get_contents(base_path('resources/data/menus/bor-secretary-menu.json'));
+                    $verticalMenuData = json_decode($verticalMenuJson);
             }  elseif($role == 14){      
                 $verticalMenuJson = file_get_contents(base_path('resources/data/menus/bac-committee-menu.json'));
                 $verticalMenuData = json_decode($verticalMenuJson);
             } 
-                /**
-                 * ! Torrexx additonals 
-                 * ? BOR Secretary
-                 * */ 
+               
 
             $horizontalMenuJson = file_get_contents(base_path('resources/data/menus/horizontal-menu.json'));
             $horizontalMenuData = json_decode($horizontalMenuJson);

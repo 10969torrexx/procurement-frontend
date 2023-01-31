@@ -105,7 +105,6 @@ class PurchaseRequestController extends Controller
 
   public function createPR(Request $request) {
       try {
-        // dd($request->all());
         // dd($this->aes->decrypt($request->id));
         $date = Carbon::now()->format('m/d/Y');
         $project_code = $request->id;
@@ -176,7 +175,7 @@ class PurchaseRequestController extends Controller
           }else{
               Session::forget('globalerror');
           }
-                    // dd($remaining);
+          // dd($remaining);
           // if(count($ppmp_deadlines)==0){
           //       session(['globalerror' => "Please set deadline first"]);
           // }else{
@@ -681,6 +680,7 @@ class PurchaseRequestController extends Controller
   }
 
   public function remove_item(Request $request){
+    dd($request->all());
     $id = (new AESCipher())->decrypt($request->id);
     $item = DB::table('purchase_request_items')
               ->select('file_name')
@@ -815,4 +815,148 @@ public function printPR(Request $request) {
             ]); 
 }
 
+# Torrexx Additionals
+    /**
+     * ! Get item from purchase request items
+     * ? KEY while it's still on draft
+     * ? TODO get item by id from purchase request table
+     */
+      // public function get_item(Request $request) {
+      //   try {
+      //     $response = \DB::table('purchase_request_items')
+      //       ->join('items', 'items.id', 'purchase_request_items.item_id')
+      //       ->where('purchase_request_items.id', (new AESCipher)->decrypt($request->id))
+      //       ->where('purchase_request_items.pr_no', 0) 
+      //       ->get([
+      //           'purchase_request_items.*',
+      //           'items.item_name'
+      //       ]);
+
+      //     if(count($response) > 0) {
+      //       return [
+      //         'status'  => 200,
+      //         'data'  => $response
+      //       ];
+      //     }
+
+      //     return [
+      //       'status'  => 400,
+      //       'message'  => 'Data not Found!'
+      //     ];
+      //   } catch (\Throwable $th) {
+      //       // return view('pages.error-500');
+      //       throw $th;
+      //   }
+      // }
+    /**
+      * ! Update Purchase Request
+      * ? KEY while it's still on draft status
+      */
+      // public function update_purchase_request(Request $request) {
+      //   try {
+      //       $file = $request->file('file');
+      //       $extension = $request->file('file')->getClientOriginalExtension();
+      //       $is_valid = false;
+      //       # validate extension
+      //           $allowed_extensions = ['pdf', 'jpeg', 'jpg', 'png'];
+      //           for ($i = 0; $i < count($allowed_extensions) ; $i++) { 
+      //             if($allowed_extensions[$i] == $extension) {
+      //                   $is_valid = true;
+      //             }
+      //           }
+      //           if($is_valid == false) {
+      //               return back()->with([
+      //                   'error' => 'Invalid file format!'
+      //               ]);
+      //           }
+
+      //       $id = $request->item;
+      //       $quantityToPR = $request->quantity;
+      //       $specification = $request->specification;
+      //       $project_code = $this->aes->decrypt($request->project_code);
+
+      //       $quantityFromPPMP = DB::table("ppmps")
+      //                 ->select('quantity')
+      //                 ->where('project_code',$project_code)
+      //                 ->where('id',$id)
+      //                 ->get();
+      //       $quantityFromPRI = DB::table("purchase_request_items")
+      //                 ->select('quantity')
+      //                 ->where('project_code',$project_code)
+      //                 ->where('item_id',$id)
+      //                 ->get();
+            
+      //       $quantity = $quantityToPR;
+      //       for($i=0; $i < count($quantityFromPRI); $i++){
+      //                 $quantity += $quantityFromPRI[$i]->quantity;
+      //       }
+            
+      //       if($quantityFromPPMP[0]->quantity < $quantity){
+      //         return back()->with([
+      //           'error' => 'The quantity exceeds the remaining item(s)!'
+      //         ]);
+      //         return response()->json([
+      //           'status' => 400, 
+      //           'message' => 'The quantity exceeds the remaining item(s)!',
+      //         ]);  
+      //       }else{
+      //           $itemCheck = DB::table('purchase_request_items')
+      //                         ->select('*')
+      //                         ->where('project_code',$project_code)
+      //                         ->where('item_id',$id)
+      //                         ->where('pr_no',0)
+      //                         ->count();
+      //           if($itemCheck == 1){
+      //             return back()->with([
+      //               'error' => 'Item already exist in the draft!'
+      //             ]);
+                
+      //           }else{
+      //               $item = DB::table('ppmps')
+      //                     ->select('item_name')
+      //                     ->where('id',$id)
+      //                     ->get();
+      //               $item_name = '';
+      //               foreach($item as $data){
+      //                 $item_name = $data->item_name;
+      //               }
+
+      //               $file_name = $item_name.'-'.time();
+      //               $destination_path = env('APP_NAME').'\\purchase_request\\item_upload\\';
+      //               if (!Storage::exists($destination_path)) {
+      //                 Storage::makeDirectory($destination_path);
+      //               }
+      //               $file->storeAs($destination_path, $file_name.'.'.$extension);
+      //               $file->move('storage/'. $destination_path, $file_name.'.'.$extension); 
+
+      //               $response = DB::table('purchase_request_items')
+      //                             ->where('id', $request->id)
+      //                             ->update([
+      //                                 'project_code' => $project_code,
+      //                                 'item_id' => $id,
+      //                                 'quantity' => $quantityToPR,
+      //                                 'specification' => $specification,
+      //                                 'file_name' => $file_name.'.'.$extension,
+      //                                 'updated_at' =>  Carbon::now()
+      //                             ]);
+      //               if($response){
+      //                 return back()->with([
+      //                   'success' => 'Item Updated successfully!'
+      //                 ]);
+                    
+      //               }else{
+      //                 return back()->with([
+      //                   'error' => 'Failed!'
+      //                 ]);
+      //               }
+      //           }
+      //       }
+      //   } catch (\Throwable $th) {
+      //       //throw $th;
+      //       return view('pages.error-500');
+      //   }
+      // }
+    
+    
+# END
 }

@@ -94,12 +94,10 @@ class AuthenticationController extends Controller
 
   public function handleGoogleCallback()
   {
-
     try {
       $user = Socialite::driver('google')->user(); 
 	    // dd($user);
       if($user){
-        
         $name = $user->name;
         $email = $user->email;
         $photo = $user->avatar;
@@ -132,8 +130,7 @@ class AuthenticationController extends Controller
                   'position' =>$position,
                   'campus' => $checkEmail->Campus
                   ])->json();
-                //  dd($login);
-
+                
                 if($login['status'] == 200){
                     $login = $login['data'];
                     session([
@@ -160,6 +157,7 @@ class AuthenticationController extends Controller
             return redirect("/login");
       }
     } catch (\Throwable $th) {
+        throw $th;
         session(['globalerror' => "Please try again"]);
         return redirect("/login");
     }

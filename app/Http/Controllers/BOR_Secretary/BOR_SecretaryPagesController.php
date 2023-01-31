@@ -47,7 +47,7 @@ class BOR_SecretaryPagesController extends Controller
                         ["link" => "/", "name" => "Home"],
                         ["name" => "BOR Resolution"]
                     ];
-                    # this will return the department.my-PPMP
+                    # this will return the department.my-PPMP 
                     return view('pages.bor_secretary.bor-resolution',
                         [
                             'pageConfigs' => $pageConfigs,
@@ -67,7 +67,6 @@ class BOR_SecretaryPagesController extends Controller
     /**
      * ! Recommended APP
      * ? TODO - get all recommended app by bac secretariat
-     * 
      */
     public function show_recommended_app() {
         try {
