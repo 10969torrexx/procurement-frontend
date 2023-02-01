@@ -636,44 +636,6 @@ Route::group(['prefix' => 'supply_custodian','middleware' => ['authuser']], func
 
 });
 
-
-/** Torrexx Additionals
- * ! Update Purchase request
- * ? enble Purchase Request while on draft
- * ? KEY route group contains functions for purchase request
- * ? TODO enable CRUD, tracking of PR
- */
-// Route::group(['prefix' => 'purchase-request', 'middleware' => ['authuser']], function() {
-//     # Update Purchase Request
-//         // ! get specified item
-//         Route::get('/get-item', 'Department\PurchaseRequestController@get_item')->name('get_item');
-//         // ! update purchase request
-//         Route::post('/update-purchase-request', 'Department\PurchaseRequestController@update_purchase_request')->name('update_purchase_request');
-// });
-
-
-# route for department-group
-Route::group(['prefix' => 'department','middleware' => ['authuser']], function() {
-    //MY PROPERTY MENU ROUTES
-    Route::get('/my_par','Employee\EmployeeController@my_par');
-    Route::get('/my_ics','Employee\EmployeeController@my_ics');
-
-    //PURCHASE REQUEST ROUTES
-        Route::get('/purchaseRequest', 'Department\PurchaseRequestController@PurchaseRequestIndex')->name('purchaseRequest');
-        Route::post('/purchaseRequest/add_Items_To_PR', 'Department\PurchaseRequestController@add_Items_To_PR');
-        Route::post('/purchaseRequest/addItem', 'Department\PurchaseRequestController@addItem')->name('addItem');
-        Route::get('/purchaseRequest/createPR', 'Department\PurchaseRequestController@createPR')->name('createPR');
-        Route::post('/purchaseRequest/createPR/remove_item', 'Department\PurchaseRequestController@remove_item')->name('remove_item');
-        Route::get('/purchaseRequest/getEmployees', 'Department\PurchaseRequestController@getEmployees');
-        Route::get('/purchaseRequest/getItems', 'Department\PurchaseRequestController@getItems');
-        Route::get('/purchaseRequest/getItem', 'Department\PurchaseRequestController@getItem');
-        Route::post('/purchaseRequest/savePR', 'Department\PurchaseRequestController@savePR');
-
-        Route::get('/trackPR', 'Department\PurchaseRequestController@TrackPRIndex')->name('trackPR');
-        Route::post('/trackPR/view_pr/printPR', 'Department\PurchaseRequestController@printPR')->name('printPR');
-        Route::get('/trackPR/view_status', 'Department\PurchaseRequestController@view_status')->name('view_status');
-        Route::get('/trackPR/view_pr', 'Department\PurchaseRequestController@view_pr')->name('view_pr');
-
 Route::group(['prefix' => 'PR','middleware' => ['authuser']], function() {
     Route::get('/purchaseRequest', 'Department\PurchaseRequestController@PurchaseRequestIndex')->name('purchaseRequest');
     Route::post('/purchaseRequest/add_Items_To_PR', 'Department\PurchaseRequestController@add_Items_To_PR');
@@ -691,19 +653,14 @@ Route::group(['prefix' => 'PR','middleware' => ['authuser']], function() {
     Route::get('/trackPR/view_status', 'Department\PurchaseRequestController@view_status')->name('view_status');
     Route::get('/trackPR/view_pr', 'Department\PurchaseRequestController@view_pr')->name('view_pr');
 
-
+    
 });
+
 # route for department-group
 Route::group(['prefix' => 'department','middleware' => ['authuser']], function() {
     //MY PROPERTY MENU ROUTES
     Route::get('/my_par','Employee\EmployeeController@my_par');
     Route::get('/my_ics','Employee\EmployeeController@my_ics');
-
-    //PURCHASE REQUEST ROUTES
-   
-
-
-    //END PURCHASE REQUEST ROUTES
     
     /* Torrexx Additionals */
         /** Implementing Functions Related to the department end user */
@@ -819,44 +776,6 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
         // ? END
     });
 /** END */
-
-// Route::group(['prefix' => 'employee','middleware' => ['authuser']], function() {
-//     Route::get('/','finalControllers\EmployeeController@index')->name('employeelist');
-//     Route::post('/search-department-employment-status', 'finalControllers\EmployeeController@search');
-//     Route::get('/edit','finalControllers\EmployeeController@edit')->name('employee.edit');
-//     Route::post('/create','finalControllers\EmployeeController@store')->name('employee.add');
-//     Route::post('/update','finalControllers\EmployeeController@update')->name('employee.update');
-//     Route::post('/delete','finalControllers\EmployeeController@destroy')->name('employee.delete');
-//     Route::get('/employeelist','finalControllers\EmployeeController@employeelist')->name('employee.list');
-// });
-
-// Route::group(['prefix' => 'inventory','middleware' => ['authuser']], function() {
-//     Route::get('/','finalControllers\InventoryController@index');
-//     Route::post('/search','finalControllers\InventoryController@search')->name("psearch");
-//     Route::get('/print/{id}/{type}/{cluster}','finalControllers\InventoryController@print');
-// });
-
-// Route::group(['prefix' => 'property','middleware' => ['authuser']], function() {
-//     Route::get('/','finalControllers\PropertyController@index');
-//     Route::get('/print/{id}/{fund}/{empid}','finalControllers\PropertyController@print');
-// });
-
-// Route::group(['prefix' => 'ics','middleware' => ['authuser']], function() {
-//     Route::get('/','finalControllers\ICSController@index');
-//     Route::post('/search', 'finalControllers\ICSController@search');
-//     Route::get('/search/{Employee}', 'finalControllers\ICSController@search');
-//     Route::get('/print/{id}/{fund}/{empid}','finalControllers\ICSController@print');
-
-// });
-
-// Route::group(['prefix' => 'supplier','middleware' => ['authuser']], function() {
-//     Route::get('/','finalControllers\SupplierController@index');
-// });
-
-// Route::group(['prefix' => 'department','middleware' => ['authuser']], function() {
-//     Route::get('/','finalControllers\DepartmentController@index');
-// });
-
 
 
 #end
