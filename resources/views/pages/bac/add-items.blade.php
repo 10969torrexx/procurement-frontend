@@ -91,7 +91,6 @@
                       <thead>
                           <tr>
                               <th>Item Name</th>
-                              {{-- <th>Campus</th> --}}
                               <th>Category</th>
                               <th>APP TYPE</th>
                               <th>Mode Of Procurement</th>

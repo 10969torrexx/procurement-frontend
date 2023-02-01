@@ -137,7 +137,7 @@ class ItemController extends Controller
 
     // $item =  Http::withToken(session('token'))->get(env('APP_API'). "/api/item/index")->json();
     $category = DB::table("categories")
-              ->where("campus", session('campus'))
+              // ->where("campus", session('campus'))
               ->whereNull("deleted_at")
               ->get();
 

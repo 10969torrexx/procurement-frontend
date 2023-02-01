@@ -49,7 +49,7 @@
                     <thead>
                       <tr>
                         <th>Unit of Measurements</th>
-                        {{-- <th>Campus</th> --}}
+                        <th>Campus</th>
                         <th>Added By</th>
                         <th>Date Added</th>
                         <th>Date Updated</th>
@@ -60,22 +60,24 @@
                       @foreach($data1 as $data1)
                         <tr>
                           <td maxlength="6">{{ $data1->unit_of_measurement }}</td>
-                          {{-- <td>{{ (new GlobalDeclare)->Campus(IntVal($data1->campus)) }}</td> --}}
+                          <td>{{ (new GlobalDeclare)->Campus(IntVal($data1->campus)) }}</td>
                           <td>{{ $data1->name }}</td>
                           <td>{{ explode('-', date('j F, Y- g:i a', strtotime($data1->created_at)))[0] }}</td>
                           <td>{{ explode('-', date('j F, Y- g:i a', strtotime($data1->updated_at)))[0] }}</td>
                           <td>
-                            <div class="dropdown">
-                              <span
-                                  class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
-                                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu"></span>
-                              <div class="dropdown-menu dropdown-menu-left">
-                                  <a class="dropdown-item edit" data-id = "<?=$aes->encrypt($data1->id)?>" data-toggle = "modal" id="editModal" href = "{{ $aes->encrypt($data1->id) }}"><i class="bx bx-edit-alt mr-1"></i> edit</a>
-                                  <a class="dropdown-item delete-unit" href = "{{ $aes->encrypt($data1->id) }}">
-                                      <i class="bx bx-trash mr-1"></i> delete
-                                  </a>
+                            @if($data1->campus == session('campus'))
+                              <div class="dropdown">
+                                <span
+                                    class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu"></span>
+                                <div class="dropdown-menu dropdown-menu-left">
+                                    <a class="dropdown-item edit" data-id = "<?=$aes->encrypt($data1->id)?>" data-toggle = "modal" id="editModal" href = "{{ $aes->encrypt($data1->id) }}"><i class="bx bx-edit-alt mr-1"></i> edit</a>
+                                    <a class="dropdown-item delete-unit" href = "{{ $aes->encrypt($data1->id) }}">
+                                        <i class="bx bx-trash mr-1"></i> delete
+                                    </a>
+                                </div>
                               </div>
-                          </div> 
+                            @endif 
                           </td> 
                         </tr>
                       @endforeach

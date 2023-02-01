@@ -764,8 +764,13 @@ class BudgetOfficerController extends Controller
                             ->select('id')
                             ->where('campus',session('campus'))
                             ->whereNull('deleted_at')
+                            ->orderBy('department_name')
                             ->get();
-        $fund_source_ids = DB::table('fund_sources')->select('id')->whereNull('deleted_at')->get();
+        $fund_source_ids = DB::table('fund_sources')
+                            ->select('id')
+                            ->whereNull('deleted_at')
+                            ->orderBy('fund_source')
+                            ->get();
         $years = DB::table('ppmp_deadline')
                     ->select('year','id')
                     ->where('campus',session('campus'))
