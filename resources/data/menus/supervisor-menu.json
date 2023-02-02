@@ -11,13 +11,13 @@
         "navheader": "My Property"
       },
       {
-        "url": "department/my_par",
+        "url": "property/PAR",
         "name": "PAR",
         "i18n": "User",
         "icon": "list"
       },
       {
-        "url": "department/my_ics",
+        "url": "property/ICS",
         "name": "ICS",
         "i18n": "User",
         "icon": "gears"

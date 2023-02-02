@@ -239,11 +239,11 @@
     <!-- Greetings Content Starts -->
     <section id="basic-datatable">
       <div class="card-content" >
-        <?php $campuscount = count($campusCheck); $camp = 0; $endorse = 0; $bac_committee_status = ""; $campusload = "";$project_category="";$project_year=""; $appType="";?>
+        <?php $campuscount = count($campusCheck); $camp = 0; $endorse = 0; /* $bac_committee_status = ""; */ $campusload = "";$project_category="";$project_year=""; $appType="";?>
             @foreach($campusCheck as $campusload)
               <?php $project_category = $campusload->project_category; 
                     $appType = $campusload->app_type; 
-                    $bac_committee_status = $campusload->bac_committee_status;
+                    // $bac_committee_status = $campusload->bac_committee_status;
                     $endorse = $campusload->endorse;
                     $project_year = $campusload->project_year;?>
                 @if($campusload->campus == 1)
@@ -262,7 +262,13 @@
                 @if($bac_stat == 0 || $bac_stat == 2)
                   <button type="button" class="btn btn-success form-control col-sm-4  approve" value="1" active>Recommend</button>
                 @else
+                
+                @if(count($expired) > 0)
                   <button type="button" class="btn btn-success form-control col-sm-4  approve" value="0" active><i class="fa-solid fa-rotate-left"></i></button>
+                @else
+                  <div class="col-sm-12 p-1 bg-info text-white"><i class="fa-solid fa-circle-info"></i> &nbsp; Status can be changed after a day !</div>
+                @endif
+                  {{-- <button type="button" class="btn btn-success form-control col-sm-4  approve" value="0" active><i class="fa-solid fa-rotate-left"></i></button> --}}
                 @endif
 
                 {{-- @if($Categories[0]->bac_committee_status == 1 || $Categories[0]->bac_committee_status == 2)
@@ -477,6 +483,9 @@
                                 echo ", $title";
                               }
                             ?>
+                            @if ($prepared_by[0]->status == 1)
+                              <i class="fa-solid fa-circle-check" value="<?=$aes->encrypt($approved_by[0]->id)?>" style="margin-left:5px;color:green"></i>
+                            @endif
                           </div>
                           <div class="profession">
                             <?php
@@ -505,6 +514,7 @@
                             $Title = "";
                             $id = "";
                             $Profession = "";
+                            $Rstat = "";
                             foreach($recommending_approval as $recommending_approval1){
                                   if($Position == $recommending_approval1->Position){
                                     $checker=1;
@@ -512,6 +522,7 @@
                                     $Title = $recommending_approval1->Title;
                                     $id = $recommending_approval1->id;
                                     $Profession = $recommending_approval1->Profession;
+                                    $Rstat = $recommending_approval1->status;
                                   }
                                 }
                             ?>
@@ -527,6 +538,9 @@
                                     echo ", $title";
                                   }
                                 ?>
+                                @if($Rstat == 1)
+                                  <i class="fa-solid fa-circle-check" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;color:green"></i>
+                                @endif
                               </div>
                               <div class="profession">
                                 <?php
@@ -537,6 +551,14 @@
                                     }
                                 ?>
                               </div>
+                            <?php
+                              }else{
+                            ?>
+                                <div class="name">
+                                  <button type="button" class="btn btn-outline-secondary form-control add_recommendingapproval" value="31"><i class="fa-solid fa-plus"></i></button>
+                                </div>
+                                <div class="profession">
+                                </div>
                             <?php
                               }
                             ?>
@@ -550,6 +572,7 @@
                             $Title = "";
                             $id = "";
                             $Profession = "";
+                            $Rstat = "";
                             foreach($recommending_approval as $recommending_approval2){
                                   if($Position == $recommending_approval2->Position){
                                     $checker=1;
@@ -557,6 +580,7 @@
                                     $Title = $recommending_approval2->Title;
                                     $id = $recommending_approval2->id;
                                     $Profession = $recommending_approval2->Profession;
+                                    $Rstat = $recommending_approval2->status;
                                   }
                                 }
                             ?>
@@ -572,6 +596,9 @@
                                     echo ", $title";
                                   }
                                 ?>
+                                @if($Rstat == 1)
+                                  <i class="fa-solid fa-circle-check signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;color:green"></i>
+                                @endif
                               </div>
                               <div class="profession">
                                 <?php
@@ -582,6 +609,14 @@
                                     }
                                 ?>
                               </div>
+                            <?php
+                              }else{
+                            ?>
+                                <div class="name">
+                                  <button type="button" class="btn btn-outline-secondary form-control add_recommendingapproval" value="32"><i class="fa-solid fa-plus"></i></button>
+                                </div>
+                                <div class="profession">
+                                </div>
                             <?php
                               }
                             ?>
@@ -595,6 +630,7 @@
                             $Title = "";
                             $id = "";
                             $Profession = "";
+                            $Rstat = "";
                             foreach($recommending_approval as $recommending_approval3){
                                   if($Position == $recommending_approval3->Position){
                                     $checker=1;
@@ -602,6 +638,7 @@
                                     $Title = $recommending_approval3->Title;
                                     $id = $recommending_approval3->id;
                                     $Profession = $recommending_approval3->Profession;
+                                    $Rstat = $recommending_approval3->status;
                                   }
                                 }
                             ?>
@@ -617,6 +654,9 @@
                                     echo ", $title";
                                   }
                                 ?>
+                                @if($Rstat == 1)
+                                  <i class="fa-solid fa-circle-check signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;color:green"></i>
+                                @endif
                               </div>
                               <div class="profession">
                                 <?php
@@ -627,6 +667,14 @@
                                     }
                                 ?>
                               </div>
+                            <?php
+                              }else{
+                            ?>
+                                <div class="name">
+                                  <button type="button" class="btn btn-outline-secondary form-control add_recommendingapproval" value="33"><i class="fa-solid fa-plus"></i></button>
+                                </div>
+                                <div class="profession">
+                                </div>
                             <?php
                               }
                             ?>
@@ -643,6 +691,7 @@
                             $Title = "";
                             $id = "";
                             $Profession = "";
+                            $Rstat = "";
                             foreach($recommending_approval as $recommending_approval4){
                                   if($Position == $recommending_approval4->Position){
                                     $checker=1;
@@ -650,6 +699,7 @@
                                     $Title = $recommending_approval4->Title;
                                     $id = $recommending_approval4->id;
                                     $Profession = $recommending_approval4->Profession;
+                                    $Rstat = $recommending_approval4->status;
                                   }
                                 }
                             ?>
@@ -665,6 +715,9 @@
                                     echo ", $title";
                                   }
                                 ?>
+                                @if($Rstat == 1)
+                                  <i class="fa-solid fa-circle-check" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;color:green"></i>
+                                @endif
                               </div>
                               <div class="profession">
                                 <?php
@@ -675,6 +728,14 @@
                                     }
                                 ?>
                               </div>
+                            <?php
+                              }else{
+                            ?>
+                                <div class="name">
+                                  <button type="button" class="btn btn-outline-secondary form-control add_recommendingapproval" value="34"><i class="fa-solid fa-plus"></i></button>
+                                </div>
+                                <div class="profession">
+                                </div>
                             <?php
                               }
                             ?>
@@ -688,6 +749,7 @@
                             $Title = "";
                             $id = "";
                             $Profession = "";
+                            $Rstat = "";
                             foreach($recommending_approval as $recommending_approval5){
                                   if($Position == $recommending_approval5->Position){
                                     $checker=1;
@@ -695,6 +757,7 @@
                                     $Title = $recommending_approval5->Title;
                                     $id = $recommending_approval5->id;
                                     $Profession = $recommending_approval5->Profession;
+                                    $Rstat = $recommending_approval5->status;
                                   }
                                 }
                             ?>
@@ -710,6 +773,9 @@
                                     echo ", $title";
                                   }
                                 ?>
+                                @if($Rstat == 1)
+                                  <i class="fa-solid fa-circle-check" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;color:green"></i>
+                                @endif
                               </div>
                               <div class="profession">
                                 <?php
@@ -720,6 +786,14 @@
                                     }
                                 ?>
                               </div>
+                            <?php
+                              }else{
+                            ?>
+                                <div class="name">
+                                  <button type="button" class="btn btn-outline-secondary form-control add_recommendingapproval" value="35"><i class="fa-solid fa-plus"></i></button>
+                                </div>
+                                <div class="profession">
+                                </div>
                             <?php
                               }
                             ?>
@@ -733,6 +807,7 @@
                             $Title = "";
                             $id = "";
                             $Profession = "";
+                            $Rstat = "";
                             foreach($recommending_approval as $recommending_approval6){
                                   if($Position == $recommending_approval6->Position){
                                     $checker=1;
@@ -740,6 +815,7 @@
                                     $Title = $recommending_approval6->Title;
                                     $id = $recommending_approval6->id;
                                     $Profession = $recommending_approval6->Profession;
+                                    $Rstat = $recommending_approval6->status;
                                   }
                                 }
                             ?>
@@ -755,6 +831,9 @@
                                     echo ", $title";
                                   }
                                 ?>
+                                @if($Rstat == 1)
+                                  <i class="fa-solid fa-circle-check" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;color:green"></i>
+                                @endif
                               </div>
                               <div class="profession">
                                 <?php
@@ -766,8 +845,17 @@
                                 ?>
                               </div>
                             <?php
+                              }else{
+                            ?>
+                                <div class="name">
+                                  <button type="button" class="btn btn-outline-secondary form-control add_recommendingapproval" value="36"><i class="fa-solid fa-plus"></i></button>
+                                </div>
+                                <div class="profession">
+                                </div>
+                            <?php
                               }
                             ?>
+                                
                           </div> 
                         </div>
         
@@ -780,6 +868,7 @@
                             $Title = "";
                             $id = "";
                             $Profession = "";
+                            $Rstat = "";
                             foreach($recommending_approval as $recommending_approval7){
                                   if($Position == $recommending_approval7->Position){
                                     $checker=1;
@@ -787,6 +876,7 @@
                                     $Title = $recommending_approval7->Title;
                                     $id = $recommending_approval7->id;
                                     $Profession = $recommending_approval7->Profession;
+                                    $Rstat = $recommending_approval7->status;
                                   }
                                 }
                             ?>
@@ -802,6 +892,9 @@
                                     echo ", $title";
                                   }
                                 ?>
+                                @if($Rstat == 1)
+                                  <i class="fa-solid fa-circle-check" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;color:green"></i>
+                                @endif
                               </div>
                               <div class="profession">
                                 <?php
@@ -812,6 +905,14 @@
                                     }
                                 ?>
                               </div>
+                            <?php
+                              }else{
+                            ?>
+                                <div class="name">
+                                  <button type="button" class="btn btn-outline-secondary form-control add_recommendingapproval" value="37"><i class="fa-solid fa-plus"></i></button>
+                                </div>
+                                <div class="profession">
+                                </div>
                             <?php
                               }
                             ?>
@@ -825,6 +926,7 @@
                             $Title = "";
                             $id = "";
                             $Profession = "";
+                            $Rstat = "";
                             foreach($recommending_approval as $recommending_approval8){
                                   if($Position == $recommending_approval8->Position){
                                     $checker=1;
@@ -832,6 +934,7 @@
                                     $Title = $recommending_approval8->Title;
                                     $id = $recommending_approval8->id;
                                     $Profession = $recommending_approval8->Profession;
+                                    $Rstat = $recommending_approval5->status;
                                   }
                                 }
                             ?>
@@ -847,6 +950,9 @@
                                     echo ", $title";
                                   }
                                 ?>
+                                @if($Rstat == 1)
+                                  <i class="fa-solid fa-circle-check" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;color:green"></i>
+                                @endif
                               </div>
                               <div class="profession">
                                 <?php
@@ -857,6 +963,14 @@
                                     }
                                 ?>
                               </div>
+                            <?php
+                              }else{
+                            ?>
+                                <div class="name">
+                                  <button type="button" class="btn btn-outline-secondary form-control add_recommendingapproval" value="38"><i class="fa-solid fa-plus"></i></button>
+                                </div>
+                                <div class="profession">
+                                </div>
                             <?php
                               }
                             ?>
@@ -875,6 +989,9 @@
                                   echo ", $title";
                             }
                           ?>
+                            @if ($approved_by[0]->status == 1)
+                              <i class="fa-solid fa-circle-check" value="<?=$aes->encrypt($approved_by[0]->id)?>" style="margin-left:5px;color:green"></i>
+                            @endif
                         </div>
                         <div class="profession">
                           <?php
@@ -891,7 +1008,6 @@
                         </div>
                       </div> 
                     </td>
-                  </tr>
                 </tfoot>
             </table>
               {{-- @include('pages.bac.generate-app-non-cse.view-modal') --}}

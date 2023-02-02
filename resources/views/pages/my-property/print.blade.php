@@ -50,12 +50,16 @@
                                         <tr style="border: 0">
                                             <td colspan="2">Fund cluster:</td>
                                             <td colspan="3" class="fund">{{  $par->FundCluster }}</td>
-                                            <td colspan="2" class="Par">PAR No.: {{/* substr($par->DateIssued, 0, 7)."-".str_pad( */$par->PARNo/*   */ }}</td>
+                                            @if ($par->propertytype == "PAR")
+                                                <td colspan="2" class="Par">PAR No.: {{/* substr($par->DateIssued, 0, 7)."-".str_pad( */$par->PARNo/* , 4, "0", STR_PAD_LEFT) */ }}</td>
+                                            @else
+                                                <td colspan="2" class="Par">ICS No.: {{/* substr($par->DateIssued, 0, 7)."-".str_pad( */$par->PARNo/* , 4, "0", STR_PAD_LEFT)  */}}</td>
+                                            @endif
                                         </tr>
                                         <tr style="text-align: center">
                                             <td style="width: 10%">Quantity</td>
                                             <td style="width: 10%">Unit</td>
-                                            <td style="width: 30%">Description</td>
+                                            <td style="width: 30%">Description</td> 
                                             <td style="width: 12.5%">Property<br>Number</td>
                                             <td style="width: 12.5%">Date<br>Acquired</td>
                                             <td style="width:12.5%">Unit<br>Price</td>

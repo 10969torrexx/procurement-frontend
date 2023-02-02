@@ -567,6 +567,16 @@ Route::group(['prefix' => 'supervisor','middleware' => ['authuser']], function()
     // Route::post('/accept-reject-all', 'Supervisor\SupervisorControllerSupplemental@accept_reject_all')->name('accept-reject-all');
 });
 
+Route::group(['prefix' => 'property','middleware' => ['authuser']], function() {
+    //Supervisor Side
+    Route::get('/{id}', 'MyProperty\MyPropertyController@index');
+    Route::post('/print-show','MyProperty\MyPropertyController@print_par')->name('print-show');
+    Route::post('/current-user-list','MyProperty\MyPropertyController@current_user')->name('current-user-list');
+    Route::post('/current-user-add','MyProperty\MyPropertyController@add_current_user')->name('current-user-add');
+    Route::post('/print-property','MyProperty\MyPropertyController@print')->name('print-property');
+    Route::post('/search-property','MyProperty\MyPropertyController@search')->name('search-property');
+});
+
 Route::group(['prefix' => 'president','middleware' => ['authuser']], function() {
     //Supervisor Side
     Route::get('/list/{id}', 'President\PresidentHopeController@list');
@@ -776,7 +786,6 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
         // ? END
     });
 /** END */
-
 
 #end
 
