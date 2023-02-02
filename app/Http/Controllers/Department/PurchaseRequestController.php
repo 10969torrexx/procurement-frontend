@@ -23,7 +23,7 @@ class PurchaseRequestController extends Controller
   public function PurchaseRequestIndex(){
     $pageConfigs = ['pageHeader' => true];
     $breadcrumbs = [
-      ["link" => "/", "name" => "Home"],["name" => "Approve PPMPs"]
+      ["link" => "/", "name" => "Home"],["name" => "Approved PPMPs"]
     ];
     $year = Carbon::now()->format('Y');
     $department_id = session('department_id');
@@ -106,7 +106,6 @@ class PurchaseRequestController extends Controller
 
   public function createPR(Request $request) {
       try {
-        // dd($request->all());
         // dd($this->aes->decrypt($request->id));
         $date = Carbon::now()->format('m/d/Y');
         $project_code = $request->id;
@@ -114,7 +113,7 @@ class PurchaseRequestController extends Controller
         $pageConfigs = ['pageHeader' => true];
         $breadcrumbs = [
             ["link" => "/", "name" => "Home"],
-            ["link" => "/department/purchaseRequest", "name" => "Approve PPMPs"],
+            ["link" => "/PR/purchaseRequest", "name" => "Approve PPMPs"],
             ["name" => "Create PR"]
         ];
        
@@ -177,7 +176,7 @@ class PurchaseRequestController extends Controller
           }else{
               Session::forget('globalerror');
           }
-                    // dd($remaining);
+          // dd($remaining);
           // if(count($ppmp_deadlines)==0){
           //       session(['globalerror' => "Please set deadline first"]);
           // }else{
@@ -900,6 +899,7 @@ class PurchaseRequestController extends Controller
   }
 
   public function remove_item(Request $request){
+    dd($request->all());
     $id = (new AESCipher())->decrypt($request->id);
     $item = DB::table('purchase_request_items')
               ->select('file_name')

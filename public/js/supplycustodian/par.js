@@ -737,9 +737,9 @@ $(document).on('click', '.print', function (e) {
               </tr>'
             );
             
-            $par = (response['data'][0]['DateIssued'].substring(0, 7)+"-"+response['data'][0]['PARNo'].padStart( 4, "0") );
-            console.log($par);
-            $(".Par").text('PAR No. : '+/* response['data'][0]['PARNo'] */ $par);
+            // $par = (response['data'][0]['DateIssued'].substring(0, 7)+"-"+response['data'][0]['PARNo'].padStart( 4, "0") );
+            // console.log($par);
+            $(".Par").text('PAR No. : '+/* response['data'][0]['PARNo'] */ /* $par */ response['data'][0]['PARNo']);
             $(".Fund").text(response['data'][0]['FundCluster']);
             $(".employeeName").text(response['data'][0]['name']);
             $(".positionTitle").text(response['data'][0]['EmpPosition']);

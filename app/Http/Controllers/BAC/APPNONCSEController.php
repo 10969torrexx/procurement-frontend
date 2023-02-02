@@ -14,6 +14,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\Storage;
 use Pdf;
+use Carbon\Carbon;
 
 class APPNONCSEController extends Controller
 {
@@ -22,7 +23,7 @@ class APPNONCSEController extends Controller
     $breadcrumbs = [
       ["link" => "/", "name" => "Home"],["name" => "APP NON-CSE"]
     ];
-
+    $scope = "campus";
     $Project = DB::table("project_titles as pt")
         ->join("ppmps as p", "p.project_code", "=", "pt.id")
         ->whereNull("pt.deleted_at")
@@ -86,7 +87,7 @@ class APPNONCSEController extends Controller
           ->get("pt.project_year");
 
     $campusCheck = DB::table("project_titles as pt")
-          ->select("pt.campus","pt.endorse","pt.pres_status","pt.bac_committee_status","pt.project_category","p.app_type")
+          ->select("pt.campus","pt.endorse","pt.project_category","p.app_type")
           ->join("ppmps as p", "p.project_code", "=", "pt.id")
           ->whereNull("pt.deleted_at")
           ->where("p.app_type", 'Non-CSE')
@@ -126,13 +127,20 @@ class APPNONCSEController extends Controller
     $campusinfo = DB::table("campusinfo")
           ->where("campus",session('campus'))
           ->get();
+          
+    // $signName ="";
+    // foreach($signatures as $sign){
+    //   $signName = $sign->Name;
+    // }
 
     $users = DB::table("users")
+          ->select("name","id")
           ->where("campus",session('campus'))
+          // ->where("name",'!=',$signName)
           ->whereNull("username")
-          ->get("name");
+          ->get();
           
-    return view('pages.bac.generate-app-non-cse.list', compact('Categories','ppmps','signatures','campusinfo','Project','Project_title','prepared_by','recommending_approval','approved_by','users','campusCheck'),
+    return view('pages.bac.generate-app-non-cse.list', compact('Categories','scope','ppmps','signatures','campusinfo','Project','Project_title','prepared_by','recommending_approval','approved_by','users','campusCheck'),
       [
         'pageConfigs'=>$pageConfigs,
         'breadcrumbs'=>$breadcrumbs
@@ -145,7 +153,7 @@ class APPNONCSEController extends Controller
     $breadcrumbs = [
       ["link" => "/", "name" => "Home"],["name" => "APP NON-CSE"]
     ];
-
+    $scope = "campus";
     $Project = DB::table("project_titles as pt")
         ->join("ppmps as p", "p.project_code", "=", "pt.id")
         ->whereNull("pt.deleted_at")
@@ -209,7 +217,7 @@ class APPNONCSEController extends Controller
           ->get("pt.project_year");
 
     $campusCheck = DB::table("project_titles as pt")
-          ->select("pt.campus","pt.endorse","pt.pres_status","pt.bac_committee_status","pt.project_category")
+          ->select("pt.campus","pt.endorse","pt.project_category")
           ->join("ppmps as p", "p.project_code", "=", "pt.id")
           ->whereNull("pt.deleted_at")
           ->where("p.app_type", 'Non-CSE')
@@ -251,11 +259,13 @@ class APPNONCSEController extends Controller
           ->get();
 
     $users = DB::table("users")
+          ->select("name","id")
           ->where("campus",session('campus'))
+          // ->where("name",'!=',$signName)
           ->whereNull("username")
-          ->get("name");
+          ->get();
           
-    return view('pages.bac.generate-app-non-cse.list', compact('Categories','ppmps','signatures','campusinfo','Project','Project_title','prepared_by','recommending_approval','approved_by','users','campusCheck'),
+    return view('pages.bac.generate-app-non-cse.list', compact('Categories','scope','ppmps','signatures','campusinfo','Project','Project_title','prepared_by','recommending_approval','approved_by','users','campusCheck'),
       [
         'pageConfigs'=>$pageConfigs,
         'breadcrumbs'=>$breadcrumbs
@@ -268,7 +278,7 @@ class APPNONCSEController extends Controller
     $breadcrumbs = [
       ["link" => "/", "name" => "Home"],["name" => "APP NON-CSE"]
     ];
-
+    $scope = "campus";
     $Project = DB::table("project_titles as pt")
         ->join("ppmps as p", "p.project_code", "=", "pt.id")
         ->whereNull("pt.deleted_at")
@@ -332,7 +342,7 @@ class APPNONCSEController extends Controller
           ->get("pt.project_year");
 
     $campusCheck = DB::table("project_titles as pt")
-          ->select("pt.campus","pt.endorse","pt.pres_status","pt.bac_committee_status","pt.project_category")
+          ->select("pt.campus","pt.endorse","pt.project_category")
           ->join("ppmps as p", "p.project_code", "=", "pt.id")
           ->whereNull("pt.deleted_at")
           ->where("p.app_type", 'Non-CSE')
@@ -374,11 +384,12 @@ class APPNONCSEController extends Controller
           ->get();
 
     $users = DB::table("users")
+          ->select("name","id")
           ->where("campus",session('campus'))
           ->whereNull("username")
-          ->get("name");
+          ->get();
           
-    return view('pages.bac.generate-app-non-cse.list', compact('Categories','ppmps','signatures','campusinfo','Project','Project_title','prepared_by','recommending_approval','approved_by','users','campusCheck'),
+    return view('pages.bac.generate-app-non-cse.list', compact('Categories','scope','ppmps','signatures','campusinfo','Project','Project_title','prepared_by','recommending_approval','approved_by','users','campusCheck'),
       [
         'pageConfigs'=>$pageConfigs,
         'breadcrumbs'=>$breadcrumbs
@@ -393,7 +404,7 @@ class APPNONCSEController extends Controller
     $breadcrumbs = [
       ["link" => "/", "name" => "Home"],["name" => "APP NON-CSE"]
     ];
-
+    $scope = "Uwide";
     $Project = DB::table("project_titles as pt")
         ->join("ppmps as p", "p.project_code", "=", "pt.id")
         ->whereNull("pt.deleted_at")
@@ -446,7 +457,7 @@ class APPNONCSEController extends Controller
         // dd($ppmps);
           
     $campusCheck = DB::table("project_titles as pt")
-          ->select("pt.campus","pt.endorse","pt.pres_status","pt.bac_committee_status","pt.project_category","p.app_type")
+          ->select("pt.campus","pt.endorse","pt.project_category","p.app_type")
           ->join("ppmps as p", "p.project_code", "=", "pt.id")
           ->whereNull("pt.deleted_at")
           ->where("p.app_type", 'Non-CSE')
@@ -498,11 +509,12 @@ class APPNONCSEController extends Controller
           ->get();
 
     $users = DB::table("users")
+          ->select("name","id")
           ->where("campus",session('campus'))
           ->whereNull("username")
-          ->get("name");
+          ->get();
 
-    return view('pages.bac.generate-app-non-cse.list', compact('Categories','ppmps','signatures','campusinfo','Project','Project_title','prepared_by','recommending_approval','approved_by','users','campusCheck'),
+    return view('pages.bac.generate-app-non-cse.list', compact('Categories','scope','ppmps','signatures','campusinfo','Project','Project_title','prepared_by','recommending_approval','approved_by','users','campusCheck'),
       [
         'pageConfigs'=>$pageConfigs,
         'breadcrumbs'=>$breadcrumbs
@@ -564,17 +576,26 @@ class APPNONCSEController extends Controller
           'status' => 500, 
           ]); 
       }else{
-        $done = DB::table("project_titles as pt")
-          ->join("ppmps as p", "p.project_code", "=", "pt.id")
-          ->whereNull("pt.deleted_at")
-          ->where("p.app_type", 'Non-CSE')
-          ->where("pt.project_category", "=", $request->category)
-          ->where("p.status", "=", 4)
-          ->where("pt.status", "=", 4)
-          ->where("pt.campus", session('campus'))
-          ->where("pt.project_year",$request->year)
+        // $done = DB::table("project_titles as pt")
+        //   ->join("ppmps as p", "p.project_code", "=", "pt.id")
+        //   ->whereNull("pt.deleted_at")
+        //   ->where("p.app_type", 'Non-CSE')
+        //   ->where("pt.project_category", "=", $request->category)
+        //   ->where("p.status", "=", 4)
+        //   ->where("pt.status", "=", 4)
+        //   ->where("pt.campus", session('campus'))
+        //   ->where("pt.project_year",$request->year)
+        //   ->update([
+        //     "pt.pres_status" => $request->submit
+        //   ]);
+
+          
+      $done = DB::table("signatories_app_non_cse")
+          ->where("Year","=",$request->year)
+          ->where("users_id",'=',session('user_id'))
           ->update([
-            "pt.pres_status" => $request->submit
+            'status' => $request->value,
+            'pres_created_at' => Carbon::now()
           ]);
 
           if($done){
@@ -1203,12 +1224,14 @@ class APPNONCSEController extends Controller
       $Signatories = DB::table("signatories_app_non_cse")
         // ->where('id',$id)
         ->insert([
+          'users_id'=>$request->users_id,
           'Name'=>$request->Name,
           'Profession'=>$request->Profession,
           'Title'=>$request->Title,
           'Year'=>$request->Year,
           'Role'=>1,
           'Campus'=>session('campus'),
+          'created_at'=> Carbon::now(),
         ]);
 
       if($Signatories) {
@@ -1239,12 +1262,14 @@ class APPNONCSEController extends Controller
       $Signatories = DB::table("signatories_app_non_cse")
         // ->where('id',$id)
         ->insert([
+          'users_id'=>$request->users_id,
           'Name'=>$request->Name,
           'Profession'=>$request->Profession,
           'Title'=>$request->Title,
           'Year'=>$request->Year,
           'Role'=>2,
           'Campus'=>session('campus'),
+          'created_at'=> Carbon::now(),
         ]);
 
       if($Signatories) {
@@ -1266,6 +1291,7 @@ class APPNONCSEController extends Controller
         ]);
     }
   }
+
   public function add_recommendingapproval(Request $request){
     // dd($request->all());
     try{
@@ -1274,6 +1300,7 @@ class APPNONCSEController extends Controller
       $Signatories = DB::table("signatories_app_non_cse")
         // ->where('id',$id)
         ->insert([
+          'users_id'=>$request->users_id,
           'Name'=>$request->Name,
           'Profession'=>$request->Profession,
           'Title'=>$request->Title,
@@ -1281,12 +1308,48 @@ class APPNONCSEController extends Controller
           'Position'=>$request->Position,
           'Role'=>3,
           'Campus'=>session('campus'),
+          'created_at'=> Carbon::now(),
         ]);
 
       if($Signatories) {
         return response()->json([
         'status' =>  200,
         'data'  =>  $Signatories,
+        ]);
+      }
+      else{
+        return response()->json([
+          'status' =>  400,
+          'data'  =>  "error",
+          ]);
+      }
+    }catch (\Throwable $th) {
+        return response()->json([
+            'status' => 400,
+            'message'   => $th
+        ]);
+    }
+  }
+
+  public function add_recommendingapproval_modal(Request $request){
+    // dd($request->all());
+    try{
+      $users = DB::table("users as u")
+          ->where("u.campus",session('campus'))
+          ->whereNotIn('u.id',DB::table("signatories_app_non_cse as s")
+                ->where("s.Year",'=',$request->year)
+                ->where("s.campus",session('campus'))
+                ->pluck('s.users_id'))
+          ->whereNull("u.username")
+          ->get();
+          // dd($users);
+      
+
+      if($users) {
+        return response()->json([
+        'status' =>  200,
+        // 'data'  =>  $Signatories,
+        'users'  =>  $users,
         ]);
       }
       else{
@@ -1340,9 +1403,11 @@ class APPNONCSEController extends Controller
       $Signatories = DB::table("signatories_app_non_cse")
         ->where('id',$request->id)
         ->update([
-          'Name'=>$request->Name,
-          'Profession' =>$request->Profession,
-          'Title' =>$request->Title,
+          'users_id'    => $request->users_id,
+          'Name'        =>$request->Name,
+          'Profession'  =>$request->Profession,
+          'Title'       =>$request->Title,
+          'updated_at'=> Carbon::now(),
         ]);
 
       if($Signatories) {

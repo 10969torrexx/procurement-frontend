@@ -239,12 +239,12 @@
     <!-- Greetings Content Starts -->
     <section id="basic-datatable">
       <div class="card-content" >
-        <?php $campuscount = count($campusCheck); $camp = 0; $endorse = 0; $pres_status = ""; $bac_committee_status = ""; $campusload = "";$project_category=""; $appType="";?>
+        <?php $campuscount = count($campusCheck); $camp = 0; $endorse = 0; /* $pres_status = ""; */ /* $bac_committee_status = ""; */ $campusload = "";$project_category=""; $appType="";?>
             @foreach($campusCheck as $campusload)
               <?php $project_category = $campusload->project_category; 
                     $appType = $campusload->app_type; 
-                    $bac_committee_status = $campusload->bac_committee_status;
-                    $pres_status = $campusload->pres_status;
+                    // $bac_committee_status = $campusload->bac_committee_status;
+                    // $pres_status = $campusload->pres_status;
                     $endorse = $campusload->endorse;?>
                 @if($campusload->campus == 1)
                     <?php $camp++;?>
@@ -256,21 +256,8 @@
                     <?php/*  $endorse++; */?>
                 @endif --}}
             @endforeach
-          <div class="card-header" >
-            {{-- <div class="" >
-            <button  type="button" class="btn btn-light form-control col-sm-1 mt-1 generatepdf" >PDF</button>
-            <button  type="button" class="btn btn-light form-control col-sm-1 mt-1 generatepdf" >PDF</button>
-            </div>
-            <div class="mt-1" style="border-bottom:1px solid black;"></div> --}}
             
-            {{-- @if(session('role') == 12)
-              <div class="row col-sm-4" style="background: #bf5279">
-                <button href="/bac/app-non-cse" type="button" class="btn btn-outline-secondary form-control col-sm-4  generatepdf" value="{{ $campuscount }}" active>Indicative</button>
-                <button  type="button" class="btn btn-outline-secondary form-control col-sm-4  generatepdf" value="{{ $campuscount }}">PPMP</button>
-                <button  type="button" class="btn btn-outline-secondary form-control col-sm-4  generatepdf" value="{{ $campuscount }}">Supplemental</button>
-              </div>
-              <hr>
-            @endif --}}
+          <div class="card-header" >
             <div class="generate" {{-- style="background-color: #bf5279" --}}>
               <input type="hidden" class="campusCheck" value="{{ $campuscount }}">
               <input type="hidden" name="app_type" class="app_type" value="{{ $appType }}">
@@ -293,13 +280,21 @@
                     <button  type="button" class="btn btn-primary form-control col-sm-1 mt-1 endorse" value="0"><i class="fa-solid fa-rotate-left"></i></button>
                   @endif
                 @endif --}}
+                @php
+                    $pres_status = "";
+                @endphp
+                @foreach ($approved_by as $presStatus)
+                    @php
+                        $pres_status = $presStatus->status;
+                    @endphp
+                @endforeach
                 @if(session('role') == 10)
                   @if($pres_status == 0)
-                    <button  type="button" class="btn btn-primary form-control col-sm-1 mt-1 submittopresident " value="1" data-id="{{ $project_category}}">SUBMIT</button>
-                  @endif
-                      <input type="hidden" name="project_category" id="project_category" value="{{ $project_category}}">
-                  @if($pres_status == 1)
+                    <button  type="button" class="btn btn-primary form-control col-sm-1 mt-1 submittopresident " value="4" data-id="{{ $project_category}}">SUBMIT</button>
+                  @elseif($pres_status == 1)
                     <button  type="button" class="btn btn-primary form-control col-sm-1 mt-1 submittopresident " value="0" data-id="{{ $project_category}}"><i class="fa-solid fa-rotate-left"></i></button>
+                  @else
+                      <input type="hidden" name="project_category" id="project_category" value="{{ $project_category}}">
                   @endif
                 @endif
               @endif
@@ -312,23 +307,30 @@
                     @if($camp > 0)
                       <form action="{{ route('show-all') }}" method="post">
                         @csrf
-                      <input type="hidden" name="project_category" class="project_category" id="project_category" value="{{ $project_category}}">
-                      <button type="submit" class="dropdown-item {{-- univ_wide --}}" id="{{-- univ_wide --}}"> University Wide</button>
+                        <input type="hidden" name="project_category" class="project_category" id="project_category" value="{{ $project_category}}">
+                        @if($scope == "campus")
+                          <button type="submit" class="dropdown-item {{-- univ_wide --}}" id="{{-- univ_wide --}}"> University Wide</button>
+                        @endif
                       </form>
-                      <?php $Pcategory = ""; 
-                      if($project_category==0){
-                        $Pcategory = "indicative";
-                      }else if($project_category==1){
-                        $Pcategory = "traditional";
-                      }else if($project_category==2){
-                        $Pcategory = "Supplemental";
-                      }
-                      ?>
+
+                      @if ($scope == "Uwide")
+                        <?php $Pcategory = ""; 
+                        if($project_category==0){
+                          $Pcategory = "indicative";
+                        }else if($project_category==1){
+                          $Pcategory = "traditional";
+                        }else if($project_category==2){
+                          $Pcategory = "Supplemental";
+                        }
+                        ?>
                         <a class="dropdown-item main" href = "/bac/app-non-cse-{{ $Pcategory }}">
                             Main Campus Only
                         </a>
+                      @endif
+
                     @endif
-                  @if(count($campusCheck) == 1)
+                  @if($scope == 'campus')
+                  {{-- @if(count($campusCheck) == 1) --}}
                     @if(session('role') == 10)
                       @if($endorse == 0)
                         <input type="hidden" class="endorse" value="1">
@@ -431,11 +433,12 @@
                             @endforeach
                           </div>
                         </div>
-                        @if(count($campusCheck) == 1)
+                        {{-- @if(count($campusCheck) == 1) --}}
+                        @if($scope == 'campus')
                           <div class="col-sm-7" style="float: left;">
                             <label style="float: left;padding-top:10px;" > Status: </label>
-                            <label class="ml-1" style="font-size:15px;float: left;padding-top:6px;text-transform: capitalize;color:{{ (new GlobalDeclare)->pres_status_color($pres_status) }}" > {{ (new GlobalDeclare)->pres_status($pres_status) }} </label>
-                            <label class="ml-1"  style="font-size:15px;float: left;padding-top:6px;text-transform: capitalize;color:black;">|</label>
+                            {{-- <label class="ml-1" style="font-size:15px;float: left;padding-top:6px;text-transform: capitalize;color:{{ (new GlobalDeclare)->pres_status_color($pres_status) }}" > {{ (new GlobalDeclare)->pres_status($pres_status) }} </label>
+                            <label class="ml-1"  style="font-size:15px;float: left;padding-top:6px;text-transform: capitalize;color:black;">|</label> --}}
                             <label class="ml-1" style="font-size:15px;float: left;padding-top:6px;text-transform: capitalize;color:{{ (new GlobalDeclare)->endorse_color($endorse) }}" >{{ (new GlobalDeclare)->endorse($endorse) }} </label>
                           </div>
                         @endif
@@ -667,8 +670,8 @@
                   ?>
                     <tr>
                       <td colspan="2" class="last" style="border-bottom : none;"><div class="child">Prepared by:</div></td>
-                      <td colspan="8" class="last" style="border-bottom : none;"><div class="child">Recommending Approval: &nbsp;<span style="color: {{ (new GlobalDeclare)->bac_committee_status_color($bac_committee_status) }};text-transform: uppercase;">{{ (new GlobalDeclare)->bac_committee_status($bac_committee_status) }}</span></div></td>
-                      <td colspan="4" class="last" style="border-bottom : none; border-right:1px solid black;"><div class="child" style="height:10px">Approved by: &nbsp;<span style="color: {{ (new GlobalDeclare)->pres_status_color($pres_status) }};text-transform: uppercase;">{{ (new GlobalDeclare)->pres_status($pres_status) }}</span></div></td>
+                      <td colspan="8" class="last" style="border-bottom : none;"><div class="child">Recommending Approval: {{-- &nbsp;<span style="color: {{ (new GlobalDeclare)->bac_committee_status_color($bac_committee_status) }};text-transform: uppercase;">{{ (new GlobalDeclare)->bac_committee_status($bac_committee_status) }}</span> --}}</div></td>
+                      <td colspan="4" class="last" style="border-bottom : none; border-right:1px solid black;"><div class="child" style="height:10px">Approved by: &nbsp;{{-- <span style="color: {{ (new GlobalDeclare)->pres_status_color($pres_status) }};text-transform: uppercase;">{{ (new GlobalDeclare)->pres_status($pres_status) }}</span> --}}</div></td>
                     </tr>
                     <tr >
                       <td colspan="2" class="last" style="border-top : none;">
@@ -693,7 +696,12 @@
                                   echo ", $title";
                                 }
                               ?>
-                              <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($prepared_by[0]->id)?>" style="margin-left:5px;"></i>
+                              {{-- <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($prepared_by[0]->id)?>" style="margin-left:5px;"></i> --}}
+                              @if($prepared_by[0]->status == 0)
+                                <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($prepared_by[0]->id)?>" style="margin-left:5px;"></i>
+                              @else
+                                <i class="fa-solid fa-circle-check" value="<?=$aes->encrypt($prepared_by[0]->id)?>" style="margin-left:5px;color:green"></i>
+                            @endif
                             </div>
                             <div class="profession">
                               <?php
@@ -804,6 +812,7 @@
                               $Title = "";
                               $id = "";
                               $Profession = "";
+                              $Rstat = "";
                               foreach($recommending_approval as $recommending_approval1){
                                     if($Position == $recommending_approval1->Position){
                                       $checker=1;
@@ -811,6 +820,7 @@
                                       $Title = $recommending_approval1->Title;
                                       $id = $recommending_approval1->id;
                                       $Profession = $recommending_approval1->Profession;
+                                      $Rstat = $recommending_approval1->status;
                                     }
                                   }
                               ?>
@@ -826,7 +836,11 @@
                                       echo ", $title";
                                     }
                                   ?>
-                                  <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                  @if($Rstat == 0)
+                                    <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                  @else
+                                    <i class="fa-solid fa-circle-check" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;color:green"></i>
+                                  @endif
                                 </div>
                                 <div class="profession">
                                   <?php
@@ -858,6 +872,7 @@
                               $Title = "";
                               $id = "";
                               $Profession = "";
+                              $Rstat = "";
                               foreach($recommending_approval as $recommending_approval2){
                                     if($Position == $recommending_approval2->Position){
                                       $checker=1;
@@ -865,6 +880,7 @@
                                       $Title = $recommending_approval2->Title;
                                       $id = $recommending_approval2->id;
                                       $Profession = $recommending_approval2->Profession;
+                                      $Rstat = $recommending_approval2->status;
                                     }
                                   }
                               ?>
@@ -880,7 +896,11 @@
                                       echo ", $title";
                                     }
                                   ?>
-                                  <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                  @if($Rstat == 0)
+                                    <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                  @else
+                                    <i class="fa-solid fa-circle-check signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;color:green"></i>
+                                  @endif
                                 </div>
                                 <div class="profession">
                                   <?php
@@ -912,6 +932,7 @@
                               $Title = "";
                               $id = "";
                               $Profession = "";
+                              $Rstat = "";
                               foreach($recommending_approval as $recommending_approval3){
                                     if($Position == $recommending_approval3->Position){
                                       $checker=1;
@@ -919,6 +940,7 @@
                                       $Title = $recommending_approval3->Title;
                                       $id = $recommending_approval3->id;
                                       $Profession = $recommending_approval3->Profession;
+                                      $Rstat = $recommending_approval3->status;
                                     }
                                   }
                               ?>
@@ -934,7 +956,11 @@
                                       echo ", $title";
                                     }
                                   ?>
-                                  <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                  @if($Rstat == 0)
+                                    <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                  @else
+                                    <i class="fa-solid fa-circle-check signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;color:green"></i>
+                                  @endif
                                 </div>
                                 <div class="profession">
                                   <?php
@@ -969,6 +995,7 @@
                               $Title = "";
                               $id = "";
                               $Profession = "";
+                              $Rstat = "";
                               foreach($recommending_approval as $recommending_approval4){
                                     if($Position == $recommending_approval4->Position){
                                       $checker=1;
@@ -976,6 +1003,7 @@
                                       $Title = $recommending_approval4->Title;
                                       $id = $recommending_approval4->id;
                                       $Profession = $recommending_approval4->Profession;
+                                      $Rstat = $recommending_approval4->status;
                                     }
                                   }
                               ?>
@@ -991,7 +1019,11 @@
                                       echo ", $title";
                                     }
                                   ?>
-                                  <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                  @if($Rstat == 0)
+                                    <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                  @else
+                                    <i class="fa-solid fa-circle-check" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;color:green"></i>
+                                  @endif
                                 </div>
                                 <div class="profession">
                                   <?php
@@ -1023,6 +1055,7 @@
                               $Title = "";
                               $id = "";
                               $Profession = "";
+                              $Rstat = "";
                               foreach($recommending_approval as $recommending_approval5){
                                     if($Position == $recommending_approval5->Position){
                                       $checker=1;
@@ -1030,6 +1063,7 @@
                                       $Title = $recommending_approval5->Title;
                                       $id = $recommending_approval5->id;
                                       $Profession = $recommending_approval5->Profession;
+                                      $Rstat = $recommending_approval5->status;
                                     }
                                   }
                               ?>
@@ -1045,7 +1079,11 @@
                                       echo ", $title";
                                     }
                                   ?>
-                                  <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                  @if($Rstat == 0)
+                                    <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                  @else
+                                    <i class="fa-solid fa-circle-check" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;color:green"></i>
+                                  @endif
                                 </div>
                                 <div class="profession">
                                   <?php
@@ -1077,6 +1115,7 @@
                               $Title = "";
                               $id = "";
                               $Profession = "";
+                              $Rstat = "";
                               foreach($recommending_approval as $recommending_approval6){
                                     if($Position == $recommending_approval6->Position){
                                       $checker=1;
@@ -1084,6 +1123,7 @@
                                       $Title = $recommending_approval6->Title;
                                       $id = $recommending_approval6->id;
                                       $Profession = $recommending_approval6->Profession;
+                                      $Rstat = $recommending_approval6->status;
                                     }
                                   }
                               ?>
@@ -1099,7 +1139,11 @@
                                       echo ", $title";
                                     }
                                   ?>
-                                  <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                  @if($Rstat == 0)
+                                    <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                  @else
+                                    <i class="fa-solid fa-circle-check" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;color:green"></i>
+                                  @endif
                                 </div>
                                 <div class="profession">
                                   <?php
@@ -1134,6 +1178,7 @@
                               $Title = "";
                               $id = "";
                               $Profession = "";
+                              $Rstat = "";
                               foreach($recommending_approval as $recommending_approval7){
                                     if($Position == $recommending_approval7->Position){
                                       $checker=1;
@@ -1141,6 +1186,7 @@
                                       $Title = $recommending_approval7->Title;
                                       $id = $recommending_approval7->id;
                                       $Profession = $recommending_approval7->Profession;
+                                      $Rstat = $recommending_approval7->status;
                                     }
                                   }
                               ?>
@@ -1156,7 +1202,11 @@
                                       echo ", $title";
                                     }
                                   ?>
-                                  <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                  @if($Rstat == 0)
+                                    <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                  @else
+                                    <i class="fa-solid fa-circle-check" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;color:green"></i>
+                                  @endif
                                 </div>
                                 <div class="profession">
                                   <?php
@@ -1188,6 +1238,7 @@
                               $Title = "";
                               $id = "";
                               $Profession = "";
+                              $Rstat = "";
                               foreach($recommending_approval as $recommending_approval8){
                                     if($Position == $recommending_approval8->Position){
                                       $checker=1;
@@ -1195,6 +1246,7 @@
                                       $Title = $recommending_approval8->Title;
                                       $id = $recommending_approval8->id;
                                       $Profession = $recommending_approval8->Profession;
+                                      $Rstat = $recommending_approval5->status;
                                     }
                                   }
                               ?>
@@ -1210,7 +1262,11 @@
                                       echo ", $title";
                                     }
                                   ?>
-                                  <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                  @if($Rstat == 0)
+                                    <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                  @else
+                                    <i class="fa-solid fa-circle-check" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;color:green"></i>
+                                  @endif
                                 </div>
                                 <div class="profession">
                                   <?php
@@ -1247,14 +1303,14 @@
 
                         <?php
                         if($approved_by -> isEmpty()){
-                      ?>
+                        ?>
                         <div class="col-md-12 mb-1 text-center">
                           {{-- <i class="fa-solid fa-plus"></i> --}}
                           <button type="button" class="btn btn-outline-secondary newapprovedby">Add New</button>
                         </div>
-                      <?php
-                        }else{
-                      ?>
+                        <?php
+                          }else{
+                        ?>
                         <div class="person5" style="height: 200px;margin-top:60px">
                           <div class="name">
                             <label class="signatoriesName">{{$approved_by[0]->Name}}</label>
@@ -1265,7 +1321,11 @@
                                     echo ", $title";
                               }
                             ?>
-                            <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($approved_by[0]->id)?>" style="margin-left:5px;"></i>
+                            @if($approved_by[0]->status == 0)
+                              <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($approved_by[0]->id)?>" style="margin-left:5px;"></i>
+                            @else
+                              <i class="fa-solid fa-circle-check" value="<?=$aes->encrypt($approved_by[0]->id)?>" style="margin-left:5px;color:green"></i>
+                            @endif
                           </div>
                           <div class="profession">
                             <?php
@@ -1281,9 +1341,9 @@
                             Date:_____________
                           </div>
                         </div> 
-                      <?php
-                        }
-                      ?>
+                        <?php
+                          }
+                        ?>
                       </td>
                     </tr>
                   <?php

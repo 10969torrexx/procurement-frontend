@@ -10,6 +10,7 @@ use App\Models\Deadline;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\AESCipher;
 use App\Http\Controllers\GlobalDeclare;
+use App\Http\Controllers\Department\DepartmentPagesController;
 use DB;
 use Carbon\Carbon;
 
@@ -1077,23 +1078,33 @@ class BudgetOfficerController extends Controller
         $breadcrumbs = [
           ["link" => "/", "name" => "Home"],["name" => "Signed PPMP"]
         ];
-
-        $date = Carbon::now()->format('Y');
-        $allocated_budget = DB::table('allocated__budgets')
-                            ->select('departments.id', 'departments.department_name','allocated__budgets.*', 'fund_sources.fund_source')
-                            ->join('departments', 'departments.id', '=', 'allocated__budgets.department_id')
-                            ->join('fund_sources', 'fund_sources.id', '=', 'allocated__budgets.fund_source_id')
-                            ->get();
-        
-        $ppmp_deadline = DB::table('ppmp_deadline')
-                            ->where('year',$date+1)
-                            ->get();
-
-            return view('pages.budgetofficer.view-signed-ppmp',compact('allocated_budget','ppmp_deadline'), [
-                'pageConfigs'=>$pageConfigs,
-                'breadcrumbs'=>$breadcrumbs,
-            ]); 
+        /** Torrexx Edit
+         * 
+         */
+            // $date = Carbon::now()->format('Y');
+            // $allocated_budget = DB::table('allocated__budgets')
+            //                     ->select('departments.id', 'departments.department_name','allocated__budgets.*', 'fund_sources.fund_source')
+            //                     ->join('departments', 'departments.id', '=', 'allocated__budgets.department_id')
+            //                     ->join('fund_sources', 'fund_sources.id', '=', 'allocated__budgets.fund_source_id')
+            //                     ->get();
             
+            // $ppmp_deadline = DB::table('ppmp_deadline')
+            //                     ->where('year',$date+1)
+            //                     ->get();
+
+            //     return view('pages.budgetofficer.view-signed-ppmp',compact('allocated_budget','ppmp_deadline'), [
+            //         'pageConfigs'=>$pageConfigs,
+            //         'breadcrumbs'=>$breadcrumbs,
+            //     ]); 
+            
+        /** END */
+        
+        /** Torrexx Additionals
+         * ! show upload ppmp from DepartmentPagesController
+         * ? TODO enable access to DepartmentPagesController@show_upload_ppmp()
+         * ? KEY import department pages controller
+         */
+           return (new DepartmentPagesController)->show_upload_ppmp();
     }
 
     public function my_par(){

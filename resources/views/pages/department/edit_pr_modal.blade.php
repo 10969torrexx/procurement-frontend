@@ -22,6 +22,7 @@
             
             <form id="updateItem" method="POST" enctype="multipart/form-data"> @csrf
                 {{-- <form action="{{ route('updateItem') }}" method="POST" enctype="multipart/form-data"> @csrf --}}
+
                 
                 <div class="col-sm" hidden>
                     <fieldset class="form-group">
@@ -89,6 +90,7 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           <button type="submit" class="btn btn-primary updateButton">Update</button>
+
         </div>
         </form>
       </div>

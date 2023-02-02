@@ -493,7 +493,7 @@ $(document).on('click', '.removebutton', function (e) {
                             location.reload();
                         }
                       })
-                    }if(response.status == 400){
+                    } if(response.status == 400){
                       Swal.fire({ 
                         icon: 'error',
                         title: 'Error',
@@ -518,6 +518,45 @@ $(document).on('click', '.print', function (e) {
       // 'app_type' : $(".app_type").val(),
       // 'value' : $(this).val()
   };
+
+console.log(data);
+    $.ajax({
+    type: 'post',
+    url: "/department/trackPR/view_pr/printPR",
+    headers: {'X-CSRF-TOKEN' : $('meta[name="csrf-token"]').attr('content')},
+    data: data,
+    success: function(viewContent) {
+    console.log(viewContent);
+        if(viewContent){
+            var css = '@page { size: A4 portrait; }',
+            head = document.head || document.getElementsByTagName('head')[0],
+            style = document.createElement('style');
+
+            style.type = 'text/css';
+            style.media = 'print';
+
+            if (style.styleSheet){
+            style.styleSheet.cssText = css;
+            } else {
+            style.appendChild(document.createTextNode(css));
+            }
+
+            head.appendChild(style);
+
+              var originalContents = document.body.innerHTML;
+              document.body.innerHTML = viewContent;
+              window.print();
+              document.body.innerHTML = originalContents;
+              location.reload();
+        }else{
+            toastr.error('Can\'t print. Error!')
+        }
+        },
+      error: function (data){
+        console.log(data);
+      }
+    });
+
 // console.log(data);
   $.ajax({
   type: 'post',
@@ -555,12 +594,42 @@ $(document).on('click', '.print', function (e) {
     console.log(data);
   }
   });
+
 });
 
 $(document).on('click', '.editbutton', function (e) {
   e.preventDefault();
   var project_code = $(".project_code").val();
   var id = $(this).attr("href");
+
+  // alert(id);
+    $.ajax({
+      type: 'GET',
+      url: "/purchase-request/get-item",
+      headers: {'X-CSRF-TOKEN' : $('meta[name="csrf-token"]').attr('content')},
+      data: {
+        'id'  : id
+      },
+      success: function(response) {
+        // ! show when success
+          if(response['status'] == 200) {
+            console.log(response['data']);
+            response['data'].forEach(element => {
+                $('#default-id').val(element.id);
+            });
+          } 
+        // ! show when error
+          if(response['status'] == 400) {
+            Swal.fire({ 
+              icon: 'error',
+              title: 'Error',
+              text: response['message'],
+            })
+          }
+      }
+    });
+
+
 
   // alert(project_code);
   $.ajaxSetup({
@@ -619,8 +688,10 @@ $(document).on('click', '.editbutton', function (e) {
     }
   });
 
+
 });
 // END EDIT BUTTON
+
 
 $("form#updateItem").submit(function(e) {
   e.preventDefault();

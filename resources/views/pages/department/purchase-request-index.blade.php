@@ -1,15 +1,12 @@
 <?php
-  use App\Http\Controllers\AESCipher;
+    use App\Http\Controllers\AESCipher;
     use App\Http\Controllers\GlobalDeclare;
-
     $aes = new AESCipher();
     $global = new GlobalDeclare();
 ?>
-
 @extends('layouts.contentLayoutMaster')
 {{-- title --}}
 @section('title','Purchase Request')
-
 {{-- vendor style --}}
 @section('vendor-styles')
 <link rel="stylesheet" type="text/css" href="{{asset('vendors/css/animate/animate.css')}}">
@@ -18,12 +15,9 @@
 <link rel="stylesheet" type="text/css" href="{{asset('vendors/css/extensions/toastr.css')}}">
 @endsection
 {{-- page-styles --}}
-
 @section('page-styles')
 <link rel="stylesheet" type="text/css" href="{{asset('css/plugins/extensions/toastr.css')}}">
-
 @endsection
-
 @section('content')
     
 <!-- Scroll - horizontal and vertical table -->
@@ -36,12 +30,9 @@
                 </div>
                 <div class="card-content">
                     <div class="card-body card-dashboard">
-
                         {{-- <a href = "#" class = "btn btn-success round mr-1 mb-1" data-flag = "{{ $aes->encrypt('accounts')}}" data-button = "{{ $aes->encrypt('add')}}" data-id = "{{ $aes->encrypt('0')}}" data-toggle = "modal" data-target = "#allModal"><i class="bx bx-plus"></i> New Account</a> --}}
                         {{-- <a href = "#" class = "AllocateBudget btn btn-success round mr-1 mb-1" data-toggle = "modal" data-target = "#AllocateBudgetModal"><i class="bx bx-plus"></i>Allocate Budget</a> --}}
                         {{-- <a href = "allocate_budget1" class = "AllocateBudget1 btn btn-success round mr-1 mb-1"><i class="bx bx-plus"></i>Allocate Budget 1</a> --}}
-                        
-
                         {{-- {{ session('department_id') }} --}}
                         <p class="card-text"></p>
                         <div class="table-responsive">
@@ -96,7 +87,8 @@
                                         document.getElementById("add_to_me").innerHTML +=
                                         "<h3>This is the text which has been inserted by JS</h3>";
                                     }
-                                </script> --}}
+                                </script> 
+                            --}}
                         </div>
                     </div>
                 </div>

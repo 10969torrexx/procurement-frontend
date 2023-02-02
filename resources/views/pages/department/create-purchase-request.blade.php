@@ -1,30 +1,24 @@
 <?php
-  use App\Http\Controllers\AESCipher;
+    use App\Http\Controllers\AESCipher;
     use App\Http\Controllers\GlobalDeclare;
-
     $aes = new AESCipher();
     $global = new GlobalDeclare();
 ?>
-
 @extends('layouts.contentLayoutMaster')
 {{-- title --}}
 @section('title','Purchase Request')
 
 {{-- vendor style --}}
 @section('vendor-styles')
-<link rel="stylesheet" type="text/css" href="{{asset('vendors/css/animate/animate.css')}}">
-<link rel="stylesheet" type="text/css" href="{{asset('vendors/css/extensions/sweetalert2.min.css')}}">
-<link rel="stylesheet" type="text/css" href="{{asset('vendors/css/tables/datatable/datatables.min.css')}}">
-<link rel="stylesheet" type="text/css" href="{{asset('vendors/css/extensions/toastr.css')}}">
-
+    <link rel="stylesheet" type="text/css" href="{{asset('vendors/css/animate/animate.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('vendors/css/extensions/sweetalert2.min.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('vendors/css/tables/datatable/datatables.min.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('vendors/css/extensions/toastr.css')}}">
 @endsection
 {{-- page-styles --}}
-
 @section('page-styles')
-<link rel="stylesheet" type="text/css" href="{{asset('css/plugins/extensions/toastr.css')}}">
-
+    <link rel="stylesheet" type="text/css" href="{{asset('css/plugins/extensions/toastr.css')}}">
 @endsection
-
 @section('content')
     
 <!-- Scroll - horizontal and vertical table -->
@@ -102,7 +96,7 @@
                             <div class="col-sm-6">
                                 <fieldset class="form-group" >
                                         <label for="">Upload File</label>
-                                        <input type="file" name="file" class="file form-control" required>
+                                        <input type="file" name="file" class="file form-control" required> 
                                 </fieldset>
                             </div>
                         </div>
@@ -132,7 +126,6 @@
     </div>
 {{-- </div> --}}
                 
-
     {{-- <div class="row"> --}}
         {{-- <div class="col-12"> --}}
             <div class="card">

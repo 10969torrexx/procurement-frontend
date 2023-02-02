@@ -524,6 +524,7 @@ Route::group(['prefix' => 'bac','middleware' => ['authuser']], function() {
     Route::post('/add-preparedby', 'BAC\APPNONCSEController@add_preparedby')->name('add-preparedby');
     Route::post('/add-approvedby', 'BAC\APPNONCSEController@add_approvedby')->name('add-approvedby');
     Route::post('/add-recommendingapproval', 'BAC\APPNONCSEController@add_recommendingapproval')->name('add-recommendingapproval');
+    Route::post('/add_recommendingapproval_modal', 'BAC\APPNONCSEController@add_recommendingapproval_modal')->name('add_recommendingapproval_modal');
     Route::post('/update-signatories', 'BAC\APPNONCSEController@update_signatories')->name('update-signatories');
     Route::get('/app-non-cse-year', 'BAC\APPNONCSEController@app_non_cse_year')->name('app-non-cse-year');
     Route::post('/app-non-cse-print', 'President\PresidentHopeController@print')->name('app-non-cse-print');
@@ -564,6 +565,16 @@ Route::group(['prefix' => 'supervisor','middleware' => ['authuser']], function()
     // Route::post('/supervisor-ppmp-disapproved', 'Supervisor\SupervisorControllerSupplemental@status')->name('supervisor-ppmp-disapproved');
     // Route::post('/supervisor-ppmp-done', 'Supervisor\SupervisorControllerSupplemental@done')->name('supervisor-ppmp-done');
     // Route::post('/accept-reject-all', 'Supervisor\SupervisorControllerSupplemental@accept_reject_all')->name('accept-reject-all');
+});
+
+Route::group(['prefix' => 'property','middleware' => ['authuser']], function() {
+    //Supervisor Side
+    Route::get('/{id}', 'MyProperty\MyPropertyController@index');
+    Route::post('/print-show','MyProperty\MyPropertyController@print_par')->name('print-show');
+    Route::post('/current-user-list','MyProperty\MyPropertyController@current_user')->name('current-user-list');
+    Route::post('/current-user-add','MyProperty\MyPropertyController@add_current_user')->name('current-user-add');
+    Route::post('/print-property','MyProperty\MyPropertyController@print')->name('print-property');
+    Route::post('/search-property','MyProperty\MyPropertyController@search')->name('search-property');
 });
 
 Route::group(['prefix' => 'president','middleware' => ['authuser']], function() {
@@ -655,18 +666,14 @@ Route::group(['prefix' => 'PR','middleware' => ['authuser']], function() {
     Route::post('/trackPR/delete_pr', 'Department\PurchaseRequestController@delete_pr')->name('delete_pr');
     Route::get('/trackPR/edit_pr', 'Department\PurchaseRequestController@editPR')->name('edit_pr');
 
+    
 });
+
 # route for department-group
 Route::group(['prefix' => 'department','middleware' => ['authuser']], function() {
     //MY PROPERTY MENU ROUTES
     Route::get('/my_par','Employee\EmployeeController@my_par');
     Route::get('/my_ics','Employee\EmployeeController@my_ics');
-
-    //PURCHASE REQUEST ROUTES
-   
-
-
-    //END PURCHASE REQUEST ROUTES
     
     /* Torrexx Additionals */
         /** Implementing Functions Related to the department end user */
@@ -782,45 +789,6 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
         // ? END
     });
 /** END */
-
-// Route::group(['prefix' => 'employee','middleware' => ['authuser']], function() {
-//     Route::get('/','finalControllers\EmployeeController@index')->name('employeelist');
-//     Route::post('/search-department-employment-status', 'finalControllers\EmployeeController@search');
-//     Route::get('/edit','finalControllers\EmployeeController@edit')->name('employee.edit');
-//     Route::post('/create','finalControllers\EmployeeController@store')->name('employee.add');
-//     Route::post('/update','finalControllers\EmployeeController@update')->name('employee.update');
-//     Route::post('/delete','finalControllers\EmployeeController@destroy')->name('employee.delete');
-//     Route::get('/employeelist','finalControllers\EmployeeController@employeelist')->name('employee.list');
-// });
-
-// Route::group(['prefix' => 'inventory','middleware' => ['authuser']], function() {
-//     Route::get('/','finalControllers\InventoryController@index');
-//     Route::post('/search','finalControllers\InventoryController@search')->name("psearch");
-//     Route::get('/print/{id}/{type}/{cluster}','finalControllers\InventoryController@print');
-// });
-
-// Route::group(['prefix' => 'property','middleware' => ['authuser']], function() {
-//     Route::get('/','finalControllers\PropertyController@index');
-//     Route::get('/print/{id}/{fund}/{empid}','finalControllers\PropertyController@print');
-// });
-
-// Route::group(['prefix' => 'ics','middleware' => ['authuser']], function() {
-//     Route::get('/','finalControllers\ICSController@index');
-//     Route::post('/search', 'finalControllers\ICSController@search');
-//     Route::get('/search/{Employee}', 'finalControllers\ICSController@search');
-//     Route::get('/print/{id}/{fund}/{empid}','finalControllers\ICSController@print');
-
-// });
-
-// Route::group(['prefix' => 'supplier','middleware' => ['authuser']], function() {
-//     Route::get('/','finalControllers\SupplierController@index');
-// });
-
-// Route::group(['prefix' => 'department','middleware' => ['authuser']], function() {
-//     Route::get('/','finalControllers\DepartmentController@index');
-// });
-
-
 
 #end
 
