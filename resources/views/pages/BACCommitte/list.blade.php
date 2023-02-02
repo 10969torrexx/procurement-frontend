@@ -42,12 +42,18 @@
                                     </tr>
                                 </thead>
                                 @foreach ($app as $data)
-                                        {{-- @for ($i = 0; $i < count($data->0); $i++) --}}
                                 <tbody>
                                     <tr>
                                         <td>{{-- {{ $data->year_created }}- --}}{{ $loop->iteration  }}</td>
                                         <td>University Annual Procurement Plan For FY {{ $data->project_year }}</td>
-                                        <td style="text-align: left; color:{{ (new GlobalDeclare)->bac_committee_status_color($data->bac_committee_status) }}">{{ (new GlobalDeclare)->bac_committee_status($data->bac_committee_status) }}</td>
+                                        @php
+                                            $bac_committee_status = "";
+                                        @endphp
+                                        @foreach ($recommending_approval as $bac_committee_Status)
+                                            @if ($data->project_year == $bac_committee_Status->Year)
+                                                <td style="text-align: left; color:{{ (new GlobalDeclare)->bac_committee_status_color($bac_committee_Status->status) }}">{{ (new GlobalDeclare)->bac_committee_status($bac_committee_Status->status) }}</td>
+                                            @endif
+                                        @endforeach
                                         <td>
                                             <form action="{{ route('bac_committee_app_noncse') }}" method="post">
                                                 @csrf

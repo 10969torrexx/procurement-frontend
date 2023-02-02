@@ -22,21 +22,23 @@ class PresidentHopeController extends Controller
               ->whereNull("deleted_at")
               ->where("project_category","=", $project_category)
               ->where("status","=", 4)  
-              // ->where("pres_status","=", 1)
-              ->where(function ($query) {
-                  $query->where("pres_status","=", 1)
-                  ->orWhere("pres_status","=", 2)
-                  ->orWhere("pres_status","=", 3);
-                })
               ->groupBy("project_year")
               -> get();
+
+              
+
+    $approved_by = DB::table("signatories_app_non_cse")
+        ->where("campus",session('campus'))
+        // ->where("Year", $val)
+        ->where("Role","=",2)
+        ->get();
 
     // dd($expired);
     $pageConfigs = ['pageHeader' => true];
     $breadcrumbs = [
       ["link" => "/", "name" => "Home"],["name" =>"APP NON CSE"]
     ];
-    return view('pages.president.list',compact('app'),
+    return view('pages.president.list',compact('app','approved_by'),
     [
       'pageConfigs'=>$pageConfigs,
       'breadcrumbs'=>$breadcrumbs
@@ -65,11 +67,7 @@ class PresidentHopeController extends Controller
           ->where("pt.project_category", "=", $category)
           ->where("p.status", "=", 4)
           ->where("pt.status", "=", 4)
-          ->where(function ($query) {
-              $query->where("pt.pres_status","=", 1)
-              ->orWhere("pt.pres_status","=", 2)
-              ->orWhere("pt.pres_status","=", 3);
-            })
+          
           ->where("p.campus", session('campus'))
           ->groupBy("p.campus")
           ->groupBy("p.item_category")
@@ -155,18 +153,14 @@ class PresidentHopeController extends Controller
           ->get();
 
       $campusCheck = DB::table("project_titles as pt")
-          ->select("pt.campus","pt.endorse","pt.pres_status","pt.project_category","pt.project_year","p.app_type")
+          ->select("pt.campus","pt.endorse","pt.project_category","pt.project_year","p.app_type")
           ->join("ppmps as p", "p.project_code", "=", "pt.id")
           ->whereNull("pt.deleted_at")
           ->where("p.app_type", 'Non-CSE')
           ->where("pt.project_category", "=", $category)
           ->where("p.status", "=", 4)
           ->where("pt.status", "=", 4)
-          ->where(function ($query) {
-              $query->where("pt.pres_status","=", 1)
-              ->orWhere("pt.pres_status","=", 2)
-              ->orWhere("pt.pres_status","=", 3);
-            })
+          
           ->where("pt.project_year",$year)
           ->where("pt.campus", session('campus'))
           ->groupBy("pt.campus")
@@ -236,11 +230,7 @@ class PresidentHopeController extends Controller
           ->where("pt.project_category", "=", $request->project_category)
           ->where("p.status", "=", 4)
           ->where("pt.status", "=", 4)
-          ->where(function ($query) {
-              $query->where("pt.pres_status","=", 1)
-              ->orWhere("pt.pres_status","=", 2)
-              ->orWhere("pt.pres_status","=", 3);
-            })
+          
           ->where("p.campus", session('campus'))
           ->groupBy("p.campus")
           ->groupBy("p.item_category")
@@ -260,11 +250,6 @@ class PresidentHopeController extends Controller
             ->where("p.campus", session('campus'))
             ->where("pt.project_category", "=", $request->project_category)
             ->where("pt.project_year","=",$request->year)
-            ->where(function ($query) {
-                $query->where("pt.pres_status","=", 1)
-                ->orWhere("pt.pres_status","=", 2)
-                ->orWhere("pt.pres_status","=", 3);
-              })
             ->where("p.status", "=", 4)
             ->where("pt.status", "=", 4)
             ->orderBy("p.department_id", "ASC")
@@ -281,11 +266,6 @@ class PresidentHopeController extends Controller
             ->where("pt.project_category", "=", $request->project_category)
             ->where("p.status", "=", 4)
             ->where("pt.status", "=", 4)
-            ->where(function ($query) {
-                $query->where("pt.pres_status","=", 1)
-                ->orWhere("pt.pres_status","=", 2)
-                ->orWhere("pt.pres_status","=", 3);
-              })
             // ->where("p.campus", session('campus'))
             ->groupBy("p.campus")
             ->groupBy("p.item_category")
@@ -303,11 +283,6 @@ class PresidentHopeController extends Controller
             // ->where("p.campus", session('campus'))
             ->where("pt.project_category", "=", $request->project_category)
             ->where("pt.project_year","=",$request->year)
-            ->where(function ($query) {
-                $query->where("pt.pres_status","=", 1)
-                ->orWhere("pt.pres_status","=", 2)
-                ->orWhere("pt.pres_status","=", 3);
-              })
             ->where("p.status", "=", 4)
             ->where("pt.status", "=", 4)
             ->orderBy("p.department_id", "ASC")
@@ -491,11 +466,7 @@ class PresidentHopeController extends Controller
           ->where("pt.project_category", "=", $request->category)
           ->where("p.status", "=", 4)
           ->where("pt.status", "=", 4)
-          ->where(function ($query) {
-              $query->where("pt.pres_status","=", 1)
-              ->orWhere("pt.pres_status","=", 2)
-              ->orWhere("pt.pres_status","=", 3);
-            })
+          
           ->where("p.campus", session('campus'))
           ->groupBy("p.campus")
           ->groupBy("p.item_category")
@@ -516,11 +487,6 @@ class PresidentHopeController extends Controller
             ->where("pt.project_category", "=", $request->category)
             ->where("pt.project_year","=",$request->year)
             ->where("p.status", "=", 4)
-            ->where(function ($query) {
-                $query->where("pt.pres_status","=", 1)
-                ->orWhere("pt.pres_status","=", 2)
-                ->orWhere("pt.pres_status","=", 3);
-              })
             ->where("pt.status", "=", 4)
             ->orderBy("p.department_id", "ASC")
             ->orderBy("p.project_code", "ASC")
@@ -536,11 +502,6 @@ class PresidentHopeController extends Controller
             ->where("pt.project_category", "=", $request->category)
             ->where("p.status", "=", 4)
             ->where("pt.status", "=", 4)
-            ->where(function ($query) {
-                $query->where("pt.pres_status","=", 1)
-                ->orWhere("pt.pres_status","=", 2)
-                ->orWhere("pt.pres_status","=", 3);
-              })
             // ->where("p.campus", session('campus'))
             ->groupBy("p.campus")
             ->groupBy("p.item_category")
@@ -558,11 +519,6 @@ class PresidentHopeController extends Controller
             // ->where("p.campus", session('campus'))
             ->where("pt.project_category", "=", $request->category)
             ->where("pt.project_year","=",$request->year)
-            ->where(function ($query) {
-                $query->where("pt.pres_status","=", 1)
-                ->orWhere("pt.pres_status","=", 2)
-                ->orWhere("pt.pres_status","=", 3);
-              })
             ->where("p.status", "=", 4)
             ->where("pt.status", "=", 4)
             ->orderBy("p.department_id", "ASC")
