@@ -54,6 +54,7 @@ class PurchaseRequestController extends Controller
             ->join("fund_sources as fs", "pr.fund_source_id", "=", "fs.id")
             ->join("users as u", "pr.printed_name", "=", "u.id")
             ->where("pr.department_id", $department_id)
+            ->whereNull("pr.deleted_at")
             ->get();
             // dd($pr);
 
@@ -191,36 +192,128 @@ class PurchaseRequestController extends Controller
      }
   }
 
-  public function add_Items_To_PR(Request $request){
+  public function editPR(Request $request) {
     try {
-      // dd($request->all());  
-      $itemsArray = $request->items;
-      for ($i = 0; $i < count($itemsArray); $i++) {
-         $decryptedItem[$i] = $this->aes->decrypt($itemsArray[$i]);
-        //  $itemsArrayToString.array_push($decryptedItem);
-        $item = DB::update(
-          'update ppmps set for_pr = 1 where id = ?',[$decryptedItem[$i]]
-        );
-      }
-      // dd($item);
+      // dd($request->all());
+      // dd($this->aes->decrypt($request->id));
+      $date = Carbon::now()->format('m/d/Y');
+      $pr_no = $this->aes->decrypt($request->pr_no);
+      $id = $this->aes->decrypt($request->id);
+      $pageConfigs = ['pageHeader' => true];
+      $breadcrumbs = [
+          ["link" => "/", "name" => "Home"],
+          ["link" => "/PR/trackPR", "name" => "Track PR"],
+          ["name" => "Edit PR"]
+      ];
+     
+        $itemsForPR = DB::table("purchase_request_items as pri")
+                  ->select('pri.*','p.item_name','p.item_description','p.unit_price')
+                  ->join("ppmps as p", "pri.item_id", "=", "p.id")
+                  ->where('pri.pr_no',$pr_no)
+                  ->get();
+        $itemsForPRCount = count($itemsForPR);
+        $itemsFromPRI = DB::table("purchase_request_items as pri")
+                  ->select('pri.*','p.unit_of_measurement','p.item_description','p.unit_price')
+                  ->join("ppmps as p", "pri.item_id", "=", "p.id")
+                  ->where('pri.pr_no',$pr_no)
+                  ->get();;
+        $pc = DB::table('purchase_request_items')
+                          ->select('project_code')
+                          ->where('pr_no',$pr_no)
+                          ->first();
+        $project_code = $pc->project_code;
+        $details = DB::table("project_titles as pt")
+                  ->select("pt.campus","pt.project_title","pt.fund_source","d.department_name")
+                  ->join("departments as d", "pt.department_id", "=", "d.id")
+                  ->join("fund_sources as fs", "pt.fund_source", "=", "fs.id")
+                  ->where("pt.id", $project_code)
+                  ->get();
 
-      if($item){
+        $fund_source = DB::table("project_titles as pt")
+                  ->select("fs.fund_source")
+                  ->join("fund_sources as fs", "pt.fund_source", "=", "fs.id")
+                  ->where("pt.id", $project_code)
+                  ->get();
+
+        $items = DB::table('ppmps')
+                  ->select('id','item_name','quantity')
+                  ->where('project_code','=',$project_code)
+                  ->where('mode_of_procurement','!=',33)
+                  // ->where('quantity','!=',0)
+                  ->whereNull('deleted_at')
+                  ->orderBy('item_name')
+                  ->get();
+
+        $pri = DB::table('purchase_request_items')
+                  ->select('item_id','quantity')
+                  ->where('project_code','=',$project_code)
+                  ->where('pr_no',$pr_no)
+                  ->whereNull('deleted_at')
+                  ->get();
+                  // dd($pri);
+
+        $quantity = 0;
+        $quantityPRI = 0;
+
+        foreach($items as $data){
+          $quantity += $data->quantity;
+        }
+
+        foreach($pri as $pri){
+          $quantityPRI += $pri->quantity;
+        }
+
+        $remaining = $quantity - $quantityPRI;
+        if($remaining == 0){
+          session(['globalerror' => "Sorry! There are no remaining items for you to PR in this Project! "]);
+        }else{
+            Session::forget('globalerror');
+        }
+                  // dd($remaining);
+        // if(count($ppmp_deadlines)==0){
+        //       session(['globalerror' => "Please set deadline first"]);
+        // }else{
+        //       Session::forget('globalerror');
+        // }
+        return view('pages.department.edit-purchase-request',compact('itemsForPR','itemsForPRCount','itemsFromPRI','date','details','fund_source','project_code'),
+            ['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs]
+            );
+        # end
+   } catch (\Throwable $th) {
+       throw $th;
+   }
+  }
+
+  public function add_Items_To_PR(Request $request){
+      try {
+        // dd($request->all());  
+        $itemsArray = $request->items;
+        for ($i = 0; $i < count($itemsArray); $i++) {
+          $decryptedItem[$i] = $this->aes->decrypt($itemsArray[$i]);
+          //  $itemsArrayToString.array_push($decryptedItem);
+          $item = DB::update(
+            'update ppmps set for_pr = 1 where id = ?',[$decryptedItem[$i]]
+          );
+        }
+        // dd($item);
+
+        if($item){
+          return response()->json([
+              'status' => 200,
+              'message' => 'Items Added Successfully!',
+          ]);
+        } 
         return response()->json([
-            'status' => 200,
-            'message' => 'Items Added Successfully!',
+            'status' => 400,
+            'message' => 'Error'
         ]);
-      } 
-      return response()->json([
-          'status' => 400,
-          'message' => 'Error'
-      ]);
-      // dd($item);
+        // dd($item);
 
-      // $itemsArrayToString = implode(',',$decryptedItem);
-      // dd($itemsArrayToString);
-    } catch (\Throwable $th) {
-      dd('add_Items_To_PR FUNCTION '+$th);
-    }
+        // $itemsArrayToString = implode(',',$decryptedItem);
+        // dd($itemsArrayToString);
+      } catch (\Throwable $th) {
+        dd('add_Items_To_PR FUNCTION '+$th);
+      }
   }
   
   public function addItem(Request $request){
@@ -252,11 +345,13 @@ class PurchaseRequestController extends Controller
                 ->select('quantity')
                 ->where('project_code',$project_code)
                 ->where('id',$id)
+                ->whereNull('deleted_at')
                 ->get();
       $quantityFromPRI = DB::table("purchase_request_items")
                 ->select('quantity')
                 ->where('project_code',$project_code)
                 ->where('item_id',$id)
+                ->whereNull('deleted_at')
                 ->get();
       
       $quantity = $quantityToPR;
@@ -338,146 +433,270 @@ class PurchaseRequestController extends Controller
       dd('add_Items_To_PR FUNCTION '+$th);
     }
   }
-  public function getEmployees(Request $request){
+
+  public function updateItem(Request $request){
     try {
-      // dd($request->all());  
-      $department_id = session('department_id');
-      $employees = DB::table('users')
-                    ->select('users.id','users.name')
-                    ->where('department_id','=',$department_id)
-                    ->orderBy('users.name')
-                    ->get();
-      // dd($employees);  
-      if($employees){
+      // dd($request->all());
+      $filename = $request->file('updatefile')->getClientOriginalName();
+      $id = $request->id;
+      $itemid = $this->aes->decrypt($request->itemid);
+      $project_code = $this->aes->decrypt($request->project_code);
+      $updatequantity = $request->updatequantity;
+      $updatespecification = $request->updatespecification;
+      
+      $checkItem = DB::table('purchase_request_items')
+                      ->where('id',$itemid)
+                      ->where('quantity',$request->updatequantity)
+                      ->where('file_name',$filename)
+                      ->where('specification',$request->updatespecification)
+                      ->whereNull('deleted_at')
+                      ->get();
+      
+      if(count($checkItem) == 1){
         return response()->json([
-            'status' => 200,
-            'message' => 'Success',
-            'data' => $employees,
+          'status' => 400,
+          'message' => 'No changes made!',
         ]);
       }
-      return response()->json([
+
+      $file = $request->file('updatefile');
+      $extension = $request->file('updatefile')->getClientOriginalExtension();
+          $is_valid = false;
+      # validate extension
+          $allowed_extensions = ['pdf', 'jpeg', 'jpg', 'png'];
+          for ($i = 0; $i < count($allowed_extensions) ; $i++) { 
+             if($allowed_extensions[$i] == $extension) {
+                  $is_valid = true;
+             }
+          }
+          if($is_valid == false) {
+            return response()->json([
+              'status' => 400,
+              'message' => 'Invalid Format!',
+            ]);
+          }
+
+      $quantityFromPPMP = DB::table("ppmps")
+                // ->select('quantity')
+                ->where('project_code',$project_code)
+                ->where('id',$id)
+                ->whereNull('deleted_at')
+                ->sum('quantity');
+      $quantityFromPRI = DB::table("purchase_request_items")
+                // ->select('quantity')
+                ->where('project_code',$project_code)
+                ->where('item_id',$id)
+                ->whereNull('deleted_at')
+                ->sum('quantity');
+      $quantity = DB::table("purchase_request_items")
+                // ->select('quantity')
+                ->where('project_code',$project_code)
+                ->where('id',$itemid)
+                ->whereNull('deleted_at')
+                ->sum('quantity');
+      // dd($quantityFromPRI-$quantity);
+      // $quantity = $updatequantity;
+      // for($i=0; $i < count($quantityFromPRI); $i++){
+      //           $quantity += $quantityFromPRI[$i]->quantity;
+      // }
+      if($quantityFromPPMP < ($quantityFromPRI-$quantity) + $updatequantity){
+        return response()->json([
           'status' => 400,
-          'message' => 'Error'
-      ]);
+          'message' => 'The quantity exceeds the remaining item(s)!',
+        ]);
+      } 
+      else{
+              $oldfile = DB::table('purchase_request_items')
+                            ->select('file_name')
+                            ->where('id',$itemid)
+                            ->get();
+              foreach($oldfile as $data){
+                $oldfilename = $data->file_name;
+              }
+
+              $item_name = $request->updatename;
+              $file_name = $item_name.'-'.time();
+              $destination_path = env('APP_NAME').'\\purchase_request\\item_upload\\';
+              Storage::delete($destination_path.$oldfilename);
+
+              if (!Storage::exists($destination_path)) {
+                Storage::makeDirectory($destination_path);
+              }
+              $file->storeAs($destination_path, $file_name.'.'.$extension);
+              $file->move('storage/'. $destination_path, $file_name.'.'.$extension); 
+
+
+              $response = DB::table('purchase_request_items')
+                            ->where('id',$itemid)
+                            ->update([
+                                'project_code' => $project_code,
+                                'quantity' => $updatequantity,
+                                'specification' => $updatespecification,
+                                'file_name' => $file_name.'.'.$extension,
+                                'updated_at' =>  Carbon::now()
+                            ]);
+                            
+              if($response){
+                return response()->json([
+                  'status' => 200, 
+                  'message' => 'Item Updated Successfully!',
+                ]); 
+              }else{
+                return response()->json([
+                  'status' => 400, 
+                  'message' => 'Error!',
+                ]); 
+              }
+      }
+      
     } catch (\Throwable $th) {
       dd('add_Items_To_PR FUNCTION '+$th);
     }
   }
 
-  public function getItems(Request $request){
-    try {
-      // dd($request->all()); 
-      $project_code = $this->aes->decrypt($request->project_code);
-
-      // $department_id = session('department_id');
-      $items = DB::table('ppmps')
-                    ->select('id','item_name','quantity')
-                    ->where('project_code','=',$project_code)
-                    ->where('mode_of_procurement','!=',33)
-                    // ->where('quantity','!=',0)
-                    ->whereNull('deleted_at')
-                    ->orderBy('item_name')
-                    ->get();
-      $pri = DB::table('purchase_request_items')
-                    ->select('item_id','quantity')
-                    ->where('project_code','=',$project_code)
-                    ->whereNull('deleted_at')
-                    ->get();
-            // Session::forget('error');
-
-      $quantity = 0;
-      $quantityPRI = 0;
-
-      foreach($items as $data){
-        $quantity += $data->quantity;
-      }
-
-      foreach($pri as $pri){
-        $quantityPRI += $pri->quantity;
-      }
-      $remaining = $quantity - $quantityPRI;
-      // dd($remaining);
-      // Session::forget('error');
-      
-      // if($remaining != 0){
-        if($items){
-          // if($quantity > $quantityPRI){
-          // Session::forget('message');
-              return response()->json([
-                'status' => 200,
-                'message' => 'Success',
-                'data' => $items,
-                // 'remaining' => $remaining
-                // Session::forget('message')
-              ]);
-          }
-          // else{
-          //   Session::flash('message', 'This is a message!'); 
-          //   Session::flash('alert-class', 'alert-danger');
-          // }
-        // }
+  public function getEmployees(Request $request){
+      try {
+        // dd($request->all());  
+        $department_id = session('department_id');
+        $employees = DB::table('users')
+                      ->select('users.id','users.name')
+                      ->where('department_id','=',$department_id)
+                      ->orderBy('users.name')
+                      ->get();
+        // dd($employees);  
+        if($employees){
+          return response()->json([
+              'status' => 200,
+              'message' => 'Success',
+              'data' => $employees,
+          ]);
+        }
         return response()->json([
             'status' => 400,
             'message' => 'Error'
         ]);
-       
-      // }if($remaining == 0){
-        // Session::flash(['message', "Please set deadline first"]);
-      // }
-      
-      
-      // dd($quantity-$quantityPRI);  
-      
-      
-      
-    } catch (\Throwable $th) {
-      dd('getItems FUNCTION '+$th);
-    }
+      } catch (\Throwable $th) {
+        dd('add_Items_To_PR FUNCTION '+$th);
+      }
+  }
+
+  public function getItems(Request $request){
+      try {
+        // dd($request->all()); 
+        $project_code = $this->aes->decrypt($request->project_code);
+
+        // $department_id = session('department_id');
+        $items = DB::table('ppmps')
+                      ->select('id','item_name','quantity')
+                      ->where('project_code','=',$project_code)
+                      ->where('mode_of_procurement','!=',33)
+                      // ->where('quantity','!=',0)
+                      ->whereNull('deleted_at')
+                      ->orderBy('item_name')
+                      ->get();
+        $pri = DB::table('purchase_request_items')
+                      ->select('item_id','quantity')
+                      ->where('project_code','=',$project_code)
+                      ->whereNull('deleted_at')
+                      ->get();
+              // Session::forget('error');
+
+        $quantity = 0;
+        $quantityPRI = 0;
+
+        foreach($items as $data){
+          $quantity += $data->quantity;
+        }
+
+        foreach($pri as $pri){
+          $quantityPRI += $pri->quantity;
+        }
+        $remaining = $quantity - $quantityPRI;
+        // dd($remaining);
+        // Session::forget('error');
+        
+        // if($remaining != 0){
+          if($items){
+            // if($quantity > $quantityPRI){
+            // Session::forget('message');
+                return response()->json([
+                  'status' => 200,
+                  'message' => 'Success',
+                  'data' => $items,
+                  // 'remaining' => $remaining
+                  // Session::forget('message')
+                ]);
+            }
+            // else{
+            //   Session::flash('message', 'This is a message!'); 
+            //   Session::flash('alert-class', 'alert-danger');
+            // }
+          // }
+          return response()->json([
+              'status' => 400,
+              'message' => 'Error'
+          ]);
+        
+        // }if($remaining == 0){
+          // Session::flash(['message', "Please set deadline first"]);
+        // }
+        
+        
+        // dd($quantity-$quantityPRI);  
+        
+        
+        
+      } catch (\Throwable $th) {
+        dd('getItems FUNCTION '+$th);
+      }
   }
 
   public function getItem(Request $request){
-    try {
-      // dd($request->all()); 
-      $id = $request->item;
-      $project_code = $this->aes->decrypt($request->project_code);
+      try {
+        // dd($request->all()); 
+        $id = $request->item;
+        $project_code = $this->aes->decrypt($request->project_code);
 
-      $quantityFromPRI = DB::table("purchase_request_items")
-                          ->select('quantity')
-                          ->where('project_code',$project_code)
-                          ->where('item_id',$id)
-                          ->get();
-      
-      $quantity = 0;
-      for($i=0; $i < count($quantityFromPRI); $i++){
-                $quantity += $quantityFromPRI[$i]->quantity;
+        $quantityFromPRI = DB::table("purchase_request_items")
+                            ->select('quantity')
+                            ->where('project_code',$project_code)
+                            ->where('item_id',$id)
+                            ->whereNull('deleted_at')
+                            ->get();
+        
+        $quantity = 0;
+        for($i=0; $i < count($quantityFromPRI); $i++){
+                  $quantity += $quantityFromPRI[$i]->quantity;
+        }
+
+        // $department_id = session('department_id');
+        $item = DB::table('ppmps')
+                      ->select('quantity','item_name')
+                      ->where('project_code','=',$project_code)
+                      ->where('id','=',$id)
+                      ->whereNull('deleted_at')
+                      ->get();
+                      // dd($quantity);  
+        // dd($item[0]->quantity);
+        if($quantity == $item[0]->quantity){
+            return response()->json([
+                'status' => 400,
+                'message' => $item[0]->item_name.' are already consumed!',
+            ]); 
+        }else{
+            return response()->json([
+                'status' => 200,
+                'message' => 'Success',
+                'data' => ($item[0]->quantity)-$quantity,
+            ]);
+        }
+
+
+      } catch (\Throwable $th) {
+        dd('getItems FUNCTION '+$th);
       }
-
-      // $department_id = session('department_id');
-      $item = DB::table('ppmps')
-                    ->select('quantity','item_name')
-                    ->where('project_code','=',$project_code)
-                    ->where('id','=',$id)
-                    ->get();
-                    // dd($quantity);  
-      // dd($item[0]->quantity);
-      if($quantity == $item[0]->quantity){
-          return response()->json([
-              'status' => 400,
-              'message' => $item[0]->item_name.' are already consumed!',
-          ]); 
-      }else{
-          return response()->json([
-              'status' => 200,
-              'message' => 'Success',
-              'data' => ($item[0]->quantity)-$quantity,
-          ]);
-      }
-
-
-    } catch (\Throwable $th) {
-      dd('getItems FUNCTION '+$th);
-    }
   }
+
   public function editPRItem(Request $request){
     try {
       // dd($request->all()); 
@@ -486,30 +705,29 @@ class PurchaseRequestController extends Controller
       // dd($this->aes->decrypt($request->item)); 
 
       $response = DB::table("purchase_request_items as pri")
-                          ->select('pri.*','p.item_name')
+                          ->select('pri.*','p.item_name','p.id as pID')
                           ->join("ppmps as p", "pri.item_id", "=", "p.id")
                           ->where('pri.project_code',$project_code)
                           ->where('pri.id',$id)
                           ->get();
-      // dd($response);
-      // $item_name = "";                    
-      // $quantity = 0;                    
-      // $file_name = "";                    
-      // $specification = "";
       foreach($response as $data){
         $item_name = $data->item_name;
         $quantity = $data->quantity;
         $file_name = $data->file_name;
         $specification = $data->specification;
+        $id = $data->pID;
       }
       if($response){
           return response()->json([
               'status' => 200,
               'message' => 'Success',
+              'id' => $id,
+              'item_id' => $request->item,
               'item_name' => $item_name,
               'quantity' => $quantity,
               'file_name' => $file_name,
               'specification' => $specification,
+              // 'data' => [$id,$quantity,$file_name,$specification],
           ]);
 
       }else{
@@ -540,117 +758,89 @@ class PurchaseRequestController extends Controller
       // }
 
 
-    } catch (\Throwable $th) {
-      dd('getItems FUNCTION '+$th);
-    }
+      } catch (\Throwable $th) {
+        dd('getItems FUNCTION '+$th);
+      }
   }
+
   public function savePR(Request $request){
-    try {
-      // dd($request->all());  
-      $current = Carbon::now();
-      $department_id = session('department_id');
-      $campus = session('campus');
-      $employee = $request->employee;
-      $purpose = $request->purpose;
-      $designation = $request->designation;
-      $fund_source = (new AESCipher)->decrypt($request->fund_source);
-      $project_code = (new AESCipher)->decrypt($request->project_code);
-      $date = $current->format('Y-m');
-      $pr_no_check = DB::table('purchase_request as pr')
-                        ->select('pr.*')
-                        ->orderBy('pr.pr_no')
-                        ->get();
+      try {
+        // dd($request->all());  
+        $current = Carbon::now();
+        $department_id = session('department_id');
+        $campus = session('campus');
+        $employee = $request->employee;
+        $purpose = $request->purpose;
+        $designation = $request->designation;
+        $fund_source = (new AESCipher)->decrypt($request->fund_source);
+        $project_code = (new AESCipher)->decrypt($request->project_code);
+        $date = $current->format('Y-m');
+        $pr_no_check = DB::table('purchase_request as pr')
+                          ->select('pr.*')
+                          ->orderBy('pr.pr_no')
+                          ->get();
 
-      #START Code For Replacing the Deleted PR                 
-      $count = 1;
-      foreach($pr_no_check as $data){
+        #START Code For Replacing the Deleted PR                 
+        $count = 1;
+        foreach($pr_no_check as $data){
+          $pr_no = $date.'-'.str_pad(0000+$count,4,"0",STR_PAD_LEFT);
+          if($pr_no == $data->pr_no){
+            $count++;}
+        }
         $pr_no = $date.'-'.str_pad(0000+$count,4,"0",STR_PAD_LEFT);
-        if($pr_no == $data->pr_no){
-          $count++;}
-      }
-      $pr_no = $date.'-'.str_pad(0000+$count,4,"0",STR_PAD_LEFT);
-      #END Code For Replacing the Deleted PR                 
+        #END Code For Replacing the Deleted PR                 
 
-      // dd($pr_no);
+        // dd($pr_no);
 
-      $purchaseRequest = DB::table('purchase_request')
-                            ->insert([
-                              'department_id' => $department_id,
-                              'pr_no' => $pr_no,
-                              'campus' => $campus,
-                              'fund_source_id' => $fund_source,
-                              'purpose' => $purpose,
-                              'printed_name' => $employee,
-                              'designation' => $designation,
-                              'created_at' =>  Carbon::now()
-                          ]);
-      DB::table('purchase_request_items')
-          ->where('project_code', $project_code)
-          ->where('pr_no', 0)
-          ->update([
-            'pr_no' => $pr_no
+        $purchaseRequest = DB::table('purchase_request')
+                              ->insert([
+                                'department_id' => $department_id,
+                                'pr_no' => $pr_no,
+                                'campus' => $campus,
+                                'fund_source_id' => $fund_source,
+                                'purpose' => $purpose,
+                                'printed_name' => $employee,
+                                'designation' => $designation,
+                                'created_at' =>  Carbon::now()
+                            ]);
+        DB::table('purchase_request_items')
+            ->where('project_code', $project_code)
+            ->where('pr_no', 0)
+            ->update([
+              'pr_no' => $pr_no
+            ]);
+
+        if($purchaseRequest){
+          return response()->json([
+            'status' => 200,
+            'message' => 'Success',
           ]);
-
-      if($purchaseRequest){
+        }
         return response()->json([
-          'status' => 200,
-          'message' => 'Success',
+          'status' => 400,
+          'message' => 'Error'
         ]);
-      }
-      return response()->json([
-        'status' => 400,
-        'message' => 'Error'
-      ]);
 
-      
-    } catch (\Throwable $th) {
-      dd('add_Items_To_PR FUNCTION '+$th);
-    }
+        
+      } catch (\Throwable $th) {
+        dd('add_Items_To_PR FUNCTION '+$th);
+      }
   }
 
   public function view_status(Request $request){
-    // dd($request->all());
-    // dd($id);
-    $pageConfigs = ['pageHeader' => true];
-    $breadcrumbs = [
-      ["link" => "/", "name" => "Home"],
-      ["link" => "/department/trackPR", "name" => "Track PR"],
-      // ["link" => "/department/purchaseRequest/createPR", "name" => "Create PR"],
-      ["name" => "View Status"]
-    ];
+      // dd($request->all());
+      // dd($id);
+      $pageConfigs = ['pageHeader' => true];
+      $breadcrumbs = [
+        ["link" => "/", "name" => "Home"],
+        ["link" => "/department/trackPR", "name" => "Track PR"],
+        // ["link" => "/department/purchaseRequest/createPR", "name" => "Create PR"],
+        ["name" => "View Status"]
+      ];
 
-    $id = (new AESCipher())->decrypt($request->id);
+      $id = (new AESCipher())->decrypt($request->id);
 
-    $purchase_request = DB::table("purchase_request as pr")
-                        ->select("pr.*","fs.fund_source","d.department_name","u.name")
-                        ->join("fund_sources as fs","pr.fund_source_id","fs.id")
-                        ->join("departments as d","pr.department_id","d.id")
-                        ->join("users as u","pr.printed_name","u.id")
-                        ->where("pr.id",$id)
-                        ->get();
-
-    return view('pages.department.view_status_page',compact('purchase_request'),  [
-                'pageConfigs'=>$pageConfigs,
-                'breadcrumbs'=>$breadcrumbs,
-                // 'error' => $error,
-            ]); 
-  }
-
-  public function view_pr(Request $request){
-    // dd($request->all());
-    // dd($id);
-    $pageConfigs = ['pageHeader' => true];
-    $breadcrumbs = [
-      ["link" => "/", "name" => "Home"],
-      ["link" => "/department/trackPR", "name" => "Track PR"],
-      // ["link" => "/department/purchaseRequest/createPR", "name" => "Create PR"],
-      ["name" => "View PR"]
-    ];
-
-    $id = (new AESCipher())->decrypt($request->id);
-    // $date = Carbon::now()->format('m/d/Y');
-
-    $purchase_request = DB::table("purchase_request as pr")
+      $purchase_request = DB::table("purchase_request as pr")
                           ->select("pr.*","fs.fund_source","d.department_name","u.name")
                           ->join("fund_sources as fs","pr.fund_source_id","fs.id")
                           ->join("departments as d","pr.department_id","d.id")
@@ -658,26 +848,55 @@ class PurchaseRequestController extends Controller
                           ->where("pr.id",$id)
                           ->get();
 
-    $pr_no = '';
-    foreach($purchase_request as $data){
-      $pr_no = $data->pr_no;
-    }
-                    // dd($pr_no);
-    $itemsForPR = DB::table("purchase_request_items as pri")
-              ->select('pri.*','p.unit_of_measurement','p.item_description','p.unit_price')
-              ->join('ppmps as p','pri.item_id','p.id')
-              ->where('pri.pr_no',$pr_no)
-              ->whereNull('pri.deleted_at')
-              ->get();
-              // dd($itemsForPR);
+      return view('pages.department.view_status_page',compact('purchase_request'),  [
+                  'pageConfigs'=>$pageConfigs,
+                  'breadcrumbs'=>$breadcrumbs,
+                  // 'error' => $error,
+              ]); 
+  }
 
-          
+  public function view_pr(Request $request){
+      // dd($request->all());
+      // dd($id);
+      $pageConfigs = ['pageHeader' => true];
+      $breadcrumbs = [
+        ["link" => "/", "name" => "Home"],
+        ["link" => "/department/trackPR", "name" => "Track PR"],
+        // ["link" => "/department/purchaseRequest/createPR", "name" => "Create PR"],
+        ["name" => "View PR"]
+      ];
 
-    return view('pages.department.view_pr_page',compact('purchase_request','itemsForPR','id'), [
-                'pageConfigs'=>$pageConfigs,
-                'breadcrumbs'=>$breadcrumbs,
-                // 'error' => $error,
-            ]); 
+      $id = (new AESCipher())->decrypt($request->id);
+      // $date = Carbon::now()->format('m/d/Y');
+
+      $purchase_request = DB::table("purchase_request as pr")
+                            ->select("pr.*","fs.fund_source","d.department_name","u.name")
+                            ->join("fund_sources as fs","pr.fund_source_id","fs.id")
+                            ->join("departments as d","pr.department_id","d.id")
+                            ->join("users as u","pr.printed_name","u.id")
+                            ->where("pr.id",$id)
+                            ->get();
+
+      $pr_no = '';
+      foreach($purchase_request as $data){
+        $pr_no = $data->pr_no;
+      }
+                      // dd($pr_no);
+      $itemsForPR = DB::table("purchase_request_items as pri")
+                ->select('pri.*','p.unit_of_measurement','p.item_description','p.unit_price')
+                ->join('ppmps as p','pri.item_id','p.id')
+                ->where('pri.pr_no',$pr_no)
+                ->whereNull('pri.deleted_at')
+                ->get();
+                // dd($itemsForPR);
+
+            
+
+      return view('pages.department.view_pr_page',compact('purchase_request','itemsForPR','id'), [
+                  'pageConfigs'=>$pageConfigs,
+                  'breadcrumbs'=>$breadcrumbs,
+                  // 'error' => $error,
+              ]); 
   }
 
   public function remove_item(Request $request){
@@ -715,74 +934,74 @@ class PurchaseRequestController extends Controller
             'message'=>'No Item Found!'
         ]);
     }
-}
-
-public function upload_ppmp(Request $request) {
-  try {
-      $validate = Validator::make($request->all(), [
-          'project_category'  => ['required'],
-          'year_created'  =>  ['required'],
-          'file_name' => ['required'],
-          'signed_ppmp'   => ['required', 'mimes:pdf, jpeg, jpg, png', 'max:2048']
-      ]);
-      if($request->hasFile('signed_ppmp')) {
-          $file = $request->file('signed_ppmp');
-          $extension = $request->file('signed_ppmp')->getClientOriginalExtension();
-         
-          $is_valid = false;
-          # validate extension
-              $allowed_extensions = ['pdf', 'jpeg', 'jpg', 'png'];
-              for ($i = 0; $i < count($allowed_extensions) ; $i++) { 
-                 if($allowed_extensions[$i] == $extension) {
-                      $is_valid = true;
-                 }
-              }
-              if($is_valid == false) {
-                  return back()->with([
-                      'error' => 'Invalid file format!'
-                  ]);
-              }
-          # end
-          $file_name = (new GlobalDeclare)->project_category((new AESCipher)->decrypt($request->project_category)) .'-'. time();
-          $destination_path = env('APP_NAME').'\\department_upload\\signed_ppmp\\';
-          if (!Storage::exists($destination_path)) {
-              Storage::makeDirectory($destination_path);
-          }
-          $file->storeAs($destination_path, $file_name.'.'.$extension);
-          // \Storage::put($destination_path, $file_name.'.'.$extension);
-          $file->move('storage/'. $destination_path, $file_name.'.'.$extension);
-          DB::table('signed_ppmp')
-          ->insert([
-              'employee_id'   => session('employee_id'),
-              'department_id'   => session('department_id'),
-              'campus'   => session('campus'),
-              'year_created'   => (new AESCipher)->decrypt($request->year_created),
-              'project_category'  => (new AESCipher)->decrypt($request->project_category),
-              'file_name'   => $request->file_name,
-              'file_directory'    => $destination_path .''. $file_name.'.'.$extension,
-              'signed_ppmp' =>  $file_name.'.'.$extension,
-              'created_at'    => Carbon::now(),
-              'updated_at'    => Carbon::now()
-          ]);
-
-          # storing data to signed_ppmp table
-          return back()->with([
-              'success' => 'PPMP uploaded successfully!'
-          ]);
-      } else {
-          return back()->with([
-              'error' => 'Please fill the form accordingly!'
-          ]);
-      }
-  } catch (\Throwable $th) {
-      // throw $th;
-      return view('pages.error-500');
   }
-}
 
-public function printPR(Request $request) {
-  // dd($request->all());
-  $id = (new AESCipher())->decrypt($request->id);
+  public function upload_ppmp(Request $request) {
+    try {
+        $validate = Validator::make($request->all(), [
+            'project_category'  => ['required'],
+            'year_created'  =>  ['required'],
+            'file_name' => ['required'],
+            'signed_ppmp'   => ['required', 'mimes:pdf, jpeg, jpg, png', 'max:2048']
+        ]);
+        if($request->hasFile('signed_ppmp')) {
+            $file = $request->file('signed_ppmp');
+            $extension = $request->file('signed_ppmp')->getClientOriginalExtension();
+          
+            $is_valid = false;
+            # validate extension
+                $allowed_extensions = ['pdf', 'jpeg', 'jpg', 'png'];
+                for ($i = 0; $i < count($allowed_extensions) ; $i++) { 
+                  if($allowed_extensions[$i] == $extension) {
+                        $is_valid = true;
+                  }
+                }
+                if($is_valid == false) {
+                    return back()->with([
+                        'error' => 'Invalid file format!'
+                    ]);
+                }
+            # end
+            $file_name = (new GlobalDeclare)->project_category((new AESCipher)->decrypt($request->project_category)) .'-'. time();
+            $destination_path = env('APP_NAME').'\\department_upload\\signed_ppmp\\';
+            if (!Storage::exists($destination_path)) {
+                Storage::makeDirectory($destination_path);
+            }
+            $file->storeAs($destination_path, $file_name.'.'.$extension);
+            // \Storage::put($destination_path, $file_name.'.'.$extension);
+            $file->move('storage/'. $destination_path, $file_name.'.'.$extension);
+            DB::table('signed_ppmp')
+            ->insert([
+                'employee_id'   => session('employee_id'),
+                'department_id'   => session('department_id'),
+                'campus'   => session('campus'),
+                'year_created'   => (new AESCipher)->decrypt($request->year_created),
+                'project_category'  => (new AESCipher)->decrypt($request->project_category),
+                'file_name'   => $request->file_name,
+                'file_directory'    => $destination_path .''. $file_name.'.'.$extension,
+                'signed_ppmp' =>  $file_name.'.'.$extension,
+                'created_at'    => Carbon::now(),
+                'updated_at'    => Carbon::now()
+            ]);
+
+            # storing data to signed_ppmp table
+            return back()->with([
+                'success' => 'PPMP uploaded successfully!'
+            ]);
+        } else {
+            return back()->with([
+                'error' => 'Please fill the form accordingly!'
+            ]);
+        }
+    } catch (\Throwable $th) {
+        // throw $th;
+        return view('pages.error-500');
+    }
+  }
+
+  public function printPR(Request $request) {
+    // dd($request->all());
+    $id = (new AESCipher())->decrypt($request->id);
     $date = Carbon::now()->format('Y-m-d');
 
     $purchase_request = DB::table("purchase_request as pr")
@@ -813,6 +1032,88 @@ public function printPR(Request $request) {
                 // 'breadcrumbs'=>$breadcrumbs,
                 // 'error' => $error,
             ]); 
-}
+  }
+
+  public function delete_pr(Request $request){
+    // dd($request->all());
+
+    $id = (new AESCipher())->decrypt($request->id);
+    $pr_no = (new AESCipher())->decrypt($request->pr_no);
+
+    $response = DB::table('purchase_request')
+                  ->where('id',$id)
+                  ->update([
+                      'deleted_at' =>  Carbon::now()
+                  ]);
+    
+    DB::table('purchase_request_items')
+      ->where('pr_no',$pr_no)
+      ->update([
+          'deleted_at' =>  Carbon::now()
+    ]);   
+
+    $destination_path = env('APP_NAME').'\\purchase_request\\item_upload\\';
+  
+    $oldfile = DB::table('purchase_request_items')
+                  ->select('file_name')
+                  ->where('pr_no',$pr_no)
+                  ->get();
+    // dd($oldfile);
+    foreach($oldfile as $data){
+      $oldfilename = $data->file_name;
+      Storage::delete($destination_path.$oldfilename);
+    }
+
+    if($response)
+    {
+        // return back()->with([
+        //   'success' => 'PR Deleted Successfully!'
+        // ]);
+        return response()->json([
+            'status'=>200,
+            'message'=>'PR Deleted Successfully!'
+        ]);
+    }
+    else
+    {
+      // return back()->with([
+      //   'error' => 'Error!'
+      // ]);
+        return response()->json([
+            'status'=>400,
+            'message'=>'Error!'
+        ]);
+    }
+  }
+
+  // public function edit_pr(Request $request){
+  //   dd('success');
+  //   $id = (new AESCipher())->decrypt($request->id);
+  //   $response = DB::table('purchase_request')
+  //                 ->where('id',$id)
+  //                 ->update([
+  //                     'deleted_at' =>  Carbon::now()
+  //                 ]);
+  //   if($response)
+  //   {
+  //       return back()->with([
+  //         'success' => 'PR Deleted Successfully!'
+  //       ]);
+  //       // return response()->json([
+  //       //     'status'=>200,
+  //       //     'message'=>'PR Deleted Successfully!'
+  //       // ]);
+  //   }
+  //   else
+  //   {
+  //     return back()->with([
+  //       'error' => 'Error!'
+  //     ]);
+  //       // return response()->json([
+  //       //     'status'=>400,
+  //       //     'message'=>'Error!'
+  //       // ]);
+  //   }
+  // }
 
 }

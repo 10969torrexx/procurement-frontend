@@ -53,6 +53,7 @@
                                         <th>Fund Source</th>
                                         <th>Purpose</th>
                                         <th>Printed Name</th>
+                                        <th>Status</th>
                                         <th>Created at</th>
                                     </tr>
                                 </thead>
@@ -77,8 +78,15 @@
                                                             <a class="dropdown-item" ctr = "<?=$ctr?>" href = "{{ route('view_pr', ['id' => $aes->encrypt($data->id)]) }}" >
                                                                 <i class="bx bx-show-alt mr-1"></i>View PR</a>
                                                             <a class="dropdown-item" ctr = "<?=$ctr?>" href = "{{ route('view_status', ['id' => $aes->encrypt($data->id)]) }}">
-                                                                <i class="bx bx-edit-alt mr-1"></i>View Status</a>
-                                                            {{-- <a class="dropdown-item" ctr = "<?=$ctr?>" href = "{{ route('viewPR', ['id' => $aes->encrypt($data->id)]) }}">
+                                                                <i class="bx bx-task mr-1"></i>View Status</a>
+                                                            @if($data->status == 0)
+                                                            <a class="dropdown-item" ctr = "<?=$ctr?>" href = "{{ route('edit_pr', ['id' => $aes->encrypt($data->id) , 'pr_no' => $aes->encrypt($data->pr_no)]) }}" >
+                                                                <i class="bx bx-edit-alt mr-1"></i> Edit</a>
+                                                            <a class="dropdown-item deletebutton" ctr = "<?=$ctr?>" href = "{{ $aes->encrypt($data->id) }}" rel = "{{ $aes->encrypt($data->pr_no) }}">
+                                                                <i class="bx bx-trash mr-1"></i> Delete </a>
+                                                            @endif
+                                                            
+                                                                {{-- <a class="dropdown-item" ctr = "<?=$ctr?>" href = "{{ route('viewPR', ['id' => $aes->encrypt($data->id)]) }}">
                                                                 <i class="fa fa-eye mr-2"></i>View PR</a> --}}
                                                             {{-- <a href = "{{ route('department-addItem', ['id' => $aes->encrypt($data['id']) => $aes->encrypt($ProjectTitleResponse[$i]['allocated_budget']) ]) }}" class="dropdown-item">
                                                                 <i class = "fa fa-plus mr-2"></i>Add Item</a> --}}
@@ -89,6 +97,11 @@
                                                 <td>{{$data->fund_source}}</td>
                                                 <td>{{$data->purpose}}</td>
                                                 <td>{{$data->name}}</td>
+                                                @if($data->status == 0)
+                                                <td style="color:blue;">Pending</td>
+                                                @elseif($data->status == 1)
+                                                <td style="color:green;">Approved</td>
+                                                @endif
                                                 <td>{{ date('M. j, Y', strtotime($data->created_at))}}</td>
                                             </tr>
                                             <?php $ctr = $ctr + 1 ?>
@@ -113,12 +126,24 @@
 {{-- @include('pages.department.preview-PR-modal') --}}
 {{-- @include('pages.department.view-pr') --}}
 
-
-{{-- ADD MODAL --}}
-
-{{-- END ADD MODAL --}}
-
-
+@if(Session::has('success'))
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            html: "{{ Session::get('success')}}",
+            })
+    </script>
+@endif
+@if(Session::has('error'))
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            html: "{{ Session::get('error')}}",
+            })
+    </script>
+@endif
 
 <!--/ Scroll - horizontal and vertical table -->
 @endsection

@@ -639,6 +639,7 @@ Route::group(['prefix' => 'PR','middleware' => ['authuser']], function() {
     Route::get('/purchaseRequest', 'Department\PurchaseRequestController@PurchaseRequestIndex')->name('purchaseRequest');
     Route::post('/purchaseRequest/add_Items_To_PR', 'Department\PurchaseRequestController@add_Items_To_PR');
     Route::post('/purchaseRequest/addItem', 'Department\PurchaseRequestController@addItem')->name('addItem');
+    Route::post('/purchaseRequest/updateItem', 'Department\PurchaseRequestController@updateItem')->name('updateItem');
     Route::get('/purchaseRequest/createPR', 'Department\PurchaseRequestController@createPR')->name('createPR');
     Route::post('/purchaseRequest/createPR/remove_item', 'Department\PurchaseRequestController@remove_item')->name('remove_item');
     Route::get('/purchaseRequest/getEmployees', 'Department\PurchaseRequestController@getEmployees');
@@ -651,6 +652,8 @@ Route::group(['prefix' => 'PR','middleware' => ['authuser']], function() {
     Route::post('/trackPR/view_pr/printPR', 'Department\PurchaseRequestController@printPR')->name('printPR');
     Route::get('/trackPR/view_status', 'Department\PurchaseRequestController@view_status')->name('view_status');
     Route::get('/trackPR/view_pr', 'Department\PurchaseRequestController@view_pr')->name('view_pr');
+    Route::post('/trackPR/delete_pr', 'Department\PurchaseRequestController@delete_pr')->name('delete_pr');
+    Route::get('/trackPR/edit_pr', 'Department\PurchaseRequestController@editPR')->name('edit_pr');
 
 });
 # route for department-group
