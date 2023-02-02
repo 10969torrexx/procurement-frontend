@@ -291,7 +291,7 @@
                 @if(session('role') == 10)
                   @if($pres_status == 0)
                     <button  type="button" class="btn btn-primary form-control col-sm-1 mt-1 submittopresident " value="4" data-id="{{ $project_category}}">SUBMIT</button>
-                  @elseif($pres_status == 1)
+                  @elseif($pres_status == 4)
                     <button  type="button" class="btn btn-primary form-control col-sm-1 mt-1 submittopresident " value="0" data-id="{{ $project_category}}"><i class="fa-solid fa-rotate-left"></i></button>
                   @else
                       <input type="hidden" name="project_category" id="project_category" value="{{ $project_category}}">

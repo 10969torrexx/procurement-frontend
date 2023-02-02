@@ -15,6 +15,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\Storage;
 use Pdf;
 use Carbon\Carbon;
+use App\Http\Controllers\HistoryLogController;
 
 class APPNONCSEController extends Controller
 {
@@ -127,7 +128,8 @@ class APPNONCSEController extends Controller
     $campusinfo = DB::table("campusinfo")
           ->where("campus",session('campus'))
           ->get();
-          
+        
+    // ( new HistoryLogController)->store(session('department_id'), session('employee_id'), session('campus'), null, 'View Traditional Index', 'View', $request->ip() )
     // $signName ="";
     // foreach($signatures as $sign){
     //   $signName = $sign->Name;
@@ -547,6 +549,18 @@ class APPNONCSEController extends Controller
             ->update([
               "pt.endorse" => $request->endorse
             ]);
+            
+            # this will created history_log
+                  (new HistoryLogController)->store(
+                    session('department_id'),
+                    session('employee_id'),
+                    session('campus'),
+                    NULL,
+                    'Endorse APP NON-CSE , '.'Category: '.$request->category.', Year: '.$request->year,
+                    'Endorse/Not'.$request->endorse,
+                    $request->ip(),
+                );
+            # end
         if($done){
           return response()->json([
             'status' => 200, 
@@ -563,7 +577,7 @@ class APPNONCSEController extends Controller
   }
 
   public function submit_to_president(Request $request){
-    // dd($request->all());
+    dd($request->all());
 
       $check = DB::table("signatories_app_non_cse")
           ->where("Year",$request->year)
@@ -597,6 +611,18 @@ class APPNONCSEController extends Controller
             'status' => $request->value,
             'pres_created_at' => Carbon::now()
           ]);
+            
+          # this will created history_log
+                (new HistoryLogController)->store(
+                  session('department_id'),
+                  session('employee_id'),
+                  session('campus'),
+                  NULL,
+                  'Submit to Pres APP NON-CSE , '.'Category: '.$request->category.', Year: '.$request->year,
+                  'Submit/Not:'.$request->value,
+                  $request->ip(),
+              );
+          # end
 
           if($done){
             return response()->json([
