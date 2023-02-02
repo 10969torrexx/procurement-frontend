@@ -13,7 +13,6 @@ use Carbon\Carbon;
 class PresidentHopeController extends Controller
 {
   public function list($id){
-    
     $aes = new GlobalDeclare();
     $project_category = $aes->project_category_num($id);
     // dd($project_category);
