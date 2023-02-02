@@ -76,8 +76,13 @@
                                         <i class="bx bx-trash mr-1"></i> delete
                                     </a>
                                 </div>
+<<<<<<< HEAD
+                              </div>
+                            @endif 
+=======
                               </div> 
                             @endif
+>>>>>>> cc410d1bef8baa625a370ae8ed816c2c46d00049
                           </td> 
                         </tr>
                       @endforeach
