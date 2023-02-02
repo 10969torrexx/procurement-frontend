@@ -19,13 +19,10 @@
                     <input type="text" id="project_code"  class="project_code form-control" placeholder="<?=($project_code)?>" name = "project_code" value="<?=($project_code)?>">
                 </fieldset>
             </div>
-            @if (!empty(session("globalerror")))
-                <div class="alert alert-danger" role="alert">
-                    {{session("globalerror")}}
-                </div>
-            @else
+            
+            <form id="updateItem" method="POST" enctype="multipart/form-data"> @csrf
+                {{-- <form action="{{ route('updateItem') }}" method="POST" enctype="multipart/form-data"> @csrf --}}
 
-            <form action="{{ route('addItem') }}" method="POST" enctype="multipart/form-data"> @csrf
                 
                 <div class="col-sm" hidden>
                     <fieldset class="form-group">
@@ -33,7 +30,30 @@
                         <input type="text" id="project_code"  class="project_code form-control" placeholder="<?=($project_code)?>" name = "project_code" value="<?=($project_code)?>">
                     </fieldset>
                 </div>
-
+                {{-- <div class="col-sm" hidden>
+                    <fieldset class="form-group">
+                        <label for="">data</label>
+                        <input type="text" id="data"  class="data form-control" placeholder="data" name = "data" value="">
+                    </fieldset>
+                </div> --}}
+                <div class="col-sm" hidden>
+                    <fieldset class="form-group">
+                        <label for="">id</label>
+                        <input type="text" id="updateid"  class="updateid form-control" placeholder="" name = "itemid" value="">
+                    </fieldset>
+                </div>
+                <div class="col-sm" hidden>
+                    <fieldset class="form-group">
+                        <label for="">id</label>
+                        <input type="text" id="id"  class="id form-control" placeholder="" name = "id" value="">
+                    </fieldset>
+                </div>
+                <div class="col-sm-6" hidden>
+                    <fieldset class="form-group">
+                        <label for="Item">Item</label>
+                        <input style="border:1px solid rgb(233, 230, 230);" type="text" id="updatename"  class="updatename form-control" placeholder="Item" name = "updatename" value = "" required>
+                    </fieldset>
+                </div>
                 <div class="row">
                     
                     <div class="col-sm-6">
@@ -66,12 +86,10 @@
                         </fieldset>
                     </div>
                 </div>
-
-            @endif
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary">Update</button>
+          <button type="submit" class="btn btn-primary updateButton">Update</button>
 
         </div>
         </form>

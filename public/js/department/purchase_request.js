@@ -128,7 +128,7 @@ $(document).on('click', '.PR_button', function (e) {
   var specification = $(".specification").val();
   var project_code = $(".project_code1").val();
 
-  alert(item);
+  // alert(item);
   
   if(item==null){
     Swal.fire({
@@ -646,12 +646,32 @@ $(document).on('click', '.editbutton', function (e) {
     url: "/PR/purchaseRequest/editPRItem",
     data: data,
     success: function (response) {
-      console.log(response)
+      // console.log(response.data)
       if (response.status == 200) {
-        
+            // Get a reference to our file input
+            // const fileInput = document.querySelector('.updatefile');
+
+            // Create a new File object
+            // const myFile = new File(['new file'], response.file_name, {
+                // type: 'text/plain',
+                // lastModified: Date.now(),
+            // });
+
+            // Now let's create a DataTransfer to get a FileList
+            // const dataTransfer = new DataTransfer();
+            // dataTransfer.items.add(myFile);
+            // fileInput.files = dataTransfer.files;
+
+        // var dataArray = [];
+        // for(var i=0; i < response.data.length;i++){
+        //   dataArray.push(response.data[i])
+        // }
+        // console.log(dataArray);
+        // $('.data').val(response.data); 
         $('.updatename').val(response.item_name); 
         $('.updatequantity').val(response.quantity); 
-        $('#updatefile').text(response.file_name); 
+        $('.updateid').val(response.item_id); 
+        $('.id').val(response.id); 
         $('.updatespecification').val(response.specification); 
         $('#EditPRModal').modal('show');
 
@@ -664,7 +684,6 @@ $(document).on('click', '.editbutton', function (e) {
           text: response.message,
           })
         document.getElementById('item').getElementsByTagName('option')[0].selected = 'selected';
-
       }
     }
   });
@@ -674,3 +693,113 @@ $(document).on('click', '.editbutton', function (e) {
 // END EDIT BUTTON
 
 
+$("form#updateItem").submit(function(e) {
+  e.preventDefault();
+ 
+  var formData = new FormData(this);    
+  
+  $.ajax({
+      url:'/PR/purchaseRequest/updateItem',
+      type: 'POST',
+      data: formData,
+      success: function (response) {
+          // alert(data)
+          if (response.status == 200) {
+            // Swal.fire({
+            //   icon: 'success',
+            //   title: 'Success',
+            //   text: response.message,
+            //   })
+              $('#EditPRModal').modal('hide');
+              Swal.fire({
+                title: 'Saved',
+                icon: 'success',
+                html: response.message,
+                timer: 1000,
+                timerProgressBar: true,
+                didOpen: () => {
+                  Swal.showLoading()
+                  const b = Swal.getHtmlContainer().querySelector('b')
+                  timerInterval = setInterval(() => {
+                    b.textContent = Swal.getTimerLeft()
+                  }, 100)
+                },
+                willClose: () => {
+                  clearInterval(timerInterval)
+                }
+              }).then((result) => {
+                if (result.dismiss === Swal.DismissReason.timer) {
+                  location.reload();
+                }
+              })
+          }
+          if (response.status == 400) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: response.message,
+              })
+          }
+      },
+      cache: false,
+      contentType: false,
+      processData: false
+  });
+
+
+});
+
+$(document).on('click', '.deletebutton', function (e) {
+  e.preventDefault();
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    var id = $(this).attr("href");
+    var pr_no = $(this).attr("rel");
+    var data = {
+      'id': id,
+      'pr_no': pr_no,
+      };
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',  
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes',
+      confirmButtonClass: 'btn btn-primary',
+      cancelButtonClass: 'btn btn-danger ml-1',
+      buttonsStyling: false,
+    }).then((result) => {
+            if (result.isConfirmed) {
+              $.ajax({
+                type: "POST",
+                url: "/PR/trackPR/delete_pr",
+                data:data,
+                success: function (response) {
+                      if(response['status'] == 200) {
+                      location.reload();
+                        Swal.fire({
+                          title: 'Success',
+                          html: response.message,
+                          icon: 'success',
+                        })
+                      }if(response.status == 400){
+                        Swal.fire({ 
+                          icon: 'error',
+                          title: 'Error',
+                          text: response.message,
+                        })
+                      }
+                }
+            });
+            }else if (result.isDenied) {
+              Swal.fire('Changes are not saved', '', 'info')
+            }
+      })
+});
