@@ -416,19 +416,6 @@ class PresidentHopeController extends Controller
         'pres_created_at' => Carbon::now()
       ]);
     }else{
-      // $Project_title = DB::table("project_titles as pt")
-      //   ->join("ppmps as p", "p.project_code", "=", "pt.id")
-      //   ->whereNull("pt.deleted_at")
-      //   ->where("pt.project_year","=",$request->year)
-      //   ->where("p.app_type","=",$request->app_type)
-      //   ->where("pt.campus", session('campus'))
-      //   ->where("pt.project_category", "=", $request->category)
-      //   ->where("p.status", "=", 4)
-      //   ->update([
-      //     'pt.pres_status' => $request->value,
-      //     'pt.pres_updated_at'=> Carbon::now(),
-      //   ]);
-      
       $signatories = DB::table("signatories_app_non_cse")
       ->where("Year","=",$request->year)
       ->where("users_id",'=',session('user_id'))
@@ -437,9 +424,19 @@ class PresidentHopeController extends Controller
         'pres_updated_at' => Carbon::now()
       ]);
     }
-              // dd($Project_title);
-              
       if($signatories){
+        $project = DB::table("project_titles as pt")
+            ->join("ppmps as p", "p.project_code", "=", "pt.id")
+            ->where("pt.project_category","=", $request->category)
+            ->where("p.app_type","=", $request->app_type)
+            ->where("pt.status","=", 4)  
+            ->where("pt.project_year","=", $request->year)
+            ->whereNull("pt.deleted_at")
+            ->whereNull("p.deleted_at")
+            ->update([
+              'pres_status' => $request->value,
+            ]);
+        
         return response()->json([
           'status' => 200, 
           // 'data' => $supplier,

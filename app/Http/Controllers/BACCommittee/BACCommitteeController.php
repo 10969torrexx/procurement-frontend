@@ -17,14 +17,17 @@ class BACCommitteeController extends Controller
     $aes = new GlobalDeclare();
     $project_category = $aes->project_category_num($id);
     // dd($project_category);
-    $app = DB::table("project_titles")
-              // ->select("project_year","id","bac_committee_status")
-              ->whereNull("deleted_at")
-              ->where("project_category","=", $project_category)
-              ->where("status","=", 4)  
-              ->groupBy("project_year")
+    $app = DB::table("project_titles as pt")
+              ->select("pt.*")
+              ->join("ppmps as p", "p.project_code", "=", "pt.id")
+              ->where("pt.project_category","=", $project_category)
+              ->where("p.app_type","=", "Non-CSE")
+              ->where("pt.status","=", 4)  
+              ->whereNull("pt.deleted_at")
+              ->whereNull("p.deleted_at")
+              ->groupBy("pt.project_year")
               -> get();
-    // dd(session('user_id'));
+    // dd($app);
 
     $recommending_approval = DB::table("signatories_app_non_cse")
           ->where("campus",session('campus'))
@@ -54,7 +57,7 @@ class BACCommitteeController extends Controller
 
       $pageConfigs = ['pageHeader' => true];
       $breadcrumbs = [
-        ["link" => "/", "name" => "Home"],["link" => "/president/list/".$project_category,"name" => "APP NON CSE"],["link" => "/", "name" => $year]
+        ["link" => "/", "name" => "Home"],["link" => "/baccommittee/list/".$project_category,"name" => "APP NON CSE"],["link" => "/", "name" => $year]
       ];
 
         if(session('role') != 13) {
@@ -83,7 +86,7 @@ class BACCommitteeController extends Controller
             ->join("project_titles as pt", "p.project_code", "=", "pt.id")
             ->whereNull("p.deleted_at")
             ->whereNull("pt.deleted_at")
-            // ->where('pt.bac_committee_status', 1) // ! torrexx - change
+            ->where('pt.bac_committee_status', 1) // ! torrexx - change
             ->where("pt.project_year","=",$year)
             ->where("p.app_type", 'Non-CSE')
             ->where("pt.project_category", "=", $category)
@@ -356,27 +359,61 @@ class BACCommitteeController extends Controller
   public function bac_committee_decision(Request $request){
     // dd($request->all());
       try {
+
           if ($request->value == 1) {
             $signatories = DB::table("signatories_app_non_cse")
               ->where("Year","=",$request->year)
               ->where("users_id",'=',session('user_id'))
+              ->where("Role",'=',3)
               ->update([
                 'status' => $request->value,
                 'bac_committee_created_at' => Carbon::now()
               ]);
+              // dd($signatories);
           }else{
             $signatories = DB::table("signatories_app_non_cse")
               ->where("Year","=",$request->year)
               ->where("users_id",'=',session('user_id'))
+              ->where("Role",'=',3)
               ->update([
                 'status' => $request->value,
                 'bac_committee_updated_at' => Carbon::now()
               ]);
-            
           }
-                // dd($Project_title);
-                
+
         if($signatories){
+          
+          #Bac Committee Status in Project titles table
+            $sign = DB::table("signatories_app_non_cse")
+              ->where("Year","=",$request->year)
+              ->where("users_id",'=',session('user_id'))
+              ->where("Role",'=',3)
+              ->get("status");
+              // dd($sign);
+              $signatures = 0;
+              foreach($sign as $bacStat) {
+                $signatures += $bacStat->status;
+              }
+
+              $bac_committee_stat = 0;
+              if($signatures >= 6){
+                $bac_committee_stat = 1;
+              }else{
+                $bac_committee_stat = 0;
+              }
+
+              $app = DB::table("project_titles as pt")
+                  ->join("ppmps as p", "p.project_code", "=", "pt.id")
+                  ->where("pt.project_category","=", $request->category)
+                  ->where("p.app_type","=", $request->app_type)
+                  ->where("pt.status","=", 4)  
+                  ->where("pt.project_year","=", $request->year)
+                  ->whereNull("pt.deleted_at")
+                  ->whereNull("p.deleted_at")
+                  ->update([
+                    'bac_committee_status' => $bac_committee_stat,
+                  ]);
+          #end
           return response()->json([
             'status' => 200, 
             // 'data' => $supplier,
