@@ -663,7 +663,7 @@ Route::group(['prefix' => 'PR','middleware' => ['authuser']], function() {
     Route::get('/trackPR/view_status', 'Department\PurchaseRequestController@view_status')->name('view_status');
     Route::get('/trackPR/view_pr', 'Department\PurchaseRequestController@view_pr')->name('view_pr');
 
-
+    
 });
 
 # route for department-group
@@ -671,12 +671,6 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
     //MY PROPERTY MENU ROUTES
     Route::get('/my_par','Employee\EmployeeController@my_par');
     Route::get('/my_ics','Employee\EmployeeController@my_ics');
-
-    //PURCHASE REQUEST ROUTES
-   
-
-
-    //END PURCHASE REQUEST ROUTES
     
     /* Torrexx Additionals */
         /** Implementing Functions Related to the department end user */

@@ -26,10 +26,24 @@
       "navheader": "supplyofficer"
     },
     {
-      "url": "users",
-      "name": "User",
-      "i18n": "User",
-      "icon": "users"
+      "url": "PR/purchaseRequest",
+      "name": "Purchase Request",
+      "i18n": "Shoppingcart",
+      "icon": "shoppingcart",
+      "submenu": [
+        {
+          "url": "PR/purchaseRequest",
+          "name": "Create PR",
+          "i18n": "User",
+          "icon": "like"
+        },
+        {
+          "url": "PR/trackPR",
+          "name": "Track PR",
+          "i18n": "User",
+          "icon": "shoppingcart-in"
+        }
+      ]
     }
   ]
 }
