@@ -11,13 +11,13 @@
       "navheader": "My Property"
     },
     {
-      "url": "budgetofficer/my_par",
+      "url": "property/PAR",
       "name": "PAR",
       "i18n": "User",
       "icon": "list"
     },
     {
-      "url": "budgetofficer/my_ics",
+      "url": "property/ICS",
       "name": "ICS",
       "i18n": "User",
       "icon": "gears"

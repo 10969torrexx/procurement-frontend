@@ -5,8 +5,8 @@
     $aes = new AESCipher();
     $global = new GlobalDeclare();
 ?>
-<div class="modal fade text-left" id="PreviewPRModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel160" style="display: none;" aria-hidden="true">
-  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document" >
+<div class="modal fade text-left " id="PreviewPRModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel160" style="display: none;" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered " role="document" >
       
     <div class="modal-content">
       <div class="modal-header text-center" id = "headModal">
@@ -22,7 +22,6 @@
       <div class="modal-body">
         <style>
           table.PR{
-            
             width: 100%;
             border-collapse: collapse;
             height: 200px;
@@ -58,6 +57,9 @@
           }
           input{
             border: none;
+          }
+          .selectEmployee {
+            text-transform: uppercase;
           }
         </style>
         {{-- <div class="table-responsive"> --}}
@@ -111,16 +113,18 @@
               </tr>
             </thead>
             <tbody>
-              <?php $i=0; $counter=15; $total = 0;?>
-              @foreach($ppmps as $ppmps)
-              <?php $i++; $counter--; $total+=$ppmps->estimated_price?>
+              <?php $i=0; $counter=10; $total = 0;?>
+              @foreach($itemsFromPRI as $data)
+              <?php $i++; $counter--;?>
               <tr>
-                <td class="first" style="text-align: right;font-style: italic;">{{ $i }}</td>
-                <td style="text-align: center">{{ $ppmps->unit_of_measurement }}</td>
-                <td style="text-align: left">{{ $ppmps->item_description }}</td>
-                <td style="text-align: center">{{ $ppmps->quantity  }}</td>
-                <td style="text-align: right">{{number_format($ppmps->unit_price,2,'.',',')}}</td>
-                <td style="text-align: right">{{number_format($ppmps->estimated_price,2,'.',',')}}</td>
+                <td class="first" style="text-align: right;font-style: italic;padding-right:5px">{{ $i }}</td>
+                <td style="text-align: center">{{ $data->unit_of_measurement }}</td>
+                <td style="text-align: left">{{ $data->item_description }}</td>
+                <td style="text-align: center">{{ $data->quantity  }}</td>
+                <?php $estimated_price =  $data->unit_price * $data->quantity; 
+                $total += $estimated_price?>
+                <td style="text-align: right">{{number_format($data->unit_price,2,'.',',')}}</td>
+                <td style="text-align: right">{{number_format($estimated_price,2,'.',',')}}</td>
               </tr>
               @endforeach
               @for($a = 1; $a < $counter; $a++)
@@ -163,7 +167,13 @@
               </tr>
               <tr>
                 <td style="border-left:1px solid black; border-bottom: none;border-right: none;border-top: none;font-weight:bold;">Printed Name:</td>
-                <td colspan="2" style="border-right: none;border-top: none;text-align:center;font-weight:bold;" class="selectEmployee" value="">-- Select Employee --<i class="fa-solid fa-pen-to-square employeeEdit" value="" style="margin-left:5px;"></i></td>
+                <td colspan="2" style="border-right: none;border-top: none;text-align:center;font-weight:bold;"  value="">
+                  <select style="border: none;text-align:center;font-weight:bold;" id="selectEmployee" class="selectEmployee form-control" required>
+                    <option value="" selected disabled>-- Select Employee --</option>
+                  </select>
+                </td>
+
+                {{-- <td colspan="2" style="border-right: none;border-top: none;text-align:center;font-weight:bold;"  class="selectEmployee" id="selectEmployee" value="">-- Select Employee --<i class="fa-solid fa-pen-to-square employeeEdit" value="" style="margin-left:5px;"></i></td> --}}
                 <td colspan="3" style="border-top: none;text-align:center;font-weight:bold;">PROSE IVY G. YEPES, EdD</td>
               </tr>
               <tr>

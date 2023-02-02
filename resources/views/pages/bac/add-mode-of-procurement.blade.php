@@ -64,12 +64,21 @@
                           <tr>
                             <td >{{ $data->mode_of_procurement }}</td>
                             <td >{{ $data->abbreviation }}</td>
+<<<<<<< HEAD
                             <td>{{ (new GlobalDeclare)->Campus(IntVal($data->campus)) }}</td> 
                             <td>{{ $data->name }}</td>
                             <td>{{ explode('-', date('j F, Y- g:i a', strtotime($data->created_at)))[0] }}</td>
                             <td>{{ explode('-', date('j F, Y- g:i a', strtotime($data->updated_at)))[0] }}</td>
                             <td>
                               @if($data->campus == session('campus'))
+=======
+                              <td>{{(new GlobalDeclare)->Campus($data->campus)}}</td>
+                              <td>{{ $data->name }}</td>
+                            <td>{{ explode('-', date('j F, Y- g:i a', strtotime($data->created_at)))[0] }}</td>
+                            <td>{{ explode('-', date('j F, Y- g:i a', strtotime($data->updated_at)))[0] }}</td>
+                            <td>
+                              {{-- @if($data->campus == session('campus')) --}}
+>>>>>>> cc410d1bef8baa625a370ae8ed816c2c46d00049
                                 <div class="dropdown">
                                   <span
                                     class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
@@ -81,7 +90,11 @@
                                     </a>
                                   </div>
                                 </div> 
+<<<<<<< HEAD
                               @endif
+=======
+                              {{-- @endif --}}
+>>>>>>> cc410d1bef8baa625a370ae8ed816c2c46d00049
                             </td> 
                           </tr>
                         @endforeach

@@ -94,12 +94,10 @@ class AuthenticationController extends Controller
 
   public function handleGoogleCallback()
   {
-
     try {
       $user = Socialite::driver('google')->user(); 
 	    // dd($user);
       if($user){
-        
         $name = $user->name;
         $email = $user->email;
         $photo = $user->avatar;
@@ -117,7 +115,8 @@ class AuthenticationController extends Controller
          // if($checkEmail){
           //  if($checkEmail['status'] == 200){
                 $employee_id = $checkEmail->id;
-               
+                $position = $checkEmail->EmploymentStatus;
+
                 $middle_name = $checkEmail->MiddleName;
                 $middle_initial = substr($middle_name, 0, 1).'.';
                 $name = ucfirst(strtolower($checkEmail->FirstName)).' '.$middle_initial.' '.ucfirst(strtolower($checkEmail->LastName));
@@ -128,10 +127,10 @@ class AuthenticationController extends Controller
                   'email' => $email,
                   'photo' => $photo,
                   'employee_id' =>$employee_id,
+                  'position' =>$position,
                   'campus' => $checkEmail->Campus
                   ])->json();
-                //  dd($login);
-
+                
                 if($login['status'] == 200){
                     $login = $login['data'];
                     session([
@@ -144,6 +143,7 @@ class AuthenticationController extends Controller
                         'department_id' => $login['department_id'],
                         'user_id' => $login['user_id'],
                         'employee_id' =>  $login['employee_id'],
+                        'position' =>  $login['position'],
                         'immediate_supervisor'  =>   $login['immediate_supervisor'],
                     ]);
   
@@ -157,6 +157,7 @@ class AuthenticationController extends Controller
             return redirect("/login");
       }
     } catch (\Throwable $th) {
+        throw $th;
         session(['globalerror' => "Please try again"]);
         return redirect("/login");
     }

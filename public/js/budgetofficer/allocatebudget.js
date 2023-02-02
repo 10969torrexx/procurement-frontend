@@ -6,23 +6,11 @@ $("#AllocateBudgetModal").on("hidden.bs.modal", function(e){
       $('.budget').val('');
       $('.mandatory_expenditures').val('');
 })
+
 $("#UpdateAllocateBudgetModal").on("hidden.bs.modal", function(e){
   // location.reload();
 })
-// $("#AllocateBudgetModal").on("show.bs.modal", function(e){
-//   // $("#bodyModal").html('<i class="bx bx-loader-circle"></i> Please wait...');
-//   $.ajax({
-//     cache      : false,
-//     beforeSend : function(){
-//       $('.modal-body').html('<i class="spinner-border spinner-border-sm"></i> Loading... ');
 
-//     },
-//     success: function(result){
-//       $('.modal-body').show();
-//     },
-//   });
-//   // $("#bodyModalImage").html('<i class="bx bx-loader-circle"></i> Please wait...');
-// })
 $(document).ready(function() {
   $('.mandatory_expenditures').select2({
     theme: 'bootstrap-5',
@@ -466,7 +454,7 @@ $(document).on('click', '.editbutton', function (e) {
           var department_index = array_department.indexOf(department_id);
           var fundsource_index = array_fundsources.indexOf(parseInt(fund_source_id));
           var year_index = array_years.indexOf(year.toString());
-// console.log(department_index);
+          // console.log(array_department);
           
             document.getElementById('update_type').getElementsByTagName('option')[type_index+1].selected = 'selected';
             document.getElementById('update_department').getElementsByTagName('option')[department_index+1].selected = 'selected';

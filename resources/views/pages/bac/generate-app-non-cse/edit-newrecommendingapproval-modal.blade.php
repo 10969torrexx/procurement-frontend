@@ -3,10 +3,10 @@
         <div class="modal-content">
             <div class="modal-body">
                 <label for="recommendingapprovalName">Name:</label>
-                <select class="selectpicker form-control recommendingapprovalName" id="recommendingapprovalName" data-style="btn-light" data-live-search="true">
+                <select class="select form-control recommendingapprovalName" id="recommendingapprovalName" data-style="btn-light" {{-- data-live-search="true" --}}>
                     <option selected>choose</option>
                     @foreach($users as $users)
-                        <option value="{{ $users->name }}">{{ $users->name }}</option>
+                        <option value="{{ $users->id }}">{{ $users->name }}</option>
                     @endforeach
                 </select>
                 {{-- <input type="text" style="margin-bottom: 1%;" class="form-control recommendingapprovalName" id="recommendingapprovalName" value=""> --}}

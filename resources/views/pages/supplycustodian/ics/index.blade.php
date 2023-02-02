@@ -43,12 +43,34 @@
                                 
                             </div>
                             <div class="table-responsive">
-                                <table class="table nowrap zero-configuration">
+                                <form action="{{ route('searchICS') }}" method="post">
+                                    @csrf
+                                    <div class="{{-- col-md-12 text-right  --}} mb-1 row" >
+                                            {{-- <input type="text" name="" id="" class="col-sm-2 " placeholder="Search">
+                                            <button type="button"  class="btn btn-success col-md-1 mt-1 ppmpDone" >Done</button> --}}
+                                            <div class="col-sm-4 text-left" {{-- style="background: black" --}}> 
+                                                @if($check != 1 )
+                                                    <a href="{{ route('ics_index') }}" ><button type="button"  class="btn btn-outline-primary col-md-3 " >Show All</button></a>
+                                                @else
+                                                @endif
+                                            </div>
+                                            <div class="col-sm-4"></div>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control Search" name="Search" placeholder="Search" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                                <div class="input-group-append">
+                                                <button class="btn btn-success" type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+                                                </div>
+                                            </div>
+                                    </div>
+                                </form>
+                                <table class="table nowrap zero-configuration table-sm">
                                     <thead>
                                         <tr>
-                                            <th>Action</th>
+                                            <th class="col-sm-1">Action</th>
                                             <th>ICS #</th>
                                             <th>Name</th>
+                                            {{-- <th>Issued To</th> --}}
+                                            {{-- <th>Issued By</th> --}}
                                             <th>Fund Cluster</th>
                                             <th>PO #</th>
                                             <th>Date Acquired</th>
@@ -68,59 +90,64 @@
                                         <?php $ctr=1; ?>
                                         @foreach ($propertys as $property)
                                                 @if ($property->Quantity > 0)
-                                                <?php $par = substr($property->DateIssued, 0, 7)."-".str_pad($property->PARNo, 4, "0", STR_PAD_LEFT) ?>
-                                                <tr id="{{$ctr}}">
-                                                    <td style="width: 25px">
-                                                        @if ($property->finalize == 0)
-                                                        <div class="dropdown d-inline-flex {{$ctr}}">
-                                                            <span
-                                                                class="{{$ctr}} bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
-                                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu"></span>
-                                                            <div class="dropdown-menu dropdown-menu-left">
-                                                                <a class="dropdown-item additempar" href = "#" {{-- data-flag = "<?=$aes->encrypt('property')?>"--}} data-button = "{{ $par }}" data-id = "<?=$aes->encrypt($property->id)?>"  data-toggle = "modal" data-target = "#addicsModal"><i class="bx bx-plus mr-1"></i> add item</a>
-                                                                <a class="dropdown-item editpar" href = "#" data-flag = "<?=$aes->encrypt('property')?>" data-button = "<?=$aes->encrypt('edit')?>" data-id = "<?=$aes->encrypt($property->id."-".$property->id)?>" data-toggle = "modal" data-target = "#editicsModal"><i class="bx bx-edit-alt mr-1"></i> edit</a>
-                                                                <a class="dropdown-item deletepar" ctr = "<?=$ctr?>" data-id = "<?=$aes->encrypt($property->id)?>">
-                                                                    <i class="bx bx-trash mr-1"></i> delete
-                                                                </a> 
-                                                                <a class="dropdown-item finalize text-danger" button = "{{-- <?=$aes->encrypt('finalize')?> --}}" flag = "{{-- <?=$aes->encrypt('property')?> --}}" data-id = "<?=$aes->encrypt($property->id)?>">
-                                                                    <i class="bx bx-check mr-1 text-danger"></i> Finalize
-                                                                </a>
-                                                            </div> 
-                                                        </div>    
-                                                        
-                                                        @else
-                                                        <a href = "#" data-flag = "<?=$aes->encrypt('property')?>" data-button = "<?=$aes->encrypt('transfer')?>" data-id = "<?=$aes->encrypt($property->id)?>" data-toggle = "modal" data-target = "#allModal" title = "Transfer of item"><i class="bx bx-transfer-alt mr-1"></i></a>
-                                                        <a href = "#" class="deletepar" {{-- data-flag = "<?=$aes->encrypt('property')?>" data-button = "<?=$aes->encrypt('dispose')?>" --}} data-id = "<?=$aes->encrypt($property->id)?>"{{--  data-toggle = "modal" data-target = "#allModal" --}} title = "Dispose of item"><i class="bx bx-trash mr-1 text-danger"></i></a>
-                                                        <a href = "/property/print/{{urlencode($aes->encrypt($property->id))}}/{{$property->FundCluster}}/{{$property->EmployeeID}}"><i class="bx bx-printer text-success"></i></a>
-                                                        
-                                                        @endif 
-                                                    {{-- <input type="text" name="parNum" id="parNum" class="form-control parNum" value="{{ $par }}" hidden>
-                                                    <input type="text" name="type" id="type" class="form-control type" value="{{ $property->propertytype }}" hidden>
-                                                    <input type="text" name="IssuedBy" id="IssuedBy" class="form-control IssuedBy" value="{{ $property->IssuedBy }}" hidden>
-                                                    <input type="text" name="DateIssued" id="DateIssued" class="form-control DateIssued" value="{{ $property->DateIssued }}" hidden>
-                                                    <input type="text" name="DateAcquired" id="DateAcquired" class="form-control DateAcquired" value="{{ $property->DateAcquired }}" hidden>
-                                                    <input type="text" name="PONumber" id="PONumber" class="form-control PONumber" value="{{ $property->PONumber }}" hidden>
-                                                    <input type="text" name="DateReceived" id="DateReceived" class="form-control DateReceived" value="{{ $property->DateReceived }}" hidden>
-                                                    <input type="text" name="StoreName" id="StoreName" class="form-control StoreName" value="{{ $property->StoreName }}" hidden> --}}
-                                                    </td>
-                                                    <td>{{$par}}</td>
-                                                    <td>{{$property->name}}</td>
-                                                    <td>{{$property->FundCluster}}</td>  
-                                                    <td>{{$property->PONumber}}</td>  
-                                                    <td>{{$property->DateAcquired}}</td> 
-                                                    <td>{{$property->SupplierName}}</td> 
-                                                    <td>{{$property->ItemName}}</td>
-                                                    <td>{{$property->Quantity . " " .$property->Unit}}</td>
-                                                    <td>{{number_format(str_replace(",","",$property->UnitPrice),2,'.',',') }}</td>
-                                                    <td>{{number_format(str_replace(",","",$property->UnitPrice)*$property->Quantity,2,'.',',') }}</td>
-                                                    <td>{{$property->remarks}}</td>
-                                                </tr>
-                                                <?php $ctr = $ctr + 1 ?>
+                                                    <?php $par = substr($property->DateIssued, 0, 7)."-".str_pad($property->PARNo, 4, "0", STR_PAD_LEFT) ?>
+                                                    <tr id="{{$ctr}}">
+                                                        <td style="width: 25px">
+                                                            @if ($property->finalize == 0)
+                                                                <div class="dropdown d-inline-flex {{$ctr}}">
+                                                                    <span
+                                                                        class="{{$ctr}} bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
+                                                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu"></span>
+                                                                    <div class="dropdown-menu dropdown-menu-left">
+                                                                        <a class="dropdown-item additempar" href = "#" {{-- data-flag = "<?=$aes->encrypt('property')?>"--}} data-button = "{{ $par }}" data-id = "<?=$aes->encrypt($property->id)?>"  data-toggle = "modal" data-target = "#addicsModal"><i class="bx bx-plus mr-1"></i> add item</a>
+                                                                        <a class="dropdown-item editpar" href = "#" data-flag = "<?=$aes->encrypt('property')?>" data-button = "<?=$aes->encrypt('edit')?>" data-id = "<?=$aes->encrypt($property->id."-".$property->id)?>" data-toggle = "modal" data-target = "#editicsModal"><i class="bx bx-edit-alt mr-1"></i> edit</a>
+                                                                        <a class="dropdown-item deletepar" ctr = "<?=$ctr?>" data-id = "<?=$aes->encrypt($property->id)?>">
+                                                                            <i class="bx bx-trash mr-1"></i> delete
+                                                                        </a> 
+                                                                        <a class="dropdown-item finalize text-danger" button = "{{-- <?=$aes->encrypt('finalize')?> --}}" flag = "{{-- <?=$aes->encrypt('property')?> --}}" data-id = "<?=$aes->encrypt($property->id)?>">
+                                                                            <i class="bx bx-check mr-1 text-danger"></i> Finalize
+                                                                        </a>
+                                                                    </div> 
+                                                                </div>    
+                                                                
+                                                                @else
+                                                                <div class="ml-1">
+                                                                    <a href = "#" class="transferto" {{-- data-flag = "<?=$aes->encrypt('property')?>" data-button = "<?=$aes->encrypt('transfer')?>" --}} data-id = "<?=$aes->encrypt($property->id)?>" data-toggle = "modal" data-target = "#transferModal" title = "Transfer of item"><i class="bx bx-transfer-alt mr-1"></i></a>
+                                                                    <a href = "#" class="finaldeleteics" {{-- data-flag = "<?=$aes->encrypt('property')?>" data-button = "<?=$aes->encrypt('dispose')?>" --}} data-id = "<?=$aes->encrypt($property->id)?>" data-toggle = "modal" data-target = "#deleteModalics" title = "Dispose of item"><i class="bx bx-trash mr-1 text-danger"></i></a>
+                                                                    <a href = "#" class="print" data-id = "<?=$aes->encrypt($property->id)?>" data-toggle = "modal" data-target = "#printModalics"><i class="bx bx-printer text-success"></i></a>
+                                                                </div>
+                                                                
+                                                            @endif 
+                                                        </td>
+                                                        {{-- <td>{{$par}}</td> --}}
+                                                        <td>{{$property->PARNo}}</td>
+                                                        <td>{{$property->name}}</td>
+                                                        {{-- <td>{{$property->name}}</td> --}}
+                                                        <td>{{$property->FundCluster}}</td>  
+                                                        <td>{{$property->PONumber}}</td>  
+                                                        <td>{{$property->DateAcquired}}</td> 
+                                                        <td>{{$property->SupplierName}}</td> 
+                                                        <td>{{$property->ItemName}}</td>
+                                                        <td>{{$property->Quantity . " " .$property->unit}}</td>
+                                                        <td>{{number_format(str_replace(",","",$property->UnitPrice),2,'.',',') }}</td>
+                                                        <td>{{number_format(str_replace(",","",$property->UnitPrice)*$property->Quantity,2,'.',',') }}</td>
+                                                        <td>
+                                                            <?php $transfer = "";
+                                                             if($property->ItemStatus == 1){
+                                                                echo $property->remarks.' ( Transfered )';
+                                                            }else{
+                                                                echo $property->remarks;
+                                                            }
+                                                            ?>
+                                                        </td>
+                                                    </tr>
+                                                    <?php $ctr = $ctr + 1 ?>
                                                 @endif
                                         @endforeach
                                         @endif
                                     </tbody>
                                 </table>
+                                {{ $propertys->onEachSide(1)->links() }}
                             </div>
                         @endif
                     </div>
@@ -131,7 +158,10 @@
   
 @include('pages.supplycustodian.ics.ics-modal')
 @include('pages.supplycustodian.ics.edit-modal')
+@include('pages.supplycustodian.ics.delete-modal')
 @include('pages.supplycustodian.ics.add-modal')
+@include('pages.supplycustodian.ics.print-modal')
+@include('pages.supplycustodian.ics.transfer-modal')
 </section>
 <!-- Dashboard Ecommerce ends -->
 @endsection
@@ -141,9 +171,9 @@
 {{-- <script src="{{asset('vendors/js/extensions/swiper.min.js')}}"></script> --}}
 
 
-<script src="{{asset('vendors/js/tables/datatable/datatables.min.js')}}"></script>
+{{-- <script src="{{asset('vendors/js/tables/datatable/datatables.min.js')}}"></script>
 <script src="{{asset('vendors/js/tables/datatable/dataTables.bootstrap4.min.js')}}"></script>
-<script src="{{asset('vendors/js/tables/datatable/dataTables.buttons.min.js')}}"></script>
+<script src="{{asset('vendors/js/tables/datatable/dataTables.buttons.min.js')}}"></script> --}}
 {{-- <script src="{{asset('vendors/js/tables/datatable/buttons.html5.min.js')}}"></script>
 <script src="{{asset('vendors/js/tables/datatable/buttons.print.min.js')}}"></script>
 <script src="{{asset('vendors/js/tables/datatable/buttons.bootstrap.min.js')}}"></script>

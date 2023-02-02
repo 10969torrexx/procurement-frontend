@@ -85,8 +85,8 @@
                               <th>Category</th>
                               <th>APP TYPE</th>
                               <th>Mode of Procurement</th>
-                              {{-- <th>Campus</th> --}}
                               <th>Added By</th>
+                              <th>Campus</th>
                               <th>Date Added</th>
                               {{-- <th>Campus</th> --}}
                               <th>Date Updated</th>
@@ -115,8 +115,8 @@
                               <td>{{ $items->item_category }}</td>
                               <td>{{ $items->app_type }}</td>
                               <td>{{ $items->mode_of_procurement }}</td>
-                              <td>{{ (new GlobalDeclare())->Campus($items->campus) }} Campus</td>
-                              {{-- <td>{{ $items->name }}</td> --}}
+                              <td>{{ $items->name }}</td>
+                              <td>{{ (new GlobalDeclare())->Campus($items->campus) }}</td>
                               <td>{{ explode('-', date('j F, Y-', strtotime($items->created_at)))[0] }}</td>
                               <td>{{ explode('-', date('j F, Y-', strtotime($items->updated_at)))[0] }}</td>
                               

@@ -31,19 +31,23 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
+                <div class="col-md-12" style="padding-top:30px;padding-left:30px">
+                    <a href = "{{ route('trackPR') }}" class = "btn btn-primary mr-1 mb-1"><i class="bx bx-left-arrow"></i> Back</a>
+                </div>
                 <div class="card-header">
                     <h4 class="card-title" style="text-align: center; font-weight: bold;">ROUTING SLIP (PROCUREMENT PROCESS)</h4>
                 </div>
                 <div class="card-content">
-                    {{-- <table class="top">
+                    <table class="top">
+                    @foreach($purchase_request as $data)
                         <thead>
                             <tr class="topp" style="text-align: left;line-height:22px;font-size:15px">
                                 <td  style="width: 70px;">PR NO.:</td>
-                                <td  style="width: 185px;border-bottom: 1px solid black;"></td>
+                                <td  style="width: 185px;border-bottom: 1px solid black;">{{ $data->pr_no }}</td>
                                 <td  style="width: 40px;padding-left: 60px">Date:</td>
-                                <td  style="width: 185px;border-bottom: 1px solid black;"></td>
+                                <td  style="width: 185px;padding-left: 10px; border-bottom: 1px solid black;">{{ date('M. j, Y', strtotime($data->created_at)) }}</td>
                                 <td  style="width: 145px;padding-left: 60px">End-User:</td>
-                                <td  style="width: 185px;border-bottom: 1px solid black;"></td>
+                                <td  style="width: 185px;border-bottom: 1px solid black;">{{ $data->name }}</td>
                                 <td  style="width: 155px;padding-left: 60px">Control No.:</td>
                                 <td  style="width: 185px;border-bottom: 1px solid black;"></td>
                             </tr>
@@ -51,7 +55,8 @@
                                 <td style="padding-bottom: 20px"></td>
                             </tr>
                         </thead>
-                    </table> --}}
+                    @endforeach
+                    </table>
                     <table class="ppmp" style=" line-height:22px;font-size:15px">
                         <thead>
                             <tr class="header" style=" border-top: 1px solid black;">
@@ -498,10 +503,6 @@
                             </tr> --}}
                         </tbody>
                     </table>
-                    <div class="col-md-12 text-right" style="padding-right: 100px">
-                        <a href = "{{ route('trackPR') }}" class = "btn btn-primary round mr-1 mb-1"><i class="bx bx-left-arrow"></i> Back</a>
-                    </div>
-
                 </div>
             </div>
         </div>

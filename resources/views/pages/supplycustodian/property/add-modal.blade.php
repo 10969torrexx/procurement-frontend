@@ -58,7 +58,7 @@
                             <option value = "IGF" >Internally Generated Funds</option>
                             <option value="BRF" >Business Related Funds</option>
                         </select>
-                    </div>
+                    </div> 
                 </div>
             </div>
         
@@ -91,7 +91,13 @@
                 <div class="col-xs-4 col-lg-3 col-sm-3">
                     <div class="form-group">
                         <label for="Unit">Unit *</label>
-                        <input type="text" name="Unit" id="Unit" class="form-control addUnit" value="">
+                        {{-- <input type="text" name="Unit" id="Unit" class="form-control addUnit" value=""> --}}
+                        <select name="addUnit" class="form-control addUnit" id="addUnit">
+                            <option selected>Choose...</option>
+                            @foreach($unit as $unit)
+                            <option value="{{ $unit->id }}">{{ $unit->unit_of_measurement }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
         
@@ -105,7 +111,7 @@
                 <div class="col-xs-4 col-lg-3 col-sm-3">
                     <div class="form-group">
                         <label for="Estimatedusefullife">Estimated useful life *</label>
-                        <input type="text" name="Estimatedusefullife" id="Estimatedusefullife" class="form-control addEstimatedusefullife" value="">
+                        <input type="text" name="Estimatedusefullife" id="Estimatedusefullife" class="form-control addEstimatedusefullife" value="" >
                     </div>
                 </div>
             </div>

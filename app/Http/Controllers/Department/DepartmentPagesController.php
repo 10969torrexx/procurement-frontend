@@ -11,11 +11,14 @@ use App\Http\Controllers\Department\AllocatedBudgetsController;
 use App\Http\Controllers\Department\FundSourcesController;
 use App\Http\Controllers\Department\ItemsController;
 use App\Http\Controllers\Department\DepartmentController;
+use App\Http\Controllers\GlobalDeclare;
 
 use App\Http\Controllers\ProjectTimelineController;
 use App\Models\Departments;
 
 use App\Models\Project_Titles;
+
+use Carbon\Carbon;
 
 class DepartmentPagesController extends Controller
 {
@@ -31,10 +34,11 @@ class DepartmentPagesController extends Controller
         # end
         # this function will show the dashboard for the department users
             public function showAnnouncementPage(){
-                /** This will join the allocated__budgets table and fundsources table
-                 * - this will be displayed on the users dashboard page
-                 * - table joined [ alocated_budgets, fundsources, mandatory_expenditures, mandatory_expenditures_list ]
-                */
+               try {
+                    /** This will join the allocated__budgets table and fundsources table
+                     * - this will be displayed on the users dashboard page
+                     * - table joined [ alocated_budgets, fundsources, mandatory_expenditures, mandatory_expenditures_list ]
+                    */
                     $departmentID = \session('department_id');
                     $array_fund_id = [];
                     $mandatory_expeditures = [];
@@ -51,12 +55,14 @@ class DepartmentPagesController extends Controller
                     
                     $mandatory_expeditures = \DB::table("mandatory_expenditures as me")
                         ->select("me.year", "me.fund_source_id", \DB::raw('sum(me.price) as SumMandatory'))
-                        ->where("me.department_id", $departmentID)
-                        ->where("me.campus", session('campus'))
+                        // ->where('me.campus', session('campus'))
+                        // ->where('me.department_id', session('department_id'))
+                        ->where('me.year', Carbon::now()->addYears(1)->format('Y'))
+                        ->whereNull('me.deleted_at')
                         ->groupBy("me.year")
                         ->groupBy("me.fund_source_id")
                         ->get();
-
+                    // dd($mandatory_expeditures);
                 /** This will return table and page configs */
                     $pageConfigs = ['pageHeader' => true];
                     $breadcrumbs = [
@@ -68,6 +74,10 @@ class DepartmentPagesController extends Controller
                             'mandatory_expeditures'   =>  $mandatory_expeditures,
                             'allocated_budgets'   =>  $allocated_budgets,
                         ]);
+               } catch (\Throwable $th) {
+                    //throw $th;
+                    return view('pages.error-500');
+               }
             }
         # end
         # this will show the create project year 
@@ -96,6 +106,7 @@ class DepartmentPagesController extends Controller
                             ->where('project_titles.department_id', session('department_id'))
                             ->where('project_titles.employee_id', session('employee_id'))
                             ->where('project_titles.status', 0) //status draft
+                            ->where('project_titles.project_category', (new AESCipher)->decrypt($request->project_category))
                             ->whereNull('project_titles.deleted_at')
                             ->get([
                                 'project_titles.*',
@@ -111,7 +122,9 @@ class DepartmentPagesController extends Controller
                             ->join('fund_sources', 'fund_sources.id', 'allocated__budgets.fund_source_id')
                             ->where('allocated__budgets.campus', session('campus'))
                             ->where('allocated__budgets.department_id', session('department_id'))
-                            ->where('allocated__budgets.procurement_type', 'PPMP') // make this dynamic
+                            # this will determine the project category for this fund source | Indicative, PPMP, Supplemental
+                            ->where('allocated__budgets.procurement_type', 
+                                (new GlobalDeclare)->project_category((new AESCipher)->decrypt($request->project_category)))
                             ->whereNull('allocated__budgets.deleted_at')
                             ->get(['allocated__budgets.*', 'allocated__budgets.id as allocated_id','fund_sources.fund_source']);
 
@@ -121,7 +134,7 @@ class DepartmentPagesController extends Controller
                     $breadcrumbs = [
                         ["link" => "/", "name" => "Home"],
                         ["link" => "/department/project-category", "name" => "PROJECT CATEGORY"],
-                        ["name" => "PROJECT TITLES"],
+                        ["name" =>  "CREATE PPMP |" . " " . strtoupper((new GlobalDeclare)->project_category((new AESCipher)->decrypt($request->project_category))) ],
                     ];
                     return view('pages.department.create-ppmp',
                     ['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs], 
@@ -282,7 +295,30 @@ class DepartmentPagesController extends Controller
                             'fund_sources.fund_source',
                             'users.name as immediate_supervisor' 
                         ]);
-
+                # from project titles | approved project titles
+                    $pt_show_approved = \DB::table('project_titles')
+                        ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
+                        ->join('users', 'users.id', 'project_titles.immediate_supervisor')
+                        ->where('project_titles.campus', session('campus'))
+                        ->where('project_titles.department_id', session('department_id'))
+                        ->where('project_titles.employee_id', session('employee_id'))
+                        ->where('project_titles.status', 4)
+                        ->whereNull('project_titles.deleted_at')
+                        ->get([
+                            'project_titles.*',
+                            'fund_sources.fund_source',
+                            'users.name as immediate_supervisor' 
+                        ]);
+                # from categories table
+                    $categories = \DB::table('categories')->whereNull('deleted_at')->get();  
+                # from fund sources table
+                    $fund_sources = \DB::table('allocated__budgets')
+                        ->join('fund_sources', 'fund_sources.id', 'allocated__budgets.fund_source_id')
+                        ->where('allocated__budgets.campus', session('campus'))
+                        ->where('allocated__budgets.department_id', session('department_id'))
+                        ->where('allocated__budgets.procurement_type', 'PPMP') // make this dynamic
+                        ->whereNull('allocated__budgets.deleted_at')
+                        ->get(['allocated__budgets.*', 'allocated__budgets.id as allocated_id','fund_sources.fund_source']);
                 # this is for affixing header links above the card directoryyy
                     $pageConfigs = ['pageHeader' => true];
                     $breadcrumbs = [
@@ -295,33 +331,38 @@ class DepartmentPagesController extends Controller
                         # this will attache the data to view
                         [
                             'project_titles' => $project_titles,
-                            'pt_show_disapproved'   => $pt_show_disapproved
+                            'pt_show_disapproved'   => $pt_show_disapproved,
+                            'pt_show_approved'   => $pt_show_approved,
+                            'categories'    => $categories,
+                            'fund_sources'   => \json_decode($fund_sources),
                         ]
                     );
             } catch (\Throwable $th) {
-                //throw $th;
+                throw $th;
                 return view('pages.error-500');
             }
         }
 
         # this will show the My PPMP Page based on the provided department id by the logged in user
         public function show_by_year_created(Request $request) {
+            // dd($request->all());
             try {
                 # this will get all the data form the ppmp table based on the given department_id
-                $project_titles = \DB::table('project_titles')
-                    ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
-                    // ->join('departments', 'departments.immediate_supervisor', 'project_titles.department_id')
-                    ->join('users', 'users.id', 'project_titles.immediate_supervisor')
-                    ->where('project_titles.campus', session('campus'))
-                    ->where('project_titles.department_id', session('department_id'))
-                    ->where('project_titles.employee_id', session('employee_id'))
-                    ->where('project_titles.year_created', (new AESCipher)->decrypt($request->year_created))
-                    ->whereNull('project_titles.deleted_at')
-                    ->get([
-                        'project_titles.*',
-                        'fund_sources.fund_source',
-                        'users.name as immediate_supervisor' 
-                    ]);
+                    $project_titles = \DB::table('project_titles')
+                        ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
+                        // ->join('departments', 'departments.immediate_supervisor', 'project_titles.department_id')
+                        ->join('users', 'users.id', 'project_titles.immediate_supervisor')
+                        ->where('project_titles.campus', session('campus'))
+                        ->where('project_titles.department_id', session('department_id'))
+                        ->where('project_titles.employee_id', session('employee_id'))
+                        ->where('project_titles.year_created', (new AESCipher)->decrypt($request->year_created))
+                        ->where('project_titles.project_category', $request->project_category)
+                        ->whereNull('project_titles.deleted_at')
+                        ->get([
+                            'project_titles.*',
+                            'fund_sources.fund_source',
+                            'users.name as immediate_supervisor' 
+                        ]);
                 # from project titles table | disapproved project titles
                     $pt_show_disapproved = \DB::table('project_titles')
                         ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
@@ -330,6 +371,7 @@ class DepartmentPagesController extends Controller
                         ->where('project_titles.department_id', session('department_id'))
                         ->where('project_titles.employee_id', session('employee_id'))
                         ->where('project_titles.year_created', (new AESCipher)->decrypt($request->year_created))
+                        ->where('project_titles.project_category', $request->project_category)
                         ->where(function($query) {
                             $query->where('project_titles.status', 3)
                                 ->orWhere('project_titles.status', 5);
@@ -340,6 +382,32 @@ class DepartmentPagesController extends Controller
                             'fund_sources.fund_source',
                             'users.name as immediate_supervisor' 
                         ]);
+                # from project titles | approved project titles
+                    $pt_show_approved = \DB::table('project_titles')
+                        ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
+                        ->join('users', 'users.id', 'project_titles.immediate_supervisor')
+                        ->where('project_titles.campus', session('campus'))
+                        ->where('project_titles.department_id', session('department_id'))
+                        ->where('project_titles.employee_id', session('employee_id'))
+                        ->where('project_titles.year_created', (new AESCipher)->decrypt($request->year_created))
+                        ->where('project_titles.status', 4)
+                        ->where('project_titles.project_category', $request->project_category)
+                        ->whereNull('project_titles.deleted_at')
+                        ->get([
+                            'project_titles.*',
+                            'fund_sources.fund_source',
+                            'users.name as immediate_supervisor' 
+                        ]);
+                # from categories table
+                    $categories = \DB::table('categories')->whereNull('deleted_at')->get();  
+                # from fund sources table
+                    $fund_sources = \DB::table('allocated__budgets')
+                        ->join('fund_sources', 'fund_sources.id', 'allocated__budgets.fund_source_id')
+                        ->where('allocated__budgets.campus', session('campus'))
+                        ->where('allocated__budgets.department_id', session('department_id'))
+                        ->where('allocated__budgets.procurement_type', 'PPMP') // make this dynamic
+                        ->whereNull('allocated__budgets.deleted_at')
+                        ->get(['allocated__budgets.*', 'allocated__budgets.id as allocated_id','fund_sources.fund_source']);
                 # this is for affixing header links above the card directoryyy
                     $pageConfigs = ['pageHeader' => true];
                     $breadcrumbs = [
@@ -352,7 +420,10 @@ class DepartmentPagesController extends Controller
                         # this will attache the data to view
                         [
                             'project_titles' => $project_titles,
-                            'pt_show_disapproved' => $pt_show_disapproved
+                            'pt_show_disapproved' => $pt_show_disapproved,
+                            'pt_show_approved' => $pt_show_approved,
+                            'categories'    => $categories,
+                            'fund_sources'   => \json_decode($fund_sources),
                         ]
                     );
             } catch (\Throwable $th) {
@@ -529,4 +600,58 @@ class DepartmentPagesController extends Controller
                 return view('pages.error-500');
            }
         }
+
+        # request ppmp submission
+        public function show_ppmp_submission() {
+            try {
+               return view('pages.department.ppmp-submission');
+            } catch (\Throwable $th) {
+                throw $th;
+                return view('pages.error-500');
+            }
+        }
+
+        # upload ppmp | signed ppmp
+            public function show_upload_ppmp() {
+                try {
+                    # get uplpaded ppmp
+                    $response = \DB::table('signed_ppmp')
+                        ->where('employee_id', session('employee_id'))
+                        ->where('department_id', session('department_id'))
+                        ->where('campus', session('campus'))
+                        ->whereNull('deleted_at')
+                        ->get();
+                    # return page
+                    return view('pages.department.upload-ppmp', compact('response'));
+                } catch (\Throwable $th) {
+                    //throw $th;
+                    return view('pages.error-500');
+                }
+            }
+        # upload ppmp | signed ppmp
+            public function get_upload_ppmp(Request $request) {
+                try {
+                    $this->validate($request, [
+                        'project_category'  => ['required'],
+                        'year_created'  =>  ['required'],
+                        'file_name' => ['required'],
+                    ]);
+                    # get uplpaded ppmp
+                    $response = \DB::table('signed_ppmp')
+                        ->where('employee_id', session('employee_id'))
+                        ->where('department_id', session('department_id'))
+                        ->where('campus', session('campus'))
+                        ->where('project_category', (new AESCipher)->decrypt($request->project_category))
+                        ->where('year_created', (new AESCipher)->decrypt($request->year_created))
+                        ->where('file_name', 'like', '%'. $request->file_name .'%')
+                        ->whereNull('deleted_at')
+                        ->get();
+                    # return page
+                    return view('pages.department.upload-ppmp', compact('response'));
+                } catch (\Throwable $th) {
+                    throw $th;
+                    return view('pages.error-500');
+                }
+            }
+
 }

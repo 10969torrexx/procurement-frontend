@@ -11,13 +11,13 @@
         "navheader": "My Property"
       },
       {
-        "url": "department/my_par",
+        "url": "property/PAR",
         "name": "PAR",
         "i18n": "User",
         "icon": "list"
       },
       {
-        "url": "department/my_ics",
+        "url": "property/ICS",
         "name": "ICS",
         "i18n": "User",
         "icon": "gears"
@@ -46,19 +46,33 @@
         
       },
       {
-        "url": "department/PR",
+        "url": "department/ppmp-submission",
+        "name": "PPMP Submission",
+        "i18n": "Notebook",
+        "icon": "envelope-pull"
+        
+      },
+      {
+        "url": "department/upload-ppmp",
+        "name": "Upload PPMP",
+        "i18n": "Notebook",
+        "icon": "briefcase"
+        
+      },
+      {
+        "url": "PR/purchaseRequest",
         "name": "Purchase Request",
         "i18n": "Shoppingcart",
         "icon": "shoppingcart",
         "submenu": [
           {
-            "url": "department/purchaseRequest",
+            "url": "PR/purchaseRequest",
             "name": "Create PR",
             "i18n": "User",
             "icon": "like"
           },
           {
-            "url": "department/trackPR",
+            "url": "PR/trackPR",
             "name": "Track PR",
             "i18n": "User",
             "icon": "shoppingcart-in"

@@ -1,0 +1,191 @@
+{
+  "menu": [
+    {
+      "url": "/",
+      "name": "Dashboard",
+      "i18n": "Dashboard",
+      "slug": "dashboard",
+      "icon": "desktop"
+    },
+    {
+      "navheader": "My Property"
+    },
+    {
+      "url": "property/PAR",
+      "name": "PAR",
+      "i18n": "User",
+      "icon": "list"
+    },
+    {
+      "url": "property/ICS",
+      "name": "ICS",
+      "i18n": "User",
+      "icon": "gears"
+    },
+    {
+      "navheader": "End-User"
+    },
+    {
+      "url": "department/announcements", 
+      "name": "Announcement",
+      "i18n": "Calendar",
+      "icon": "calendar"
+    },
+    {
+      "url": "department/project-category",
+      "name": "Create PPMP",
+      "i18n": "User",
+      "icon": "users"
+      
+    },
+    {
+      "url": "department/myPPMP",
+      "name": "MY PPMP",
+      "i18n": "Notebook",
+      "icon": "notebook"
+      
+    },
+    {
+      "navheader": "BAC COMMITTEE"
+    },
+    {
+      "url": "bor-secetary/upload-bor-resolution", 
+      "name": "BOR Resolution",
+      "i18n": "Calendar",
+      "icon": "calendar"
+    },
+    {
+      "url": "#",
+      "name": "APP NON-CSE",
+      "i18n": "User",
+      "icon": "users",
+      "submenu": [
+        {
+          "url": "#",
+          "name": "Indicative",
+          "i18n": "User",
+          "icon": "shoppingcart-in",
+          "submenu": [
+            {
+              "url": "baccommittee/list/Indicative",
+              "name": "View",
+              "i18n": "User",
+              "icon": "shoppingcart-in"
+            },
+            {
+              "url": "#",
+              "name": "Signed APP",
+              "i18n": "User",
+              "icon": "shoppingcart-in"
+            }]
+            
+        },
+        {
+          "url": "#",
+          "name": "Traditional",
+          "i18n": "User",
+          "icon": "shoppingcart-in",
+          "submenu": [
+            {
+              "url": "baccommittee/list/PPMP",
+              "name": "View",
+              "i18n": "User",
+              "icon": "shoppingcart-in"
+            },
+            {
+              "url": "#",
+              "name": "Signed APP",
+              "i18n": "User",
+              "icon": "shoppingcart-in"
+            }]
+        },
+        {
+          "url": "#",
+          "name": "Supplemental",
+          "i18n": "User",
+          "icon": "shoppingcart-in",
+          "submenu": [
+            {
+              "url": "baccommittee/list/Supplemental",
+              "name": "View",
+              "i18n": "User",
+              "icon": "shoppingcart-in"
+            },
+            {
+              "url": "#",
+              "name": "Signed APP",
+              "i18n": "User",
+              "icon": "shoppingcart-in"
+            }]
+        }
+      ]
+    },
+    {
+      "url": "#",
+      "name": "APP CSE",
+      "i18n": "User",
+      "icon": "users",
+      "submenu": [
+        {
+          "url": "#",
+          "name": "Indicative",
+          "i18n": "User",
+          "icon": "shoppingcart-in",
+          "submenu": [
+            {
+              "url": "#",
+              "name": "View",
+              "i18n": "User",
+              "icon": "shoppingcart-in"
+            },
+            {
+              "url": "#",
+              "name": "Signed APP",
+              "i18n": "User",
+              "icon": "shoppingcart-in"
+            }]
+            
+        },
+        {
+          "url": "#",
+          "name": "Traditional",
+          "i18n": "User",
+          "icon": "shoppingcart-in",
+          "submenu": [
+            {
+              "url": "#",
+              "name": "View",
+              "i18n": "User",
+              "icon": "shoppingcart-in"
+            },
+            {
+              "url": "#",
+              "name": "Signed APP",
+              "i18n": "User",
+              "icon": "shoppingcart-in"
+            }]
+        },
+        {
+          "url": "#",
+          "name": "Supplemental",
+          "i18n": "User",
+          "icon": "shoppingcart-in",
+          "submenu": [
+            {
+              "url": "#",
+              "name": "View",
+              "i18n": "User",
+              "icon": "shoppingcart-in"
+            },
+            {
+              "url": "#",
+              "name": "Signed APP",
+              "i18n": "User",
+              "icon": "shoppingcart-in"
+            }]
+        }
+      ]
+      
+    }
+  ]
+}

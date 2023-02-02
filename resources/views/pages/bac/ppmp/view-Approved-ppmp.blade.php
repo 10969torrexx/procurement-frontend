@@ -43,6 +43,8 @@
     
                             
                             @foreach ($data as $line)
+                            
+                            <input type="hidden" class="project_category" value="{{ $line->project_category }}">
                                     {{-- @for ($i = 0; $i < count($data->0); $i++) --}}
                             <tbody>
                                 <tr>
