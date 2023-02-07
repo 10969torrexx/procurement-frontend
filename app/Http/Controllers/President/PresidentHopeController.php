@@ -7,7 +7,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
 use App\Http\Controllers\AESCipher;
 use App\Http\Controllers\GlobalDeclare;
-use Illuminate\Support\Facades\DB;;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\HistoryLogController;
 use Carbon\Carbon;
 
 class PresidentHopeController extends Controller
@@ -216,20 +217,6 @@ class PresidentHopeController extends Controller
     try{
         $count = $request->campusCheck;
         if($count  == 1){
-          // $Categories = DB::table("ppmps as p")
-          //   ->join("project_titles as pt", "p.project_code", "=", "pt.id")
-          //   ->whereNull("p.deleted_at")
-          //   ->where("pt.project_year","=",$request->year)
-          //   ->where("p.app_type", 'Non-CSE')
-          //   ->where("pt.project_category", "=", $request->category)
-          //   ->where("p.status", "=", 4)
-          //   ->where("pt.status", "=", 4)
-          //   ->where("p.campus", session('campus'))
-          //   ->groupBy("p.campus")
-          //   ->groupBy("p.item_category")
-          //   ->orderBy("p.campus","ASC")
-          //   ->get();
-          
           $Categories = DB::table("ppmps as p")
           ->join("project_titles as pt", "p.project_code", "=", "pt.id")
           ->whereNull("p.deleted_at")
@@ -275,7 +262,6 @@ class PresidentHopeController extends Controller
             ->where("pt.project_category", "=", $request->project_category)
             ->where("p.status", "=", 4)
             ->where("pt.status", "=", 4)
-            // ->where("p.campus", session('campus'))
             ->groupBy("p.campus")
             ->groupBy("p.item_category")
             ->orderBy("p.campus","ASC")
@@ -297,38 +283,6 @@ class PresidentHopeController extends Controller
             ->orderBy("p.department_id", "ASC")
             ->orderBy("p.project_code", "ASC")
             ->get();
-            // dd($ppmps);
-            // $Categories = DB::table("ppmps as p")
-            // ->join("project_titles as pt", "p.project_code", "=", "pt.id")
-            // ->whereNull("p.deleted_at")
-            // ->where("pt.project_year","=",$request->year)
-            // ->where("p.app_type", 'Non-CSE')
-            // ->where("pt.project_category", "=", $request->category)
-            // ->where("pt.endorse", "=", 1)
-            // ->where("p.status", "=", 4)
-            // // ->where("p.campus", session('campus'))
-            // ->groupBy("p.campus")
-            // ->groupBy("p.item_category")
-            // ->orderBy("p.campus","ASC")
-            // ->get();
-
-            // $ppmps = DB::table("ppmps as p")
-            //   ->select("pt.project_title", "d.department_name", "p.*", "pt.fund_source","pt.project_code as ProjectCode","ab.allocated_budget","ab.remaining_balance","fs.fund_source","m.mode_of_procurement as procurementName")
-            //   ->join("project_titles as pt", "p.project_code", "=", "pt.id")
-            //   ->join('mode_of_procurement as m','m.id','=','p.mode_of_procurement')
-            //   ->join("departments as d", "pt.department_id", "=", "d.id")
-            //   ->join('allocated__budgets as ab','pt.allocated_budget','=','ab.id')
-            //   ->join('fund_sources as fs','fs.id','=','ab.fund_source_id')
-            //   ->where("p.app_type", 'Non-CSE')
-            //   ->whereNull("p.deleted_at")
-            //   // ->where("p.campus", session('campus'))
-            // ->where("pt.project_category", "=", $request->category)
-            //   ->where("pt.project_year","=",$request->year)
-            //   ->where("pt.endorse", "=", 1)
-            //   ->where("p.status", "=", 4)
-            //   ->orderBy("p.department_id", "ASC")
-            //   ->orderBy("p.project_code", "ASC")
-            //   ->get();
           }
 
       $signatures = DB::table("signatories_app_non_cse")
@@ -363,6 +317,19 @@ class PresidentHopeController extends Controller
           ->where("campus",session('campus'))
           ->get();
         // dd($campusinfo);
+
+          # this will created history_log
+            (new HistoryLogController)->store(
+              session('department_id'),
+              session('employee_id'),
+              session('campus'),
+              NULL,
+              'Generate PDF From President, Year: '.$request->year,", Category: ".$request->project_category.", Type: ".$request->app_type,
+              'Generate PDF',
+              $request->ip(),
+            );
+          # end 
+
         $pdf = \Pdf::loadView('pages.president.generate-pdf', compact('Categories','ppmps','signatures','campusinfo','prepared_by','recommending_approval','approved_by'))->setPaper('legal', 'landscape');
         return $pdf->download("APP_NON_CSE_".$request->year.".pdf"); 
         
@@ -433,6 +400,19 @@ class PresidentHopeController extends Controller
         'pres_updated_at' => Carbon::now()
       ]);
     }
+    
+        # this will created history_log
+          (new HistoryLogController)->store(
+            session('department_id'),
+            session('employee_id'),
+            session('campus'),
+            NULL,
+            'Approve / Not From President, Year: '.$request->year,
+            'Approve / Not',
+            $request->ip(),
+          );
+        # end 
+
       if($signatories){
         $project = DB::table("project_titles as pt")
             ->join("ppmps as p", "p.project_code", "=", "pt.id")
@@ -564,6 +544,19 @@ class PresidentHopeController extends Controller
           ->where("campus",session('campus'))
           ->get(); 
         // dd($campusinfo);
+
+        # this will created history_log
+          (new HistoryLogController)->store(
+            session('department_id'),
+            session('employee_id'),
+            session('campus'),
+            NULL,
+            'Print App From President, Year: '.$request->year.", Category: ".$request->category.", Type: ".$request->app_type,
+            'Print',
+            $request->ip(),
+          );
+        # end 
+
         return view('pages.president.print', compact('Categories','ppmps','signatures','campusinfo','prepared_by','recommending_approval','approved_by'));
     }catch (\Throwable $th) {
         throw $th;

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\AESCipher;
 use App\Http\Controllers\GlobalDeclare;
 // use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\HistoryLogController;
 use App\Employee;
 use App\PropertySub;
 use DB;
@@ -14,19 +15,6 @@ use Carbon\Carbon;
 
 class MyPropertyController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-
-    // protected $global;
-    // protected $aes;
-    // public function __construct(){
-    //     $this->aes = new AESCipher();
-    //     $this->global = new GlobalDeclare();
-    // }
-    
     public function index($id){
         $check = 1;
         $type = $id;
@@ -235,9 +223,17 @@ class MyPropertyController extends Controller
             ->orderBy('p.DateIssued', "desc")
             ->get();
 
-        // $par = DB::table("property")
-        //     ->where("id",$id)
-        //     ->get();
+            # this will created history_log
+              (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                $request->id,
+                'Print My Property ',
+                'Print',
+                $request->ip(),
+              );
+            # end   
         // dd($par);
         return view('pages.my-property.print',compact('par'));
     }
@@ -308,6 +304,18 @@ class MyPropertyController extends Controller
                     'campus'      => session('campus'),
                     'created_at'  => Carbon::now(),
                     ]);
+
+            
+            # this will created history_log
+            (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                NULL,
+                'Add User for My Property, User: '.$id,
+                'add',
+                $request->ip(),
+              );
 
             $properties = DB::table("property_current_user as pc")
                 ->select('pc.*','p.id','p.quantity as Quantity','p.ItemName')
