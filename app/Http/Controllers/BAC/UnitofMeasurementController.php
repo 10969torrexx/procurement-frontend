@@ -9,123 +9,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use DB;
 Use Carbon\Carbon;
+use App\Http\Controllers\HistoryLogController;
 
 class UnitofMeasurementController extends Controller
 {
-  // public function additems(){
-  //   $item =  Http::withToken(session('token'))->get(env('APP_API'). "/api/item/index")->json();
-  //   return view('pages.bac.add-unit-of-measurement',
-  //   [
-  //     'data' => $item['data'],
-
-  //   ] 
-  //   );
-  // }
-    // public function index(){
-    //     $pageConfigs = ['pageHeader' => true];
-    //     $breadcrumbs = [
-    //       ["link" => "/", "name" => "Home"],["name" => "Unit of Measurement"]
-    //     ];
-        
-
-    //     $unitofmeasurement =  Http::withToken(session('token'))->post(env('APP_API'). "/api/unit-of-measurement/index"[
-    //       'campus' => session('campus')
-    //     ])->json();
-    //     // dd($unitofmeasurement);
-    //     return view('pages.bac.add-unit-of-measurement',['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs],
-    //     [
-    //       // 'data' => $unitofmeasurement['data'],
-    //       'data' => $unitofmeasurement['data'],
-    //       'data1' => $unitofmeasurement['data1'],
-    //     ] 
-    //     );
-    // }
-
-    //   public function store(Request $request){
-    //     // dd( $request -> all()); 
-    //     $aes = new AESCipher();
-    //     $global = new GlobalDeclare();
-    //     $item_id = $aes->decrypt($request->item_id);
-    //     $unitofmeasurement = $request->unitofmeasurement;
-    //     $response = Http::withToken(session('token'))->post(env('APP_API'). "/api/unit-of-measurement/store",[
-    //     'campus'=> session('campus'),
-    //     'name'=> session('name'),
-    //     'item_id' => $item_id,
-    //     'unit_of_measurement' => $unitofmeasurement,
-    //     ])->json();
-    //       // dd( $response); 
-    //     if($response) 
-    //     {
-    //     if($response['status'] == 200){
-    //     // return redirect('/superadmin/items')->with('success', 'Added Successfully!!');
-    //     return response()->json([
-    //       'status' => 200, 
-    //     ]);    
-    //     }
-
-    //     if($response['status'] == 400){
-    //       return response()->json([
-    //       'status' => 400, 
-    //     ]); 
-    //       // return redirect('/superadmin/items')->with('error', 'Item Already Exist!');
-    //       }
-    //     }
-    //   }
-
-    //   public function show(Request $request){
-    //     $id = $request->id;
-    //     $aes = new AESCipher();
-    //     $global = new GlobalDeclare();
-    //     $id1 = $aes->decrypt($id);
-    //     $response = Http::withToken(session('token'))->get(env('APP_API'). "/api/unit/show/".$id1,[
-    //     'id' => $id1,
-    //     ])->json();
-    //         return $response; 
-    //   }
-
-    //   public function update(Request $request){
-    //     $unit_of_measurement = $request->unit_of_measurement;
-    //     $id = $request->id;
-    //     $aes = new AESCipher();
-    //     $global = new GlobalDeclare();
-    //     $id1 = $aes->decrypt($id);
-    //     $response = Http::withToken(session('token'))->put(env('APP_API'). "/api/unit/update/".$id1,[
-    //     'id' => $id1,
-    //     'unit_of_measurement' => $unit_of_measurement,
-    //     ])->json();
-    //     return $response;
-    //         // dd($response);
-    //   }
-    //   public function delete(Request $request){
-    //     $id = $request->id;
-    //     $aes = new AESCipher();
-    //     $global = new GlobalDeclare();
-    //     $id1 = $aes->decrypt($id);
-    //     // dd($id1);
-    //     $response = Http::withToken(session('token'))->delete(env('APP_API'). "/api/unit/delete/".$id1,[
-    //       'id' => $id1,
-    //     ])->json();
-    //     if($response) 
-    //     {
-    //       // dd( $response);
-    //       if($response['status'] == 200){
-    //       return response()->json([
-    //         'status' => 200, 
-    //         ]);     
-    //       }
-    //       if($response['status'] == 400){
-    //         return response()->json([
-    //           'status' => 400, 
-    //         ]);    
-    //       }else{
-    //         return response()->json([
-    //           'status' => 500, 
-    //         ]);   
-    //       }
-    //     }
-    //   // dd($response);
-    //   }
-
   public function index(){
     $pageConfigs = ['pageHeader' => true];
     $breadcrumbs = [
@@ -181,6 +68,18 @@ class UnitofMeasurementController extends Controller
         'created_at'=> Carbon::now(),
         'updated_at'=> Carbon::now(),
           ]);   
+
+          # this will created history_log
+                (new HistoryLogController)->store(
+                  session('department_id'),
+                  session('employee_id'),
+                  session('campus'),
+                  NULL,
+                  'Added UnitofMeasurements: '. $request->unitofmeasurement,
+                  'Added',
+                  $request->ip(),
+              );
+          # end 
 
         return response()->json([
           'status' => 200, 
@@ -239,6 +138,18 @@ class UnitofMeasurementController extends Controller
                 'name'     =>session('name'),
                 'updated_at'=> Carbon::now(),
               ]);
+
+              # this will created history_log
+                    (new HistoryLogController)->store(
+                      session('department_id'),
+                      session('employee_id'),
+                      session('campus'),
+                      $id,
+                      'Update UnitofMeasurements: '. $request->unit_of_measurement,
+                      'update',
+                      $request->ip(),
+                  );
+              # end 
       if($unit){
         return response()->json([
           'status' => 200, 
@@ -258,6 +169,18 @@ class UnitofMeasurementController extends Controller
                   ->update([
                     'deleted_at' => Carbon::now(),
                   ]);
+
+                  # this will created history_log
+                        (new HistoryLogController)->store(
+                          session('department_id'),
+                          session('employee_id'),
+                          session('campus'),
+                          $id,
+                          'Delete UnitofMeasurements ',
+                          'Delete',
+                          $request->ip(),
+                      );
+                  # end 
 
     if( $unit)
       {

@@ -94,7 +94,7 @@ class ItemController extends Controller
                 session('department_id'),
                 session('employee_id'),
                 session('campus'),
-                $id,
+                NULL,
                 'Added Item: '. $item,
                 'Added',
                 $request->ip(),
@@ -102,7 +102,7 @@ class ItemController extends Controller
         # end 
         return response()->json([
                     'status' => 200, 
-                    'message' => 'Save Succesfully!.',
+                    'message' => 'Save Successfully!.',
                 ]); 
       }else{
         DB::table("items")
@@ -123,7 +123,7 @@ class ItemController extends Controller
                 session('department_id'),
                 session('employee_id'),
                 session('campus'),
-                $id,
+                NULL,
                 'Added Item: '. $item,
                 'Added',
                 $request->ip(),
@@ -131,7 +131,7 @@ class ItemController extends Controller
         # end 
         return response()->json([
                     'status' => 200, 
-                    'message' => 'Save Succesfully!.',
+                    'message' => 'Save Successfully!.',
                 ]); 
       }
     }
