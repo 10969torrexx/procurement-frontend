@@ -56,11 +56,12 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="icons p-2 text-center">
+                                    <script src="https://cdn.lordicon.com/ritcuqlt.js"></script>
                                     <lord-icon
-                                        src="https://cdn.lordicon.com/ajkxzzfb.json"
+                                        src="https://cdn.lordicon.com/gzcbkoye.json"
                                         trigger="hover"
-                                        style="width:250px;height:250px;"
-                                        >
+                                        colors="primary:#66a1ee"
+                                        style="width:250px;height:250px">
                                     </lord-icon>
                                 </div>
                                 <a href="{{ route('department-showCreatetPPMP', ['project_category' => (new AESCipher)->encrypt(1)]) }}" class="btn btn-primary col-12">
@@ -73,9 +74,11 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="icons p-2 text-center">
+                                    <script src="https://cdn.lordicon.com/ritcuqlt.js"></script>
                                     <lord-icon
-                                        src="https://cdn.lordicon.com/oegrrprk.json"
+                                        src="https://cdn.lordicon.com/ggihhudh.json"
                                         trigger="hover"
+                                        colors="primary:#121331,secondary:#16a9c7,tertiary:#ebe6ef"
                                         style="width:250px;height:250px">
                                     </lord-icon>
                                 </div>

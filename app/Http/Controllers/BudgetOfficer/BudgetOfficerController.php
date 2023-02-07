@@ -1078,33 +1078,26 @@ class BudgetOfficerController extends Controller
         $breadcrumbs = [
           ["link" => "/", "name" => "Home"],["name" => "Signed PPMP"]
         ];
-        /** Torrexx Edit
-         * 
-         */
-            // $date = Carbon::now()->format('Y');
-            // $allocated_budget = DB::table('allocated__budgets')
-            //                     ->select('departments.id', 'departments.department_name','allocated__budgets.*', 'fund_sources.fund_source')
-            //                     ->join('departments', 'departments.id', '=', 'allocated__budgets.department_id')
-            //                     ->join('fund_sources', 'fund_sources.id', '=', 'allocated__budgets.fund_source_id')
-            //                     ->get();
-            
-            // $ppmp_deadline = DB::table('ppmp_deadline')
-            //                     ->where('year',$date+1)
-            //                     ->get();
-
-            //     return view('pages.budgetofficer.view-signed-ppmp',compact('allocated_budget','ppmp_deadline'), [
-            //         'pageConfigs'=>$pageConfigs,
-            //         'breadcrumbs'=>$breadcrumbs,
-            //     ]); 
-            
-        /** END */
-        
         /** Torrexx Additionals
          * ! show upload ppmp from DepartmentPagesController
          * ? TODO enable access to DepartmentPagesController@show_upload_ppmp()
          * ? KEY import department pages controller
          */
-           return (new DepartmentPagesController)->show_upload_ppmp();
+
+         try {
+            # get uplpaded ppmp
+            $response = \DB::table('signed_ppmp')
+                ->where('employee_id', session('employee_id'))
+                ->where('department_id', session('department_id'))
+                ->where('campus', session('campus'))
+                ->whereNull('deleted_at')
+                ->get();
+            # return page
+            return view('pages.budgetofficer.signed-ppmp', compact('response'));
+        } catch (\Throwable $th) {
+            //throw $th;
+            return view('pages.error-500');
+        }
     }
 
     public function my_par(){
