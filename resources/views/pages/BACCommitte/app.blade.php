@@ -239,11 +239,11 @@
     <!-- Greetings Content Starts -->
     <section id="basic-datatable">
       <div class="card-content" >
-        <?php $campuscount = count($campusCheck); $camp = 0; $endorse = 0; /* $bac_committee_status = ""; */ $campusload = "";$project_category="";$project_year=""; $appType="";?>
+        <?php $campuscount = count($campusCheck); $camp = 0; $endorse = 0; $bac_committee_status = ""; $campusload = "";$project_category="";$project_year=""; $appType="";?>
             @foreach($campusCheck as $campusload)
               <?php $project_category = $campusload->project_category; 
                     $appType = $campusload->app_type; 
-                    // $bac_committee_status = $campusload->bac_committee_status;
+                    $bac_committee_status = $campusload->bac_committee_status;
                     $endorse = $campusload->endorse;
                     $project_year = $campusload->project_year;?>
                 @if($campusload->campus == 1)
@@ -258,26 +258,22 @@
 
           <div class="card-header" >
             @if (session('role') == 14)
-              <div class="row col-sm-4" >
-                @if($bac_stat == 0 || $bac_stat == 2)
-                  <button type="button" class="btn btn-success form-control col-sm-4  approve" value="1" active>Recommend</button>
-                @else
-                
-                @if(count($expired) > 0)
-                  <button type="button" class="btn btn-success form-control col-sm-4  approve" value="0" active><i class="fa-solid fa-rotate-left"></i></button>
-                @else
-                  <div class="col-sm-12 p-1 bg-info text-white"><i class="fa-solid fa-circle-info"></i> &nbsp; Status can be changed after a day !</div>
-                @endif
-                  {{-- <button type="button" class="btn btn-success form-control col-sm-4  approve" value="0" active><i class="fa-solid fa-rotate-left"></i></button> --}}
-                @endif
-
-                {{-- @if($Categories[0]->bac_committee_status == 1 || $Categories[0]->bac_committee_status == 2)
-                <button  type="button" class="btn btn-danger form-control col-sm-4 ml-1 disapprove" value="3">Disapprove</button>
-                @else
-                <button  type="button" class="btn btn-danger form-control col-sm-4 ml-1 disapprove" value="1"><i class="fa-solid fa-rotate-left"></i></button>
-                @endif --}}
-              </div>
-              <hr>
+              @if ($bac_committee_status == 0)
+                <div class="row col-sm-4" >
+                    @if($bac_stat == 0 || $bac_stat == 2)
+                      <button type="button" class="btn btn-success form-control col-sm-4  approve" value="1" active>Recommend</button>
+                    @endif
+                    
+                    @if(count($expired) > 0)
+                      <button type="button" class="btn btn-success form-control col-sm-4  approve" value="0" active><i class="fa-solid fa-rotate-left"></i></button>
+                    @else
+                      <div class="col-sm-12 p-1 bg-info text-white"><i class="fa-solid fa-circle-info"></i> &nbsp; Status can be changed after a day !</div>
+                    @endif
+                    {{-- <button type="button" class="btn btn-success form-control col-sm-4  approve" value="0" active><i class="fa-solid fa-rotate-left"></i></button> --}}
+                  
+                </div>
+                <hr>
+              @endif
               <div class="row col-sm-4">
                 <p>Status: <span style="color: {{ (new GlobalDeclare)->bac_committee_status_color($bac_stat) }};text-transform: uppercase;">{{ (new GlobalDeclare)->bac_committee_status($bac_stat) }}</span></p> 
               </div>

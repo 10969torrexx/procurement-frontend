@@ -261,11 +261,12 @@ class MyPropertyController extends Controller
         $aes = new AESCipher();
         $global = new GlobalDeclare();
         $id = $aes->decrypt($request->id);
+        // dd($id);  
         $pageConfigs = ['pageHeader' => true];
         $breadcrumbs = [
             ["link" => "/", "name" => "Home"],["link" => "#", "name" => "Property Custodian"],["link" =>"#",  "name" => "View"]
         ];
-        $property = DB::table("property_current_user as pc")
+        $properties = DB::table("property_current_user as pc")
             ->select('pc.*','p.id','p.quantity as Quantity','p.ItemName')
             ->join('property as p','p.id','=','pc.property_id')
             ->where('pc.property_id',$id)
@@ -275,15 +276,20 @@ class MyPropertyController extends Controller
             ->get();
 
         // dd($property);
-        $PropertyQuantity = "";
-        foreach ($property as $properties) {
-            $PropertyQuantity = $properties->Quantity;
-        }
+            $PropertyQuantity = 0;
+            $userQuantity = 0;
+            // $compute = 0;
+            foreach ($properties as $property) {
+                $PropertyQuantity = $property->Quantity;
+                $userQuantity += $property->quantity;
+            }
+            $compute =  $PropertyQuantity - $userQuantity;
         // dd($PropertyQuantity);
         return response()->json([
             'status' => 200, 
-            'data' => $property,
+            'data' => $properties,
             'quantity' => $PropertyQuantity,
+            'userQuantity' => $compute,
         ]); 
     }
 
@@ -294,7 +300,16 @@ class MyPropertyController extends Controller
             $global = new GlobalDeclare();
             $id = $aes->decrypt($request->id);
 
-            $property = DB::table("property_current_user as pc")
+            $add = DB::table("property_current_user")
+                ->insert([
+                    'property_id' => $id,
+                    'name'        => $request->name,
+                    'quantity'    => $request->quantity,
+                    'campus'      => session('campus'),
+                    'created_at'  => Carbon::now(),
+                    ]);
+
+            $properties = DB::table("property_current_user as pc")
                 ->select('pc.*','p.id','p.quantity as Quantity','p.ItemName')
                 ->join('property as p','p.id','=','pc.property_id')
                 ->where('pc.property_id',$id)
@@ -302,43 +317,31 @@ class MyPropertyController extends Controller
                 ->where("pc.campus", session('campus'))
                 ->orderBy('pc.created_at', "desc")
                 ->get();
-                dd($id);
+                // dd($properties );
 
             $PropertyQuantity = 0;
             $userQuantity = 0;
             // $compute = 0;
-            foreach ($property as $property) {
+            foreach ($properties as $property) {
                 $PropertyQuantity = $property->Quantity;
                 $userQuantity += $property->quantity;
             }
             $compute =  $PropertyQuantity - $userQuantity;
-            dd($compute);
-            if($request->quantity > $compute){
+
+            if ($add) {
                 return response()->json([
-                    'status' => 300, 
+                    'status' => 200, 
+                    'data' => $properties,
+                    'quantity' => $PropertyQuantity,
+                    'userQuantity' => $compute,
                 ]);
             }else{
-                $add = DB::table("property_current_user")
-                    ->insert([
-                        'property_id' => $id,
-                        'name'        => $request->name,
-                        'quantity'    => $request->quantity,
-                        'campus'      => session('campus'),
-                        'created_at'  => Carbon::now(),
-                        ]);
-                if ($add) {
-                    return response()->json([
-                        'status' => 200, 
-                        'data' => $property,
-                        'quantity' => $PropertyQuantity,
-                    ]);
-                }else{
-                    return response()->json([
-                        'status' => 400, 
-                        'data' => $property,
-                        'quantity' => $PropertyQuantity,
-                    ]);
-                }
+                return response()->json([
+                    'status' => 400, 
+                    'data' => $properties,
+                    'quantity' => $PropertyQuantity,
+                    'userQuantity' => $compute,
+                ]);
             }
 
         } catch (\Throwable $th) {

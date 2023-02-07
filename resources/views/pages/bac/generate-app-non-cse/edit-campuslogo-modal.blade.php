@@ -8,7 +8,7 @@
                 </button>
               </div>
             <div class="modal-body">
-                <form action="{{ route('update-campuslogo') }}" method="post" enctype="multipart/form-data">
+                <form {{-- action="{{ route('update-campuslogo') }}" --}} id ="CampusLogo" method="post" enctype="multipart/form-data">
                     @csrf
                     <div class="" style="margin-top: 1%;">
                         <label for="inputName">Upload logo:</label>
