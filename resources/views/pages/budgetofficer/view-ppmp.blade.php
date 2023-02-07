@@ -8,7 +8,7 @@
 
 @extends('layouts.contentLayoutMaster')
 {{-- page Title --}}
-@section('title','New PPMP Request')
+@section('title','New Requests')
 {{-- vendor css --}}
 @section('vendor-styles')
 <link rel="stylesheet" type="text/css" href="{{asset('vendors/css/charts/apexcharts.css')}}">
@@ -81,6 +81,7 @@
                                         ?>
                                         <td style="text-align: left; color:red;">Disapproved</td>
                                         <?php
+                                        
                                         }/* elseif($data->status == 6){
                                         ?>
                                         <td style="text-align: left; color:yellowgreen;">Revised</td>
@@ -96,14 +97,29 @@
                                         } */
                                         ?>
                                         <td>
-                                            <form action="{{ route('showPPMP') }}" method="post">
+                                            @if($data->project_category == 0)
+                                            <form action="/budgetofficer/view_indicative/showPPMP" method="post">
                                                 @csrf
                                                 <input type="text" id="project_code12" class=" form-control d-none" name="project_code" value="<?=$aes->encrypt($data->id)?>">
-                                                {{-- <input type="text" class="form-control d-none" name="employee_id" value="<?=$aes->encrypt($data->employee_id)?>">
-                                                <input type="text" class="form-control d-none" name="department_id" value="<?=$aes->encrypt($data->department_id)?>">
-                                                <input type="text" class="form-control d-none" name="item_status" value="<?=$aes->encrypt(0)?>"> --}}
                                                 <button type="submit" class="btn btn-outline-secondary view"  >view</button>
                                             </form>
+                                            {{-- @endif --}}
+
+                                            @elseif($data->project_category == 1)
+                                            <form action="/budgetofficer/view_ppmp/showPPMP" method="post">
+                                                @csrf
+                                                <input type="text" id="project_code12" class=" form-control d-none" name="project_code" value="<?=$aes->encrypt($data->id)?>">
+                                                <button type="submit" class="btn btn-outline-secondary view"  >view</button>
+                                            </form>
+                                            {{-- @endif --}}
+
+                                            @elseif($data->project_category == 2)
+                                            <form action="/budgetofficer/view_supplemental/showPPMP" method="post">
+                                                @csrf
+                                                <input type="text" id="project_code12" class=" form-control d-none" name="project_code" value="<?=$aes->encrypt($data->id)?>">
+                                                <button type="submit" class="btn btn-outline-secondary view"  >view</button>
+                                            </form>
+                                            @endif
                                         </td>
                                         {{-- <td>{{ $data->project_code }}</td>
                                         <td>{{ $data->project_title }}</td> --}}

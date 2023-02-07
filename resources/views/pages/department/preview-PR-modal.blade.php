@@ -81,7 +81,7 @@
                     <div style="float:left;height:100%;width:50%;text-align:left;">{{$details[0]->department_name}}</div>
                     <div style="float:right;width:50%">
                         <div style="width:20%;float:left;font-weight:bold;" >PR No.</div>
-                        <div style="width:70%;float:left;border-bottom:1px solid black">0000-00-0000</div>
+                        <div style="width:70%;float:left;border-bottom:1px solid black">{{$pr_no}}</div>
                     </div>
                   </div>
                 </td>
@@ -97,7 +97,7 @@
                     <div style="float:left;width:49%;border-bottom:1px solid black;border-right:1px solid black;height:17px;"></div>
                     <div style="float:right;width:50%">
                         <div style="width:70%;float:left;font-weight:bold;" >Responsibility Center Code: </div>
-                        <div style="width:20%;float:left;border-bottom:1px solid black;"> 0000</div>
+                        <div style="width:20%;float:left;border-bottom:1px solid black;padding-top:15px"> </div>
                     </div>
                   </div>
                 </td>
@@ -147,11 +147,12 @@
                 @endif
             </tbody>
             <tfoot>
-              <tr>
+            {{-- @foreach($information as $info) --}}
+            <tr>
                 <td class="purpose" style="border-right:none;text-align:left;text-align:left;font-weight:bold;">Purpose: </td>
                 <td colspan="5" >
                     <div style="border-bottom:1px solid black">
-                      <input type="text" name="add1" value="" placeholder="Enter purpose here" id="purpose_input" class="purpose_input border-none" style="width: 100%;">
+                      <input type="text" name="add1" value="{{ $purpose }}" placeholder="Enter purpose here" id="purpose_input" class="purpose_input border-none" style="width: 100%;">
                     </div>
                 </td>
               </tr>
@@ -168,37 +169,53 @@
               <tr>
                 <td style="border-left:1px solid black; border-bottom: none;border-right: none;border-top: none;font-weight:bold;">Printed Name:</td>
                 <td colspan="2" style="border-right: none;border-top: none;text-align:center;font-weight:bold;"  value="">
-                  <select style="border: none;text-align:center;font-weight:bold;" id="selectEmployee" class="selectEmployee form-control" required>
-                    <option value="" selected disabled>-- Select Employee --</option>
+                  <select style="border: none;text-align:center;font-weight:bold;"   id="selectEmployee" class="selectEmployee form-control" required>
+                    <option value="{{ $name }}" selected disabled>-- Select Employee --</option>
                   </select>
                 </td>
 
                 {{-- <td colspan="2" style="border-right: none;border-top: none;text-align:center;font-weight:bold;"  class="selectEmployee" id="selectEmployee" value="">-- Select Employee --<i class="fa-solid fa-pen-to-square employeeEdit" value="" style="margin-left:5px;"></i></td> --}}
-                <td colspan="3" style="border-top: none;text-align:center;font-weight:bold;">PROSE IVY G. YEPES, EdD</td>
+                @if($total >= 25000)
+                  <td colspan="3" style="border-top: none;text-align:center;font-weight:bold;"> {{ strtoupper($hope) }}</td>
+                @elseif($total >= 0 && $total < 25000)
+                  <td colspan="3" style="border-top: none;text-align:center;font-weight:bold;"> {{ strtoupper('Susana B. Ceniza') }}</td>
+                @endif
               </tr>
               <tr>
                 <td style="border-left:1px solid black; border-top: none;border-right: none;font-weight:bold;">Designation:</td>
                 <td colspan="2" style="border-right: none;text-align:center;">
                   <div style="border-bottom:1px solid black">
-                  <input type="text" name="add1" value="" placeholder="Enter designation here" class="designation_input border-none" style="width: 100%;text-align:center;">
+                  <input type="text" name="add1" value="{{ $designation }}" placeholder="Enter designation here" class="designation_input border-none" style="width: 100%;text-align:center;">
                 </div></td>
+                @if($total >= 25000)
                 <td colspan="3" style="text-align:center;">University President</td>
+                @elseif($total >= 0 && $total < 25000)
+                <td colspan="3" style="text-align:center;">Alternate</td>
+                @endif
               </tr>
               <tr><td colspan="6" style="border-left: 1px solid black;height:20px"></td></tr>
-            </tfoot>
+            {{-- @endforeach --}}
+          </tfoot>
           </table>
         </div>
       {{-- </div> --}}
 
-      <div class="modal-footer" id = "footModal">
+      <div class="modal-footer" id = "footModal"> 
           <button type="button" class="btn btn-light-secondary" data-dismiss="modal" >
-          <i class="bx bx-x d-block d-sm-none"></i>
-          <span class="d-none d-sm-block">Cancel</span>
+            <i class="bx bx-x d-block d-sm-none"></i>
+            <span class="d-none d-sm-block">Cancel</span>
           </button>
+          @if($pr_no == "0000-00-0000")
           <button type="submit" class="btn btn-primary ml-1 btnCompletePR">
-          <i class="bx bx-check d-block d-sm-none"></i>
-          <span class="d-none d-sm-block">Complete PR</span>
+            <i class="bx bx-check d-block d-sm-none"></i>
+            <span class="d-none d-sm-block">Complete PR</span>
           </button>
+          @else
+          <button type="submit" class="btn btn-primary ml-1 btnCompletePR">
+            <i class="bx bx-check d-block d-sm-none"></i>
+            <span class="d-none d-sm-block">Update PR</span>
+          </button>
+          @endif
       </div>
   </form>
       </div>

@@ -16,13 +16,23 @@ class PresidentHopeController extends Controller
     $aes = new GlobalDeclare();
     $project_category = $aes->project_category_num($id);
     // dd($project_category);
-    $app = DB::table("project_titles")
-              // ->select("project_year","id","pres_status")
-              ->whereNull("deleted_at")
-              ->where("project_category","=", $project_category)
-              ->where("status","=", 4)  
+        $app = DB::table("project_titles as pt")
+              ->join("ppmps as p", "p.project_code", "=", "pt.id")
+              ->where("pt.project_category","=", $project_category)
+              ->where("p.app_type","=", "Non-CSE")
+              ->where("pt.status","=", 4)  
+              ->whereNull("pt.deleted_at")
+              ->whereNull("p.deleted_at")
               ->groupBy("project_year")
               -> get();
+    // $app = DB::table("project_titles")
+    //           // ->select("project_year","id","pres_status")
+    //           ->whereNull("deleted_at")
+    //           ->where("project_category","=", $project_category)
+    //           ->where("status","=", 4)  
+    //           ->where("app_type","=", "Non-CSE")
+    //           ->groupBy("project_year")
+    //           -> get();
 
               
 
@@ -32,7 +42,7 @@ class PresidentHopeController extends Controller
         ->where("Role","=",2)
         ->get();
 
-    // dd($expired);
+    // dd($app);
     $pageConfigs = ['pageHeader' => true];
     $breadcrumbs = [
       ["link" => "/", "name" => "Home"],["name" =>"APP NON CSE"]
@@ -164,19 +174,6 @@ class PresidentHopeController extends Controller
           ->where("pt.campus", session('campus'))
           ->groupBy("pt.campus")
           ->get();
-
-      // $expired = DB::table("project_titles")
-      //     ->whereNull("deleted_at")
-      //     ->where("project_category","=", $category)
-      //     ->where("status","=", 4)  
-      //     ->where("project_year",$year)
-      //     ->where(function ($query) {
-      //         $query->where("pres_status","=", 1)
-      //         ->orWhere("pres_status","=", 2)
-      //         ->orWhere("pres_status","=", 3);
-      //       })
-      //     ->get();
-
           
       $expired = DB::table("signatories_app_non_cse")
           ->where("campus",session('campus'))
@@ -191,10 +188,23 @@ class PresidentHopeController extends Controller
           ->whereDate('pres_created_at','<', Carbon::now()->subDays(1))
           ->get();
 
-          // dd($expired);
+      $blocked = DB::table("signatories_app_non_cse")
+          ->where("campus",session('campus'))
+          ->where("Year",$year)
+          ->where("users_id",'=',session('user_id'))
+          ->where(function ($query) {
+              $query->where("status","=", 0)
+              ->orWhere("status","=", 1)
+              ->orWhere("status","=", 2);
+            })
+          ->where('Role',2)
+          ->whereDate('pres_created_at','<', Carbon::now()->subDays(7))
+          ->get();
+
+          // dd($blocked);
 
       // $ppmp =  Http::withToken(session('token'))->get(env('APP_API'). "/api/supervisor/index")->json();
-      return view('pages.President.app', compact('ppmps','signatories','campusinfo'/* ,'Project' */,'Categories','campusCheck','Project_title','prepared_by','recommending_approval','approved_by','expired'),
+      return view('pages.President.app', compact('ppmps','signatories','campusinfo'/* ,'Project' */,'Categories','campusCheck','Project_title','prepared_by','recommending_approval','approved_by','blocked','expired'),
       [
         'pageConfigs'=>$pageConfigs,
         'breadcrumbs'=>$breadcrumbs
@@ -433,7 +443,7 @@ class PresidentHopeController extends Controller
             ->whereNull("pt.deleted_at")
             ->whereNull("p.deleted_at")
             ->update([
-              'pres_status' => $request->value,
+              'pt.pres_status' => $request->value,
             ]);
         
         return response()->json([

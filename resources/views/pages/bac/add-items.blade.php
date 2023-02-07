@@ -108,29 +108,7 @@
                               <td>{{ $items->item_name }}</td>
                               <td>{{ $items->item_category }}</td>
                               <td>{{ $items->app_type }}</td>
-                              <td>{{ $items->mode_of_procurement }}
-                                  {{-- <input type="hidden" class="campusCheck" value="{{ $campuscount }}"> --}}
-
-                                {{-- <?php
-                                  if($items->public_bidding == 0){
-                                  echo $items->mode_of_procurement;
-                                  }elseif($items->public_bidding == 1){
-                                  echo 'Public Bidding';
-                                  }
-                                ?>  --}}
-                                {{-- @if($items->public_bidding == 0)
-                                  <?php $pro = ""; ?>
-                                  @foreach($procurement as $procurements)
-                                    <?php if( $procurements->id == $items->mode_of_procurement_id )
-                                      $pro = $procurements->mode_of_procurement;
-                                    ?>
-                                  @endforeach
-                                  {{ $pro }}
-                                @endif
-                                @if($items->public_bidding == 1)
-                                  Public Bidding
-                                @endif --}}
-                              </td>
+                              <td>{{ $items->mode_of_procurement }}</td>
                               <td>{{ $items->name }}</td>
                               <td>{{(new GlobalDeclare)->Campus($items->campus)}}</td>
                               <td>{{ explode('-', date('j F, Y-', strtotime($items->created_at)))[0] }}</td>

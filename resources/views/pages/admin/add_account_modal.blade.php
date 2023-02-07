@@ -49,7 +49,11 @@
                                 <option value="{{$aes->encrypt(12)}}">President/HOPE</option>
                                 <option value="{{$aes->encrypt(13)}}">BOR Secretariat</option>
                                 <option value="{{$aes->encrypt(14)}}">BAC Committee</option>
+<<<<<<< HEAD
                             </select>
+=======
+                            </select> 
+>>>>>>> 7812d49045457d73ba73e1e5a02e153e1f444803
                             
                         </fieldset>
                     </div>

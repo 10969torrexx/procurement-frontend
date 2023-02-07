@@ -10,6 +10,7 @@ use App\Models\Deadline;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\AESCipher;
 use App\Http\Controllers\GlobalDeclare;
+use App\Http\Controllers\HistoryLogController;
 use App\Http\Controllers\Department\DepartmentPagesController;
 use DB;
 use Carbon\Carbon;
@@ -37,13 +38,13 @@ class BudgetOfficerController extends Controller
     }
 
     public function PPMPindex(){
+        
         $pageConfigs = ['pageHeader' => true];
         $breadcrumbs = [
           ["link" => "/", "name" => "Home"],["name" =>"Pending PPMPs"]
         ];
         
         $ppmp = DB::table("project_titles as pt")
-
               ->select("pt.*","ab.allocated_budget","ab.remaining_balance","fs.fund_source","d.department_name")
               ->join('ppmps as p','p.project_code','=','pt.id')
               ->join('departments as d','pt.department_id','=','d.id')
@@ -57,9 +58,9 @@ class BudgetOfficerController extends Controller
                    ->orWhere('pt.status', 4)
                    ->orWhere('pt.status', 5);
              })
+              ->where("pt.project_category", 1)
               ->groupBy("pt.project_title")
-              ->where("p.is_supplemental","=", 0)
-              -> get();
+              ->get();
   
             //   dd($ppmp);
 
@@ -68,7 +69,91 @@ class BudgetOfficerController extends Controller
               ->join('project_titles as pt','pt.id','=','p.project_code')
               ->whereNull("p.deleted_at")
               ->where("p.campus",session('campus'))
-              ->where("p.is_supplemental","=", 0)
+            //   ->where("p.is_supplemental","=", 0)
+              ->get();
+        
+        return view('pages.budgetofficer.view-ppmp', compact('ppmp','item'),
+        [
+          'pageConfigs'=>$pageConfigs,
+          'breadcrumbs'=>$breadcrumbs
+        ]);
+    } 
+
+    public function IndicativeIndex(){
+        
+        $pageConfigs = ['pageHeader' => true];
+        $breadcrumbs = [
+          ["link" => "/", "name" => "Home"],["name" =>"Pending Indicatives"]
+        ];
+        
+        $ppmp = DB::table("project_titles as pt")
+              ->select("pt.*","ab.allocated_budget","ab.remaining_balance","fs.fund_source","d.department_name")
+              ->join('ppmps as p','p.project_code','=','pt.id')
+              ->join('departments as d','pt.department_id','=','d.id')
+              ->join('allocated__budgets as ab','pt.allocated_budget','=','ab.id')
+              ->join('fund_sources as fs','fs.id','=','ab.fund_source_id')
+              ->where("pt.campus",session('campus'))
+              ->whereNull("pt.deleted_at")
+            //   ->whereRaw('pt.status = 2 or pt.status = 4 or pt.status = 5') 
+              ->where(function ($query) {
+                $query->where('pt.status', 2)
+                   ->orWhere('pt.status', 4)
+                   ->orWhere('pt.status', 5);
+             })
+              ->where("pt.project_category", 0)
+              ->groupBy("pt.project_title")
+              ->get();
+  
+            //   dd($ppmp);
+
+        $item = DB::table("ppmps as p")
+              ->select("pt.project_code as code","pt.id as pt_id","pt.project_title as title","p.*")
+              ->join('project_titles as pt','pt.id','=','p.project_code')
+              ->whereNull("p.deleted_at")
+              ->where("p.campus",session('campus'))
+            //   ->where("p.is_supplemental","=", 0)
+              ->get();
+        
+        return view('pages.budgetofficer.view-ppmp', compact('ppmp','item'),
+        [
+          'pageConfigs'=>$pageConfigs,
+          'breadcrumbs'=>$breadcrumbs
+        ]);
+    } 
+
+    public function SupplementalIndex(){
+        
+        $pageConfigs = ['pageHeader' => true];
+        $breadcrumbs = [
+          ["link" => "/", "name" => "Home"],["name" =>"Pending Supplementals"]
+        ];
+        
+        $ppmp = DB::table("project_titles as pt")
+              ->select("pt.*","ab.allocated_budget","ab.remaining_balance","fs.fund_source","d.department_name")
+              ->join('ppmps as p','p.project_code','=','pt.id')
+              ->join('departments as d','pt.department_id','=','d.id')
+              ->join('allocated__budgets as ab','pt.allocated_budget','=','ab.id')
+              ->join('fund_sources as fs','fs.id','=','ab.fund_source_id')
+              ->where("pt.campus",session('campus'))
+              ->whereNull("pt.deleted_at")
+            //   ->whereRaw('pt.status = 2 or pt.status = 4 or pt.status = 5') 
+              ->where(function ($query) {
+                $query->where('pt.status', 2)
+                   ->orWhere('pt.status', 4)
+                   ->orWhere('pt.status', 5);
+             })
+              ->where("pt.project_category", 2)
+              ->groupBy("pt.project_title")
+              ->get();
+  
+            //   dd($ppmp);
+
+        $item = DB::table("ppmps as p")
+              ->select("pt.project_code as code","pt.id as pt_id","pt.project_title as title","p.*")
+              ->join('project_titles as pt','pt.id','=','p.project_code')
+              ->whereNull("p.deleted_at")
+              ->where("p.campus",session('campus'))
+            //   ->where("p.is_supplemental","=", 0)
               ->get();
         
         return view('pages.budgetofficer.view-ppmp', compact('ppmp','item'),
@@ -95,24 +180,56 @@ class BudgetOfficerController extends Controller
                     $query->where('p.status', 2)
                        ->orWhere('p.status', 4)
                        ->orWhere('p.status', 5);
-
                     })
 
                   -> get();
 
-        // dd($data);
+        // dd($id);
+        $category = DB::table('project_titles')
+        ->where('id',$id)
+        ->get();
+        // dd($category);
+        foreach($category as $cat){
+            $category = $cat->project_category;
+        }
+        // dd($category);
 
-        $pageConfigs = ['pageHeader' => true];
-        $breadcrumbs = [
-          ["link" => "/", "name" => "Home"],
-          ["link" => "/budgetofficer/view_ppmp","name" =>"Pending PPMPs"],
-          ["name" =>"PPMP"]
-        ];
-            return view('pages.budgetofficer.check_ppmp',compact('data'),
+        if($category == 0){
+            (new HistoryLogController)->store(session('department_id'),session('employee_id'),session('campus'),$id,'Viewed Indicative','View',$request->ip());
+
+            $pageConfigs = ['pageHeader' => true];
+            $breadcrumbs = [
+              ["link" => "/", "name" => "Home"],
+              ["link" => "/budgetofficer/view_indicative","name" =>"Pending Indicatives"],
+              ["name" =>"Indicatives"]
+            ];
+        }
+        if($category == 1){
+            (new HistoryLogController)->store(session('department_id'),session('employee_id'),session('campus'),$id,'Viewed PPMPs','View',$request->ip());
+
+            $pageConfigs = ['pageHeader' => true];
+            $breadcrumbs = [
+              ["link" => "/", "name" => "Home"],
+              ["link" => "/budgetofficer/view_ppmp","name" =>"Pending PPMPs"],
+              ["name" =>"PPMP"]
+            ];
+        }
+        if($category == 2){
+            (new HistoryLogController)->store(session('department_id'),session('employee_id'),session('campus'),$id,'Viewed Supplemental','View',$request->ip());
+            $pageConfigs = ['pageHeader' => true];
+            $breadcrumbs = [
+              ["link" => "/", "name" => "Home"],
+              ["link" => "/budgetofficer/view_supplemental","name" =>"Pending Supplementals"],
+              ["name" =>"Supplementals"]
+            ];
+            
+        }
+        return view('pages.budgetofficer.check_ppmp',compact('data','category'),
             [
               'pageConfigs'=>$pageConfigs,
               'breadcrumbs'=>$breadcrumbs
             ]);
+            
     }
 
     public function status(Request $request){
@@ -148,6 +265,8 @@ class BudgetOfficerController extends Controller
         for($i = 0; $i < count($request->item_id);$i++){
 
             if($status[$i] == 4){
+        (new HistoryLogController)->store(session('department_id'),session('employee_id'),session('campus'),$item_id,'Accepted an Item','Accept',$request->ip());
+
                     $changed = DB::table('ppmps as p')
                             ->where('id', $item_id[$i])
                             ->update([
@@ -161,6 +280,8 @@ class BudgetOfficerController extends Controller
                                 'remaining_balance' =>$calc,
                             ]);
             }else if($status[$i] == 5){
+        (new HistoryLogController)->store(session('department_id'),session('employee_id'),session('campus'),$item_id,'Rejected an Item','Reject',$request->ip());
+
                     $changed = DB::table('ppmps as p')
                     ->where('id', $item_id[$i])
                     ->update([
@@ -207,6 +328,8 @@ class BudgetOfficerController extends Controller
         $project_code = $request->project_code;
         $count_disapproved = $request->count_disapproved;
         if($count_disapproved == 0){
+        (new HistoryLogController)->store(session('department_id'),session('employee_id'),session('campus'),$request->id,'Accepted PPMP','Accept',$request->ip());
+
             $project_timeline = DB::table("project_timeline")
                 ->insert([
                 'employee_id'=>session('employee_id'),
@@ -219,6 +342,8 @@ class BudgetOfficerController extends Controller
                 'created_at' => Carbon::now()
                 ]); 
         }else if($count_disapproved > 0){
+        (new HistoryLogController)->store(session('department_id'),session('employee_id'),session('campus'),$request->id,'Rejected PPMP','Reject',$request->ip());
+
             $project_timeline = DB::table("project_timeline")
                 ->insert([
                 'employee_id'=>session('employee_id'),
@@ -325,6 +450,8 @@ class BudgetOfficerController extends Controller
           // dd($ppmp);
   
               if($request->value == 4 ){
+        (new HistoryLogController)->store(session('department_id'),session('employee_id'),session('campus'),$request->id,'Accepted PPMP','Accept',$request->ip());
+                
                 $timeline = DB::table("project_timeline")
                 ->insert([
                 'employee_id'=>session('employee_id'),
@@ -338,6 +465,8 @@ class BudgetOfficerController extends Controller
                 ]);
   
               }else{
+        (new HistoryLogController)->store(session('department_id'),session('employee_id'),session('campus'),$request->id,'Rejected PPMP','Reject',$request->ip());
+
                 $timeline = DB::table("project_timeline")
                 ->insert([
                 'employee_id'=>session('employee_id'),
@@ -371,7 +500,7 @@ class BudgetOfficerController extends Controller
           'status' => 500, 
           ]); 
         }
-      }
+    }
     
     public function addMandatoryExpenditure(Request $request){
         $department = $request->department;
@@ -403,6 +532,9 @@ class BudgetOfficerController extends Controller
                         'campus' => session('campus'),
                         'created_at' => Carbon::now()
                     ]);
+
+            (new HistoryLogController)->store(session('department_id'),session('employee_id'),session('campus'),null,'Added Mandatory Expenditure','Add',$request->ip());
+
             if($expenditure){
                 return response()->json([
                         'status' => 200, 
@@ -501,6 +633,8 @@ class BudgetOfficerController extends Controller
                                 ]
                             );
 
+                (new HistoryLogController)->store(session('department_id'),session('employee_id'),session('campus'),$id,'Updated Mandatory Expenditure','Update',$request->ip());
+
                 if($response){
                     return response()->json([
                             'status' => 200, 
@@ -532,6 +666,8 @@ class BudgetOfficerController extends Controller
                         'deleted_at' =>  Carbon::now()
                         ]
                     );
+            (new HistoryLogController)->store(session('department_id'),session('employee_id'),session('campus'),$id,'Deleted Mandatory Expenditure','Delete',$request->ip());
+
                 if($response)
                 {
                     return response()->json([
@@ -707,6 +843,8 @@ class BudgetOfficerController extends Controller
                     'campus' => session("campus"),
                     'created_at' => Carbon::now()
                 ]);
+            (new HistoryLogController)->store(session('department_id'),session('employee_id'),session('campus'),null,'Allocated Budget','Allocate',$request->ip());
+
                 if($allocate_budget){
                     return response()->json([
                             'status' => 200, 
@@ -736,6 +874,8 @@ class BudgetOfficerController extends Controller
                       'deleted_at' =>  Carbon::now()
                       ]
                   );
+            (new HistoryLogController)->store(session('department_id'),session('employee_id'),session('campus'),$id,'Deleted Allocated Budget','Delete',$request->ip());
+
               if($deadline)
               {
                   return response()->json([
@@ -776,9 +916,10 @@ class BudgetOfficerController extends Controller
                     ->select('year','id')
                     ->where('campus',session('campus'))
                     ->whereNull('deleted_at')
+                    ->groupBy('year')
                     ->get();
         // $type = DB::table('ppmp_deadline')->select('year','id')->whereNull('deleted_at')->get();
-        // dd($department_ids);
+        // dd($years);
         if($response){
             return response()->json([
                     'status' => 200, 
@@ -847,6 +988,7 @@ class BudgetOfficerController extends Controller
                                 'remaining_balance' =>  $remaining_balance,
                                 'updated_at' =>  Carbon::now()
                             ]);
+            (new HistoryLogController)->store(session('department_id'),session('employee_id'),session('campus'),$id,'Updated Allocated Budget','Update',$request->ip());
 
             if($response){
                 return response()->json([
@@ -898,6 +1040,7 @@ class BudgetOfficerController extends Controller
                                         'end_date'=>  $EndDate,
                                         'created_at' => Carbon::now()
                                     ]);
+                (new HistoryLogController)->store(session('department_id'),session('employee_id'),session('campus'),null,'Set '.$Type.' Deadline','Save',$request->ip());
                 if($deadline){
                     return response()->json([
                             'status' => 200, 
@@ -927,6 +1070,7 @@ class BudgetOfficerController extends Controller
                         'deleted_at' =>  Carbon::now()
                         ]
                     );
+                (new HistoryLogController)->store(session('department_id'),session('employee_id'),session('campus'),$id,'Deleted Deadline','Delete',$request->ip());
                 if($deadline)
                 {
                     return response()->json([
@@ -1007,6 +1151,8 @@ class BudgetOfficerController extends Controller
                             'updated_at' =>  Carbon::now()
                             ]
                         );
+                (new HistoryLogController)->store(session('department_id'),session('employee_id'),session('campus'),$id,'Updated Deadline','Update',$request->ip());
+
                 if( $response)
                 {
                     return response()->json([
@@ -1078,33 +1224,26 @@ class BudgetOfficerController extends Controller
         $breadcrumbs = [
           ["link" => "/", "name" => "Home"],["name" => "Signed PPMP"]
         ];
-        /** Torrexx Edit
-         * 
-         */
-            // $date = Carbon::now()->format('Y');
-            // $allocated_budget = DB::table('allocated__budgets')
-            //                     ->select('departments.id', 'departments.department_name','allocated__budgets.*', 'fund_sources.fund_source')
-            //                     ->join('departments', 'departments.id', '=', 'allocated__budgets.department_id')
-            //                     ->join('fund_sources', 'fund_sources.id', '=', 'allocated__budgets.fund_source_id')
-            //                     ->get();
-            
-            // $ppmp_deadline = DB::table('ppmp_deadline')
-            //                     ->where('year',$date+1)
-            //                     ->get();
-
-            //     return view('pages.budgetofficer.view-signed-ppmp',compact('allocated_budget','ppmp_deadline'), [
-            //         'pageConfigs'=>$pageConfigs,
-            //         'breadcrumbs'=>$breadcrumbs,
-            //     ]); 
-            
-        /** END */
-        
         /** Torrexx Additionals
          * ! show upload ppmp from DepartmentPagesController
          * ? TODO enable access to DepartmentPagesController@show_upload_ppmp()
          * ? KEY import department pages controller
          */
-           return (new DepartmentPagesController)->show_upload_ppmp();
+
+         try {
+            # get uplpaded ppmp
+            $response = \DB::table('signed_ppmp')
+                ->where('employee_id', session('employee_id'))
+                ->where('department_id', session('department_id'))
+                ->where('campus', session('campus'))
+                ->whereNull('deleted_at')
+                ->get();
+            # return page
+            return view('pages.budgetofficer.signed-ppmp', compact('response'));
+        } catch (\Throwable $th) {
+            //throw $th;
+            return view('pages.error-500');
+        }
     }
 
     public function my_par(){
