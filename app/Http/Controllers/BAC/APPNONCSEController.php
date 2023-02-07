@@ -75,6 +75,7 @@ class APPNONCSEController extends Controller
           ->orderBy("p.department_id", "ASC")
           ->orderBy("p.project_code", "ASC")
           ->get();
+          // dd($ppmps);
 
     $Project_title = DB::table("project_titles as pt")
           ->join("ppmps as p", "p.project_code", "=", "pt.id")
@@ -88,7 +89,7 @@ class APPNONCSEController extends Controller
           ->get("pt.project_year");
 
     $campusCheck = DB::table("project_titles as pt")
-          ->select("pt.campus","pt.endorse","pt.project_category","p.app_type")
+          ->select("pt.*","p.app_type")
           ->join("ppmps as p", "p.project_code", "=", "pt.id")
           ->whereNull("pt.deleted_at")
           ->where("p.app_type", 'Non-CSE')
@@ -206,6 +207,7 @@ class APPNONCSEController extends Controller
           ->orderBy("p.department_id", "ASC")
           ->orderBy("p.project_code", "ASC")
           ->get();
+          // dd($ppmps);
 
     $Project_title = DB::table("project_titles as pt")
           ->join("ppmps as p", "p.project_code", "=", "pt.id")
@@ -219,7 +221,7 @@ class APPNONCSEController extends Controller
           ->get("pt.project_year");
 
     $campusCheck = DB::table("project_titles as pt")
-          ->select("pt.campus","pt.endorse","pt.project_category")
+          ->select("pt.*","p.app_type")
           ->join("ppmps as p", "p.project_code", "=", "pt.id")
           ->whereNull("pt.deleted_at")
           ->where("p.app_type", 'Non-CSE')
@@ -344,7 +346,7 @@ class APPNONCSEController extends Controller
           ->get("pt.project_year");
 
     $campusCheck = DB::table("project_titles as pt")
-          ->select("pt.campus","pt.endorse","pt.project_category")
+          ->select("pt.*","p.app_type")
           ->join("ppmps as p", "p.project_code", "=", "pt.id")
           ->whereNull("pt.deleted_at")
           ->where("p.app_type", 'Non-CSE')
@@ -459,7 +461,7 @@ class APPNONCSEController extends Controller
         // dd($ppmps);
           
     $campusCheck = DB::table("project_titles as pt")
-          ->select("pt.campus","pt.endorse","pt.project_category","p.app_type")
+          ->select("pt.*","p.app_type")
           ->join("ppmps as p", "p.project_code", "=", "pt.id")
           ->whereNull("pt.deleted_at")
           ->where("p.app_type", 'Non-CSE')
@@ -867,6 +869,19 @@ class APPNONCSEController extends Controller
         $campusinfo = DB::table("campusinfo")
         ->where("campus",session('campus'))
         ->get();
+        
+          # this will created history_log
+                (new HistoryLogController)->store(
+                  session('department_id'),
+                  session('employee_id'),
+                  session('campus'),
+                  NULL,
+                  'Generate PDF APP NON-CSE , '.'Category: '.$request->category.', Year: '.$request->year,
+                  'Generate PDF',
+                  $request->ip(),
+              );
+          # end
+
         $pdf = Pdf::loadView('pages.bac.generate-app-non-cse.generate-pdf', compact('Categories','ppmps','signatures','campusinfo','prepared_by','recommending_approval','approved_by'))->setPaper('legal', 'landscape');
         return $pdf->download(); 
         
@@ -1259,6 +1274,18 @@ class APPNONCSEController extends Controller
           'Campus'=>session('campus'),
           'created_at'=> Carbon::now(),
         ]);
+        
+        # this will created history_log
+              (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                NULL,
+                'Added Signatories for Prepared By, Year: '.$request->Year,
+                'ADD',
+                $request->ip(),
+            );
+        # end
 
       if($Signatories) {
         return response()->json([
@@ -1297,6 +1324,18 @@ class APPNONCSEController extends Controller
           'Campus'=>session('campus'),
           'created_at'=> Carbon::now(),
         ]);
+        
+        # this will created history_log
+              (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                NULL,
+                'Added Signatories for Approved By, Year: '.$request->Year,
+                'ADD',
+                $request->ip(),
+            );
+        # end
 
       if($Signatories) {
         return response()->json([
@@ -1336,6 +1375,18 @@ class APPNONCSEController extends Controller
           'Campus'=>session('campus'),
           'created_at'=> Carbon::now(),
         ]);
+        
+        # this will created history_log
+              (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                NULL,
+                'Added Signatories for Recommending Approval, Year: '.$request->Year,
+                'ADD',
+                $request->ip(),
+            );
+        # end
 
       if($Signatories) {
         return response()->json([
@@ -1435,6 +1486,18 @@ class APPNONCSEController extends Controller
           'Title'       =>$request->Title,
           'updated_at'=> Carbon::now(),
         ]);
+        
+        # this will created history_log
+              (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                $request->id,
+                'Update Signatories',
+                'Update',
+                $request->ip(),
+            );
+        # end
 
       if($Signatories) {
         return response()->json([
@@ -1498,6 +1561,18 @@ class APPNONCSEController extends Controller
           'email' =>$request->Email,
           'contact_number' =>$request->Contact,
         ]);
+        
+        # this will created history_log
+              (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                $request->id,
+                'Update Campus Info',
+                'Update',
+                $request->ip(),
+            );
+        # end
 
       if($campusinfo) {
         return response()->json([
@@ -1553,7 +1628,19 @@ class APPNONCSEController extends Controller
         ->update([
           'slsu_logo'=>$extension,
         ]);
-
+        
+        # this will created history_log
+              (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                $id,
+                'Update Campus Logo',
+                'Update',
+                $request->ip(),
+            );
+        # end
+      // dd($campusinfo);
       if($campusinfo) {
         return response()->json([
         'status' =>  200,
@@ -1618,6 +1705,19 @@ class APPNONCSEController extends Controller
         ->update([
           'logo2'=>$extension,
         ]);
+        
+        # this will created history_log
+              (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                $id,
+                'Update Other Logo',
+                'Update',
+                $request->ip(),
+            );
+        # end
+        // dd($campusinfo);
 
       if($campusinfo) {
         return response()->json([
@@ -1638,7 +1738,6 @@ class APPNONCSEController extends Controller
         ]);
     }
   } 
-
   
   public function print(Request $request){
     // dd($request->all());
@@ -1765,6 +1864,18 @@ class APPNONCSEController extends Controller
           ->where("campus",session('campus'))
           ->get(); 
         // dd($campusinfo);
+        
+        # this will created history_log
+              (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                $id,
+                'Print APP NON-CSE',
+                'Print',
+                $request->ip(),
+            );
+        # end
         return view('pages.bac.generate-app-non-cse.print', compact('Categories','ppmps','signatures','campusinfo','prepared_by','recommending_approval','approved_by'));
     }catch (\Throwable $th) {
         throw $th;

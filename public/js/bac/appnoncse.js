@@ -774,62 +774,71 @@ $(document).on('click', '.endorse', function (e) {
     'endorse' : $(".endorse").val(),
     'category' : $("#project_category").val()
   }
-  console.log(data);
-  $.ajaxSetup({
-    headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-    }
-  });
-
-  $.ajax({
-    type: "POST",
-    url: "app-non-cse-done",
-    data: data,
-    dataType: "json",
-    success: function (response) {
-      // console.log(response);
-      if(response['status'] == 200) {
-        Swal.fire({
-          title: '',
-          html: 'Loading...',
-          icon: 'success',
-          timer: 1000,
-          timerProgressBar: true,
-          didOpen: () => {
-            Swal.showLoading()
-            const b = Swal.getHtmlContainer().querySelector('b')
-            timerInterval = setInterval(() => {
-              b.textContent = Swal.getTimerLeft()
-            }, 100)
-          },
-          willClose: () => {
-            clearInterval(timerInterval)
-          }
-          }).then((result) => {
-            /* Read more about handling dismissals below */
-            if (result.dismiss === Swal.DismissReason.timer) {
-              location.reload();
-              console.log('I was closed by the timer')
-            }
-            location.reload();
-          })
-      }else if(response['status'] == 500){
-        Swal.fire({
-          icon: 'info',
-          title: 'Oops...',
-          text: 'Incomplete Signatories',
-        })
-        // $(this).text('Shared');
-      }else{ 
-        Swal.fire({
-          icon: 'error',
-          title: 'Oops...',
-          text: 'Already Exist',
-        })
-        // $(this).text('Shared');
+console.log($(".president_stat").val());
+  if ($(".president_stat").val() == 0 && $(".bac_committee_stat").val() == 0) {
+    Swal.fire({
+      icon: 'info',
+      title: 'Oops...',
+      text: 'Signatories must be recommended and approved',
+    })
+  } else {
+    console.log(data);
+    $.ajaxSetup({
+      headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
       }
-    }
-  })
+    });
+  
+    $.ajax({
+      type: "POST",
+      url: "app-non-cse-done",
+      data: data,
+      dataType: "json",
+      success: function (response) {
+        // console.log(response);
+        if(response['status'] == 200) {
+          Swal.fire({
+            title: '',
+            html: 'Loading...',
+            icon: 'success',
+            timer: 1000,
+            timerProgressBar: true,
+            didOpen: () => {
+              Swal.showLoading()
+              const b = Swal.getHtmlContainer().querySelector('b')
+              timerInterval = setInterval(() => {
+                b.textContent = Swal.getTimerLeft()
+              }, 100)
+            },
+            willClose: () => {
+              clearInterval(timerInterval)
+            }
+            }).then((result) => {
+              /* Read more about handling dismissals below */
+              if (result.dismiss === Swal.DismissReason.timer) {
+                location.reload();
+                console.log('I was closed by the timer')
+              }
+              location.reload();
+            })
+        }else if(response['status'] == 500){
+          Swal.fire({
+            icon: 'info',
+            title: 'Oops...',
+            text: 'Incomplete Signatories',
+          })
+          // $(this).text('Shared');
+        }else{ 
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Already Exist',
+          })
+          // $(this).text('Shared');
+        }
+      }
+    })
+  }
 });
 
 //submit to university president
@@ -969,6 +978,117 @@ error: function (data){
 });
 });
 
+$("form#OtherLogo").submit(function(e) {
+  e.preventDefault();
+ 
+  var formData = new FormData(this);    
+  
+  $.ajax({
+      url:'/bac/update-logo',
+      type: 'POST',
+      data: formData,
+      success: function (response) {
+          // alert(data)
+          if (response.status == 200) {
+            // Swal.fire({
+            //   icon: 'success',
+            //   title: 'Success',
+            //   text: response.message,
+            //   })
+              $('#edit_logo').modal('hide');
+              Swal.fire({
+                title: 'Saved',
+                icon: 'success',
+                html: response.message,
+                timer: 1000,
+                timerProgressBar: true,
+                didOpen: () => {
+                  Swal.showLoading()
+                  const b = Swal.getHtmlContainer().querySelector('b')
+                  timerInterval = setInterval(() => {
+                    b.textContent = Swal.getTimerLeft()
+                  }, 100)
+                },
+                willClose: () => {
+                  clearInterval(timerInterval)
+                }
+              }).then((result) => {
+                if (result.dismiss === Swal.DismissReason.timer) {
+                  location.reload();
+                }
+              })
+          }
+          if (response.status == 400) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: response.message,
+              })
+          }
+      },
+      cache: false,
+      contentType: false,
+      processData: false
+  });
+
+
+});
+
+$("form#CampusLogo").submit(function(e) {
+  e.preventDefault();
+ 
+  var formData = new FormData(this);    
+  
+  $.ajax({
+      url:'/bac/update-campuslogo',
+      type: 'POST',
+      data: formData,
+      success: function (response) {
+          // alert(data)
+          if (response.status == 200) {
+            // Swal.fire({
+            //   icon: 'success',
+            //   title: 'Success',
+            //   text: response.message,
+            //   })
+              $('#edit_logo').modal('hide');
+              Swal.fire({
+                title: 'Saved',
+                icon: 'success',
+                html: response.message,
+                timer: 1000,
+                timerProgressBar: true,
+                didOpen: () => {
+                  Swal.showLoading()
+                  const b = Swal.getHtmlContainer().querySelector('b')
+                  timerInterval = setInterval(() => {
+                    b.textContent = Swal.getTimerLeft()
+                  }, 100)
+                },
+                willClose: () => {
+                  clearInterval(timerInterval)
+                }
+              }).then((result) => {
+                if (result.dismiss === Swal.DismissReason.timer) {
+                  location.reload();
+                }
+              })
+          }
+          if (response.status == 400) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: response.message,
+              })
+          }
+      },
+      cache: false,
+      contentType: false,
+      processData: false
+  });
+
+
+});
 //trigger edit new recommendingapproval modal
 // $(document).on('click', '.newrecommendingapproval', function (e) {
 //   $("#edit_newrecommendingapproval").modal('show');  

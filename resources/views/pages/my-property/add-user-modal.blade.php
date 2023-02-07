@@ -28,12 +28,14 @@
             <div class="form-group">
                 <label for="Userquantity">Quantity: </label>
                 <input type="number" name="Userquantity" id="Userquantity" class="form-control Userquantity" value="">
+                <input type="hidden" name="remainingquantity" id="remainingquantity" class="form-control remainingquantity" value="">
+                <input type="hidden" name="itemquantity" id="itemquantity" class="form-control itemquantity" value="">
             </div>
 
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary CloseUser" data-dismiss="modal">Close</button>
-          <button type="button" value="" id="AddUser" class="btn btn-success AddUser">Add</button>
+          <button type="button" id="AddUser" class="btn btn-success AddUser">Add</button>
         </div>
       </div>
     </div>

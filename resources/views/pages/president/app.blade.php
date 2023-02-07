@@ -258,6 +258,7 @@
 
 
           <div class="card-header" >
+            @if(count($blocked) ==  0 || $blocked == null)
               <div class="row col-sm-4" >
                 @if($bac_stat == 0 || $bac_stat == 2)
                   <button type="button" class="btn btn-success form-control col-sm-4  approve" value="1" active>Approve</button>
@@ -276,6 +277,7 @@
                 @endif --}}
               </div>
               <hr>
+            @endif
               <div class="row col-sm-4">
                 <p>Status: <span style="color: {{ (new GlobalDeclare)->pres_status_color($bac_stat) }};text-transform: uppercase;">{{ (new GlobalDeclare)->pres_status($bac_stat) }}</span></p> 
                 {{-- <p>Status: <span style="color: {{ (new GlobalDeclare)->pres_status_color($pres_status) }};text-transform: uppercase;">{{ (new GlobalDeclare)->pres_status($pres_status) }}</span></p>  --}}

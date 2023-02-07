@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
 use App\Http\Controllers\AESCipher;
 use App\Http\Controllers\GlobalDeclare;
+use App\Http\Controllers\HistoryLogController;
 use DB;
 use Carbon\Carbon;
 
@@ -180,7 +181,7 @@ class BACCommitteeController extends Controller
           ->get();
 
       $campusCheck = DB::table("project_titles as pt")
-          ->select("pt.campus","pt.endorse"/* ,"pt.bac_committee_status" */,"pt.project_category","pt.project_year","p.app_type")
+          ->select("pt.campus","pt.endorse","pt.bac_committee_status","pt.project_category","pt.project_year","p.app_type")
           ->join("ppmps as p", "p.project_code", "=", "pt.id")
           ->whereNull("pt.deleted_at")
           ->where("p.app_type", 'Non-CSE')
@@ -319,6 +320,19 @@ class BACCommitteeController extends Controller
           ->where("campus",session('campus'))
           ->get();
         // dd($campusinfo);
+        
+
+            # this will created history_log
+              (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                NULL,
+                'BAC Committee generate APP '.$request->app_type,
+                'Generate PDF',
+                $request->ip(),
+              );
+            # end   
         $pdf = \Pdf::loadView('pages.BACCommitte.generate-pdf', compact('Categories','ppmps','signatures','campusinfo','prepared_by','recommending_approval','approved_by'))->setPaper('legal', 'landscape');
         return $pdf->download("APP_NON_CSE_".$request->year.".pdf"); 
         
@@ -396,7 +410,7 @@ class BACCommitteeController extends Controller
               }
 
               $bac_committee_stat = 0;
-              if($signatures >= 6){
+              if($signatures >= 8){
                 $bac_committee_stat = 1;
               }else{
                 $bac_committee_stat = 0;
@@ -414,6 +428,18 @@ class BACCommitteeController extends Controller
                     'bac_committee_status' => $bac_committee_stat,
                   ]);
           #end
+          
+          # this will created history_log
+            (new HistoryLogController)->store(
+              session('department_id'),
+              session('employee_id'),
+              session('campus'),
+              NULL,
+              'BAC Committee Status APP '.$request->app_type.': '.$bac_committee_stat.'Year: '.$request->year,
+              'Recommend or Not',
+              $request->ip(),
+            );
+          # end 
           return response()->json([
             'status' => 200, 
             // 'data' => $supplier,
@@ -534,6 +560,18 @@ class BACCommitteeController extends Controller
           ->where("campus",session('campus'))
           ->get(); 
         // dd($campusinfo);
+        
+        # this will created history_log
+          (new HistoryLogController)->store(
+            session('department_id'),
+            session('employee_id'),
+            session('campus'),
+            NULL,
+            'BAC Committee Print APP '.$request->app_type.', Year: '.$request->year,
+            'Print',
+            $request->ip(),
+          );
+        # end 
         return view('pages.BACCommitte.print', compact('Categories','ppmps','signatures','campusinfo','prepared_by','recommending_approval','approved_by'));
     }catch (\Throwable $th) {
         throw $th;

@@ -104,12 +104,12 @@
                                                 <?php $par = substr($property->DateIssued, 0, 7)."-".str_pad($property->PARNo, 4, "0", STR_PAD_LEFT) ?>
                                                 <tr id="{{$ctr}}">
                                                     <td style="width: 25px">
-                                                        @if ($property->finalize != 0)
+                                                        {{-- @if ($property->finalize > 0) --}}
                                                             <div {{-- class="ml-1" --}} style="text-align:center">
                                                                 <a href = "#" class="print" data-id = "<?=$aes->encrypt($property->id)?>" data-toggle = "modal" data-target = "#printModal"><i class="bx bx-printer text-success"></i></a>
-                                                                <a href = "#" class="currentUser ml-1" data-id = "<?=$aes->encrypt($property->id)?>" data-toggle = "modal" data-target = "#userModal" title="View Current User"><i class="bx bx-note text-primary"></i></a>
+                                                                <a href = "#" class="currentUser ml-1" value="{{ $property->Quantity }}" data-id = "<?=$aes->encrypt($property->id)?>" data-toggle = "modal" data-target = "#userModal" title="View Current User"><i class="bx bx-note text-primary"></i></a>
                                                             </div>
-                                                        @endif 
+                                                        {{-- @endif  --}}
                                                     </td>
                                                     {{-- <td>{{$par}}</td> --}}
                                                     <td>{{$property->PARNo}}</td>
