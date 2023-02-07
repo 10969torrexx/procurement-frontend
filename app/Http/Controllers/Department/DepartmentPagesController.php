@@ -604,7 +604,8 @@ class DepartmentPagesController extends Controller
         # request ppmp submission
         public function show_ppmp_submission() {
             try {
-               return view('pages.department.ppmp-submission');
+                return view('pages.page-coming-soon');
+            //    return view('pages.department.ppmp-submission');
             } catch (\Throwable $th) {
                 throw $th;
                 return view('pages.error-500');

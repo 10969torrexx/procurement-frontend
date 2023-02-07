@@ -22,11 +22,7 @@ class ItemController extends Controller
     // $item =  Http::withToken(session('token'))->get(env('APP_API'). "/api/item/index")->json();
     $category = DB::table("categories")
               // ->where("campus", session('campus'))
-<<<<<<< HEAD
-              ->whereNull("deleted_at")
-=======
               ->whereNull("deleted_at") 
->>>>>>> cc410d1bef8baa625a370ae8ed816c2c46d00049
               ->get();
 
     $item = DB::table("items as i")
