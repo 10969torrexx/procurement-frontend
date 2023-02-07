@@ -123,11 +123,13 @@ class DepartmentPagesController extends Controller
                             ->where('allocated__budgets.campus', session('campus'))
                             ->where('allocated__budgets.department_id', session('department_id'))
                             # this will determine the project category for this fund source | Indicative, PPMP, Supplemental
-                            ->where('allocated__budgets.procurement_type', 
-                                (new GlobalDeclare)->project_category((new AESCipher)->decrypt($request->project_category)))
+                                ->where('allocated__budgets.procurement_type', 
+                                    (new GlobalDeclare)->project_category((new AESCipher)->decrypt($request->project_category)))
+                            // ! determine the deadline of submission
+                                ->where('allocated__budgets.deadline_of_submission', '>=', Carbon::now()->format('Y-m-d'))
                             ->whereNull('allocated__budgets.deleted_at')
                             ->get(['allocated__budgets.*', 'allocated__budgets.id as allocated_id','fund_sources.fund_source']);
-
+                       
                 # end 
                 # this will return the page
                     $pageConfigs = ['pageHeader' => true];

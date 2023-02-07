@@ -1080,11 +1080,10 @@ class BudgetOfficerController extends Controller
         ];
         /** Torrexx Additionals
          * ! show upload ppmp from DepartmentPagesController
-         * ? TODO enable access to DepartmentPagesController@show_upload_ppmp()
          * ? KEY import department pages controller
          */
 
-         try {
+        try {
             # get uplpaded ppmp
             $response = \DB::table('signed_ppmp')
                 ->where('employee_id', session('employee_id'))
