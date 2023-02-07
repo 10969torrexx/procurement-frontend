@@ -449,8 +449,12 @@ Route::group(['prefix' => 'budgetofficer','middleware' => ['authuser']], functio
 
     Route::get('/view_signed_ppmp','BudgetOfficer\BudgetOfficerController@signed_ppmps_index');
     Route::get('/view_ppmp','BudgetOfficer\BudgetOfficerController@PPMPindex')->name('view_ppmp');
+    Route::get('/view_indicative','BudgetOfficer\BudgetOfficerController@IndicativeIndex')->name('view_indicative');
+    Route::get('/view_supplemental','BudgetOfficer\BudgetOfficerController@SupplementalIndex')->name('view_supplemental');
     Route::get('/returnView','BudgetOfficer\BudgetOfficerController@returnView');
     Route::post('/view_ppmp/showPPMP', 'BudgetOfficer\BudgetOfficerController@showPPMP')->name('showPPMP');
+    Route::post('/view_indicative/showPPMP', 'BudgetOfficer\BudgetOfficerController@showPPMP')->name('showPPMP');
+    Route::post('/view_supplemental/showPPMP', 'BudgetOfficer\BudgetOfficerController@showPPMP')->name('showPPMP');
     Route::post('/view_ppmp/showPPMP/ppmp-status', 'BudgetOfficer\BudgetOfficerController@status')->name('ppmp-status');
     Route::post('/view_ppmp/showPPMP/ppmp-timeline', 'BudgetOfficer\BudgetOfficerController@timeline')->name('ppmp-timeline');
     Route::post('/view_ppmp/showPPMP/accept-reject-all', 'BudgetOfficer\BudgetOfficerController@accept_reject_all')->name('accept-reject-all');

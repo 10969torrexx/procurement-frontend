@@ -9,126 +9,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use DB;
 Use Carbon\Carbon;
+use App\Http\Controllers\HistoryLogController;
 
 class ItemController extends Controller
 {
-    // public function additems(){
-    //     $pageConfigs = ['pageHeader' => true];
-    //     $breadcrumbs = [
-    //       ["link" => "/", "name" => "Home"],["name" => "Items"]
-    //     ];
-    //     $item =  Http::withToken(session('token'))->post(env('APP_API'). "/api/item/index",[
-    //       'campus' => session('campus')
-    //     ])->json();
-          
-    //     // dd( $item);
-    //     $items = $item['data'];
-    //     $category =$item['data1'];
-    //     $all = [$items,$category];
-    //     return view('pages.bac.add-items',['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs],
-    //     [
-    //       // 'data' => $item['data'],
-    //       // 'data1' => $item['data1'],
-    //       'data' =>[ $all]
-    //     ] 
-    //     );
-    // }
-
-    //   public function store(Request $request){
-    //     // dd( $request-> all()); 
-    //     $item = $request->item_name;
-    //     $public_bidding = $request->public_bidding;
-    //     $item_category = $request->item_category;
-    //     $app_type = $request->app_type;
-    //     $response = Http::withToken(session('token'))->post(env('APP_API'). "/api/item/store",[
-    //     'item_name' => $item,
-    //     'item_category' => $item_category,
-    //     'app_type' => $app_type,
-    //     'public_bidding' => $public_bidding,
-    //     'campus'=> session('campus'),
-    //     'name'=> session('name'),
-    //     ])->json();
-    //     if($response) 
-    //     {
-    //       if($response['status'] == 200){
-    //       return response()->json([
-    //         'status' => 200, 
-    //     ]);    
-    //       }
-
-    //       if($response['status'] == 400){
-    //         return response()->json([
-    //         'status' => 400, 
-    //     ]); 
-    //         }
-    //     }
-    //     // dd($response);
-    //   }
-
-    //   public function show(Request $request){
-    //     $id = $request->id;
-    //     $aes = new AESCipher();
-    //     $global = new GlobalDeclare();
-    //     $id1 = $aes->decrypt($id);
-    //     $response = Http::withToken(session('token'))->get(env('APP_API'). "/api/item/show/".$id1,[
-    //     'id' => $id1,
-    //     ])->json();
-    //     // dd($response);
-    //         return $response; 
-    //   }
-
-    //   public function update(Request $request){
-    //     // dd($request->all());
-    //     $item_name = $request->item_name;
-    //     $item_category = $request->item_category;
-    //     $public_bidding = $request->public_bidding;
-    //     $app_type = $request->app_type;
-    //     $id = $request->id;
-    //     $aes = new AESCipher();
-    //     $global = new GlobalDeclare();
-    //     $id1 = $aes->decrypt($id);
-    //     // dd(session('name'));
-    //     $response = Http::withToken(session('token'))->post(env('APP_API'). "/api/item/update",[
-    //     'id' => $id1,
-    //     'item_name' => $item_name,
-    //     'name'=> session('name'),
-    //     'item_category' => $item_category,
-    //     'public_bidding' => $public_bidding,
-    //     'app_type' => $app_type,
-    //     ])->json();
-    //         // dd($response);
-    //     return $response;
-    //   }
-
-    //   public function delete(Request $request){
-    //     $id = $request->id;
-    //     $aes = new AESCipher();
-    //     $global = new GlobalDeclare();
-    //     $id1 = $aes->decrypt($id);
-    //     $response = Http::withToken(session('token'))->delete(env('APP_API'). "/api/item/delete/".$id1,[
-    //     'id' => $id1,
-    //     ])->json();
-    //     if($response) 
-    //     {
-    //       // dd( $response);
-    //       if($response['status'] == 200){
-    //       return response()->json([
-    //         'status' => 200, 
-    //         ]);     
-    //       }
-    //       if($response['status'] == 400){
-    //         return response()->json([
-    //           'status' => 400, 
-    //         ]);    
-    //       }else{
-    //         return response()->json([
-    //           'status' => 500, 
-    //         ]);   
-    //       }
-    //     }
-    //   // dd($response);
-    //   }
-
   public function additems(){
     $pageConfigs = ['pageHeader' => true];
     $breadcrumbs = [
@@ -156,11 +40,6 @@ class ItemController extends Controller
               ->whereNull("deleted_at")
               ->orderBy("mode_of_procurement","ASC")
               ->get();
-    // dd($procurement);
-    // $items = $item['data'];
-    // $category =$item['data1'];
-    // $all = [$item,$category];
-    // dd( $mode);
     return view('pages.bac.add-items',['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs],compact('category', 'item','mode','mode2')
     );
   }
@@ -169,7 +48,6 @@ class ItemController extends Controller
     // dd( $request-> all()); 
     $item = $request->item_name;
     $mode_of_procurement = $request->mode_of_procurement;
-    // $public_bidding = $request->public_bidding;
     $item_category = $request->item_category;
     $app_type = $request->app_type;
 
@@ -210,6 +88,18 @@ class ItemController extends Controller
             'created_at'=> Carbon::now(),
             'updated_at'=> Carbon::now(),
         ]);
+          
+        # this will created history_log
+              (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                $id,
+                'Added Item: '. $item,
+                'Added',
+                $request->ip(),
+            );
+        # end 
         return response()->json([
                     'status' => 200, 
                     'message' => 'Save Succesfully!.',
@@ -227,6 +117,18 @@ class ItemController extends Controller
             'created_at'=> Carbon::now(),
             'updated_at'=> Carbon::now(),
         ]);
+          
+        # this will created history_log
+              (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                $id,
+                'Added Item: '. $item,
+                'Added',
+                $request->ip(),
+            );
+        # end 
         return response()->json([
                     'status' => 200, 
                     'message' => 'Save Succesfully!.',
@@ -310,6 +212,17 @@ class ItemController extends Controller
                           'updated_at'=> Carbon::now(),
                       ]);
             }
+            # this will created history_log
+                  (new HistoryLogController)->store(
+                    session('department_id'),
+                    session('employee_id'),
+                    session('campus'),
+                    $id,
+                    'Update Item: '. $request->item_name,
+                    'Update',
+                    $request->ip(),
+                );
+            # end 
               if($save){
                 return response()->json([
                   'status' => 200, 
@@ -348,6 +261,17 @@ class ItemController extends Controller
                             'updated_at'=> Carbon::now(),
                         ]);
               }
+              # this will created history_log
+                    (new HistoryLogController)->store(
+                      session('department_id'),
+                      session('employee_id'),
+                      session('campus'),
+                      $id,
+                      'Update Item: '. $request->item_name,
+                      'Update',
+                      $request->ip(),
+                  );
+              # end 
               if($save){
                 return response()->json([
                   'status' => 200, 
@@ -366,6 +290,7 @@ class ItemController extends Controller
               ]);
             }
           }
+          
         }
       }catch (\Throwable $th) {
           return response()->json([
@@ -385,6 +310,17 @@ class ItemController extends Controller
         ->update([
           'deleted_at'=> Carbon::now(),
       ]);
+      # this will created history_log
+            (new HistoryLogController)->store(
+              session('department_id'),
+              session('employee_id'),
+              session('campus'),
+              $id,
+              'Delete Item',
+              'Delete',
+              $request->ip(),
+          );
+      # end 
     if($response){
       return response()->json([
       'status' => 200, 

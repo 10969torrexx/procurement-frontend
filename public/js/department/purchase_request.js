@@ -1,6 +1,9 @@
 $(document).ready(function() {
 
     var project_code = $(".project_code").val();
+    var employee = $( "#selectEmployee option:selected" ).val();
+    // var data:  {somekey:$('#AttorneyEmpresa').val()}
+    // alert(employee);
     var quantity = 0;
     $.ajaxSetup({
       headers: {
@@ -39,9 +42,15 @@ $(document).ready(function() {
         $('.selectEmployee').empty()
         $('.selectEmployee').append('<option value="" style="border: none;text-align:center;font-weight:bold;" selected disabled>-- Select Employee --</option>')
         for(var i = 0; i < response['data'].length; i++) {
-          $('.selectEmployee').append(
-            '<option style="border: none;text-align:center;font-weight:bold;" value="'+ response['data'][i]['id'] + ' ">' 
-                              + response['data'][i]['name'] + '</option>')
+          if(response['data'][i]['name'] == employee){
+            $('.selectEmployee').append(
+              '<option style="border: none;text-align:center;font-weight:bold;" value="'+ response['data'][i]['id'] + ' " selected>' 
+                                + response['data'][i]['name'] + '</option>')
+          }else{
+            $('.selectEmployee').append(
+              '<option style="border: none;text-align:center;font-weight:bold;" value="'+ response['data'][i]['id'] + ' ">' 
+                                + response['data'][i]['name'] + '</option>')
+          }
         }
         // $('#EmployeeEditModal').modal('show')
 
@@ -52,9 +61,9 @@ $(document).ready(function() {
 
 $("#PreviewPRModal").on("hidden.bs.modal", function(e){
   // location.reload();
-      $('.designation_input').val('');
-      $('.purpose_input').val('');
-      document.getElementById('selectEmployee').getElementsByTagName('option')[0].selected = 'selected';
+      // $('.designation_input').val('');
+      // $('.purpose_input').val('');
+      // document.getElementById('selectEmployee').getElementsByTagName('option')[0].selected = 'selected';
 
 })
 
@@ -320,7 +329,7 @@ $(document).on('click', '.btnCompletePR', function (e) {
             title: 'Incomplete',
             text: 'Please enter Designation!',
             })
-      }else if(selectEmployee==''){
+      }else if(selectEmployee==null){
         Swal.fire({
             icon: 'error',
             title: 'Incomplete',
@@ -332,6 +341,7 @@ $(document).on('click', '.btnCompletePR', function (e) {
         var designation_input = $(".designation_input").val()
         var fund_source = $(".fund_source_id").val()
         var project_code = $(".project_code").val()
+        var pr_no = $(".pr_no").val();
 
         var data = {
                 'employee': selectEmployee,
@@ -339,6 +349,7 @@ $(document).on('click', '.btnCompletePR', function (e) {
                 'designation': designation_input,
                 'fund_source': fund_source,
                 'project_code': project_code,
+                'pr_no': pr_no,
                 }
 
         $.ajaxSetup({
@@ -357,7 +368,7 @@ $(document).on('click', '.btnCompletePR', function (e) {
                         Swal.fire({
                           title: 'Saved',
                           icon: 'success',
-                          html: 'Completed Successfully!',
+                          html: response.message,
                           timer: 1000,
                           timerProgressBar: true,
                           didOpen: () => {
@@ -453,6 +464,11 @@ $(document).on('click', '.removebutton', function (e) {
     });
 
     var id = $(this).attr("href");
+    var pr_no = $(".pr_no").val();
+    var data = {
+      'id': id,
+      'pr_no': pr_no,
+    }
     Swal.fire({
       title: 'Are you sure?',
       text: "You won't be able to revert this!",
@@ -469,7 +485,7 @@ $(document).on('click', '.removebutton', function (e) {
               $.ajax({
                 type: "POST",
                 url: "/PR/purchaseRequest/createPR/remove_item",
-                data:{'id':id},
+                data:data,
                 success: function (response) {
                       if(response['status'] == 200) {
                         Swal.fire({

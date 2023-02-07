@@ -108,7 +108,6 @@
 
 <section id="dropzone-examples">
   <!-- Upload signed ppmp starts -->
-    @if (session('role') == 4)
       <div class="row">
         <div class="col-12">
           <div class="card">
@@ -163,7 +162,6 @@
           </div>
         </div>
       </div>
-    @endif
   <!-- single file upload starts -->
   <div class="row">
     <div class="col-12">
@@ -210,7 +208,7 @@
                 </form>
               {{-- search uploaded ppmp --}}
               {{-- list of uploaded ppmp --}}
-                  <div class="table-responsive col-12 container">
+                    <div class="table-responsive col-12 container">
                       <table class="table zero-configuration item-table" id="item-table">
                           <thead>
                               <tr>
@@ -238,14 +236,12 @@
                                                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu">
                                               </span>
                                               <div class="btn dropdown-menu dropdown-menu-left">
-                                                  @if (session('role') == 4)
-                                                    <a href = "" id="edit-uploaded-ppmp-btn" data-id="{{ (new AESCipher)->encrypt($item->id) }}" class="dropdown-item">
-                                                      <i class="bx bx-edit-alt mr-1"></i>Edit
-                                                    </a>
-                                                    <a href = "{{ route('delete_ppmp', ['id' => (new AESCipher)->encrypt($item->id) ]) }}" data-id="" class="dropdown-item">
-                                                      <i class="fa-solid fa-trash mr-1"></i>delete
-                                                    </a>
-                                                  @endif
+                                                  <a href = "" id="edit-uploaded-ppmp-btn" data-id="{{ (new AESCipher)->encrypt($item->id) }}" class="dropdown-item">
+                                                    <i class="bx bx-edit-alt mr-1"></i>Edit
+                                                  </a>
+                                                  <a href = "{{ route('delete_ppmp', ['id' => (new AESCipher)->encrypt($item->id) ]) }}" data-id="" class="dropdown-item">
+                                                    <i class="fa-solid fa-trash mr-1"></i>delete
+                                                  </a>
                                                   <a href = "" data-id="{{ (new AESCipher)->encrypt($item->id) }}" id="preview-ppmp-btn"  class="dropdown-item">
                                                     <i class="fa-solid fa-eye mr-1"></i>View
                                                   </a>
@@ -260,9 +256,8 @@
                                  @endforeach
                               {{-- showing ppmp data based on department and user --}}
                           </tbody>
-                          
                       </table>
-                  </div>
+                    </div>
               {{-- list of uploaded ppmp --}}
           </div>
         </div>

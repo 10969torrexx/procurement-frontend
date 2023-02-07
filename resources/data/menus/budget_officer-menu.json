@@ -47,7 +47,28 @@
       "url": "budgetofficer/view_ppmp",
       "name": "Pending PPMPs",
       "i18n": "User",
-      "icon": "list"
+      "icon": "list",
+      "submenu": [
+          {
+            "url": "budgetofficer/view_ppmp",
+            "name": "PPMPS",
+            "i18n": "User",
+            "icon": "like"
+          },
+          {
+            "url": "budgetofficer/view_indicative",
+            "name": "Indicative",
+            "i18n": "User",
+            "icon": "shoppingcart-in"
+          },
+          
+          {
+            "url": "budgetofficer/view_supplemental",
+            "name": "Supplemental",
+            "i18n": "User",
+            "icon": "shoppingcart-in"
+          }
+        ]
     } ,
     {
       "url": "budgetofficer/view_signed_ppmp",
