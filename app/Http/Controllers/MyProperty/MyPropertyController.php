@@ -39,6 +39,7 @@ class MyPropertyController extends Controller
             ->where("p.propertytype", $id)
             ->where("p.EmployeeID", session('user_id'))
             ->where("p.campus", session('campus'))
+            ->where("p.finalize", 1)
             ->orderBy('p.DateIssued', "desc")
             ->paginate(10);
             // dd($propertys );

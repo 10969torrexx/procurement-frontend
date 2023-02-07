@@ -94,6 +94,15 @@ class GlobalDeclare extends Controller
             case 11:
                 $out = "Immediate Supervisor";
                 break;
+            case 12:
+                $out = "President/HOPE";
+                break;
+            case 13:
+                $out = "BOR Secretariat";
+                break;
+            case 14:
+                $out = "BAC Committee";
+                break;
     }
         return $out;
     }
