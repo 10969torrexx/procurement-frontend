@@ -46,7 +46,11 @@ class PurchaseRequestController extends Controller
         ["link" => "/", "name" => "Home"],["name" => "Track PR"]
       ];
       // return view('pages.budgetofficer.allocatebudget',['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs]);
-  
+      $hope = DB::table('users')
+      ->where('role',12)
+      ->where('campus',session('campus'))
+      ->get();
+      // dd($users);
       $department_id = session('department_id');
       $pr = DB::table("purchase_request as pr")
             ->select("pr.*","fs.fund_source","u.name","d.department_name")
@@ -55,10 +59,11 @@ class PurchaseRequestController extends Controller
             ->join("users as u", "pr.printed_name", "=", "u.id")
             ->where("pr.department_id", $department_id)
             ->whereNull("pr.deleted_at")
+            ->orderBy('pr.created_at')
             ->get();
             // dd($pr);
 
-          return view('pages.department.track-pr-index',compact('pr'), [
+          return view('pages.department.track-pr-index',compact('pr','hope'), [
               'pageConfigs'=>$pageConfigs,
               'breadcrumbs'=>$breadcrumbs,
               // 'error' => $error,
@@ -109,6 +114,7 @@ class PurchaseRequestController extends Controller
         // dd($this->aes->decrypt($request->id));
         $date = Carbon::now()->format('m/d/Y');
         $project_code = $request->id;
+        $pr_no = "0000-00-0000";
         $id = $this->aes->decrypt($request->id);
         $pageConfigs = ['pageHeader' => true];
         $breadcrumbs = [
@@ -116,12 +122,19 @@ class PurchaseRequestController extends Controller
             ["link" => "/PR/purchaseRequest", "name" => "Approve PPMPs"],
             ["name" => "Create PR"]
         ];
-       
+          $hope = DB::table('users')
+                    ->where('role',12)
+                    ->where('campus',session('campus'))
+                    ->get();
+          foreach($hope as $data){
+            $hope = $data->name;
+          }
           $itemsForPR = DB::table("purchase_request_items as pri")
                     ->select('pri.*','p.item_name','p.item_description','p.unit_price')
                     ->join("ppmps as p", "pri.item_id", "=", "p.id")
                     ->where('pri.project_code',$id)
                     ->where('pri.pr_no',0)
+                    ->whereNull('pri.deleted_at')
                     ->get();
           $itemsForPRCount = count($itemsForPR);
           $itemsFromPRI = DB::table("purchase_request_items as pri")
@@ -129,60 +142,67 @@ class PurchaseRequestController extends Controller
                     ->join("ppmps as p", "pri.item_id", "=", "p.id")
                     ->where('pri.project_code',$id)
                     ->where('pri.pr_no',0)
-                    ->get();;
-                    // dd($itemsFromPRI);
+                    ->whereNull('pri.deleted_at')
+                    ->get();
+                    // dd($id);
 
           $details = DB::table("project_titles as pt")
                     ->select("pt.campus","pt.project_title","pt.fund_source","d.department_name")
                     ->join("departments as d", "pt.department_id", "=", "d.id")
                     ->join("fund_sources as fs", "pt.fund_source", "=", "fs.id")
                     ->where("pt.id", $id)
+                    ->whereNull('pt.deleted_at')
                     ->get();
           $fund_source = DB::table("project_titles as pt")
                     ->select("fs.fund_source")
                     ->join("fund_sources as fs", "pt.fund_source", "=", "fs.id")
                     ->where("pt.id", $id)
-                    ->get();
+                    ->whereNull('pt.deleted_at')
+                    ->get();  
 
           $items = DB::table('ppmps')
-                    ->select('id','item_name','quantity')
+                    // ->select('id','item_name','quantity')
                     ->where('project_code','=',$id)
                     ->where('mode_of_procurement','!=',33)
                     // ->where('quantity','!=',0)
                     ->whereNull('deleted_at')
                     ->orderBy('item_name')
-                    ->get();
+                    ->whereNull('deleted_at')
+                    ->sum('quantity');
 
           $pri = DB::table('purchase_request_items')
-                    ->select('item_id','quantity')
+                    // ->select('item_id','quantity')
                     ->where('project_code','=',$id)
+                    ->where('quantity','!=',0)
                     ->whereNull('deleted_at')
-                    ->get();
+                    ->sum('quantity');
 
-          $quantity = 0;
-          $quantityPRI = 0;
+          // $quantity = 0;
+          // $quantityPRI = 0;
 
-          foreach($items as $data){
-            $quantity += $data->quantity;
-          }
+          // foreach($items as $data){
+          //   $quantity += $data->quantity;
+          // }
 
-          foreach($pri as $pri){
-            $quantityPRI += $pri->quantity;
-          }
-
-          $remaining = $quantity - $quantityPRI;
+          // foreach($pri as $pri){
+          //   $quantityPRI += $pri->quantity;
+          // }
+          $purpose = "";
+          $name = "";
+          $designation = "";
+          $remaining = $items - $pri;
           if($remaining == 0){
             session(['globalerror' => "Sorry! There are no remaining items for you to PR in this Project! "]);
           }else{
               Session::forget('globalerror');
           }
-          // dd($remaining);
+          // dd($information);
           // if(count($ppmp_deadlines)==0){
           //       session(['globalerror' => "Please set deadline first"]);
           // }else{
           //       Session::forget('globalerror');
           // }
-          return view('pages.department.create-purchase-request',compact('itemsForPR','itemsForPRCount','itemsFromPRI','date','details','fund_source','project_code'),
+          return view('pages.department.create-purchase-request',compact('hope','purpose','name','designation','itemsForPR','pr_no','itemsForPRCount','itemsFromPRI','date','details','fund_source','project_code'),
               ['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs]
               );
           # end
@@ -205,20 +225,30 @@ class PurchaseRequestController extends Controller
           ["name" => "Edit PR"]
       ];
      
+        $hope = DB::table('users')
+                  ->where('role',12)
+                  ->where('campus',session('campus'))
+                  ->get();
+        foreach($hope as $data){
+          $hope = $data->name;
+        }
         $itemsForPR = DB::table("purchase_request_items as pri")
                   ->select('pri.*','p.item_name','p.item_description','p.unit_price')
                   ->join("ppmps as p", "pri.item_id", "=", "p.id")
                   ->where('pri.pr_no',$pr_no)
+                  ->whereNull('pri.deleted_at')
                   ->get();
         $itemsForPRCount = count($itemsForPR);
         $itemsFromPRI = DB::table("purchase_request_items as pri")
                   ->select('pri.*','p.unit_of_measurement','p.item_description','p.unit_price')
                   ->join("ppmps as p", "pri.item_id", "=", "p.id")
                   ->where('pri.pr_no',$pr_no)
+                  ->whereNull('pri.deleted_at')
                   ->get();;
-        $pc = DB::table('purchase_request_items')
+        $pc = DB::table('purchase_request')
                           ->select('project_code')
                           ->where('pr_no',$pr_no)
+                          ->whereNull('deleted_at')
                           ->first();
         $project_code = $pc->project_code;
         $details = DB::table("project_titles as pt")
@@ -226,43 +256,46 @@ class PurchaseRequestController extends Controller
                   ->join("departments as d", "pt.department_id", "=", "d.id")
                   ->join("fund_sources as fs", "pt.fund_source", "=", "fs.id")
                   ->where("pt.id", $project_code)
+                  ->whereNull('pt.deleted_at')
                   ->get();
 
         $fund_source = DB::table("project_titles as pt")
                   ->select("fs.fund_source")
                   ->join("fund_sources as fs", "pt.fund_source", "=", "fs.id")
                   ->where("pt.id", $project_code)
+                  ->whereNull('pt.deleted_at')
                   ->get();
 
         $items = DB::table('ppmps')
-                  ->select('id','item_name','quantity')
+                  // ->select('id','item_name','quantity')
                   ->where('project_code','=',$project_code)
                   ->where('mode_of_procurement','!=',33)
                   // ->where('quantity','!=',0)
+                  ->where('pr_no','!=',0)
                   ->whereNull('deleted_at')
-                  ->orderBy('item_name')
-                  ->get();
+                  // ->orderBy('item_name')
+                  ->sum('quantity');
 
         $pri = DB::table('purchase_request_items')
-                  ->select('item_id','quantity')
+                  // ->select('item_id','quantity')
                   ->where('project_code','=',$project_code)
-                  ->where('pr_no',$pr_no)
+                  // ->where('pr_no','!=',0)
                   ->whereNull('deleted_at')
-                  ->get();
+                  ->sum('quantity');
                   // dd($pri);
-
-        $quantity = 0;
-        $quantityPRI = 0;
-
-        foreach($items as $data){
-          $quantity += $data->quantity;
-        }
-
-        foreach($pri as $pri){
-          $quantityPRI += $pri->quantity;
-        }
-
-        $remaining = $quantity - $quantityPRI;
+        $information = DB::table('purchase_request as pr')
+                    ->select('pr.purpose','u.name','pr.designation')
+                    ->join('users as u','pr.printed_name','=','u.id')
+                    ->where('pr.id',$id)
+                    ->get();
+                    
+          foreach($information as $data){
+            $purpose = $data->purpose;
+            $name = $data->name;
+            $designation = $data->designation;
+          }
+        $remaining = $items - $pri;
+        // dd($information); 
         if($remaining == 0){
           session(['globalerror' => "Sorry! There are no remaining items for you to PR in this Project! "]);
         }else{
@@ -274,7 +307,10 @@ class PurchaseRequestController extends Controller
         // }else{
         //       Session::forget('globalerror');
         // }
-        return view('pages.department.edit-purchase-request',compact('itemsForPR','itemsForPRCount','itemsFromPRI','date','details','fund_source','project_code'),
+        $project_code = $this->aes->encrypt($project_code);
+        // dd($project_code); 
+
+        return view('pages.department.edit-purchase-request',compact('hope','purpose','name','designation','itemsForPR','pr_no','itemsForPRCount','itemsFromPRI','date','details','fund_source','project_code'),
             ['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs]
             );
         # end
@@ -320,7 +356,8 @@ class PurchaseRequestController extends Controller
       // dd($request->all());
       $file = $request->file('file');
       $extension = $request->file('file')->getClientOriginalExtension();
-      // dd($file);
+      $pr_no = (new AESCipher())->decrypt($request->pr_no);
+    // dd($pr_no);
       $is_valid = false;
       # validate extension
           $allowed_extensions = ['pdf', 'jpeg', 'jpg', 'png'];
@@ -337,6 +374,11 @@ class PurchaseRequestController extends Controller
 
       $id = $request->item;
       $quantityToPR = $request->quantity;
+      if($quantityToPR == 0){
+        return back()->with([
+          'error' => 'Quantity cannot be zero!'
+      ]);
+      }
       $specification = $request->specification;
       $project_code = $this->aes->decrypt($request->project_code);
 
@@ -367,11 +409,15 @@ class PurchaseRequestController extends Controller
           'message' => 'The quantity exceeds the remaining item(s)!',
         ]);  
       }else{
+          if($pr_no == "0000-00-0000"){
+            $pr_no = 0;
+          }
           $itemCheck = DB::table('purchase_request_items')
                         ->select('*')
                         ->where('project_code',$project_code)
                         ->where('item_id',$id)
-                        ->where('pr_no',0)
+                        ->where('pr_no', $pr_no)
+                        ->whereNull('deleted_at')
                         ->count();
                         // dd($itemCheck);
           if($itemCheck == 1){
@@ -400,15 +446,28 @@ class PurchaseRequestController extends Controller
               $file->storeAs($destination_path, $file_name.'.'.$extension);
               $file->move('storage/'. $destination_path, $file_name.'.'.$extension); 
 
-              $response = DB::table('purchase_request_items')
-                            ->insert([
-                                'project_code' => $project_code,
-                                'item_id' => $id,
-                                'quantity' => $quantityToPR,
-                                'specification' => $specification,
-                                'file_name' => $file_name.'.'.$extension,
-                                'created_at' =>  Carbon::now()
-                            ]);
+              if($pr_no == "0000-00-0000"){
+                $response = DB::table('purchase_request_items')
+                              ->insert([
+                                  'project_code' => $project_code,
+                                  'item_id' => $id,
+                                  'quantity' => $quantityToPR,
+                                  'specification' => $specification,
+                                  'file_name' => $file_name.'.'.$extension,
+                                  'created_at' =>  Carbon::now()
+                              ]);
+              }else{
+                $response = DB::table('purchase_request_items')
+                              ->insert([
+                                  'pr_no' => $pr_no,
+                                  'project_code' => $project_code,
+                                  'item_id' => $id,
+                                  'quantity' => $quantityToPR,
+                                  'specification' => $specification,
+                                  'file_name' => $file_name.'.'.$extension,
+                                  'created_at' =>  Carbon::now()
+                              ]);
+              }
               if($response){
                 return back()->with([
                   'success' => 'Item added successfully!'
@@ -765,6 +824,8 @@ class PurchaseRequestController extends Controller
   public function savePR(Request $request){
       try {
         // dd($request->all());  
+        $has_pr_no = (new AESCipher)->decrypt($request->pr_no);
+        
         $current = Carbon::now();
         $department_id = session('department_id');
         $campus = session('campus');
@@ -790,10 +851,11 @@ class PurchaseRequestController extends Controller
         #END Code For Replacing the Deleted PR                 
 
         // dd($pr_no);
-
-        $purchaseRequest = DB::table('purchase_request')
+        if($has_pr_no=="0000-00-0000"){
+          $purchaseRequest = DB::table('purchase_request')
                               ->insert([
                                 'department_id' => $department_id,
+                                'project_code' => $project_code,
                                 'pr_no' => $pr_no,
                                 'campus' => $campus,
                                 'fund_source_id' => $fund_source,
@@ -802,24 +864,49 @@ class PurchaseRequestController extends Controller
                                 'designation' => $designation,
                                 'created_at' =>  Carbon::now()
                             ]);
-        DB::table('purchase_request_items')
-            ->where('project_code', $project_code)
-            ->where('pr_no', 0)
-            ->update([
-              'pr_no' => $pr_no
+          DB::table('purchase_request_items')
+              ->where('project_code', $project_code)
+              ->where('pr_no', 0)
+              ->update([
+                'pr_no' => $pr_no
+              ]);
+
+          if($purchaseRequest){
+            return response()->json([
+              'status' => 200,
+              'message' => 'PR Completed Successfully',
             ]);
-
-        if($purchaseRequest){
+          }
           return response()->json([
-            'status' => 200,
-            'message' => 'Success',
+            'status' => 400,
+            'message' => 'Error'
           ]);
-        }
-        return response()->json([
-          'status' => 400,
-          'message' => 'Error'
-        ]);
+        }else{
+          $purchaseRequest = DB::table('purchase_request')
+                                ->where('pr_no',$has_pr_no)
+                                ->update([
+                                  // 'department_id' => $department_id,
+                                  // 'pr_no' => $pr_no,
+                                  // 'campus' => $campus,
+                                  'status' => 1,
+                                  'purpose' => $purpose,
+                                  'printed_name' => $employee,
+                                  'designation' => $designation,
+                                  'updated_at' =>  Carbon::now()
+                                ]);
 
+          if($purchaseRequest){
+            return response()->json([
+              'status' => 200,
+              'message' => 'PR Updated Successfully',
+            ]);
+          }
+            return response()->json([
+              'status' => 400,
+              'message' => 'Error'
+            ]);
+        }
+        
         
       } catch (\Throwable $th) {
         dd('add_Items_To_PR FUNCTION '+$th);
@@ -864,7 +951,10 @@ class PurchaseRequestController extends Controller
         // ["link" => "/department/purchaseRequest/createPR", "name" => "Create PR"],
         ["name" => "View PR"]
       ];
-
+      $hope = DB::table('users')
+      ->where('role',12)
+      ->where('campus',session('campus'))
+      ->get();
       $id = (new AESCipher())->decrypt($request->id);
       // $date = Carbon::now()->format('m/d/Y');
 
@@ -891,7 +981,7 @@ class PurchaseRequestController extends Controller
 
             
 
-      return view('pages.department.view_pr_page',compact('purchase_request','itemsForPR','id'), [
+      return view('pages.department.view_pr_page',compact('hope','purchase_request','itemsForPR','id'), [
                   'pageConfigs'=>$pageConfigs,
                   'breadcrumbs'=>$breadcrumbs,
                   // 'error' => $error,
@@ -899,12 +989,18 @@ class PurchaseRequestController extends Controller
   }
 
   public function remove_item(Request $request){
-    dd($request->all());
+    // dd($request->all());
     $id = (new AESCipher())->decrypt($request->id);
+    $pr_no = (new AESCipher())->decrypt($request->pr_no);
+    $last = DB::table('purchase_request_items')
+              ->where('pr_no',$pr_no)
+              ->whereNull('deleted_at')
+              ->count();
+    // dd($last);
     $item = DB::table('purchase_request_items')
               ->select('file_name')
               ->where('id',$id)
-              ->where('pr_no',0)
+              // ->where('pr_no',0)
               ->get();
     $file_name = '';
     foreach($item as $data){
@@ -916,10 +1012,18 @@ class PurchaseRequestController extends Controller
     // unlink($destination_path.$file_name);
     // Storage::disk('local')->delete($destination_path.$file_name);
     // Storage::delete('storage/'.$destination_path.$file_name);
-    
+    if($last == 1){
+      DB::table('purchase_request')
+            ->where('pr_no',$pr_no)
+            ->update([
+              'status' => 0,
+            ]);
+    }
     $response = DB::table('purchase_request_items')
             ->where('id',$id)
-            ->delete();
+            ->update([
+              'deleted_at' => Carbon::now(),
+            ]);
     if($response)
     {
         return response()->json([
@@ -1011,12 +1115,18 @@ class PurchaseRequestController extends Controller
                           ->join("users as u","pr.printed_name","u.id")
                           ->where("pr.id",$id)
                           ->get();
-
+    $hope = DB::table('users')
+              ->where('role',12)
+              ->where('campus',session('campus'))
+              ->get();
+    foreach($hope as $data){
+      $hope = $data->name;
+    }
     $pr_no = '';
     foreach($purchase_request as $data){
       $pr_no = $data->pr_no;
     }
-                    // dd($pr_no);
+                    // dd($hope);
     $itemsForPR = DB::table("purchase_request_items as pri")
               ->select('pri.*','p.unit_of_measurement','p.item_description','p.unit_price')
               ->join('ppmps as p','pri.item_id','p.id')
@@ -1027,7 +1137,7 @@ class PurchaseRequestController extends Controller
 
           
 
-    return view('pages.department.print_pr',compact('purchase_request','itemsForPR','date','id'), [
+    return view('pages.department.print_pr',compact('hope','purchase_request','itemsForPR','date','id'), [
                 // 'pageConfigs'=>$pageConfigs,
                 // 'breadcrumbs'=>$breadcrumbs,
                 // 'error' => $error,

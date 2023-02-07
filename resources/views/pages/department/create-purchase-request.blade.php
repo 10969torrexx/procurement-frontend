@@ -51,7 +51,11 @@
                 </div>
                 
                 <div class="container">
-                    
+                    <div class="row" hidden>
+                        <fieldset class="form-group">
+                            <input type="text" class="pr_no form-control"  placeholder="" value="<?=$aes->encrypt($pr_no)?>">
+                        </fieldset>
+                    </div>
                     <div class="row" hidden>
                         <fieldset class="form-group">
                             <input type="text" class="fund_source_id form-control"  placeholder="" value="<?=$aes->encrypt($details[0]->fund_source)?>">
@@ -77,7 +81,11 @@
                                 <input type="text" id="project_code"  class="project_code form-control" placeholder="<?=($project_code)?>" name = "project_code" value="<?=($project_code)?>">
                             </fieldset>
                         </div>
-
+                        <div class="row" hidden>
+                            <fieldset class="form-group">
+                                <input type="text" class="pr_no form-control"  placeholder="" name = "pr_no" value="<?=$aes->encrypt($pr_no)?>">
+                            </fieldset>
+                        </div>
                         <div class="row">
                             <div class="col-sm-4">
                                 <fieldset class="form-group">
@@ -137,7 +145,7 @@
 
                           
                         @if($itemsForPRCount != 0)
-                            <a href = "#" class = "btn btn-success round mr-1 mb-1" data-toggle = "modal" data-target = "#PreviewPRModal"><i class="bx bx-check"></i> PREVIEW PR</a>
+                            <a href = "#" class = "btn btn-success mr-1 mb-1" data-toggle = "modal" data-target = "#PreviewPRModal"><i class="bx bx-check"></i> PREVIEW PR</a>
                         @endif
 
                         <div class="table-responsive">
