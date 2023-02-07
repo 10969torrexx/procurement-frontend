@@ -50,10 +50,15 @@
                                 <option value="{{$aes->encrypt(13)}}">BOR Secretariat</option>
                                 <option value="{{$aes->encrypt(14)}}">BAC Committee</option>
 <<<<<<< HEAD
+<<<<<<< HEAD
                             </select>
 =======
                             </select> 
 >>>>>>> 7812d49045457d73ba73e1e5a02e153e1f444803
+=======
+
+                            </select> 
+>>>>>>> 550431fa8c7a650375dd9f8a36b4a16125ed4f5b
                             
                         </fieldset>
                     </div>
