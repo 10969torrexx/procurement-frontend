@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
 use App\Http\Controllers\AESCipher;
 use App\Http\Controllers\GlobalDeclare;
+use App\Http\Controllers\HistoryLogController;
 use DB;
 use Carbon\Carbon;
 
@@ -235,6 +236,18 @@ class SupervisorController extends Controller
                   'status' => $status,
                   'remarks' => $remarks
               ]);
+
+              # this will created history_log
+                (new HistoryLogController)->store(
+                  session('department_id'),
+                  session('employee_id'),
+                  session('campus'),
+                  NULL,
+                  'Status for Supervisor, id: '.$item_id,
+                  'Status',
+                  $request->ip(),
+                );
+              # end 
         
       if( $response)
       {
@@ -380,6 +393,19 @@ class SupervisorController extends Controller
             'created_at' => Carbon::now()
             ]);  
           }
+
+            # this will created history_log
+              (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                NULL,
+                'Status and projectCode for this id: '.$request->project_id,
+                'Status adn Generate',
+                $request->ip(),
+              );
+            # end 
+
           if( $timeline){
             return response()->json([
             'status' => 200, 
@@ -540,6 +566,19 @@ class SupervisorController extends Controller
               'created_at' => Carbon::now()
               ]);  
             }
+
+            
+          # this will created history_log
+            (new HistoryLogController)->store(
+              session('department_id'),
+              session('employee_id'),
+              session('campus'),
+              NULL,
+              'Status from Supervisor for this id: '.$request->id,
+              'Status',
+              $request->ip(),
+            );
+          # end 
 
         if($ppmp)
         {

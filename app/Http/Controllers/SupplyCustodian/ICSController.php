@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AESCipher;
 use App\Http\Controllers\GlobalDeclare;
+use App\Http\Controllers\HistoryLogController;
 use DB;
 use Carbon\Carbon;
 use App\Employee;
@@ -143,6 +144,18 @@ class ICSController extends Controller
                     'created_at'            => Carbon::now(),
                     'updated_at'            => Carbon::now(),
                 ]);
+
+                # this will created history_log
+                  (new HistoryLogController)->store(
+                    session('department_id'),
+                    session('employee_id'),
+                    session('campus'),
+                    NULL,
+                    'Add ICS Property',
+                    'Add',
+                    $request->ip(),
+                  );
+                # end 
             
                 if($par){
                     return response()->json([
@@ -281,6 +294,18 @@ class ICSController extends Controller
             ->update([
                 'finalize'        => 1,
             ]);
+            
+        # this will created history_log
+            (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                $id,
+                'Finalize ICS Property',
+                'Finalize',
+                $request->ip(),
+                );
+        # end 
         
         if($par){
             return response()->json([
@@ -308,6 +333,17 @@ class ICSController extends Controller
             ->update([
                 'deleted_at'     => Carbon::now(),
             ]);
+            # this will created history_log
+                (new HistoryLogController)->store(
+                    session('department_id'),
+                    session('employee_id'),
+                    session('campus'),
+                    $id,
+                    'Delete ICS Property',
+                    'Delete',
+                    $request->ip(),
+                    );
+            # end 
         
         if($par){
             return response()->json([
@@ -402,6 +438,17 @@ class ICSController extends Controller
                         'DateTransferred'       => $request->DateAcquired,
                         'updated_at'     => Carbon::now(),
                     ]);
+                    # this will created history_log
+                        (new HistoryLogController)->store(
+                            session('department_id'),
+                            session('employee_id'),
+                            session('campus'),
+                            $request->id,
+                            'Edit ICS Property',
+                            'Edit',
+                            $request->ip(),
+                            );
+                    # end 
                 
                 if($par){
                     return response()->json([
@@ -496,6 +543,18 @@ class ICSController extends Controller
                         'created_at'     => Carbon::now(),
                         'updated_at'     => Carbon::now(),
                     ]);
+
+                    # this will created history_log
+                        (new HistoryLogController)->store(
+                            session('department_id'),
+                            session('employee_id'),
+                            session('campus'),
+                            NULL,
+                            'Add Items ICS Property',
+                            'Add',
+                            $request->ip(),
+                            );
+                    # end 
                 
                 if($par){
                     return response()->json([
@@ -567,6 +626,17 @@ class ICSController extends Controller
                 'updated_at'            => Carbon::now(),
             ]);
         }
+        # this will created history_log
+            (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                $request->id,
+                'Dispose ICS Property, Quantity: '.$request->Quantity,
+                'Dispose',
+                $request->ip(),
+                );
+        # end 
         
         if($par){
             return response()->json([
@@ -678,6 +748,18 @@ class ICSController extends Controller
         }
         
                 // dd($check);
+                
+        # this will created history_log
+            (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                $request->id,
+                'Transfer ICS Property, Quantity: '.$request->Quantity,
+                'Transfer',
+                $request->ip(),
+                );
+        # end 
         if($par){
             return response()->json([
                 'status' => 200, 
@@ -747,6 +829,18 @@ class ICSController extends Controller
         //     ->where("id",$id)
         //     ->get();
         // dd($par);
+
+        # this will created history_log
+            (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                $request->id,
+                'Print ICS Property',
+                'Print',
+                $request->ip(),
+                );
+        # end 
         return view('pages.supplycustodian.ics.print',compact('par'));
     }
 
