@@ -21,6 +21,21 @@
 <link rel="stylesheet" type="text/css" href="{{asset('css/plugins/extensions/toastr.css')}}">
 @endsection
 @section('content')
+<style>
+    #t-table, #t-th, #t-td  {
+        border: 1px solid;
+        font-size: 11px;
+        padding: 5px;
+        text-align: center;
+    }
+    #t-table{
+        width: 100%;
+    }
+
+    .tbg-secondary {
+        background-color: rgba(71, 95, 123, 0.9) !important;
+    }
+</style>
 <!-- Zero configuration table -->
 <section id="horizontal-vertical">
     <div class="row">
@@ -216,20 +231,21 @@
 
                             {{-- creating data tables for the list of project titles --}}
                                 <div class="table-responsive col-12 col-md-12 col-sm-12 container">
-                                    <table class="table zero-configuration item-table" id="item-table">
+                                    <table class="table zero-configuration item-table" id="item-table t-table">
                                         <thead>
-                                            <tr>
-                                                <th><input type="checkbox" name="" id="select-all"></th>
-                                                <th>#</th>
+                                            <tr id="t-tr">
+                                                <th id="t-td"><input type="checkbox" name="" id="select-all"></th>
+                                                <th id="t-td">#</th>
                                                 {{-- <th>Project Code</th> --}}
-                                                <th>Project Title</th>
-                                                <th>Project Year</th>
-                                                <th>Status</th>
-                                                <th>Immediate SUPERVISOR</th>
-                                                <th>Project Type</th>
-                                                <th>Fund Source</th>
-                                                <th>Date Added</th>
-                                                <th>Action</th>
+                                                <th id="t-td">Project Title</th>
+                                                <th id="t-td">Project Year</th>
+                                                <th id="t-td">Status</th>
+                                                <th id="t-td">Immediate SUPERVISOR</th>
+                                                <th id="t-td">Project Type</th>
+                                                <th id="t-td">Fund Source</th>
+                                                <th id="t-td">Deadline</th>
+                                                <th id="t-td">Date Added</th>
+                                                <th id="t-td">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -237,16 +253,17 @@
                                             {{-- showing ppmp data based on department and user --}}
                                                 @foreach ($project_titles as $item)
                                                     <tr>
-                                                        <td><input type="checkbox" name="" class="project-checkbox" value="{{ $item->id }}" data-status="{{ $item->status }}"></td>
-                                                        <td>{{ $loop->iteration }}</td>
-                                                        <td>{{ $item->project_title }}</td>
-                                                        <td>{{ $item->project_year }}</td>
-                                                        <td>{{ Str::ucfirst((new GlobalDeclare)->status($item->status)) }}</td>
-                                                        <td>{{ $item->immediate_supervisor }}</td>
-                                                        <td>{{ $item->project_type }}</td>
-                                                        <td>{{ $item->fund_source }}</td>
-                                                        <td>{{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0]  }}</td>
-                                                        <td>
+                                                        <td id="t-td"><input type="checkbox" name="" class="project-checkbox" value="{{ $item->id }}" data-status="{{ $item->status }}"></td>
+                                                        <td id="t-td">{{ $loop->iteration }}</td>
+                                                        <td id="t-td">{{ $item->project_title }}</td>
+                                                        <td id="t-td">{{ $item->project_year }}</td>
+                                                        <td id="t-td">{{ Str::ucfirst((new GlobalDeclare)->status($item->status)) }}</td>
+                                                        <td id="t-td">{{ $item->immediate_supervisor }}</td>
+                                                        <td id="t-td">{{ $item->project_type }}</td>
+                                                        <td id="t-td">{{ $item->fund_source }}</td>
+                                                        <td id="t-td">{{ explode('-', date('j F, Y-', strtotime($item->deadline_of_submission)))[0]  }}</td>
+                                                        <td id="t-td">{{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0]  }}</td>
+                                                        <td id="t-td">
                                                             <div class="dropdown">
                                                                 <span
                                                                     class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"

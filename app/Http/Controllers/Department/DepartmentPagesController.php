@@ -96,11 +96,12 @@ class DepartmentPagesController extends Controller
         # end
         # this function will show Projec Titles that are status = 0
             public function showCreatePPMP(Request $request){
-                # this will get data from database
-                    # from project_titles table | draft project titles
-                        $project_titles = \DB::table('project_titles')
+                try {
+                    # this will get data from database
+                        # from project_titles table | draft project titles
+                            $project_titles = \DB::table('project_titles')
                             ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
-                            // ->join('departments', 'departments.immediate_supervisor', 'project_titles.department_id')
+                            ->join('allocated__budgets', 'allocated__budgets.id', 'project_titles.allocated_budget')
                             ->join('users', 'users.id', 'project_titles.immediate_supervisor')
                             ->where('project_titles.campus', session('campus'))
                             ->where('project_titles.department_id', session('department_id'))
@@ -111,44 +112,48 @@ class DepartmentPagesController extends Controller
                             ->get([
                                 'project_titles.*',
                                 'fund_sources.fund_source',
-                                'users.name as immediate_supervisor' 
+                                'users.name as immediate_supervisor',
+                                'allocated__budgets.deadline_of_submission'
                             ]);
-                    # from departments table
-                        $departments = \DB::table('departments')->where('id', session('department_id'))->get();
-                    # from categories table
-                        $categories = \DB::table('categories')->whereNull('deleted_at')->get();
-                    # from fund sources table
-                        $fund_sources = \DB::table('allocated__budgets')
-                            ->join('fund_sources', 'fund_sources.id', 'allocated__budgets.fund_source_id')
-                            ->where('allocated__budgets.campus', session('campus'))
-                            ->where('allocated__budgets.department_id', session('department_id'))
-                            # this will determine the project category for this fund source | Indicative, PPMP, Supplemental
-                                ->where('allocated__budgets.procurement_type', 
-                                    (new GlobalDeclare)->project_category((new AESCipher)->decrypt($request->project_category)))
-                            // ! determine the deadline of submission
-                                ->where('allocated__budgets.deadline_of_submission', '>=', Carbon::now()->format('Y-m-d'))
-                            ->whereNull('allocated__budgets.deleted_at')
-                            ->get(['allocated__budgets.*', 'allocated__budgets.id as allocated_id','fund_sources.fund_source']);
-                       
-                # end 
-                # this will return the page
-                    $pageConfigs = ['pageHeader' => true];
-                    $breadcrumbs = [
-                        ["link" => "/", "name" => "Home"],
-                        ["link" => "/department/project-category", "name" => "PROJECT CATEGORY"],
-                        ["name" =>  "CREATE PPMP |" . " " . strtoupper((new GlobalDeclare)->project_category((new AESCipher)->decrypt($request->project_category))) ],
-                    ];
-                    return view('pages.department.create-ppmp',
-                    ['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs], 
-                    # this will attache the data to view
-                    [
-                        'project_titles' => $project_titles,
-                        'fund_sources'   => \json_decode($fund_sources),
-                        'departments'   =>  $departments,
-                        'categories'    => $categories,
-                        'project_category' => $request->project_category,
-                    ]);
-                # end
+                        # from departments table
+                            $departments = \DB::table('departments')->where('id', session('department_id'))->get();
+                        # from categories table
+                            $categories = \DB::table('categories')->whereNull('deleted_at')->get();
+                        # from fund sources table
+                            $fund_sources = \DB::table('allocated__budgets')
+                                ->join('fund_sources', 'fund_sources.id', 'allocated__budgets.fund_source_id')
+                                ->where('allocated__budgets.campus', session('campus'))
+                                ->where('allocated__budgets.department_id', session('department_id'))
+                                # this will determine the project category for this fund source | Indicative, PPMP, Supplemental
+                                    ->where('allocated__budgets.procurement_type', 
+                                        (new GlobalDeclare)->project_category((new AESCipher)->decrypt($request->project_category)))
+                                // ! determine the deadline of submission
+                                    ->where('allocated__budgets.deadline_of_submission', '>=', Carbon::now()->format('Y-m-d'))
+                                ->whereNull('allocated__budgets.deleted_at')
+                                ->get(['allocated__budgets.*', 'allocated__budgets.id as allocated_id','fund_sources.fund_source']);
+                    # end 
+                    # this will return the page
+                        $pageConfigs = ['pageHeader' => true];
+                        $breadcrumbs = [
+                            ["link" => "/", "name" => "Home"],
+                            ["link" => "/department/project-category", "name" => "PROJECT CATEGORY"],
+                            ["name" =>  "CREATE PPMP |" . " " . strtoupper((new GlobalDeclare)->project_category((new AESCipher)->decrypt($request->project_category))) ],
+                        ];
+                        return view('pages.department.create-ppmp',
+                        ['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs], 
+                        # this will attache the data to view
+                        [
+                            'project_titles' => $project_titles,
+                            'fund_sources'   => \json_decode($fund_sources),
+                            'departments'   =>  $departments,
+                            'categories'    => $categories,
+                            'project_category' => $request->project_category,
+                        ]);
+                    # end
+                } catch (\Throwable $th) {
+                    throw $th;
+                    return view('pages.error-500');
+                }
             }
         # end
         # this will show add item on project based on project title

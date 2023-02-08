@@ -3,6 +3,7 @@
     use App\Http\Controllers\AESCipher;
     $aes = new AESCipher();
     use App\Http\Controllers\GlobalDeclare;
+    use Carbon\Carbon;
     $current_project_code ='';
     $project_title_id = '';
     $total_estimated_price = 0.0;
@@ -571,82 +572,86 @@
                 
                 {{-- creating data tables for the list of project titles --}}
                     <div class="table-responsive col-12 container scrollable">
-                        <table class="table  scrollable zero-configuration item-table " id="item-table">
+                        <table class="table  scrollable zero-configuration item-table " id="item-table t-table">
                             <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Item name</th>
-                                    <th class="text-nowrap">app type</th>
-                                    <th>quantity</th>
-                                    <th>Unit Price</th>
-                                    <th class="text-nowrap">estimated price</th>
-                                    <th>item description</th>
-                                    <th>unit of measurement</th>
-                                    <th>mode of procurement</th>
-                                    <th class="text-nowrap">expected month</th>
-                                    <th>status</th>
-                                    <th>date created</th>
-                                    <th>Action</th>
+                                <tr id="t-tr">
+                                    <th id="t-td">#</th>
+                                    <th id="t-td">Item name</th>
+                                    <th id="t-td" class="text-nowrap">app type</th>
+                                    <th id="t-td">quantity</th>
+                                    <th id="t-td">Unit Price</th>
+                                    <th id="t-td" class="text-nowrap">estimated price</th>
+                                    <th id="t-td">item description</th>
+                                    <th id="t-td">unit of measurement</th>
+                                    <th id="t-td">mode of procurement</th>
+                                    <th id="t-td" class="text-nowrap">expected month</th>
+                                    <th id="t-td">status</th>
+                                    <th id="t-td">date created</th>
+                                    <th id="t-td">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                    {{-- showing ppmp data based on department and user --}}
-                                        @foreach ($ppmp_response as $item)
-                                            <tr>
-                                                <td>{{ $loop->iteration }}</td>
-                                                <td class="text-nowrap">{{ $item->item_name }}</td>
-                                                <td>{{ $item->app_type }}</td>
-                                                <td>{{ $item->quantity }}</td>
-                                                <td>₱{{ number_format($item->unit_price,2,'.',',')  }}</td>
-                                                <td>₱{{ number_format($item->estimated_price,2,'.',',')  }}</td>
-                                                <td>{{ $item->item_description }}</td>
-                                                <td>{{ $item->unit_of_measurement }}</td>
-                                                <td>{{ $item->mode_of_procurement }}</td>
-                                                <td>{{  (new GlobalDeclare)->Month( $item->expected_month) }}</td>
-                                                    @if (Str::ucfirst((new GlobalDeclare)->status($item->status)) == 'approved')
-                                                        <td class="text-success">{{ Str::ucfirst((new GlobalDeclare)->status($item->status))  }}</td>
-                                                    @else
-                                                        <td class="text-danger">{{ Str::ucfirst((new GlobalDeclare)->status($item->status)) }}</td>
-                                                    @endif
-                                                <td class="text-nowrap">{{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0] }}</td>
-                                                <td>
-                                                    <div class="dropdown">
-                                                        <span
-                                                            class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
-                                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu">
-                                                        </span>
-                                                        <div class="dropdown-menu dropdown-menu-left">
-                                                            <a class="dropdown-item" data-id = "{{ $item->ppmps_id }}" id="edit-ppmp-btn" href = "#">
-                                                                <i class="bx bx-edit-alt mr-1"></i> edit
-                                                            </a>
-                                                            <a href="{{ route('department-delete-item', ['id'=> (new AESCipher)->encrypt($item->ppmps_id)]) }}" class="dropdown-item" id="delete-item-btn">
-                                                                <i class="bx bx-trash mr-1"></i> delete
-                                                            </a>
-                                                        </div>
-                                                    </div> 
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    
+                                {{-- showing ppmp data based on department and user --}}
+                                    @foreach ($ppmp_response as $item)
+                                        <tr id="t-tr">
+                                            <td id="t-td">{{ $loop->iteration }}</td>
+                                            <td id="t-td" class="text-nowrap">{{ $item->item_name }}</td>
+                                            <td id="t-td">{{ $item->app_type }}</td>
+                                            <td id="t-td">{{ $item->quantity }}</td>
+                                            <td id="t-td">₱{{ number_format($item->unit_price,2,'.',',')  }}</td>
+                                            <td id="t-td">₱{{ number_format($item->estimated_price,2,'.',',')  }}</td>
+                                            <td id="t-td">{{ $item->item_description }}</td>
+                                            <td id="t-td">{{ $item->unit_of_measurement }}</td>
+                                            <td id="t-td">{{ $item->mode_of_procurement }}</td>
+                                            <td id="t-td">{{  (new GlobalDeclare)->Month( $item->expected_month) }}</td>
+                                            <td id="t-td">{{ Str::ucfirst((new GlobalDeclare)->status($item->status))  }}</td>
+                                            <td id="t-td" class="text-nowrap">{{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0] }}</td>
+                                            <td id="t-td">
+                                                <div class="dropdown">
+                                                    <span
+                                                        class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
+                                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu">
+                                                    </span>
+                                                    <div class="dropdown-menu dropdown-menu-left">
+                                                        <a class="dropdown-item" data-id = "{{ $item->ppmps_id }}" id="edit-ppmp-btn" href = "#">
+                                                            <i class="bx bx-edit-alt mr-1"></i> edit
+                                                        </a>
+                                                        <a href="{{ route('department-delete-item', ['id'=> (new AESCipher)->encrypt($item->ppmps_id)]) }}" class="dropdown-item" id="delete-item-btn">
+                                                            <i class="bx bx-trash mr-1"></i> delete
+                                                        </a>
+                                                    </div>
+                                                </div> 
+                                            </td>
+                                        </tr>
+                                    @endforeach
                                 {{-- showing ppmp data based on department and user --}}
                             </tbody>
                         </table>
                 </div>
                     {{-- adding submit ppmp feature --}}
-                    <div class="form-group p-1 row justify-content-center">
-                        <div class="form-group col-6">
-                            <form action="{{ route('department-submit-ppmp') }}" method="post">@csrf @method('POST')
-                                <input type="text" value="{{ (new AESCipher)->encrypt($project_title_id) }}" class="form-control d-none" name="current_project_code">
-                                <input type="text" class="form-control d-none" name="remaining_balance" value="{{ $allocated_budgets[0]->remaining_balance }}">
-                                <input type="text" class="form-control d-none" name="total_estimated_price" value="{{ $total_estimated_price }}">
-                                <input type="text" class="form-control d-none" name="allocated_budget" value="{{ $allocated_budgets[0]->id }}">
-                                <input type="text" class="form-control d-none" name="deadline_of_submission" value="{{ $allocated_budgets[0]->deadline_of_submission }}">
-                                <button type="submit" class="btn btn-success form-control">Submit PPMP</button>
-                            </form>
-                        </div>
-                    </div>
+                        @if (Carbon::now()->format('Y-m-d') >= $allocated_budgets[0]->deadline_of_submission)
+                            <div class="form-group p-1 row justify-content-center">
+                                <div class="container">
+                                    <div class="alert alert-danger alert-dismissible fade show col-12" role="alert">
+                                        <strong>Issue!</strong> This PPMP has reached the deadline of submission. Please contact campus Budget Officer.
+                                    </div>
+                               </div>
+                            </div>
+                        @else
+                            <div class="form-group p-1 row justify-content-center">
+                                <div class="form-group col-6">
+                                    <form action="{{ route('department-submit-ppmp') }}" method="post">@csrf @method('POST')
+                                        <input type="text" value="{{ (new AESCipher)->encrypt($project_title_id) }}" class="form-control d-none" name="current_project_code">
+                                        <input type="text" class="form-control d-none" name="remaining_balance" value="{{ $allocated_budgets[0]->remaining_balance }}">
+                                        <input type="text" class="form-control d-none" name="total_estimated_price" value="{{ $total_estimated_price }}">
+                                        <input type="text" class="form-control d-none" name="allocated_budget" value="{{ $allocated_budgets[0]->id }}">
+                                        <input type="text" class="form-control d-none" name="deadline_of_submission" value="{{ $allocated_budgets[0]->deadline_of_submission }}">
+                                        <button type="submit" class="btn btn-success form-control">Submit PPMP</button>
+                                    </form>
+                                </div>
+                            </div>
+                        @endif
                     {{-- end adding submit ppmp feature --}}
-              
                 {{-- creating data tables for the list of project titles --}}
             </div>
         </div>
