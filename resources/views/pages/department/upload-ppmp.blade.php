@@ -21,6 +21,21 @@
 <link rel="stylesheet" type="text/css" href="{{asset('css/plugins/extensions/toastr.css')}}">
 @endsection
 @section('content')
+<style>
+  #t-table, #t-th, #t-td  {
+      border: 1px solid;
+      font-size: 11px;
+      padding: 5px;
+      text-align: center;
+  }
+  #t-table{
+      width: 100%;
+  }
+
+  .tbg-secondary {
+      background-color: rgba(71, 95, 123, 0.9) !important;
+  }
+</style>
 <!-- Zero configuration table -->
 {{-- preview uploaded ppmp --}}
     <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" id="preview-ppmp" aria-labelledby="myLargeModalLabel" aria-hidden="true">
@@ -209,27 +224,27 @@
               {{-- search uploaded ppmp --}}
               {{-- list of uploaded ppmp --}}
                     <div class="table-responsive col-12 container">
-                      <table class="table zero-configuration item-table" id="item-table">
+                      <table class="table zero-configuration item-table" id="item-table t-table">
                           <thead>
-                              <tr>
-                                  <th>#</th>
-                                  <th>Project Category</th>
-                                  <th>Year Created</th>
-                                  <th>File Name</th>
-                                  <th>Date Created</th>
-                                  <th>Action</th>
+                              <tr id="t-tr">
+                                  <th id="t-td">#</th>
+                                  <th id="t-td">Project Category</th>
+                                  <th id="t-td">Year Created</th>
+                                  <th id="t-td">File Name</th>
+                                  <th id="t-td">Date Created</th>
+                                  <th id="t-td">Action</th>
                               </tr>
                           </thead>
                           <tbody>
                               {{-- showing ppmp data based on department and user --}}
                                  @foreach ($response as $item)
-                                     <tr>
-                                        <td>{{ $loop->iteration }}</td>
-                                        <td class="text-nowrap">{{ (new GlobalDeclare)->project_category($item->project_category) }}</td>
-                                        <td>{{ $item->year_created }}</td>
-                                        <td><a class="btn btn-link" >{{ $item->file_name }}</a></td>
-                                        <td  class="text-nowrap">{{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0]  }}</td>
-                                        <td>
+                                     <tr id="t-tr">
+                                        <td id="t-td">{{ $loop->iteration }}</td>
+                                        <td id="t-td" class="text-nowrap">{{ (new GlobalDeclare)->project_category($item->project_category) }}</td>
+                                        <td id="t-td">{{ $item->year_created }}</td>
+                                        <td id="t-td">{{ $item->file_name }}</td>
+                                        <td id="t-td" class="text-nowrap">{{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0]  }}</td>
+                                        <td id="t-td">
                                           <div class="dropdown">
                                               <span
                                                   class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"

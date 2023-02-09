@@ -22,8 +22,17 @@
 @endsection
 @section('content')
 <style>
-    table {
-        font-size: 13px !important;
+    #t-table, #t-th, #t-td  {
+        border: 1px solid;
+        font-size: 11px;
+        padding: 5px;
+        text-align: center;
+    }
+    #t-table{
+        width: 100%;
+    }
+    .tbg-secondary {
+        background-color: rgba(71, 95, 123, 0.9) !important;
     }
 </style>
 <!-- Zero configuration table -->
@@ -242,37 +251,36 @@
                             <div class="tab-pane active" id="my-ppmp" aria-labelledby="my-ppmp-tab" role="tabpanel"> 
                                 {{-- my ppmp data --}}
                                     <div class="table-responsive col-12 container">
-                                        <table class="table zero-configuration item-table" id="item-table">
+                                        <table class="table zero-configuration item-table" id="item-table t-table">
                                             <thead>
-                                                <tr>
-                                                    <th>#</th>
-                                                    <!-- <th>Project Code</th> -->
-                                                    <th>Project Title</th>
-                                                    <th>Year</th>
-                                                    <th>Immediate SUPERVISOR</th>
-                                                    <th>Project Type</th>
-                                                    <th>Project Category</th>
-                                                    <th>Fund Source</th>
-                                                    <th>status</th>
-                                                    <th>Date Added</th>
-                                                    <th>Action</th>
+                                                <tr id="t-tr">
+                                                    <th id="t-td">#</th>
+                                                    <th id="t-td">Project Title</th>
+                                                    <th id="t-td">Year</th>
+                                                    <th id="t-td">Immediate SUPERVISOR</th>
+                                                    <th id="t-td">Project Type</th>
+                                                    <th id="t-td">Project Category</th>
+                                                    <th id="t-td">Fund Source</th>
+                                                    <th id="t-td">status</th>
+                                                    <th id="t-td">Date Added</th>
+                                                    <th id="t-td">Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 {{-- showing ppmp data based on department and user --}}
                                                     @for ($i = 0; $i < count(json_decode($project_titles)); $i++)
-                                                        <tr>
-                                                            <td>{{ ($i) + 1 }}</td>
+                                                        <tr id="t-tr">
+                                                            <td id="t-td">{{ ($i) + 1 }}</td>
                                                             <!-- <td>{{ json_decode($project_titles)[$i]->project_code }}</td> -->
-                                                            <td  class="text-nowrap">{{ json_decode($project_titles)[$i]->project_title }}</td>
-                                                            <td>{{ json_decode($project_titles)[$i]->project_year }}</td>
-                                                            <td>{{ json_decode($project_titles)[$i]->immediate_supervisor }}</td>
-                                                            <td>{{ json_decode($project_titles)[$i]->project_type }}</td>
-                                                            <td>{{ (new GlobalDeclare)->project_category(json_decode($project_titles)[$i]->project_category) }}</td>
-                                                            <td class="text-nowrap">{{ json_decode($project_titles)[$i]->fund_source }}</td>
-                                                            <td class="text-nowrap">{{ (new GlobalDeclare)->status(json_decode($project_titles)[$i]->status) }}</td>
-                                                            <td class="text-nowrap"> {{ explode('-', date('j F, Y-', strtotime($project_titles[$i]->updated_at)))[0] }}</td>
-                                                            <td>
+                                                            <td id="t-td"  class="text-nowrap">{{ json_decode($project_titles)[$i]->project_title }}</td>
+                                                            <td id="t-td">{{ json_decode($project_titles)[$i]->project_year }}</td>
+                                                            <td id="t-td">{{ json_decode($project_titles)[$i]->immediate_supervisor }}</td>
+                                                            <td id="t-td">{{ json_decode($project_titles)[$i]->project_type }}</td>
+                                                            <td id="t-td">{{ (new GlobalDeclare)->project_category(json_decode($project_titles)[$i]->project_category) }}</td>
+                                                            <td id="t-td" class="text-nowrap">{{ json_decode($project_titles)[$i]->fund_source }}</td>
+                                                            <td id="t-td" class="text-nowrap">{{ (new GlobalDeclare)->status(json_decode($project_titles)[$i]->status) }}</td>
+                                                            <td id="t-td" class="text-nowrap"> {{ explode('-', date('j F, Y-', strtotime($project_titles[$i]->updated_at)))[0] }}</td>
+                                                            <td id="t-td">
                                                                 <form action="{{ route('department-showProjectStatus') }}" method="post"> @csrf @method('POST')
                                                                     <input type="text" class="form-control d-none" name="id" value="{{ (new AESCipher)->encrypt(json_decode($project_titles)[$i]->id) }}">
                                                                     <button class="dropdown-item btn-primary text-center" type="submit" id="show-modal">View Status</button>
@@ -292,35 +300,35 @@
                             <div class="tab-pane" id="dissapproved" aria-labelledby="dissapproved-ppmp-tab" role="tabpanel">
                                 <div class="row justify-content-center">
                                     <div class="table-responsive col-md-12 col-sm-12">
-                                        <table class="table zero-configuration item-table" id="item-table">
+                                        <table class="table zero-configuration item-table" id="item-table t-table">
                                             <thead>
-                                                <tr>
-                                                    <th>#</th>
-                                                    <th>Project Title</th>
-                                                    <th>Year</th>
-                                                    <th>Status</th>
-                                                    <th>IMmEDIATE SUPERVISOR</th>
-                                                    <th>Project Type</th>
-                                                    <th>Project Category</th>
-                                                    <th>Fund Source</th>
-                                                    <th>Date Added</th>
-                                                    <th>Action</th>
+                                                <tr id="t-tr">
+                                                    <th id="t-td">#</th>
+                                                    <th id="t-td">Project Title</th>
+                                                    <th id="t-td">Year</th>
+                                                    <th id="t-td">Status</th>
+                                                    <th id="t-td">IMmEDIATE SUPERVISOR</th>
+                                                    <th id="t-td">Project Type</th>
+                                                    <th id="t-td">Project Category</th>
+                                                    <th id="t-td">Fund Source</th>
+                                                    <th id="t-td">Date Added</th>
+                                                    <th id="t-td">Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 {{-- showing ppmp data based on department and user --}}
                                                     @foreach ($pt_show_disapproved as $item)
-                                                        <tr>
-                                                            <td>{{ $loop->iteration }}</td>
-                                                            <td>{{ $item->project_title }}</td>
-                                                            <td>{{ $item->year_created }}</td>
-                                                            <td>{{ Str::ucfirst((new GlobalDeclare)->status($item->status)) }}</td>
-                                                            <td>{{ $item->immediate_supervisor }}</td>
-                                                            <td>{{ $item->project_type }}</td>
-                                                            <td>{{ (new GlobalDeclare)->project_category($item->project_category) }}</td>
-                                                            <td>{{ $item->fund_source }}</td>
-                                                            <td  class="text-nowrap">{{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0]  }}</td>
-                                                            <td>
+                                                        <tr id="t-tr">
+                                                            <td id="t-td">{{ $loop->iteration }}</td>
+                                                            <td id="t-td">{{ $item->project_title }}</td>
+                                                            <td id="t-td">{{ $item->year_created }}</td>
+                                                            <td id="t-td">{{ Str::ucfirst((new GlobalDeclare)->status($item->status)) }}</td>
+                                                            <td id="t-td">{{ $item->immediate_supervisor }}</td>
+                                                            <td id="t-td">{{ $item->project_type }}</td>
+                                                            <td id="t-td">{{ (new GlobalDeclare)->project_category($item->project_category) }}</td>
+                                                            <td id="t-td">{{ $item->fund_source }}</td>
+                                                            <td id="t-td"  class="text-nowrap">{{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0]  }}</td>
+                                                            <td id="t-td">
                                                                 <div class="dropdown">
                                                                     <span
                                                                         class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
@@ -352,9 +360,9 @@
                             <div class="tab-pane" id="approved" aria-labelledby="approved-ppmp-tab" role="tabpanel">
                                 <div class="row justify-content-center">
                                     <div class="table-responsive col-md-12 col-sm-12">
-                                        <table class="table zero-configuration item-table" id="item-table">
+                                        <table class="table zero-configuration item-table" id="item-table t-table">
                                             <thead>
-                                                <tr>
+                                                <tr id="t-tr">
                                                     <th>#</th>
                                                     <th>Project Title</th>
                                                     <th>Year</th>
@@ -370,17 +378,17 @@
                                             <tbody>
                                                 {{-- showing ppmp data based on department and user --}}
                                                     @foreach ($pt_show_approved as $item)
-                                                        <tr>
-                                                            <td>{{ $loop->iteration }}</td>
-                                                            <td class="text-nowrap">{{ $item->project_title }}</td>
-                                                            <td>{{ $item->year_created }}</td>
-                                                            <td  class="text-nowrap">{{ Str::ucfirst((new GlobalDeclare)->status($item->status)) }}</td>
-                                                            <td  class="text-nowrap">{{ $item->immediate_supervisor }}</td>
-                                                            <td  class="text-nowrap">{{ $item->project_type }}</td>
-                                                            <td>{{ (new GlobalDeclare)->project_category($item->project_category) }}</td>
-                                                            <td  class="text-nowrap">{{ $item->fund_source }}</td>
-                                                            <td class="text-nowrap">{{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0]  }}</td>
-                                                            <td>
+                                                        <tr id="t-tr">
+                                                            <td id="t-td">{{ $loop->iteration }}</td>
+                                                            <td id="t-td" class="text-nowrap">{{ $item->project_title }}</td>
+                                                            <td id="t-td">{{ $item->year_created }}</td>
+                                                            <td id="t-td" class="text-nowrap">{{ Str::ucfirst((new GlobalDeclare)->status($item->status)) }}</td>
+                                                            <td id="t-td" class="text-nowrap">{{ $item->immediate_supervisor }}</td>
+                                                            <td id="t-td" class="text-nowrap">{{ $item->project_type }}</td>
+                                                            <td id="t-td">{{ (new GlobalDeclare)->project_category($item->project_category) }}</td>
+                                                            <td id="t-td" class="text-nowrap">{{ $item->fund_source }}</td>
+                                                            <td id="t-td" class="text-nowrap">{{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0]  }}</td>
+                                                            <td id="t-td">
                                                                 <div class="dropdown">
                                                                     <span
                                                                         class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
