@@ -115,6 +115,7 @@ class DepartmentPagesController extends Controller
                                 'users.name as immediate_supervisor',
                                 'allocated__budgets.deadline_of_submission'
                             ]);
+                            // dd($project_titles);
                         # from departments table
                             $departments = \DB::table('departments')->where('id', session('department_id'))->get();
                         # from categories table
@@ -245,7 +246,6 @@ class DepartmentPagesController extends Controller
                     $breadcrumbs = [
                         ["link" => "/", "name" => "Home"],
                         ["link" => "/department/project-category", "name" => "PROJECT CATEGORY"],
-                        ["link" => "/department/createPPMP", "name" => "PROJECT TITLES"],
                         ["name" => "ADD ITEM"]
                     ];
                     return view('pages.department.add-item',
