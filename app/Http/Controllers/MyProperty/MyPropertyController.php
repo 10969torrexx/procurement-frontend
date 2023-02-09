@@ -307,15 +307,16 @@ class MyPropertyController extends Controller
 
             
             # this will created history_log
-            (new HistoryLogController)->store(
-                session('department_id'),
-                session('employee_id'),
-                session('campus'),
-                NULL,
-                'Add User for My Property, User: '.$id,
-                'add',
-                $request->ip(),
-              );
+                (new HistoryLogController)->store(
+                    session('department_id'),
+                    session('employee_id'),
+                    session('campus'),
+                    NULL,
+                    'Add User for My Property, User: '.$id,
+                    'add',
+                    $request->ip(),
+                );
+            #end
 
             $properties = DB::table("property_current_user as pc")
                 ->select('pc.*','p.id','p.quantity as Quantity','p.ItemName')
