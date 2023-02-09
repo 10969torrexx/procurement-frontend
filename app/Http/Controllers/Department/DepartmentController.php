@@ -764,13 +764,15 @@ class DepartmentController extends Controller
                         ]);
                     }
                 # end
-                $file_name = (new GlobalDeclare)->project_category((new AESCipher)->decrypt($request->project_category)) .'-'. time();
-                $destination_path = env('APP_NAME').'\\department_upload\\signed_ppmp\\';
-                if (!\Storage::exists($destination_path)) {
-                    \Storage::makeDirectory($destination_path);
-                }
-                $file->storeAs($destination_path, $file_name.'.'.$extension);
-                $file->move('storage/'. $destination_path, $file_name.'.'.$extension);
+                # moving of the actual file
+                    $file_name = (new GlobalDeclare)->project_category((new AESCipher)->decrypt($request->project_category)) .'-'. time();
+                    $destination_path = env('APP_NAME').'\\department_upload\\signed_ppmp\\';
+                    if (!\Storage::exists($destination_path)) {
+                        \Storage::makeDirectory($destination_path);
+                    }
+                    $file->storeAs($destination_path, $file_name.'.'.$extension);
+                    $file->move('storage/'. $destination_path, $file_name.'.'.$extension);
+                # end
                 # storing data to signed_ppmp table
                     \DB::table('signed_ppmp')
                     ->insert([

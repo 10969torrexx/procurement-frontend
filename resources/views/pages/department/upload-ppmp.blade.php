@@ -327,6 +327,7 @@
             data: {
               'id' : $(this).data('id')
             }, success: function(response) {
+                console.log(response);
                 response['data'].forEach(element => {
                     $('#content').append(`<iframe src="{{asset("storage/department_upload/signed_ppmp/`+ element.signed_ppmp +`")}}" style="width:100% !important;" height="600" frameborder="0"></iframe>`);
                 });
