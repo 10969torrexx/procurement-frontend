@@ -325,16 +325,16 @@ class SupervisorController extends Controller
 
           }else{
             # this will get the project based on project id
-            $pt_year_created = DB::table('project_titles')
-                  ->where('id', $request->project_id)
-                  ->whereNull('deleted_at')
-                  ->first();
+              $pt_year_created = DB::table('project_titles')
+                    ->where('id', $request->project_id)
+                    ->whereNull('deleted_at')
+                    ->first();
 
-            $code = DB::table('project_titles')
-              ->where('id',$request->project_id)
-              ->update([
-                  'project_code'  => $pt_year_created->year_created . '-'. (count($status) + 1)
-              ]);
+              $code = DB::table('project_titles')
+                ->where('id',$request->project_id)
+                ->update([
+                    'project_code'  => $pt_year_created->year_created . '-'. (count($status) + 1)
+                ]);
             # end
           }
         #end
