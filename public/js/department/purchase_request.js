@@ -535,7 +535,7 @@ $(document).on('click', '.print', function (e) {
       // 'value' : $(this).val()
   };
 
-console.log(data);
+// console.log(data);
     $.ajax({
     type: 'post',
     url: "/department/trackPR/view_pr/printPR",
@@ -707,7 +707,96 @@ $(document).on('click', '.editbutton', function (e) {
 
 });
 // END EDIT BUTTON
+$(document).on('click', '.edit_SignedPR_button', function (e) {
+  e.preventDefault();
 
+  var id = $(this).attr("href");
+  var data = {
+      'id': id,
+    } 
+    $.ajax({
+      type: "GET",
+      url: "/PR/signed_pr/edit_signed_pr",
+      data: data,
+      success: function (response) {
+        if (response.status == 200) {
+          console.log(response)
+          response['data'].forEach(element => {
+            $('#signedPR_id').val(element.id);
+            $('#update_pr_no').val(element.pr_no);
+           });
+          $('#update_file_name').val(response['file_name'][0]);
+          $('#EditSignedPRModal').modal('show');
+        }
+        if (response.status == 400) {
+          $('.quantity').val(''); 
+          Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: response.message,
+            })
+        }
+      }
+  });
+
+
+});
+
+$("form#updateSignedPR").submit(function(e) {
+  e.preventDefault();
+ 
+  var formData = new FormData(this);    
+  
+  $.ajax({
+      url:'/PR/signed_pr/update_signed_pr',
+      type: 'POST',
+      data: formData,
+      success: function (response) {
+          // alert(data)
+          if (response.status == 200) {
+            // Swal.fire({
+            //   icon: 'success',
+            //   title: 'Success',
+            //   text: response.message,
+            //   })
+              $('#EditSignedPRModal').modal('hide');
+              Swal.fire({
+                title: 'Saved',
+                icon: 'success',
+                html: response.message,
+                timer: 1000,
+                timerProgressBar: true,
+                didOpen: () => {
+                  Swal.showLoading()
+                  const b = Swal.getHtmlContainer().querySelector('b')
+                  timerInterval = setInterval(() => {
+                    b.textContent = Swal.getTimerLeft()
+                  }, 100)
+                },
+                willClose: () => {
+                  clearInterval(timerInterval)
+                }
+              }).then((result) => {
+                if (result.dismiss === Swal.DismissReason.timer) {
+                  location.reload();
+                }
+              })
+          }
+          if (response.status == 400) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: response.message,
+              })
+          }
+      },
+      cache: false,
+      contentType: false,
+      processData: false
+  });
+
+
+});
 
 $("form#updateItem").submit(function(e) {
   e.preventDefault();
@@ -727,6 +816,61 @@ $("form#updateItem").submit(function(e) {
             //   text: response.message,
             //   })
               $('#EditPRModal').modal('hide');
+              Swal.fire({
+                title: 'Saved',
+                icon: 'success',
+                html: response.message,
+                timer: 1000,
+                timerProgressBar: true,
+                didOpen: () => {
+                  Swal.showLoading()
+                  const b = Swal.getHtmlContainer().querySelector('b')
+                  timerInterval = setInterval(() => {
+                    b.textContent = Swal.getTimerLeft()
+                  }, 100)
+                },
+                willClose: () => {
+                  clearInterval(timerInterval)
+                }
+              }).then((result) => {
+                if (result.dismiss === Swal.DismissReason.timer) {
+                  location.reload();
+                }
+              })
+          }
+          if (response.status == 400) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: response.message,
+              })
+          }
+      },
+      cache: false,
+      contentType: false,
+      processData: false
+  });
+
+
+});
+
+$("form#upload_signed_pr").submit(function(e) {
+  e.preventDefault();
+//  alert('success');  
+ var formData = new FormData(this);    
+  
+  $.ajax({
+      url:'/PR/signed_pr/upload_signed_pr',
+      type: 'POST',
+      data: formData,
+      success: function (response) {
+          // alert(data)
+          if (response.status == 200) {
+            // Swal.fire({
+            //   icon: 'success',
+            //   title: 'Success',
+            //   text: response.message,
+            //   })
               Swal.fire({
                 title: 'Saved',
                 icon: 'success',
@@ -819,3 +963,57 @@ $(document).on('click', '.deletebutton', function (e) {
             }
       })
 });
+
+$(document).on('click', '.delete_SignedPR_button', function (e) {
+  e.preventDefault();
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    var id = $(this).attr("href");
+    var data = {
+      'id': id,
+      };
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',  
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes',
+      confirmButtonClass: 'btn btn-primary',
+      cancelButtonClass: 'btn btn-danger ml-1',
+      buttonsStyling: false,
+    }).then((result) => {
+            if (result.isConfirmed) {
+              $.ajax({
+                type: "POST",
+                url: "/PR/signed_pr/delete_signed_pr",
+                data:data,
+                success: function (response) {
+                      if(response['status'] == 200) {
+                      location.reload();
+                        Swal.fire({
+                          title: 'Success',
+                          html: response.message,
+                          icon: 'success',
+                        })
+                      }if(response.status == 400){
+                        Swal.fire({ 
+                          icon: 'error',
+                          title: 'Error',
+                          text: response.message,
+                        })
+                      }
+                }
+            });
+            }else if (result.isDenied) {
+              Swal.fire('Changes are not saved', '', 'info')
+            }
+      })
+});
+

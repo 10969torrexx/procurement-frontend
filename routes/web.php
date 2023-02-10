@@ -670,6 +670,15 @@ Route::group(['prefix' => 'PR','middleware' => ['authuser']], function() {
     Route::post('/trackPR/delete_pr', 'Department\PurchaseRequestController@delete_pr')->name('delete_pr');
     Route::get('/trackPR/edit_pr', 'Department\PurchaseRequestController@editPR')->name('edit_pr');
 
+    Route::get('/signed_pr', 'Department\PurchaseRequestController@SignedPRIndex')->name('signed_pr');
+    Route::post('/signed_pr/upload_signed_pr', 'Department\PurchaseRequestController@upload_signed_pr')->name('upload_signed_pr');
+    Route::get('/signed_pr/edit_signed_pr', 'Department\PurchaseRequestController@edit_signed_pr')->name('edit_signed_pr');
+    Route::post('/signed_pr/update_signed_pr', 'Department\PurchaseRequestController@update_signed_pr')->name('update_signed_pr');
+    Route::post('/signed_pr/delete_signed_pr', 'Department\PurchaseRequestController@delete_signed_pr')->name('delete_signed_pr');
+    Route::post('/signed_pr/view_signed_pr', 'Department\PurchaseRequestController@view_signed_pr')->name('view_signed_pr');
+    Route::get('/signed_pr/download_signed_pr', 'Department\PurchaseRequestController@download_signed_pr')->name('download_signed_pr');
+
+
     
 });
 

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Carbon;
+use App\Http\Controllers\HistoryLogController;
 
 use Illuminate\Support\Facades\DB;
 class PurchaseRequestController extends Controller
@@ -69,6 +70,27 @@ class PurchaseRequestController extends Controller
               // 'error' => $error,
           ]); 
   }
+
+  public function SignedPRIndex(){
+    $pageConfigs = ['pageHeader' => true];
+    $breadcrumbs = [
+      ["link" => "/", "name" => "Home"],["name" => "Signed PR"]
+    ];
+
+    $response = DB::table("signed_purchase_request as spr")
+          ->select('spr.*','u.name')
+          ->join('users as u','spr.employee_id','u.employee_id')
+          ->where("spr.department_id", session('department_id'))
+          ->whereNull("spr.deleted_at")
+          ->get();
+          // dd($response);
+
+        return view('pages.department.signed-pr-index',compact('response'), [
+            'pageConfigs'=>$pageConfigs,
+            'breadcrumbs'=>$breadcrumbs,
+            // 'error' => $error,
+        ]); 
+}
 
   public function viewPR(Request $request) {
 
@@ -319,6 +341,232 @@ class PurchaseRequestController extends Controller
    }
   }
 
+  public function view_signed_pr(Request $request) {
+    // dd($request->all());
+    try {
+        $id = (new AESCipher)->decrypt($request->id);
+        $response = DB::table('signed_purchase_request')
+            ->where('id', $id)
+            ->whereNull('deleted_at')
+            ->get([
+                'file_name'
+            ]);
+        # this will create history_log
+            (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                $id,
+                'Viewed Uploaded Signed PR',
+                'View',
+                $request->ip(),
+            );
+        # end
+        return response ([
+            'status'    => 200,
+            'data'  => $response
+        ]);
+    } catch (\Throwable $th) {
+        return view('pages.error-500');
+        throw $th;
+    }
+  }
+  
+  public function download_signed_PR(Request $request) {
+    // dd($request->all());
+    try {
+        $id = (new AESCipher)->decrypt($request->id);
+        $response = DB::table('signed_purchase_request')
+        ->where('id', $id)
+        ->whereNull('deleted_at')
+        ->get([
+            'file_name'
+        ]);
+        // dd($response );
+        # this will created history_log
+            (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                $id,
+                'Downloaded Signed PR',
+                'Download',
+                $request->ip(),
+            );
+        # end
+        $path = 'PMIS/signed_purchase_request/';
+        return Storage::download($path.$response[0]->file_name);
+    } catch (\Throwable $th) {
+        throw $th;
+        return view('pages.error-500');
+    }
+  }
+
+  public function edit_signed_pr(Request $request) {
+    try {
+      // dd($request->all());
+      $id = $this->aes->decrypt($request->id);
+
+      $response = DB::table('signed_purchase_request')
+                    ->where('id',$id)
+                    ->get();
+      foreach($response as $data){
+        $filename = $data->file_name;
+      }
+      $file_name = explode('-',$filename );
+      if($response){
+        return response()->json([
+            'status' => 200,
+            'message' => 'Success',
+            'data' => $response,
+            'file_name' => $file_name,
+        ]);
+      }else{
+        return response()->json([
+                  'status' => 400,
+                  'message' => 'Failed',
+          ]);
+      }
+   } catch (\Throwable $th) {
+       throw $th;
+   }
+  }
+
+  public function update_signed_pr(Request $request){
+    try {
+      $id = $request->signedPR_id;
+      $pr_no = $request->update_pr_no;
+      $file_name = $request->update_file_name.'-'.time();
+      $file = $request->file('update_file');
+      $extension = $request->file('update_file')->getClientOriginalExtension();
+      $is_valid = false;
+
+      $checkPRNo = DB::table('signed_purchase_request')
+          ->where('id','!=', $id)
+          ->where('pr_no',$pr_no)
+          ->whereNull('deleted_at')
+          ->get();
+      $checkFileName = DB::table('signed_purchase_request')
+          ->select('file_name')
+          ->where('id', $id)
+          ->whereNull('deleted_at')
+          ->get();
+      foreach($checkFileName as $data){
+        $oldFileName = $data->file_name;
+      }
+
+      // dd($oldFileName);
+      if(count($checkPRNo) == 1){
+        return response()->json([
+          'status' => 400, 
+          'message' => 'Signed PR for '.$pr_no.' is already uploaded!',
+        ]);
+      }
+      // dd($request->all());
+      # validate extension
+      $allowed_extensions = 'pdf';
+      if($allowed_extensions == $extension) {
+          $is_valid = true;
+      }
+      if($is_valid == false) {
+        return response()->json([
+          'status' => 400,
+          'message' => 'Please upload .pdf file!',
+        ]);
+      }
+
+      $destination_path = env('APP_NAME').'\\signed_purchase_request\\';
+      Storage::delete($destination_path.$oldFileName);
+
+      if (!Storage::exists($destination_path)) {
+        Storage::makeDirectory($destination_path);
+      }
+      $file->storeAs($destination_path, $file_name.'.'.$extension);
+      $file->move('storage/'. $destination_path, $file_name.'.'.$extension); 
+
+      (new HistoryLogController)
+      ->store(
+            session('department_id'),
+            session('employee_id'),
+            session('campus'),
+            $id,
+            'Updated the Uploaded Signed PR',
+            'Update',
+            $request->ip()
+          );
+
+      $response = DB::table('signed_purchase_request')
+                    ->where('id',$id)
+                    ->update([
+                        'pr_no' => $pr_no,
+                        'file_name' => $file_name.'.pdf',
+                        'updated_at' =>  Carbon::now()
+                    ]);
+                    
+      if($response){
+        return response()->json([
+          'status' => 200, 
+          'message' => 'Signed PR Updated Successfully!',
+        ]); 
+      }else{
+        return response()->json([
+          'status' => 400, 
+          'message' => 'Error!',
+        ]); 
+      }
+      
+    } catch (\Throwable $th) {
+      dd('add_Items_To_PR FUNCTION '+$th);
+    }
+  }
+
+  public function delete_signed_pr(Request $request){
+    // dd($request->all());
+    $id = (new AESCipher())->decrypt($request->id);
+    $checkFileName = DB::table('signed_purchase_request')
+        ->select('file_name')
+        ->where('id', $id)
+        ->get();
+    foreach($checkFileName as $data){
+      $oldFileName = $data->file_name;
+    }
+    $response = DB::table('signed_purchase_request')
+                  ->where('id',$id)
+                  ->update([
+                      'deleted_at' =>  Carbon::now()
+                  ]);
+    
+
+    $destination_path = env('APP_NAME').'\\signed_purchase_request\\';
+    Storage::delete($destination_path.$oldFileName);
+
+    if($response)
+    {
+        (new HistoryLogController)
+          ->store(
+            session('department_id'),
+            session('employee_id'),
+            session('campus'),
+            $id,
+            'Deleted Uploaded Signed PR',
+            'Delete',
+            $request->ip()
+          );
+
+        return response()->json([
+            'status'=>200,
+            'message'=>'PR Deleted Successfully!'
+        ]);
+    }
+    else
+    {
+        return response()->json([
+            'status'=>400,
+            'message'=>'Error!'
+        ]);
+    }
+  }
+
   public function add_Items_To_PR(Request $request){
       try {
         // dd($request->all());  
@@ -351,6 +599,83 @@ class PurchaseRequestController extends Controller
       }
   }
   
+  public function upload_signed_pr(Request $request){
+    try {
+      // dd($request->all());
+      $pr_no = $request->pr_no;
+      $file_name = $request->file_name.'-'.time();
+      $file = $request->file('file');
+      $extension = $request->file('file')->getClientOriginalExtension();
+      $is_valid = false;
+      # validate extension
+          $allowed_extensions = ['pdf'];
+          for ($i = 0; $i < count($allowed_extensions) ; $i++) { 
+             if($allowed_extensions[$i] == $extension) {
+                  $is_valid = true;
+             }
+          }
+          if($is_valid == false) {
+            return response()->json([
+                'status' => 400, 
+                'message' => 'Please upload .pdf file!',
+            ]);
+          }
+
+          $checkPRNo = DB::table('signed_purchase_request')
+          ->where('pr_no',$pr_no)
+          ->whereNull('deleted_at')
+          ->get();
+
+          if(count($checkPRNo) == 1){
+            return response()->json([
+              'status' => 400, 
+              'message' => 'Signed PR for '.$pr_no.' is already uploaded!',
+            ]);
+          }
+          // $file_name = $item_name.'-'.time();
+          $destination_path = env('APP_NAME').'\\signed_purchase_request\\';
+          if (!Storage::exists($destination_path)) {
+            Storage::makeDirectory($destination_path);
+          }
+          $file->storeAs($destination_path, $file_name.'.'.$extension);
+          $file->move('storage/'. $destination_path, $file_name.'.'.$extension); 
+
+          (new HistoryLogController)
+          ->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                null,
+                'Uploaded a File',
+                'Upload',
+                $request->ip()
+              );
+
+          $response = DB::table('signed_purchase_request')
+                              ->insert([
+                                  'pr_no' => $pr_no,
+                                  'department_id' => session('department_id'),
+                                  'employee_id' => session('employee_id'),
+                                  'file_name' => $file_name.'.'.$extension,
+                                  'created_at' =>  Carbon::now()
+                              ]);
+
+          if($response){
+            return response()->json([
+              'status' => 200, 
+              'message' => 'File uploaded succesfully!',
+          ]);
+
+            return response()->json([
+              'status' => 400, 
+              'message' => 'Error!',
+            ]);
+          }
+    } catch (\Throwable $th) {
+      dd('upload_signed_pr FUNCTION '+$th);
+    }
+  }
+
   public function addItem(Request $request){
     try {
       // dd($request->all());
@@ -794,28 +1119,6 @@ class PurchaseRequestController extends Controller
                   'message' => 'failed',
           ]);
       }
-      // $department_id = session('department_id');
-      // $item = DB::table('ppmps')
-      //               ->select('quantity','item_name')
-      //               ->where('project_code','=',$project_code)
-      //               ->where('id','=',$id)
-      //               ->get();
-                    // dd($quantity);  
-      // dd($item[0]->quantity);
-      // if($quantity == $item[0]->quantity){
-      //     return response()->json([
-      //         'status' => 400,
-      //         'message' => $item[0]->item_name.' are already consumed!',
-      //     ]); 
-      // }else{
-      //     return response()->json([
-      //         'status' => 200,
-      //         'message' => 'Success',
-      //         'data' => ($item[0]->quantity)-$quantity,
-      //     ]);
-      // }
-
-
       } catch (\Throwable $th) {
         dd('getItems FUNCTION '+$th);
       }
@@ -1196,6 +1499,7 @@ class PurchaseRequestController extends Controller
     }
   }
 
+  
   // public function edit_pr(Request $request){
   //   dd('success');
   //   $id = (new AESCipher())->decrypt($request->id);

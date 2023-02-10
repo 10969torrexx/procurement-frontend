@@ -50,7 +50,7 @@
                     </div>
                 </div>
                 
-                <div class="container">
+                 
                     <div class="row" hidden>
                         <fieldset class="form-group">
                             <input type="text" class="pr_no form-control"  placeholder="" value="<?=$aes->encrypt($pr_no)?>">
@@ -68,9 +68,11 @@
                         </fieldset>
                     </div>
                     @if (!empty(session("globalerror")))
+                    <div class="col-sm-12">
                         <div class="alert alert-danger" role="alert">
                             {{session("globalerror")}}
                         </div>
+                    </div>
                     @else
                     
                     <form action="{{ route('addItem') }}" method="POST" enctype="multipart/form-data"> @csrf

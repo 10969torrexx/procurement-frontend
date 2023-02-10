@@ -1151,6 +1151,7 @@ class BudgetOfficerController extends Controller
                             'updated_at' =>  Carbon::now()
                             ]
                         );
+                        
                 (new HistoryLogController)->store(session('department_id'),session('employee_id'),session('campus'),$id,'Updated Deadline','Update',$request->ip());
 
                 if( $response)

@@ -8,7 +8,7 @@
 
 @extends('layouts.contentLayoutMaster')
 {{-- title --}}
-@section('title','Track Purchase Request')
+@section('title','Signed Purchase Request')
 
 {{-- vendor style --}}
 @section('vendor-styles')
@@ -32,8 +32,59 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title text-center mt-2">
-                        <strong>PURCHASE REQUEST</strong>
+                    <h4 class="card-title text-center mb-2 mt-2">
+                       <strong>UPLOAD SIGNED PURCHASE REQUEST</strong> 
+                    </h4>
+                </div>
+                <div class="card-content">
+                    <div class="card-body card-dashboard">
+                        <div class="container">
+
+                        <form id="upload_signed_pr" method="POST" enctype="multipart/form-data"> @csrf
+
+                            <div class="row">
+                                <div class="col-sm-2"></div>
+                                <div class="col-sm-4">
+                                    <fieldset class="form-group">
+                                        <label for="PRNo">PR No</label>
+                                        <input type="text" id="pr_no"  class="pr_no form-control" placeholder="Enter PR No" name = "pr_no" value = "" required>
+                                    </fieldset>
+                                </div>
+                                <div class="col-sm-4">
+                                    <fieldset class="form-group">
+                                        <label for="FileName">File Name</label>
+                                        <input type="text" id="file_name"  class="file_name form-control" placeholder="Enter File Name" name = "file_name" value = "" required>
+                                    </fieldset>
+                                </div>
+                                {{-- <div class="col-sm-2"></div> --}}
+
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-2"></div>
+                                <div class="col-sm-6">
+                                    <fieldset class="form-group" >
+                                            <label for="">Upload Scanned Signed PR</label>
+                                            <input type="file" name="file" class="file form-control" required> 
+                                    </fieldset>
+                                </div>
+                                <div class="col-sm-2 mt-2">
+                                    <fieldset class="form-group">
+                                        <button type="submit" class="btn btn-success text-white" id="upload_file"><i class="bx bx-upload"></i> Upload</button>
+                                    </fieldset>
+                                </div>
+                            </div>
+                        </form>
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title text-center">
+                       <strong>SIGNED PURCHASE REQUEST</strong> 
                     </h4>
                 </div>
                 <div class="card-content">
@@ -51,11 +102,9 @@
                                 <thead>
                                     <tr>
                                         <th>Action</th>
-                                        <th>PR No.</th>
-                                        <th>Fund Source</th>
-                                        <th>Purpose</th>
-                                        <th>Printed Name</th>
-                                        <th>Status</th>
+                                        <th>PR No</th>
+                                        <th>File Name</th>
+                                        <th>Uploaded by</th>
                                         <th>Created at</th>
                                     </tr>
                                 </thead>
@@ -64,7 +113,7 @@
                                     <tr><td class="text-center" colspan="4"><span class="text-danger">{{ $error}}</span></td></tr>
                                     @else
                                         <?php $ctr=1; ?>
-                                        @foreach($pr as $data)
+                                        @foreach($response as $data)
                                             <tr id = "{{$ctr}}">
                                                 <td>
                                                     {{-- <form action="{{ route('view_status') }}" method="post">
@@ -77,17 +126,14 @@
                                                             class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
                                                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu"></span>
                                                         <div class="dropdown-menu dropdown-menu-left">
-                                                            <a class="dropdown-item" ctr = "<?=$ctr?>" href = "{{ route('view_pr', ['id' => $aes->encrypt($data->id)]) }}" >
-                                                                <i class="bx bx-show-alt mr-1"></i>View PR</a>
-                                                            <a class="dropdown-item" ctr = "<?=$ctr?>" href = "{{ route('view_status', ['id' => $aes->encrypt($data->id)]) }}">
-                                                                <i class="bx bx-task mr-1"></i>View Status</a>
-                                                            @if($data->status == 0 || $data->status == 1)
-                                                            <a class="dropdown-item" ctr = "<?=$ctr?>" href = "{{ route('edit_pr', ['id' => $aes->encrypt($data->id) , 'pr_no' => $aes->encrypt($data->pr_no)]) }}" >
-                                                                <i class="bx bx-edit-alt mr-1"></i> Edit</a>
-                                                            <a class="dropdown-item deletebutton" ctr = "<?=$ctr?>" href = "{{ $aes->encrypt($data->id) }}" rel = "{{ $aes->encrypt($data->pr_no) }}">
-                                                                <i class="bx bx-trash mr-1"></i> Delete </a>
-                                                            @endif
-                                                            
+                                                            <a class="dropdown-item view_SignedPR_button" ctr = "<?=$ctr?>" href = "{{  $aes->encrypt($data->id) }}" >
+                                                                <i class="bx bx-show-alt mr-1 "></i>View Signed PR</a>
+                                                            <a class="dropdown-item" ctr = "<?=$ctr?>" href = "{{ route('download_signed_pr', ['id' => $aes->encrypt($data->id)]) }}" >
+                                                                <i class="bx bx-download mr-1"></i>Download Signed PR</a>
+                                                            <a class="dropdown-item edit_SignedPR_button" ctr = "<?=$ctr?>" href = "{{ $aes->encrypt($data->id) }}">
+                                                                <i class="bx bx-edit mr-1"></i>Edit Signed PR</a>
+                                                            <a class="dropdown-item delete_SignedPR_button" ctr = "<?=$ctr?>" href = "{{ $aes->encrypt($data->id) }}">
+                                                                <i class="bx bx-trash mr-1"></i>Delete Signed PR</a>
                                                                 {{-- <a class="dropdown-item" ctr = "<?=$ctr?>" href = "{{ route('viewPR', ['id' => $aes->encrypt($data->id)]) }}">
                                                                 <i class="fa fa-eye mr-2"></i>View PR</a> --}}
                                                             {{-- <a href = "{{ route('department-addItem', ['id' => $aes->encrypt($data['id']) => $aes->encrypt($ProjectTitleResponse[$i]['allocated_budget']) ]) }}" class="dropdown-item">
@@ -96,16 +142,8 @@
                                                     </div>   
                                                 </td>
                                                 <td>{{$data->pr_no }}</td>
-                                                <td>{{$data->fund_source}}</td>
-                                                <td>{{$data->purpose}}</td>
+                                                <td>{{$data->file_name}}</td>
                                                 <td>{{$data->name}}</td>
-                                                @if($data->status == 0)
-                                                <td><div class="badge badge-pill badge-light-warning mr-1">Draft</div></td>
-                                                @elseif($data->status == 1)
-                                                <td style="color:blue;"><div class="badge badge-pill badge-light-primary mr-1">Pending</div></td>
-                                                @elseif($data->status == 2)
-                                                <td style="color:green;"><div class="badge badge-pill badge-light-success mr-1">Approved</div></td>
-                                                @endif
                                                 <td>{{ date('M. j, Y', strtotime($data->created_at))}}</td>
                                             </tr>
                                             <?php $ctr = $ctr + 1 ?>
@@ -126,8 +164,9 @@
             </div>
         </div>
     </div>
+@include('pages.department.edit_signedPR_modal')
+@include('pages.department.signed-pr-modal')
 </section>
-{{-- @include('pages.department.preview-PR-modal') --}}
 {{-- @include('pages.department.view-pr') --}}
 
 @if(Session::has('success'))
@@ -163,6 +202,29 @@
 <script src="{{asset('vendors/js/tables/datatable/pdfmake.min.js')}}"></script>
 <script src="{{asset('vendors/js/tables/datatable/vfs_fonts.js')}}"></script>
 
+<script>
+    $(document).on('click', '.view_SignedPR_button', function(e) {
+  e.preventDefault();
+  $('#PreviewSignedPR').modal('show');
+  $('#content').html('');
+  // appending content
+  $.ajax({
+     headers: {
+        'X-CSRF-TOKEN': $("meta[name='csrf-token']").attr('content')
+     },
+     url: "/PR/signed_pr/view_signed_pr",
+     method: 'post',
+     data: {
+        'id' : $(this).attr('href')
+     }, success: function(response) {
+        console.log(response);
+        response['data'].forEach(element => {
+              $('#content').append(`<iframe src="{{asset("storage/PMIS/signed_purchase_request/`+ element.file_name +`")}}" style="width:100% !important;" height="750" frameborder="0"></iframe>`);
+        });
+     }
+  });
+});
+</script>
 {{-- <script src="{{asset('vendors/js/extensions/sweetalert2.all.min.js')}}"></script> --}}
 <script src="{{asset('vendors/js/extensions/polyfill.min.js')}}"></script>
 
