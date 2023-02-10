@@ -121,6 +121,7 @@ class ApprovedPPMPController extends Controller
         ->where('sp.campus','=', session('campus'))
         ->where('sp.deleted_at','=', NULL)
         ->where('sp.project_category','=', 0)
+        ->orderBy('sp.year_created','DESC')
         -> get();
       // dd($ppmp);
     return view('pages.bac.ppmp.view-signed-ppmp',['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs],
@@ -148,6 +149,7 @@ class ApprovedPPMPController extends Controller
         ->where('sp.campus','=', session('campus'))
         ->where('sp.deleted_at','=', NULL)
         ->where('sp.project_category','=', 1)
+        ->orderBy('sp.year_created','DESC')
         -> get();
       // dd($ppmp);
     return view('pages.bac.ppmp.view-signed-ppmp',['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs],
@@ -175,6 +177,7 @@ class ApprovedPPMPController extends Controller
         ->where('sp.campus','=', session('campus'))
         ->where('sp.deleted_at','=', NULL)
         ->where('sp.project_category','=', 2)
+        ->orderBy('sp.year_created','DESC')
         -> get();
       // dd($ppmp);
     return view('pages.bac.ppmp.view-signed-ppmp',['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs],

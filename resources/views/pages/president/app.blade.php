@@ -239,11 +239,11 @@
     <!-- Greetings Content Starts -->
     <section id="basic-datatable">
       <div class="card-content" >
-        <?php $campuscount = count($campusCheck); $camp = 0; $endorse = 0; /* $pres_status = ""; */ $campusload = "";$project_category="";$project_year=""; $appType="";?>
+        <?php $campuscount = count($campusCheck); $camp = 0; $endorse = 0; $pres_status = ""; $campusload = "";$project_category="";$project_year=""; $appType="";?>
             @foreach($campusCheck as $campusload)
               <?php $project_category = $campusload->project_category; 
                     $appType = $campusload->app_type; 
-                    // $pres_status = $campusload->pres_status;
+                    $pres_status = $campusload->pres_status;
                     $endorse = $campusload->endorse;
                     $project_year = $campusload->project_year;?>
                 @if($campusload->campus == 1)
@@ -260,28 +260,28 @@
           <div class="card-header" >
             @if(count($blocked) ==  0 || $blocked == null)
               <div class="row col-sm-4" >
-                @if($bac_stat == 0 || $bac_stat == 2)
-                  <button type="button" class="btn btn-success form-control col-sm-4  approve" value="1" active>Approve</button>
-                @else
-                  @if(count($expired) > 0)
-                    <button type="button" class="btn btn-success form-control col-sm-4  approve" value="0" active><i class="fa-solid fa-rotate-left"></i></button>
+                  @if($bac_stat == 0 || $bac_stat == 2)
+                    <button type="button" class="btn btn-success form-control col-sm-4  approve" value="1" active>Approve</button>
                   @else
-                    <div class="col-sm-12 p-1 bg-info text-white"><i class="fa-solid fa-circle-info"></i> &nbsp; Status can be changed after a day !</div>
+                    @if(count($expired) > 0)
+                      <button type="button" class="btn btn-success form-control col-sm-4  approve" value="0" active><i class="fa-solid fa-rotate-left"></i></button>
+                    @else
+                      <div class="col-sm-12 p-1 bg-info text-white"><i class="fa-solid fa-circle-info"></i> &nbsp; Status can be changed after a day !</div>
+                    @endif
                   @endif
-                @endif
-
-                {{-- @if($Categories[0]->pres_status == 1 || $Categories[0]->pres_status == 2)
-                <button  type="button" class="btn btn-danger form-control col-sm-4 ml-1 disapprove" value="3">Disapprove</button>
-                @else
-                <button  type="button" class="btn btn-danger form-control col-sm-4 ml-1 disapprove" value="1"><i class="fa-solid fa-rotate-left"></i></button>
-                @endif --}}
               </div>
               <hr>
-            @endif
               <div class="row col-sm-4">
-                <p>Status: <span style="color: {{ (new GlobalDeclare)->pres_status_color($bac_stat) }};text-transform: uppercase;">{{ (new GlobalDeclare)->pres_status($bac_stat) }}</span></p> 
-                {{-- <p>Status: <span style="color: {{ (new GlobalDeclare)->pres_status_color($pres_status) }};text-transform: uppercase;">{{ (new GlobalDeclare)->pres_status($pres_status) }}</span></p>  --}}
+                <p>Status: <span class="text-{{ (new GlobalDeclare)->pres_status_color($bac_stat) }}" style="color: ;text-transform: uppercase;">{{ (new GlobalDeclare)->pres_status($bac_stat) }}</span></p> 
               </div>
+            
+            @else
+              <div class="col-sm-4 p-1 bg-{{ (new GlobalDeclare)->pres_status_color($pres_status) }} text-white"><i class="fa-solid fa-circle-info"></i> &nbsp; {{ (new GlobalDeclare)->pres_status($pres_status) }} !</div>
+              <hr>
+            @endif
+            
+            {{-- @if ($pres_status == 0)
+            @endif --}}
             <div class="generate" >
                 <div class="dropdown" style="float: right">
                   <span
