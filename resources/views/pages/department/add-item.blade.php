@@ -375,65 +375,35 @@
                                             </div>
                                         </div>
 
-                                        <div class="row justify-content-center form-group">
-                                            <div class="container">
-                                                {{-- Displaying Error Messages --}}
-                                                    {{-- displaying error message for appended element with null values --}}
-                                                        @if($nullValues = Session::get('nullValues'))
-                                                            <div class="alert alert-damger alert-dismissible fade show" role="alert">
-                                                                <strong>Failed!</strong> Please fill all the required fields
-                                                                <p>
-                                                                    @foreach ($nullValues as $error)
-                                                                        {{ $error  }}
-                                                                    @endforeach
-                                                                </p>
-                                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                                    <span aria-hidden="true">&times;</span>
-                                                                </button>
-                                                            </div>
-                                                        @endif
-                                                    {{-- displaying error message for laravel form validation --}}
-                                                        @if($errors->all())
-                                                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                                                <strong>Failed!</strong> Please fill all the required fields
-                                                                <p>
-                                                                    @foreach ($errors->all() as $error)
-                                                                        <div>{{ $error }}</div>
-                                                                    @endforeach
-                                                                </p>
-                                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                                    <span aria-hidden="true">&times;</span>
-                                                                </button>
-                                                            </div>
-                                                        @endif
-                                                    {{-- Displaying Success Message --}}
-                                                    {{-- this will display success message if ppmp was successfully created --}}
-                                                        @if($message = Session::get('success'))
-                                                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                                                <strong>Success!</strong> 
-                                                                <p>
-                                                                    {{ $message }}
-                                                                </p>
-                                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                                    <span aria-hidden="true">&times;</span>
-                                                                </button>
-                                                            </div>
-                                                        @endif
-                                                        @if($message = Session::get('failed'))
-                                                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                                                <strong>Failed!</strong> 
-                                                                <p>
-                                                                    {{ $message }}
-                                                                </p>
-                                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                                    <span aria-hidden="true">&times;</span>
-                                                                </button>
-                                                            </div>
-                                                        @endif
-                                                    {{-- Displaying Success Message --}}
-                                                {{-- Displaying Error Messages --}}
-                                            </div>
-                                        </div>
+                                        {{-- message and errors --}}
+                                            @if(Session::has('success'))
+                                                <script>
+                                                    Swal.fire({
+                                                        title: 'Success',
+                                                        icon: 'success',
+                                                        html: "{{ Session::get('success') }}",
+                                                    });
+                                                </script>
+                                            @endif
+                                            @if($errors->all())
+                                                <script>
+                                                    Swal.fire({
+                                                        title: 'Error',
+                                                        icon: 'error',
+                                                        html: "Please make sure fields are well accounted for!",
+                                                    });
+                                                </script>
+                                            @endif
+                                            @if(Session::has('failed'))
+                                                <script>
+                                                    Swal.fire({
+                                                        title: 'Error',
+                                                        icon: 'error',
+                                                        html: "{{ Session::get('failed') }}",
+                                                    });
+                                                </script>
+                                            @endif
+                                        {{-- message and errors --}}
 
                                         <div class="row justify-content-center form-group">
                                             <div class="col-12 col-sm-12 col-md-12 p-1 border-bottom">
@@ -1062,16 +1032,27 @@
             $('#item-description-textarea').val($(this).data('item-description'));
         });
     // end
+    // formating unit price
+        $(document).on('keyup', '#unit-price', function(e) {
+            $('#final-unit-price').val($(this).val());
+        });
+    // end
     // calculating estimated price using calculate btn
         $(document).on('click', '#calculate-btn', function(e) {
             e.preventDefault();
-            if( $('#quantity').val() == 0 ||  $('#quantity').val() == null) {
+            var _unit_price_format;
+            var _estimated_price_format;
+            var _unedited_unit_price;
+            if( $('#quantity').val() == 0 ||  
+                $('#quantity').val() == null) {
                 var _quantity = 0;
                 var _unit_price = 0;
                 var _calculate = (_quantity * _unit_price);
+                // removing text format of unit price
+                    _unit_price.toString().replace('₱','');
                 // formating _unit_price
-                var _unit_price_format = "₱" + _unit_price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                var _estimated_price_format = "₱" + _calculate.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                 _unit_price_format = "₱" + _unit_price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                _estimated_price_format = "₱" + _calculate.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 $('#quantity').val('0');
                 $('#unit-price').val('');
                 $('#unit-price').val(_unit_price_format);
@@ -1081,15 +1062,18 @@
                 $('#estimated-price-p').text(_estimated_price_format);
             } else {
                 var _quantity = $('#quantity').val();
-                var _unit_price = $('#unit-price').val();
+                var _unit_price = $('#final-unit-price').val();
                 var _calculate = (_quantity * _unit_price);
+                // removing text format of unit price
+                    _unit_price.toString().replace('₱','');
+
                 // formating _unit_price
-                var _unit_price_format = "₱" + _unit_price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                var _estimated_price_format = "₱" + _calculate.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                _unit_price_format = "₱" + _unit_price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                _estimated_price_format = "₱" + _calculate.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 $('#unit-price').val('');
                 $('#unit-price').val(_unit_price_format);
                 // appending the calculated estimated price
-                $('#final-unit-price').val(_unit_price);
+                $('#final-unit-price').val(_unit_price); // this will be stored to the database
                 $('#estimated-price').val(_calculate);
                 $('#estimated-price-p').text(_estimated_price_format);
             }
@@ -1117,8 +1101,6 @@
 
             $('#edit-templates-modal').modal('hide'); // this will close the template modal
             // this will append the unit price, quantity and estimated price of the selected template
-
-            console.log($(this).data('quantity'));
             $('#edit-quantity').val($(this).data('quantity'));
             $('#edit-unit-price').val(_unit_price_format);
             $('#edit-final-unit-price').val($(this).data('unit-price'));

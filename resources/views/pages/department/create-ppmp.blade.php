@@ -334,7 +334,6 @@
             data: {
                 'id' : $(this).attr('data-id')
             }, success: function(response) { 
-                // console.log(response[0]['id']);
                 console.log(response);
                 $('#project-id').val(response[0]['id']);
                 $('#modal-header').text('Edit - ' + response[0][['project_title']]);
@@ -353,7 +352,6 @@
         $(document).on('click', '#submit-projects-btn', function(e) {
             e.preventDefault();
             var _project_checkbox = $('.project-checkbox');
-            // var _project_checkbox = document.getElementsByClassName('project-checkbox');
             var _checked_project = [];
             var _checked_status = [];
             for (let index = 0; index < $('#item-count').val(); index++) {
@@ -384,21 +382,21 @@
                         console.log(response);
                         if(response['status'] == 400) {
                             Swal.fire({
-                                  title: 'Error',
-                                  icon: 'error',
-                                  html: response['message'],
-                                  timer: 1000,
-                                  timerProgressBar: true,
-                                  didOpen: () => {
-                                    Swal.showLoading()
-                                    const b = Swal.getHtmlContainer().querySelector('b')
-                                    timerInterval = setInterval(() => {
-                                      b.textContent = Swal.getTimerLeft()
-                                    }, 100)
-                                  },
-                                  willClose: () => {
-                                    clearInterval(timerInterval)
-                                  }
+                                title: 'Error',
+                                icon: 'error',
+                                html: response['message'],
+                                timer: 1000,
+                                timerProgressBar: true,
+                                didOpen: () => {
+                                Swal.showLoading()
+                                const b = Swal.getHtmlContainer().querySelector('b')
+                                timerInterval = setInterval(() => {
+                                    b.textContent = Swal.getTimerLeft()
+                                }, 100)
+                                },
+                                willClose: () => {
+                                clearInterval(timerInterval)
+                                }
                             }).then((result) => {
                                   if (result.dismiss === Swal.DismissReason.timer) {
                                     location.reload();
@@ -409,21 +407,21 @@
 
                         if(response['status'] == 200) {
                             Swal.fire({
-                                  title: 'Success',
-                                  icon: 'success',
-                                  html: response['message'],
-                                  timer: 1000,
-                                  timerProgressBar: true,
-                                  didOpen: () => {
-                                    Swal.showLoading()
-                                    const b = Swal.getHtmlContainer().querySelector('b')
-                                    timerInterval = setInterval(() => {
-                                      b.textContent = Swal.getTimerLeft()
-                                    }, 100)
-                                  },
-                                  willClose: () => {
-                                    clearInterval(timerInterval)
-                                  }
+                                title: 'Success',
+                                icon: 'success',
+                                html: response['message'],
+                                timer: 1000,
+                                timerProgressBar: true,
+                                didOpen: () => {
+                                Swal.showLoading()
+                                const b = Swal.getHtmlContainer().querySelector('b')
+                                timerInterval = setInterval(() => {
+                                    b.textContent = Swal.getTimerLeft()
+                                }, 100)
+                                },
+                                willClose: () => {
+                                clearInterval(timerInterval)
+                                }
                             }).then((result) => {
                                   if (result.dismiss === Swal.DismissReason.timer) {
                                     location.reload();

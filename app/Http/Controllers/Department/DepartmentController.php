@@ -196,6 +196,7 @@ class DepartmentController extends Controller
      */
     public function createPPMPs(Request $request)
     {
+        dd($request->all());
         try {
             # form fields validation
             $this->validate($request, [
