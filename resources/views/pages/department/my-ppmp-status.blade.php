@@ -363,16 +363,16 @@
                                         <table class="table zero-configuration item-table" id="item-table t-table">
                                             <thead>
                                                 <tr id="t-tr">
-                                                    <th>#</th>
-                                                    <th>Project Title</th>
-                                                    <th>Year</th>
-                                                    <th>Status</th>
-                                                    <th>IMmEDIATE SUPERVISOR</th>
-                                                    <th>Project Type</th>
-                                                    <th>Project Category</th>
-                                                    <th>Fund Source</th>
-                                                    <th>Date Added</th>
-                                                    <th>Action</th>
+                                                    <th id="t-td">#</th>
+                                                    <th id="t-td">Project Title</th>
+                                                    <th id="t-td">Year</th>
+                                                    <th id="t-td">Status</th>
+                                                    <th id="t-td">IMmEDIATE SUPERVISOR</th>
+                                                    <th id="t-td">Project Type</th>
+                                                    <th id="t-td">Project Category</th>
+                                                    <th id="t-td">Fund Source</th>
+                                                    <th id="t-td">Date Added</th>
+                                                    <th id="t-td">Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
