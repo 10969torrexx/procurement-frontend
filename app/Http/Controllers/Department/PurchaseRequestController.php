@@ -81,6 +81,7 @@ class PurchaseRequestController extends Controller
           ->select('spr.*','u.name')
           ->join('users as u','spr.employee_id','u.employee_id')
           ->where("spr.department_id", session('department_id'))
+          ->where("spr.campus", session('campus'))
           ->whereNull("spr.deleted_at")
           ->get();
           // dd($response);
@@ -371,7 +372,7 @@ class PurchaseRequestController extends Controller
         throw $th;
     }
   }
-  
+
   public function download_signed_PR(Request $request) {
     // dd($request->all());
     try {
@@ -654,6 +655,7 @@ class PurchaseRequestController extends Controller
           $response = DB::table('signed_purchase_request')
                               ->insert([
                                   'pr_no' => $pr_no,
+                                  'campus' => session('campus'),
                                   'department_id' => session('department_id'),
                                   'employee_id' => session('employee_id'),
                                   'file_name' => $file_name.'.'.$extension,

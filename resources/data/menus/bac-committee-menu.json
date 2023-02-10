@@ -46,7 +46,47 @@
       
     },
     {
-      "navheader": "BAC COMMITTEE"
+      "url": "department/ppmp-submission",
+      "name": "PPMP Submission",
+      "i18n": "Notebook",
+      "icon": "envelope-pull"
+      
+    },
+    {
+      "url": "department/upload-ppmp",
+      "name": "Upload PPMP",
+      "i18n": "Notebook",
+      "icon": "briefcase"
+      
+    },
+    {
+      "url": "PR/purchaseRequest",
+      "name": "Purchase Request",
+      "i18n": "Shoppingcart",
+      "icon": "shoppingcart",
+      "submenu": [
+        {
+          "url": "PR/purchaseRequest",
+          "name": "Create PR",
+          "i18n": "User",
+          "icon": "like"
+        },
+        {
+          "url": "PR/trackPR",
+          "name": "Track PR",
+          "i18n": "User",
+          "icon": "shoppingcart-in"
+        },
+        {
+          "url": "PR/signed_pr",
+          "name": "Signed PR",
+          "i18n": "User",
+          "icon": "shoppingcart-in"
+        }
+      ]
+    },
+    {
+      "navheader": "BAC MEMBER"
     },
     {
       "url": "bor-secetary/upload-bor-resolution", 
@@ -186,6 +226,12 @@
         }
       ]
       
+    },
+    {
+      "url": "purchase_request/signed_pr",
+      "name": "Signed PRs",
+      "i18n": "User",
+      "icon": "search"
     }
   ]
 }

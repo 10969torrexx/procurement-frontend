@@ -552,6 +552,14 @@ Route::group(['prefix' => 'bac','middleware' => ['authuser']], function() {
     
 });
 
+
+Route::group(['prefix' => 'purchase_request','middleware' => ['authuser']], function() {
+
+    Route::get('/signed_pr', 'BAC\SignedPRsController@SignedPRIndex')->name('signed_pr');
+
+});
+
+
 Route::group(['prefix' => 'supervisor','middleware' => ['authuser']], function() {
     //Supervisor Side
     Route::get('/traditional', 'Supervisor\SupervisorController@Traditional_index');
