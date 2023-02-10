@@ -744,6 +744,11 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
             # edit upload
             Route::get('get-uploaded-ppmp', [DepartmentController::class, 'get_edit_ppmp'])->name('get_edit_ppmp');
             Route::post('edit-uploaded-ppmp', [DepartmentController::class, 'edit_uploaded_ppmp'])->name('edit_ppmp');
+            
+            // *TODO: request to submit PPMP Submission
+                // ! add ppmp to request ppmp submission
+                Route::get('/add-ppmp-request-submission', [DepartmentController::class, 'add_pppmp_to_request'])->name('add_pppmp_to_request');
+            // *END:
         /** END */
 
         /** Gettin data from the database */

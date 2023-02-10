@@ -169,65 +169,35 @@
                                 @endif
                             </div>
 
-                            <div class="row justify-content-center form-group">
-                                <div class="container">
-                                    {{-- Displaying Error Messages --}}
-                                        {{-- displaying error message for appended element with null values --}}
-                                            @if($nullValues = Session::get('nullValues'))
-                                                <div class="alert alert-damger alert-dismissible fade show" role="alert">
-                                                    <strong>Failed!</strong> Please fill all the required fields
-                                                    <p>
-                                                        @foreach ($nullValues as $error)
-                                                            {{ $error  }}
-                                                        @endforeach
-                                                    </p>
-                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                            @endif
-                                        {{-- displaying error message for laravel form validation --}}
-                                            @if($errors->all())
-                                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                                    <strong>Failed!</strong> Please fill all the required fields
-                                                    <p>
-                                                        @foreach ($errors->all() as $error)
-                                                            <div>{{ $error }}</div>
-                                                        @endforeach
-                                                    </p>
-                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                            @endif
-                                            @if($message = Session::get('error'))
-                                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                                    <strong>Failed!</strong> 
-                                                    <p>
-                                                        {{ $message }}
-                                                    </p>
-                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                            @endif
-                                        {{-- Displaying Success Message --}}
-                                        {{-- this will display success message if ppmp was successfully created --}}
-                                            @if($message = Session::get('success'))
-                                                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                                    <strong>Success!</strong> 
-                                                    <p>
-                                                        {{ $message }}
-                                                    </p>
-                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                            @endif
-                                        {{-- Displaying Success Message --}}
-                                    {{-- Displaying Error Messages --}}
-                                </div>
-                            </div>
+                            {{-- message and errors --}}
+                                @if(Session::has('success'))
+                                    <script>
+                                        Swal.fire({
+                                            title: 'Success',
+                                            icon: 'success',
+                                            html: "{{ Session::get('success') }}",
+                                        });
+                                    </script>
+                                @endif
+                                @if($errors->all())
+                                    <script>
+                                        Swal.fire({
+                                            title: 'Error',
+                                            icon: 'error',
+                                            html: "Please make sure fields are well accounted for!",
+                                        });
+                                    </script>
+                                @endif
+                                @if(Session::has('failed'))
+                                    <script>
+                                        Swal.fire({
+                                            title: 'Error',
+                                            icon: 'error',
+                                            html: "{{ Session::get('failed') }}",
+                                        });
+                                    </script>
+                                @endif
+                            {{-- message and errors --}}
 
                             {{-- creating data tables for the list of project titles --}}
                                 <div class="table-responsive col-12 col-md-12 col-sm-12 container">

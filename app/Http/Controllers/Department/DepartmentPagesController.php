@@ -100,22 +100,22 @@ class DepartmentPagesController extends Controller
                     # this will get data from database
                         # from project_titles table | draft project titles
                             $project_titles = \DB::table('project_titles')
-                            ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
-                            ->join('allocated__budgets', 'allocated__budgets.id', 'project_titles.allocated_budget')
-                            ->join('users', 'users.id', 'project_titles.immediate_supervisor')
-                            ->where('project_titles.campus', session('campus'))
-                            ->where('project_titles.department_id', session('department_id'))
-                            ->where('project_titles.employee_id', session('employee_id'))
-                            ->where('project_titles.status', 0) //status draft
-                            ->where('project_titles.project_category', (new AESCipher)->decrypt($request->project_category))
-                            ->whereNull('project_titles.deleted_at')
-                            ->get([
-                                'project_titles.*',
-                                'fund_sources.fund_source',
-                                'users.name as immediate_supervisor',
-                                'allocated__budgets.deadline_of_submission'
-                            ]);
-                            // dd($project_titles);
+                                ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
+                                ->join('allocated__budgets', 'allocated__budgets.id', 'project_titles.allocated_budget')
+                                ->join('users', 'users.id', 'project_titles.immediate_supervisor')
+                                ->where('project_titles.campus', session('campus'))
+                                ->where('project_titles.department_id', session('department_id'))
+                                ->where('project_titles.employee_id', session('employee_id'))
+                                ->where('project_titles.status', 0) // status draft
+                                ->where('project_titles.project_category', (new AESCipher)->decrypt($request->project_category))
+                                ->whereNull('project_titles.deleted_at')
+                                ->get([
+                                    'project_titles.*',
+                                    'fund_sources.fund_source',
+                                    'users.name as immediate_supervisor',
+                                    'allocated__budgets.deadline_of_submission'
+                                ]);
+                            dd($project_titles);
                         # from departments table
                             $departments = \DB::table('departments')->where('id', session('department_id'))->get();
                         # from categories table
