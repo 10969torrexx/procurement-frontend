@@ -67,35 +67,9 @@
 
                                                 Php {{ number_format($total) }}
                                         </td>
-                                        <?php
-                                        if($data->status == 1)
-                                        {
-                                            ?>
-                                        <td style="text-align: left; color:blue;">Pending</td>
-                                        <?php
-                                        }
-                                        elseif ($data->status == 2) {
-                                        ?>
-                                        <td style="text-align: left; color:green;">Approved</td>
-                                        <?php
-                                        }elseif($data->status == 3){
-                                        ?>
-                                        <td style="text-align: left; color:red;">Need Revision</td>
-                                        <?php
-                                        }elseif($data->status == 6){
-                                        ?>
-                                        <td style="text-align: left; color:coral;">Revised</td>
-                                        <?php
-                                        }elseif($data->status == 4){
-                                        ?>
-                                        <td style="text-align: left; color:green;">Accepted by Budget Officer</td>
-                                        <?php
-                                        }elseif($data->status == 5){
-                                        ?>
-                                        <td style="text-align: left; color:red;">Rejected by Budget Officer</td>
-                                        <?php
-                                        }
-                                        ?>
+                                        <td> 
+                                            <div class="badge badge-pill badge-light-{{ (new GlobalDeclare)->ppmp_status_color($data->status) }} mr-1">{{ (new GlobalDeclare)->ppmp_status($data->status) }}</div>
+                                        </td>
                                         <td>
                                             <form action="{{ route('show-supplemental-ppmp') }}" method="post">
                                                 @csrf

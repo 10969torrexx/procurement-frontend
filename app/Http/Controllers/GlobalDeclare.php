@@ -396,13 +396,13 @@ class GlobalDeclare extends Controller
         $out = '';
         switch ($id) {
             case 0:
-                $out = 'blue';
+                $out = 'primary';
             break;
             case 1:
-                $out = 'green';
+                $out = 'success';
             break;
             case 2:
-                $out = 'red';
+                $out = 'danger';
             break;
         }
         
@@ -467,16 +467,74 @@ class GlobalDeclare extends Controller
         $out = '';
         switch ($id) {
             case 0:
-                $out = 'blue';
+                $out = 'primary';
             break;
             case 1:
-                $out = 'green';
+                $out = 'success';
             break;
             case 2:
-                $out = 'red';
+                $out = 'danger';
             break;
         }
         
+        return $out;
+    }
+
+    # this will determine the statuses of the ppmp, Project title
+    public function ppmp_status($id) {
+        $out = '';
+        switch($id) {
+            case 0:
+                $out = "Draft";
+                break;
+            case 1:
+                $out = "Pending";
+                break;
+            case 2:
+                $out = "Accepted by Supervisor";
+                break;  
+            case 3:
+                $out = "To be Revise";
+                break;
+            case 4:
+                $out = "Accepted by Budget Officer";
+                break;
+            case 5:
+                $out = "Disapproved by Budget Officer";
+                break;
+            case 6:
+                $out = "Revised";
+                break;
+        }
+        return $out;
+    }
+    
+    # this will determine the color of the statuses of the ppmp, Project title
+    public function ppmp_status_color($id) {
+        $out = '';
+        switch($id) {
+            case 0:
+                $out = "Draft";
+                break;
+            case 1:
+                $out = "primary";
+                break;
+            case 2:
+                $out = "success";
+                break;  
+            case 3:
+                $out = "danger";
+                break;
+            case 4:
+                $out = "info";
+                break;
+            case 5:
+                $out = "danger";
+                break;
+            case 6:
+                $out = "warning";
+                break;
+        }
         return $out;
     }
 }

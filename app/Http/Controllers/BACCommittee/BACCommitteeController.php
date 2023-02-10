@@ -36,6 +36,7 @@ class BACCommitteeController extends Controller
           ->where("Role","=",3)
           ->where("users_id","=",session('user_id'))
           ->get();
+          // dd($app);
     $pageConfigs = ['pageHeader' => true];
     $breadcrumbs = [
       ["link" => "/", "name" => "Home"],["name" =>"APP NON CSE"]
@@ -400,7 +401,7 @@ class BACCommitteeController extends Controller
           #Bac Committee Status in Project titles table
             $sign = DB::table("signatories_app_non_cse")
               ->where("Year","=",$request->year)
-              ->where("users_id",'=',session('user_id'))
+              ->where("campus",'=',session('campus'))
               ->where("Role",'=',3)
               ->get("status");
               // dd($sign);

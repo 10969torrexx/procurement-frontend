@@ -42,23 +42,18 @@
     
                             
                             @foreach ($data as $line)
-                                    {{-- @for ($i = 0; $i < count($data->0); $i++) --}}
                             <tbody>
                                 <tr>
                                     <td>{{ $line->department_name }}</td>
                                     <td>{{ $line->file_name }}</td>
                                     <td>{{ $line->year_created }}</td>
                                     <td>
-                                        {{-- <a href="" class="view" style="background-color: aquamarine"><i class="fa-regular fa-eye"  title="View" href=""></i> </a> --}}
-                                        {{-- <button class="btn-success view" data-toggle = "modal" id="view_modal"></button> --}}
-                                        
                                         <div class="dropdown">
                                             <span
                                                 class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
                                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu">
                                             </span>
                                             <div class="dropdown-menu dropdown-menu-left">
-                                                {{-- <button  type="button" class="dropdown-item print" ><i class="fa-solid fa-download"></i>&nbsp; Download</button> --}}
                                                 <a href= "{{ route('download-signed-ppmp', ['id' => (new AESCipher)->encrypt($line->id) ]) }}" class="dropdown-item">
                                                   <i class="fa-solid fa-file-arrow-down mr-1"></i>Download
                                                 </a>
@@ -68,20 +63,8 @@
                                     </td>
                                     
                                 </tr>
-                                {{-- @include('pages.bac.edit-item-modal') --}}
                             </tbody>
                             @endforeach
-                            
-                                    {{-- @endfor --}}
-                            {{-- <tfoot>
-                                <tr>
-                                    <th>Department</th>
-                                    <th>Project Code</th>
-                                    <th>Project Procurement</th>
-                                    <th>Total</th>
-                                    <th>Action</th>
-                                </tr>
-                            </tfoot> --}}
                             </table>
                         </div>
                     </div>

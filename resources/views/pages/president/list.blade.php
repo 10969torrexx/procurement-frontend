@@ -47,14 +47,10 @@
                                     <tr>
                                         <td>{{-- {{ $data->year_created }}- --}}{{ $loop->iteration  }}</td>
                                         <td>University Annual Procurement Plan For FY {{ $data->project_year }}</td>
-                                        {{-- @php
-                                            $pres_status = "";
-                                        @endphp
-                                        @foreach ($approved_by as $presStatus)
-                                            @if ($data->project_year == $presStatus->Year) --}}
-                                                <td style="text-align: left; color:{{ (new GlobalDeclare)->pres_status_color($data->pres_status) }}">{{ (new GlobalDeclare)->pres_status($data->pres_status) }}</td>
-                                            {{-- @endif
-                                        @endforeach --}}
+                                        {{-- <td style="text-align: left; color:{{ (new GlobalDeclare)->pres_status_color($data->pres_status) }}">{{ (new GlobalDeclare)->pres_status($data->pres_status) }}</td>--}}
+                                        <td>
+                                            <div class="badge badge-pill badge-light-{{ (new GlobalDeclare)->pres_status_color($data->pres_status) }} mr-1">{{ (new GlobalDeclare)->pres_status($data->pres_status) }}</div>
+                                        </td> 
                                         <td>
                                             <form action="{{ route('pres_app_noncse') }}" method="post">
                                                 @csrf

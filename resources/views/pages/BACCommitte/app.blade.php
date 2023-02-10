@@ -262,20 +262,18 @@
                 <div class="row col-sm-4" >
                     @if($bac_stat == 0 || $bac_stat == 2)
                       <button type="button" class="btn btn-success form-control col-sm-4  approve" value="1" active>Recommend</button>
-                    @endif
-                    
-                    @if(count($expired) > 0)
-                      <button type="button" class="btn btn-success form-control col-sm-4  approve" value="0" active><i class="fa-solid fa-rotate-left"></i></button>
                     @else
-                      <div class="col-sm-12 p-1 bg-info text-white"><i class="fa-solid fa-circle-info"></i> &nbsp; Status can be changed after a day !</div>
+                      @if(count($expired) > 0)
+                        <button type="button" class="btn btn-success form-control col-sm-4  approve" value="0" active><i class="fa-solid fa-rotate-left"></i></button>
+                      @else
+                        <div class="col-sm-12 p-1 bg-info text-white"><i class="fa-solid fa-circle-info"></i> &nbsp; Status can be changed after a day !</div>
+                      @endif
                     @endif
-                    {{-- <button type="button" class="btn btn-success form-control col-sm-4  approve" value="0" active><i class="fa-solid fa-rotate-left"></i></button> --}}
-                  
                 </div>
                 <hr>
               @endif
               <div class="row col-sm-4">
-                <p>Status: <span style="color: {{ (new GlobalDeclare)->bac_committee_status_color($bac_stat) }};text-transform: uppercase;">{{ (new GlobalDeclare)->bac_committee_status($bac_stat) }}</span></p> 
+                <p>Status: <span class="{{ (new GlobalDeclare)->bac_committee_status_color($bac_stat) }}" style="text-transform: uppercase;">{{ (new GlobalDeclare)->bac_committee_status($bac_stat) }}</span></p> 
               </div>
             @endif
             <div class="generate" {{-- style="background-color: #bf5279" --}}>
