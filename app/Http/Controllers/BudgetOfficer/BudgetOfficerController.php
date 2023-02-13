@@ -836,14 +836,23 @@ class BudgetOfficerController extends Controller
                     'procurement_type' => $type,
                     'fund_source_id' => $fund_source_id,
                     'year' => $year,
-                    'deadline_of_submission' => $deadline_of_submission,
+                    'deadline_of_submission' => null,
                     'allocated_budget' => $allocated_budget,
                     'mandatory_expenditures' => $total_expenditures,
                     'remaining_balance' => $remaining_balance,
                     'campus' => session("campus"),
                     'created_at' => Carbon::now()
                 ]);
-            (new HistoryLogController)->store(session('department_id'),session('employee_id'),session('campus'),null,'Allocated Budget','Allocate',$request->ip());
+                
+            (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                null,
+                'Allocated Budget',
+                'Allocate',
+                $request->ip()
+            );
 
                 if($allocate_budget){
                     return response()->json([
@@ -1040,7 +1049,15 @@ class BudgetOfficerController extends Controller
                                         'end_date'=>  $EndDate,
                                         'created_at' => Carbon::now()
                                     ]);
-                (new HistoryLogController)->store(session('department_id'),session('employee_id'),session('campus'),null,'Set '.$Type.' Deadline','Save',$request->ip());
+                (new HistoryLogController)->store(
+                    session('department_id'),
+                    session('employee_id'),
+                    session('campus'),
+                    null,
+                    'Set '.$Type.' Deadline',
+                    'Save',
+                    $request->ip());
+
                 if($deadline){
                     return response()->json([
                             'status' => 200, 
