@@ -141,7 +141,6 @@
      data: {
         'id' : $(this).attr('href')
      }, success: function(response) {
-        console.log(response);
         response['data'].forEach(element => {
               $('#content').append(`<iframe src="{{asset("storage/PMIS/signed_purchase_request/`+ element.file_name +`")}}" style="width:100% !important;" height="750" frameborder="0"></iframe>`);
         });

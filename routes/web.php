@@ -553,11 +553,7 @@ Route::group(['prefix' => 'bac','middleware' => ['authuser']], function() {
 });
 
 
-Route::group(['prefix' => 'purchase_request','middleware' => ['authuser']], function() {
 
-    Route::get('/signed_pr', 'BAC\SignedPRsController@SignedPRIndex')->name('signed_pr');
-
-});
 
 
 Route::group(['prefix' => 'supervisor','middleware' => ['authuser']], function() {
@@ -655,6 +651,15 @@ Route::group(['prefix' => 'supply_custodian','middleware' => ['authuser']], func
     Route::post('/submitedit-supplier','SupplyCustodian\SupplierController@submitedit_supplier')->name('submitedit-supplier');
     Route::post('/delete-supplier','SupplyCustodian\SupplierController@delete_supplier')->name('delete-supplier');
 // });
+
+});
+
+Route::group(['prefix' => 'purchase_request','middleware' => ['authuser']], function() {
+
+    Route::get('/signed_pr', 'BAC\SignedPRsController@SignedPRIndex')->name('signed_pr');
+    Route::get('/pending_prs', 'President\PresidentHopeController@PendingPRIndex')->name('pending_prs');
+    Route::get('/pending_prs/view_pending_pr', 'President\PresidentHopeController@view_pending_pr')->name('view_pending_pr');
+    Route::post('/pending_prs/approve_or_disapprove', 'President\PresidentHopeController@approve_or_disapprove')->name('approve_or_disapprove');
 
 });
 

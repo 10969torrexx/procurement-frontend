@@ -256,6 +256,12 @@
       ]
     },
     {
+      "url": "purchase_request/pending_prs",
+      "name": "Pending PRs",
+      "i18n": "User",
+      "icon": "list"
+    },
+    {
       "url": "purchase_request/signed_pr",
       "name": "Signed PRs",
       "i18n": "User",

@@ -1017,3 +1017,140 @@ $(document).on('click', '.delete_SignedPR_button', function (e) {
       })
 });
 
+$(document).on('click', '.approve_pr', function (e) {
+  e.preventDefault();
+
+  var pr_no = $(".pr_no").text();
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+    
+    $.ajax({
+      type: 'POST',
+      url: "/purchase_request/pending_prs/approve_or_disapprove",
+      headers: {'X-CSRF-TOKEN' : $('meta[name="csrf-token"]').attr('content')},
+      data: {
+        'status'  : 2,
+        'pr_no'  : pr_no,
+        'remark'  : 'Approved',
+      },
+      success: function(response) {
+        // ! show when success
+          if(response.status == 200) {
+            
+            Swal.fire({ 
+              icon: 'success',
+              title: 'Success',
+              text: response['message'],
+              timer: 1000,
+              timerProgressBar: true,
+              didOpen: () => {
+                Swal.showLoading()
+                const b = Swal.getHtmlContainer().querySelector('b')
+                timerInterval = setInterval(() => {
+                  b.textContent = Swal.getTimerLeft()
+                }, 100)
+              },
+              willClose: () => {
+                clearInterval(timerInterval)
+              }
+            }).then((result) => {
+              if (result.dismiss === Swal.DismissReason.timer) {
+                location.reload();
+              }
+            })
+          } 
+        // ! show when error
+          if(response['status'] == 400) {
+            Swal.fire({ 
+              icon: 'info',
+              title: 'Information',
+              text: response['message'],
+            })
+          }
+      }
+    });
+  
+});
+
+$(document).on('click', '.disapprove_pr_modal', function (e) {
+  e.preventDefault();
+
+    $('#DisapprovePRModal').modal('show');
+  
+});
+
+$(document).on('click', '.disapprove_pr', function (e) {
+  e.preventDefault();
+
+  var pr_no = $(".pr_no").text();
+  var remark = $(".reject_remarks").val();
+
+  if(remark == ''){
+    Swal.fire({ 
+      icon: 'error',
+      title: 'Error',
+      text: 'Please enter remark!',
+    })
+  }else{
+
+    $.ajaxSetup({
+      headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      }
+    });
+
+    $.ajax({
+      type: 'POST',
+      url: "/purchase_request/pending_prs/approve_or_disapprove",
+      headers: {'X-CSRF-TOKEN' : $('meta[name="csrf-token"]').attr('content')},
+      data: {
+        'status'  : 3,
+        'pr_no'  : pr_no,
+        'remark'  : remark,
+      },
+      success: function(response) {
+        // ! show when success
+          if(response.status == 200) {
+            
+            $('#DisapprovePRModal').modal('hide');
+            
+            Swal.fire({ 
+              icon: 'success',
+              title: 'Success',
+              text: response['message'],
+              timer: 1000,
+              timerProgressBar: true,
+              didOpen: () => {
+                Swal.showLoading()
+                const b = Swal.getHtmlContainer().querySelector('b')
+                timerInterval = setInterval(() => {
+                  b.textContent = Swal.getTimerLeft()
+                }, 100)
+              },
+              willClose: () => {
+                clearInterval(timerInterval)
+              }
+            }).then((result) => {
+              if (result.dismiss === Swal.DismissReason.timer) {
+                location.reload();
+              }
+            })
+
+          } 
+        // ! show when error
+          if(response['status'] == 400) {
+            Swal.fire({ 
+              icon: 'info',
+              title: 'Information',
+              text: response['message'],
+            })
+          }
+      }
+    });
+  }
+  
+});

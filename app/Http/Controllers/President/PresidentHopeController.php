@@ -562,4 +562,150 @@ class PresidentHopeController extends Controller
         throw $th;
     }
   }
+
+  public function PendingPRIndex(){
+    $pageConfigs = ['pageHeader' => true];
+    $breadcrumbs = [
+      ["link" => "/", "name" => "Home"],["name" => "Pending PR"]
+    ];
+
+    $response = DB::table("purchase_request as pr")
+          ->select('pr.*','u.name','d.department_name')
+          ->join('users as u','pr.printed_name','u.id')
+          ->join('departments as d','pr.department_id','d.id')
+          ->where("pr.status", '!=', 0)
+          ->where("pr.campus", session('campus'))
+          ->whereNull("pr.deleted_at")
+          ->get();
+          // dd($response);
+
+        return view('pages.PRApprovingOfficer.pending-pr-index',compact('response'), [
+            'pageConfigs'=>$pageConfigs,
+            'breadcrumbs'=>$breadcrumbs,
+            // 'error' => $error,
+        ]); 
+  }
+
+  public function view_pending_pr(Request $request){
+    $pageConfigs = ['pageHeader' => true];
+    $breadcrumbs = [
+      ["link" => "/", "name" => "Home"],
+      ["link" => "/purchase_request/pending_prs", "name" => "Pending PR"],
+      ["name" => "View PR"]
+    ];
+    $pr_no = (new AESCipher())->decrypt($request->pr_no);
+
+    $purchase_request = DB::table("purchase_request as pr")
+                          ->select("pr.*","fs.fund_source","d.department_name","u.name")
+                          ->join("fund_sources as fs","pr.fund_source_id","fs.id")
+                          ->join("departments as d","pr.department_id","d.id")
+                          ->join("users as u","pr.printed_name","u.id")
+                          ->where("pr.campus",session('campus'))
+                          ->where("pr.pr_no",$pr_no)
+                          ->whereNull('pr.deleted_at')
+                          ->get();
+
+    $itemsForPR = DB::table("purchase_request_items as pri")
+              ->select('pri.*','p.unit_of_measurement','p.item_description','p.unit_price')
+              ->join('ppmps as p','pri.item_id','p.id')
+              ->where('pri.pr_no',$pr_no)
+              ->whereNull('pri.deleted_at')
+              ->get();
+
+          
+
+    return view('pages.PRApprovingOfficer.view_pr_page',compact('purchase_request','itemsForPR'), [
+                'pageConfigs'=>$pageConfigs,
+                'breadcrumbs'=>$breadcrumbs,
+            ]); 
+  }
+
+
+  public function approve_or_disapprove(Request $request){
+    // dd($request->all());
+    try {
+      $status = $request->status;
+      $pr_no = $request->pr_no;
+      $remark = $request->remark;
+
+      if($status == 2){
+        $statusCheck = DB::table('purchase_request')
+                        ->where('pr_no',$pr_no)
+                        ->where('status','!=',$status)
+                        ->whereNull('deleted_at')
+                        ->get();
+                        // dd($statusCheck);
+
+        if(count($statusCheck) == 1){
+          (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                null,
+                'Approved Purchase Request',
+                'Approve',
+                $request->ip()
+              );
+
+          $response = DB::table('purchase_request')
+                        ->where('pr_no',$pr_no)
+                        ->update([
+                          'status' => $status,
+                          'remark' => $remark,
+                          'approved_at' =>  Carbon::now()
+                        ]);
+                        // dd($statusCheck);
+          return response()->json([
+            'status' => 200,
+            'message' => 'PR Successfully Approved!'
+          ]);          
+        }
+        return response()->json([
+          'status' => 400,
+          'message' => 'PR is already approved!'
+        ]);
+      }
+
+      if($status == 3){
+        $statusCheck = DB::table('purchase_request')
+                        ->where('pr_no',$pr_no)
+                        ->where('status','!=',$status)
+                        ->whereNull('deleted_at')
+                        ->get();
+                        // dd($statusCheck);
+
+        if(count($statusCheck) == 1){
+          (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                null,
+                'Disapproved Purchase Request',
+                'Disapprove',
+                $request->ip()
+              );
+
+          $response = DB::table('purchase_request')
+                        ->where('pr_no',$pr_no)
+                        ->update([
+                          'status' => $status,
+                          'remark' => $remark,
+                          'disapproved_at' =>  Carbon::now()
+                        ]);
+                        // dd($statusCheck);
+          return response()->json([
+            'status' => 200,
+            'message' => 'PR Successfully Disapproved!'
+          ]);          
+        }
+        return response()->json([
+          'status' => 400,
+          'message' => 'PR is already disapproved!'
+        ]);
+      }
+
+    } catch (\Throwable $th) {
+      throw $th;
+    }
+ }
 }
