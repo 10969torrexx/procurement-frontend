@@ -6,7 +6,6 @@
     $aes = new AESCipher();
     $immediate_supervisor = '';
     $current_year = Carbon::now();
-    // dd((new AESCipher)->decrypt($project_type));
 @endphp
 @extends('layouts.contentLayoutMaster')
 {{-- title --}}
@@ -163,7 +162,7 @@
                                 @else
                                    <div class="container">
                                         <div class="alert alert-danger alert-dismissible fade show col-12" role="alert">
-                                            <strong>Failed!</strong> No allocated budget. Please contact campus budget officer!
+                                            <strong>Issue!</strong> No allocated budget for this type of PPMP. Please contact campust budget officer!
                                         </div>
                                    </div>
                                 @endif
@@ -213,6 +212,7 @@
                                                 <th id="t-td">Immediate SUPERVISOR</th>
                                                 <th id="t-td">Project Type</th>
                                                 <th id="t-td">Fund Source</th>
+                                                <th id="t-td" class="text-nowrap">Total Estimated Price</th>
                                                 <th id="t-td">Deadline</th>
                                                 <th id="t-td">Date Added</th>
                                                 <th id="t-td">Action</th>
@@ -231,6 +231,7 @@
                                                         <td id="t-td">{{ $item->immediate_supervisor }}</td>
                                                         <td id="t-td">{{ $item->project_type }}</td>
                                                         <td id="t-td">{{ $item->fund_source }}</td>
+                                                        <td id="t-td">₱ {{ number_format($total_estimated_price[ ($loop->iteration - 1) ],2,'.',',') }}</td>
                                                         <td id="t-td">{{ explode('-', date('j F, Y-', strtotime($item->deadline_of_submission)))[0]  }}</td>
                                                         <td id="t-td">{{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0]  }}</td>
                                                         <td id="t-td">
