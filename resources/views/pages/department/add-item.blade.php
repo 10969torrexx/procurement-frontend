@@ -601,11 +601,16 @@
                     {{-- adding submit ppmp feature --}}
                         @if (Carbon::now()->format('Y-m-d') >= $allocated_budgets[0]->deadline_of_submission)
                             <div class="form-group p-1 row justify-content-center">
-                                <div class="container">
-                                    <div class="alert alert-danger alert-dismissible fade show col-12" role="alert">
-                                        <strong>Issue!</strong> This PPMP has reached the deadline of submission. Please contact campus Budget Officer.
-                                    </div>
-                               </div>
+                                <div class="form-group col-6">
+                                    <form action="#" method="post">@csrf @method('POST')
+                                        <input type="text" value="{{ (new AESCipher)->encrypt($project_title_id) }}" class="form-control d-none" name="current_project_code">
+                                        <input type="text" class="form-control d-none" name="remaining_balance" value="{{ $allocated_budgets[0]->remaining_balance }}">
+                                        <input type="text" class="form-control d-none" name="total_estimated_price" value="{{ $total_estimated_price }}">
+                                        <input type="text" class="form-control d-none" name="allocated_budget" value="{{ $allocated_budgets[0]->id }}">
+                                        <input type="text" class="form-control d-none" name="deadline_of_submission" value="{{ $allocated_budgets[0]->deadline_of_submission }}">
+                                        <button type="submit" class="btn btn-primary form-control">Add PPMP to request</button>
+                                    </form>
+                                </div>
                             </div>
                         @else
                             <div class="form-group p-1 row justify-content-center">

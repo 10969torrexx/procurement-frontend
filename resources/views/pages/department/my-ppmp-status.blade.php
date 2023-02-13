@@ -257,37 +257,40 @@
                                                     <th id="t-td">#</th>
                                                     <th id="t-td">Project Title</th>
                                                     <th id="t-td">Year</th>
+                                                    <th id="t-td">status</th>
                                                     <th id="t-td">Immediate SUPERVISOR</th>
                                                     <th id="t-td">Project Type</th>
                                                     <th id="t-td">Project Category</th>
                                                     <th id="t-td">Fund Source</th>
-                                                    <th id="t-td">status</th>
+                                                    <th id="t-td" class="text-nowrap">Total Estimated Price</th>
+                                                    <th id="t-td" class="text-nowrap">Deadline of Submission</th>
                                                     <th id="t-td">Date Added</th>
                                                     <th id="t-td">Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 {{-- showing ppmp data based on department and user --}}
-                                                    @for ($i = 0; $i < count(json_decode($project_titles)); $i++)
+                                                    @foreach ($project_titles as $item)
                                                         <tr id="t-tr">
-                                                            <td id="t-td">{{ ($i) + 1 }}</td>
-                                                            <!-- <td>{{ json_decode($project_titles)[$i]->project_code }}</td> -->
-                                                            <td id="t-td"  class="text-nowrap">{{ json_decode($project_titles)[$i]->project_title }}</td>
-                                                            <td id="t-td">{{ json_decode($project_titles)[$i]->project_year }}</td>
-                                                            <td id="t-td">{{ json_decode($project_titles)[$i]->immediate_supervisor }}</td>
-                                                            <td id="t-td">{{ json_decode($project_titles)[$i]->project_type }}</td>
-                                                            <td id="t-td">{{ (new GlobalDeclare)->project_category(json_decode($project_titles)[$i]->project_category) }}</td>
-                                                            <td id="t-td" class="text-nowrap">{{ json_decode($project_titles)[$i]->fund_source }}</td>
-                                                            <td id="t-td" class="text-nowrap">{{ (new GlobalDeclare)->status(json_decode($project_titles)[$i]->status) }}</td>
-                                                            <td id="t-td" class="text-nowrap"> {{ explode('-', date('j F, Y-', strtotime($project_titles[$i]->updated_at)))[0] }}</td>
+                                                            <td id="t-td">{{ $loop->iteration }}</td>
+                                                            <td id="t-td"  class="text-nowrap">{{ $item->project_title }}</td>
+                                                            <td id="t-td">{{ $item->project_year }}</td>
+                                                            <td id="t-td" class="text-nowrap">{{ (new GlobalDeclare)->status($item->status) }}</td>
+                                                            <td id="t-td">{{ $item->immediate_supervisor }}</td>
+                                                            <td id="t-td">{{ $item->project_type }}</td>
+                                                            <td id="t-td">{{ (new GlobalDeclare)->project_category($item->project_category) }}</td>
+                                                            <td id="t-td" class="text-nowrap">{{ $item->fund_source }}</td>
+                                                            <td id="t-td">₱ {{ number_format($total_estimated_price[ ($loop->iteration - 1) ],2,'.',',') }}</td>
+                                                            <td id="t-td">{{ explode('-', date('j F, Y-', strtotime($item->deadline_of_submission)))[0]  }}</td>
+                                                            <td id="t-td" class="text-nowrap"> {{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0] }}</td>
                                                             <td id="t-td">
                                                                 <form action="{{ route('department-showProjectStatus') }}" method="post"> @csrf @method('POST')
-                                                                    <input type="text" class="form-control d-none" name="id" value="{{ (new AESCipher)->encrypt(json_decode($project_titles)[$i]->id) }}">
+                                                                    <input type="text" class="form-control d-none" name="id" value="{{ (new AESCipher)->encrypt($item->id) }}">
                                                                     <button class="dropdown-item btn-primary text-center" type="submit" id="show-modal">View Status</button>
                                                                 </form>
                                                             </td>
                                                         </tr>
-                                                    @endfor
+                                                    @endforeach
                                                 {{-- showing ppmp data based on department and user --}}
                                             </tbody>
                                         </table>
@@ -310,6 +313,8 @@
                                                     <th id="t-td">IMmEDIATE SUPERVISOR</th>
                                                     <th id="t-td">Project Type</th>
                                                     <th id="t-td">Project Category</th>
+                                                    <th id="t-td" class="text-nowrap">Total Estimated Price</th>
+                                                    <th id="t-td" class="text-nowrap">Deadline of Submission</th>
                                                     <th id="t-td">Fund Source</th>
                                                     <th id="t-td">Date Added</th>
                                                     <th id="t-td">Action</th>
@@ -326,6 +331,8 @@
                                                             <td id="t-td">{{ $item->immediate_supervisor }}</td>
                                                             <td id="t-td">{{ $item->project_type }}</td>
                                                             <td id="t-td">{{ (new GlobalDeclare)->project_category($item->project_category) }}</td>
+                                                            <td id="t-td">₱ {{ number_format($total_estimated_price[ ($loop->iteration - 1) ],2,'.',',') }}</td>
+                                                            <td id="t-td">{{ explode('-', date('j F, Y-', strtotime($item->deadline_of_submission)))[0]  }}</td>
                                                             <td id="t-td">{{ $item->fund_source }}</td>
                                                             <td id="t-td"  class="text-nowrap">{{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0]  }}</td>
                                                             <td id="t-td">
@@ -370,6 +377,8 @@
                                                     <th id="t-td">IMmEDIATE SUPERVISOR</th>
                                                     <th id="t-td">Project Type</th>
                                                     <th id="t-td">Project Category</th>
+                                                    <th id="t-td" class="text-nowrap">Total Estimated Price</th>
+                                                    <th id="t-td" class="text-nowrap">Deadline of Submission</th>
                                                     <th id="t-td">Fund Source</th>
                                                     <th id="t-td">Date Added</th>
                                                     <th id="t-td">Action</th>
@@ -386,6 +395,8 @@
                                                             <td id="t-td" class="text-nowrap">{{ $item->immediate_supervisor }}</td>
                                                             <td id="t-td" class="text-nowrap">{{ $item->project_type }}</td>
                                                             <td id="t-td">{{ (new GlobalDeclare)->project_category($item->project_category) }}</td>
+                                                            <td id="t-td">₱ {{ number_format($total_estimated_price[ ($loop->iteration - 1) ],2,'.',',') }}</td>
+                                                            <td id="t-td">{{ explode('-', date('j F, Y-', strtotime($item->deadline_of_submission)))[0]  }}</td>
                                                             <td id="t-td" class="text-nowrap">{{ $item->fund_source }}</td>
                                                             <td id="t-td" class="text-nowrap">{{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0]  }}</td>
                                                             <td id="t-td">

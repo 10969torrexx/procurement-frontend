@@ -104,33 +104,77 @@ class DepartmentController extends Controller
         }
     }
 
-    /* Store a newly created resource in storage for the Project Titles Table.
-    *
-    * @param  \Illuminate\Http\Request  $request
-    * @return \Illuminate\Http\Response
+   /**
+    * ! Delete created project title
+    * TODO: 1 get the ppmps or added items from that project title
+    * TODO: 2 get total estimated price
+    * TODO: 3 get allocated budget of the project
+    * TODO: 4 return the estimated price from the project to the remaning balance
+    * TODO: 5 delete project title & ppmps based on project id
+    * ?KEY: project id | id
     */
    public function destoryProjectTitle(Request $request)
    {
         try {
+            // TODO: 1
+                $ppmps = \DB::table('ppmps')
+                    ->where('project_code', (new AESCipher)->decrypt($request->id))
+                    ->where('campus', session('campus'))
+                    ->where('employee_id', session('employee_id'))
+                    ->where('department_id', session('department_id'))
+                    ->whereNull('deleted_at')
+                    ->get([
+                        'estimated_price'
+                    ]);
+            // TODO: END
+            // TODO: 2
+                if(count($ppmps) > 0) {
+                    $total_estimated_price = 0.0; // * this will hold the total estimated price for that project
+                    // * compute the total estimated price
+                    foreach ($ppmps as $item) {
+                        $total_estimated_price += $item->estimated_price;
+                    }
+                }
+            // TODO: END
+            // TODO: 3
+                // * search the project based on id
+                $project_title = \DB::table('project_titles')
+                    ->where('id', (new AESCipher)->decrypt($request->id))
+                    ->where('campus', session('campus'))
+                    ->where('employee_id', session('employee_id'))
+                    ->where('department_id', session('department_id'))
+                    ->get();
+            // TODO: END
+            // TODO: 4
+               if(count($ppmps) > 0) {
+                // * return the estimated price the remaining balance
+                $allocated_budgets = \DB::table('allocated__budgets')
+                    ->where('campus', session('campus'))
+                    ->where('id', $project_title[0]->allocated_budget)
+                    ->update([
+                        'remaining_balance' => $total_estimated_price
+                    ]);
+               }
+            // TODO: END
             # delete project title
-            $project_titles = \DB::table('project_titles')
-            ->where('id', (new AESCipher)->decrypt($request->id))
-            ->where('campus', session('campus'))
-            ->where('employee_id', session('employee_id'))
-            ->where('department_id', session('department_id'))
-            ->update([
-                'deleted_at' => Carbon::now()
-            ]);
+                \DB::table('project_titles')
+                    ->where('id', (new AESCipher)->decrypt($request->id))
+                    ->where('campus', session('campus'))
+                    ->where('employee_id', session('employee_id'))
+                    ->where('department_id', session('department_id'))
+                    ->update([
+                        'deleted_at' => Carbon::now()
+                    ]);
             # delete ppmps table
-            $ppmps = \DB::table('ppmps')
-            ->where('project_code', (new AESCipher)->decrypt($request->id))
-            ->where('campus', session('campus'))
-            ->where('employee_id', session('employee_id'))
-            ->where('department_id', session('department_id'))
-            ->update([
-                'deleted_at' => Carbon::now()
-            ]);
-
+                \DB::table('ppmps')
+                    ->where('project_code', (new AESCipher)->decrypt($request->id))
+                    ->where('campus', session('campus'))
+                    ->where('employee_id', session('employee_id'))
+                    ->where('department_id', session('department_id'))
+                    ->whereNull('deleted_at')
+                    ->update([
+                        'deleted_at' => Carbon::now()
+                    ]);
             # this will created history_log
                 (new HistoryLogController)->store(
                     session('department_id'),
@@ -196,7 +240,6 @@ class DepartmentController extends Controller
      */
     public function createPPMPs(Request $request)
     {
-        dd($request->all());
         try {
             # form fields validation
             $this->validate($request, [
@@ -1036,6 +1079,19 @@ class DepartmentController extends Controller
             return 400;
         } catch (\Throwable $th) {
             throw $th;
+        }
+    }
+
+    /**
+     * ! add ppmp to request PPMP Submission
+     * ? TODO add selected ppmp as request to submit PPMP Submission
+     */
+    public function add_pppmp_to_request(Request $request) {
+        try {
+            dd($request->all());
+        } catch (\Throwable $th) {
+            // throw $th;
+            return view('pages.error-500');
         }
     }
 }

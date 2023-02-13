@@ -94,28 +94,51 @@ class DepartmentPagesController extends Controller
                 # end
             }
         # end
-        # this function will show Projec Titles that are status = 0
+        # this function will show Project Titles that are status = 0
             public function showCreatePPMP(Request $request){
                 try {
                     # this will get data from database
                         # from project_titles table | draft project titles
                             $project_titles = \DB::table('project_titles')
-                            ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
-                            ->join('allocated__budgets', 'allocated__budgets.id', 'project_titles.allocated_budget')
-                            ->join('users', 'users.id', 'project_titles.immediate_supervisor')
-                            ->where('project_titles.campus', session('campus'))
-                            ->where('project_titles.department_id', session('department_id'))
-                            ->where('project_titles.employee_id', session('employee_id'))
-                            ->where('project_titles.status', 0) //status draft
-                            ->where('project_titles.project_category', (new AESCipher)->decrypt($request->project_category))
-                            ->whereNull('project_titles.deleted_at')
-                            ->get([
-                                'project_titles.*',
-                                'fund_sources.fund_source',
-                                'users.name as immediate_supervisor',
-                                'allocated__budgets.deadline_of_submission'
-                            ]);
-                            // dd($project_titles);
+                                ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
+                                ->join('allocated__budgets', 'allocated__budgets.id', 'project_titles.allocated_budget')
+                                ->join('users', 'users.id', 'project_titles.immediate_supervisor')
+                                ->where('project_titles.campus', session('campus'))
+                                ->where('project_titles.department_id', session('department_id'))
+                                ->where('project_titles.employee_id', session('employee_id'))
+                                ->where('project_titles.status', 0) // status draft
+                                ->where('project_titles.project_category', (new AESCipher)->decrypt($request->project_category))
+                                ->whereNull('project_titles.deleted_at')
+                                ->get([
+                                    'project_titles.*',
+                                    'fund_sources.fund_source',
+                                    'users.name as immediate_supervisor',
+                                    'allocated__budgets.deadline_of_submission'
+                                ]);
+                        // ! GET the total estimated prices of project(s)
+                            $total_estimated_price = array(); // * hold the total estimated prices for each ppmps basd on project
+                            if(count($project_titles) > 0) {
+                                // * get the pppmps for each project title
+                                foreach ($project_titles as $_project_title) {
+                                    $ppmps = \DB::table('ppmps')
+                                        ->where('campus', session('campus'))
+                                        ->where('department_id', session('department_id'))
+                                        ->where('employee_id', session('employee_id'))
+                                        ->where('project_code', $_project_title->id)
+                                        ->get();
+                                        $estimated_price = 0.0; // * hold the total estimated prices for each added item from each ppmp
+                                    if(count($ppmps) > 0) {
+                                        // * get the total estimated prices of ppmps based on the project
+                                        foreach ($ppmps as $_ppmp) {
+                                            $estimated_price += $_ppmp->estimated_price;
+                                        }
+                                    } else {
+                                        $estimated_price = 0.0;
+                                    }
+                                  array_push($total_estimated_price, $estimated_price);
+                                }
+                            }
+                        // ! END
                         # from departments table
                             $departments = \DB::table('departments')->where('id', session('department_id'))->get();
                         # from categories table
@@ -149,10 +172,11 @@ class DepartmentPagesController extends Controller
                             'departments'   =>  $departments,
                             'categories'    => $categories,
                             'project_category' => $request->project_category,
+                            'total_estimated_price' => $total_estimated_price // * this will show the total estimated price per project if items have already been added!
                         ]);
                     # end
                 } catch (\Throwable $th) {
-                    throw $th;
+                    // throw $th;
                     return view('pages.error-500');
                 }
             }
@@ -271,10 +295,12 @@ class DepartmentPagesController extends Controller
         # this will show the My PPMP Page based on the provided department id by the logged in user
         public function showMyPPMP() {
             try {
+            
                 # this will get all the data form the ppmp table based on the given department_id
                     $project_titles = \DB::table('project_titles')
                         ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
                         // ->join('departments', 'departments.immediate_supervisor', 'project_titles.department_id')
+                        ->join('allocated__budgets', 'allocated__budgets.id', 'project_titles.allocated_budget')
                         ->join('users', 'users.id', 'project_titles.immediate_supervisor')
                         ->where('project_titles.campus', session('campus'))
                         ->where('project_titles.department_id', session('department_id'))
@@ -283,11 +309,13 @@ class DepartmentPagesController extends Controller
                         ->get([
                             'project_titles.*',
                             'fund_sources.fund_source',
-                            'users.name as immediate_supervisor' 
+                            'users.name as immediate_supervisor',
+                            'allocated__budgets.deadline_of_submission'
                         ]);
                 # from project titles table | disapproved project titles
                     $pt_show_disapproved = \DB::table('project_titles')
                         ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
+                        ->join('allocated__budgets', 'allocated__budgets.id', 'project_titles.allocated_budget')
                         ->join('users', 'users.id', 'project_titles.immediate_supervisor')
                         ->where('project_titles.campus', session('campus'))
                         ->where('project_titles.department_id', session('department_id'))
@@ -300,11 +328,13 @@ class DepartmentPagesController extends Controller
                         ->get([
                             'project_titles.*',
                             'fund_sources.fund_source',
-                            'users.name as immediate_supervisor' 
+                            'users.name as immediate_supervisor',
+                            'allocated__budgets.deadline_of_submission'
                         ]);
                 # from project titles | approved project titles
                     $pt_show_approved = \DB::table('project_titles')
                         ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
+                        ->join('allocated__budgets', 'allocated__budgets.id', 'project_titles.allocated_budget')
                         ->join('users', 'users.id', 'project_titles.immediate_supervisor')
                         ->where('project_titles.campus', session('campus'))
                         ->where('project_titles.department_id', session('department_id'))
@@ -314,7 +344,8 @@ class DepartmentPagesController extends Controller
                         ->get([
                             'project_titles.*',
                             'fund_sources.fund_source',
-                            'users.name as immediate_supervisor' 
+                            'users.name as immediate_supervisor',
+                            'allocated__budgets.deadline_of_submission'
                         ]);
                 # from categories table
                     $categories = \DB::table('categories')->whereNull('deleted_at')->get();  
@@ -326,6 +357,82 @@ class DepartmentPagesController extends Controller
                         ->where('allocated__budgets.procurement_type', 'PPMP') // make this dynamic
                         ->whereNull('allocated__budgets.deleted_at')
                         ->get(['allocated__budgets.*', 'allocated__budgets.id as allocated_id','fund_sources.fund_source']);
+                // ! GET the total estimated prices of project(s)
+                    $total_estimated_price = array(); // * hold the total estimated prices for each ppmps basd on project
+                    $dis_total_estimated_price = array(); // * hold the total estimated prices for each ppmps basd on project thas been disapproved or declined
+                    $app_total_estimated_price = array(); // * hold the total estimated prices for each ppmps basd on project thas been approved or accepted
+                   
+                   
+                   
+                    // ? calculating estimated prices for all project titles regardless of status
+                        if(count($project_titles) > 0) {
+                            // * get the pppmps for each project title
+                            foreach ($project_titles as $_project_title) {
+                                $ppmps = \DB::table('ppmps')
+                                    ->where('campus', session('campus'))
+                                    ->where('department_id', session('department_id'))
+                                    ->where('employee_id', session('employee_id'))
+                                    ->where('project_code', $_project_title->id)
+                                    ->get();
+                                    $estimated_price = 0.0; // * hold the total estimated prices for each added item from each ppmp
+                                if(count($ppmps) > 0) {
+                                    // * get the total estimated prices of ppmps based on the project
+                                    foreach ($ppmps as $_ppmp) {
+                                        $estimated_price += $_ppmp->estimated_price;
+                                    }
+                                } else {
+                                    $estimated_price = 0.0;
+                                }
+                            array_push($total_estimated_price, $estimated_price);
+                            }
+                        }
+                    // ? calculating estimated prices for all project titles that has been disapproved
+                        if(count($pt_show_disapproved) > 0) {
+                            // * get the pppmps for each project title
+                            foreach ($pt_show_disapproved as $_project_title) {
+                                $ppmps = \DB::table('ppmps')
+                                    ->where('campus', session('campus'))
+                                    ->where('department_id', session('department_id'))
+                                    ->where('employee_id', session('employee_id'))
+                                    ->where('project_code', $_project_title->id)
+                                    ->where('status', $_project_title->status)
+                                    ->get();
+                                    $dis_estimated_price = 0.0; // * hold the total estimated prices for each added item from each ppmp
+                                if(count($ppmps) > 0) {
+                                    // * get the total estimated prices of ppmps based on the project
+                                    foreach ($ppmps as $_ppmp) {
+                                        $dis_estimated_price += $_ppmp->estimated_price;
+                                    }
+                                } else {
+                                    $dis_estimated_price = 0.0;
+                                }
+                            array_push($dis_total_estimated_price, $dis_estimated_price);
+                            }
+                        }
+                    // ? calculating estimated prices for all project titles that has been approved
+                        if(count($pt_show_approved) > 0) {
+                            // * get the pppmps for each project title
+                            foreach ($pt_show_approved as $_project_title) {
+                                $ppmps = \DB::table('ppmps')
+                                    ->where('campus', session('campus'))
+                                    ->where('department_id', session('department_id'))
+                                    ->where('employee_id', session('employee_id'))
+                                    ->where('project_code', $_project_title->id)
+                                    ->where('status', $_project_title->status)
+                                    ->get();
+                                    $app_estimated_price = 0.0; // * hold the total estimated prices for each added item from each ppmp
+                                if(count($ppmps) > 0) {
+                                    // * get the total estimated prices of ppmps based on the project
+                                    foreach ($ppmps as $_ppmp) {
+                                        $app_estimated_price += $_ppmp->estimated_price;
+                                    }
+                                } else {
+                                    $app_estimated_price = 0.0;
+                                }
+                            array_push($app_total_estimated_price, $app_estimated_price);
+                            }
+                        }
+                // ! END
                 # this is for affixing header links above the card directoryyy
                     $pageConfigs = ['pageHeader' => true];
                     $breadcrumbs = [
@@ -342,6 +449,9 @@ class DepartmentPagesController extends Controller
                             'pt_show_approved'   => $pt_show_approved,
                             'categories'    => $categories,
                             'fund_sources'   => \json_decode($fund_sources),
+                            'total_estimated_price' => $total_estimated_price, // * this will show the total estimated price per project if items have already been added!
+                            'dis_total_estimated_price' => $dis_total_estimated_price, // * this will show the total estimated price per project if items have already been added!
+                            'app_total_estimated_price' => $app_total_estimated_price, // * this will show the total estimated price per project if items have already been added!
                         ]
                     );
             } catch (\Throwable $th) {
@@ -585,8 +695,7 @@ class DepartmentPagesController extends Controller
                     $breadcrumbs = [
                         ["link" => "/", "name" => "Home"],
                         ["link" => "/department/project-category", "name" => "PROJECT CATEGORY"],
-                        ["link" => "/department/createPPMP", "name" => "PROJECT TITLES"],
-                        ["name" => "ADD ITEM"]
+                        ["name" => "VIEW ITEM"]
                     ];
                     return view('pages.department.view-disapproved-items',
                         ['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs], 

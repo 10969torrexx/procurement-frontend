@@ -6,7 +6,6 @@
     $aes = new AESCipher();
     $immediate_supervisor = '';
     $current_year = Carbon::now();
-    // dd((new AESCipher)->decrypt($project_type));
 @endphp
 @extends('layouts.contentLayoutMaster')
 {{-- title --}}
@@ -163,71 +162,41 @@
                                 @else
                                    <div class="container">
                                         <div class="alert alert-danger alert-dismissible fade show col-12" role="alert">
-                                            <strong>Failed!</strong> No allocated budget. Please contact campus budget officer!
+                                            <strong>Issue!</strong> No allocated budget for this type of PPMP. Please contact campust budget officer!
                                         </div>
                                    </div>
                                 @endif
                             </div>
 
-                            <div class="row justify-content-center form-group">
-                                <div class="container">
-                                    {{-- Displaying Error Messages --}}
-                                        {{-- displaying error message for appended element with null values --}}
-                                            @if($nullValues = Session::get('nullValues'))
-                                                <div class="alert alert-damger alert-dismissible fade show" role="alert">
-                                                    <strong>Failed!</strong> Please fill all the required fields
-                                                    <p>
-                                                        @foreach ($nullValues as $error)
-                                                            {{ $error  }}
-                                                        @endforeach
-                                                    </p>
-                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                            @endif
-                                        {{-- displaying error message for laravel form validation --}}
-                                            @if($errors->all())
-                                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                                    <strong>Failed!</strong> Please fill all the required fields
-                                                    <p>
-                                                        @foreach ($errors->all() as $error)
-                                                            <div>{{ $error }}</div>
-                                                        @endforeach
-                                                    </p>
-                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                            @endif
-                                            @if($message = Session::get('error'))
-                                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                                    <strong>Failed!</strong> 
-                                                    <p>
-                                                        {{ $message }}
-                                                    </p>
-                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                            @endif
-                                        {{-- Displaying Success Message --}}
-                                        {{-- this will display success message if ppmp was successfully created --}}
-                                            @if($message = Session::get('success'))
-                                                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                                    <strong>Success!</strong> 
-                                                    <p>
-                                                        {{ $message }}
-                                                    </p>
-                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                            @endif
-                                        {{-- Displaying Success Message --}}
-                                    {{-- Displaying Error Messages --}}
-                                </div>
-                            </div>
+                            {{-- message and errors --}}
+                                @if(Session::has('success'))
+                                    <script>
+                                        Swal.fire({
+                                            title: 'Success',
+                                            icon: 'success',
+                                            html: "{{ Session::get('success') }}",
+                                        });
+                                    </script>
+                                @endif
+                                @if($errors->all())
+                                    <script>
+                                        Swal.fire({
+                                            title: 'Error',
+                                            icon: 'error',
+                                            html: "Please make sure fields are well accounted for!",
+                                        });
+                                    </script>
+                                @endif
+                                @if(Session::has('failed'))
+                                    <script>
+                                        Swal.fire({
+                                            title: 'Error',
+                                            icon: 'error',
+                                            html: "{{ Session::get('failed') }}",
+                                        });
+                                    </script>
+                                @endif
+                            {{-- message and errors --}}
 
                             {{-- creating data tables for the list of project titles --}}
                                 <div class="table-responsive col-12 col-md-12 col-sm-12 container">
@@ -243,6 +212,7 @@
                                                 <th id="t-td">Immediate SUPERVISOR</th>
                                                 <th id="t-td">Project Type</th>
                                                 <th id="t-td">Fund Source</th>
+                                                <th id="t-td" class="text-nowrap">Total Estimated Price</th>
                                                 <th id="t-td">Deadline</th>
                                                 <th id="t-td">Date Added</th>
                                                 <th id="t-td">Action</th>
@@ -261,6 +231,7 @@
                                                         <td id="t-td">{{ $item->immediate_supervisor }}</td>
                                                         <td id="t-td">{{ $item->project_type }}</td>
                                                         <td id="t-td">{{ $item->fund_source }}</td>
+                                                        <td id="t-td">₱ {{ number_format($total_estimated_price[ ($loop->iteration - 1) ],2,'.',',') }}</td>
                                                         <td id="t-td">{{ explode('-', date('j F, Y-', strtotime($item->deadline_of_submission)))[0]  }}</td>
                                                         <td id="t-td">{{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0]  }}</td>
                                                         <td id="t-td">
