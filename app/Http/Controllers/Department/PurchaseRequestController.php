@@ -320,7 +320,7 @@ class PurchaseRequestController extends Controller
         $remaining = $items - $pri;
         // dd($information); 
         if($remaining == 0){
-          session(['globalerror' => "Sorry! There are no remaining items for you to PR in this Project! "]);
+          session(['globalerror' => "There are no remaining items for you to PR in this Project! "]);
         }else{
             Session::forget('globalerror');
         }
@@ -1137,20 +1137,23 @@ class PurchaseRequestController extends Controller
         $date = $current->format('Y-m');
         $pr_no_check = DB::table('purchase_request as pr')
                           ->select('pr.*')
+                          ->whereNull('deleted_at')
                           ->orderBy('pr.pr_no')
                           ->get();
 
-        #START Code For Replacing the Deleted PR                 
+        #START Code For Replacing pr_no that has been Deleted              
         $count = 1;
         foreach($pr_no_check as $data){
           $pr_no = $date.'-'.str_pad(0000+$count,4,"0",STR_PAD_LEFT);
           if($pr_no == $data->pr_no){
             $count++;}
         }
-        $pr_no = $date.'-'.str_pad(0000+$count,4,"0",STR_PAD_LEFT);
-        #END Code For Replacing the Deleted PR                 
+        #END Code For Replacing the Deleted PR   
+        
+        #NOTE: DON'T DELETE THIS CODE
+        #THIS Continues the sequence of PR No
+        // $pr_no = $date.'-'.str_pad(0000+$count,4,"0",STR_PAD_LEFT);
 
-        // dd($pr_no);
         if($has_pr_no=="0000-00-0000"){
           $purchaseRequest = DB::table('purchase_request')
                               ->insert([

@@ -94,8 +94,8 @@ $(function(){$(".item").change(function(){
       if (response.status == 400) {
         $('.quantity').val(''); 
         Swal.fire({
-          icon: 'error',
-          title: 'Error',
+          icon: 'info',
+          title: 'Information',
           text: response.message,
           })
         document.getElementById('item').getElementsByTagName('option')[0].selected = 'selected';
@@ -367,6 +367,9 @@ $(document).on('click', '.btnCompletePR', function (e) {
             dataType: "json",
             success: function (response) {
                 if (response.status == 200) {
+                  
+                      $('#PreviewPRModal').modal('hide')
+
                         Swal.fire({
                           title: 'Saved',
                           icon: 'success',
@@ -995,11 +998,26 @@ $(document).on('click', '.deletebutton', function (e) {
                 data:data,
                 success: function (response) {
                       if(response['status'] == 200) {
-                      location.reload();
-                        Swal.fire({
-                          title: 'Success',
-                          html: response.message,
+                        Swal.fire({ 
                           icon: 'success',
+                          title: 'Success',
+                          text: response['message'],
+                          timer: 1000,
+                          timerProgressBar: true,
+                          didOpen: () => {
+                            Swal.showLoading()
+                            const b = Swal.getHtmlContainer().querySelector('b')
+                            timerInterval = setInterval(() => {
+                              b.textContent = Swal.getTimerLeft()
+                            }, 100)
+                          },
+                          willClose: () => {
+                            clearInterval(timerInterval)
+                          }
+                        }).then((result) => {
+                          if (result.dismiss === Swal.DismissReason.timer) {
+                            location.reload();
+                          }
                         })
                       }if(response.status == 400){
                         Swal.fire({ 
