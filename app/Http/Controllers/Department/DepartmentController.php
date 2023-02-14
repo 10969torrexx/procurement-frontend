@@ -111,7 +111,7 @@ class DepartmentController extends Controller
     * TODO: 3 get allocated budget of the project
     * TODO: 4 return the estimated price from the project to the remaning balance
     * TODO: 5 delete project title & ppmps based on project id
-    * ?KEY: project id | id
+    * ? KEY: project id | id
     */
    public function destoryProjectTitle(Request $request)
    {

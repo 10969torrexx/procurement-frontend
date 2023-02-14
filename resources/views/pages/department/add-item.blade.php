@@ -9,7 +9,6 @@
     $total_estimated_price = 0.0;
     $allocated_budget = $allocated_budgets[0]->allocated_budget;
     $remaining_balance = doubleVal($allocated_budgets[0]->remaining_balance);
-
 @endphp
 
 {{-- calculations  --}}
@@ -291,7 +290,6 @@
             </div>
         </div>
     {{-- end --}}
-
     {{-- edit| view templates modal --}}
         <div class="modal fade" id="edit-templates-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
@@ -319,7 +317,6 @@
             </div>
         </div>
     {{-- edit|  view templates modal --}}
-
     
     <div class="row">
         <div class="col-12">
@@ -331,8 +328,8 @@
                         </div>
 
                         <div class="form-group col-6 text-right">
-                            <h4 class=""><strong class="text-danger">Deadline of Submission:</strong> {{ explode('-', date('F j, Y', strtotime($allocated_budgets[0]->deadline_of_submission)))[0] }}  </h4>
-                            
+                            <h6 class=""><strong class="text-secondary">Start of Submission:</strong> {{ explode('-', date('F j, Y', strtotime($allocated_budgets[0]->start_date )))[0] }}  </h6>
+                            <h5 class=""><strong class="text-danger">Deadline of Submission:</strong> {{ explode('-', date('F j, Y', strtotime($allocated_budgets[0]->end_date )))[0] }}  </h5>
                         </div>
                     </div>
                     </div>
@@ -348,33 +345,29 @@
                                                         <th>Project Type</th>
                                                         <th>Immediate Supervisor</th>
                                                         <th>Fund Source</th>
-                                                        <th>Year</th>
+                                                        <th>Project Year</th>
+                                                        <th>Year Created</th>
                                                         <th>Status</th>
                                                     </tr>
                                                     <tbody>
                                                         <tr class="border-zero">
-                                                            @for ($i = 0; $i < count($ProjectTitleResponse); $i++)
+                                                            @foreach ($project_titles as $item)
                                                                 <tr class="border-zero">
-                                                                    @php  $project_title_id = $ProjectTitleResponse[$i]['id']; @endphp
-                                                                    <!-- <td class="border-zero">{{ $current_project_code = $ProjectTitleResponse[$i]['year_created'] }}-{{ ($i) + 1}}</td> -->
-                                                                    <td>{{ $ProjectTitleResponse[$i]['project_title'] }}</td>
-                                                                    <td>{{ $ProjectTitleResponse[$i]['project_type'] }}</td>
-                                                                    <td>{{ $ProjectTitleResponse[$i]['immediate_supervisor'] }}</td>
-                                                                    <td>{{ $ProjectTitleResponse[$i]['fund_source'] }}</td>
-                                                                    <td>{{ $ProjectTitleResponse[$i]['project_year'] }}</td>
-                                                                        @if( Str::ucfirst((new GlobalDeclare)->status($ProjectTitleResponse[$i]['status'])) == 'approved' )
-                                                                            <td class="text-success">{{ Str::ucfirst((new GlobalDeclare)->status($ProjectTitleResponse[$i]['status'])) }}</td>
-                                                                        @else
-                                                                            <td class="text-danger">{{ Str::ucfirst((new GlobalDeclare)->status($ProjectTitleResponse[$i]['status'])) }}</td>
-                                                                        @endif
+                                                                    @php  $project_title_id = $item->id; @endphp
+                                                                    <td>{{ $item->project_title }}</td>
+                                                                    <td>{{ $item->project_type }}</td>
+                                                                    <td>{{ $item->immediate_supervisor }}</td>
+                                                                    <td>{{ $item->fund_source }}</td>
+                                                                    <td>{{ $item->project_year }}</td>
+                                                                    <td>{{ $item->year_created }}</td>
+                                                                    <td>{{ (new GlobalDeclare)->status($item->status) }}</td>
                                                                 </tr>
-                                                            @endfor
+                                                            @endforeach
                                                         </tr>
                                                     </tbody>
                                                 </table>
                                             </div>
                                         </div>
-
                                         {{-- message and errors --}}
                                             @if(Session::has('success'))
                                                 <script>
@@ -599,18 +592,13 @@
                         </table>
                 </div>
                     {{-- adding submit ppmp feature --}}
-                        @if (Carbon::now()->format('Y-m-d') >= $allocated_budgets[0]->deadline_of_submission)
+                        @if (Carbon::now()->format('Y-m-d') > $allocated_budgets[0]->end_date )
                             <div class="form-group p-1 row justify-content-center">
-                                <div class="form-group col-6">
-                                    <form action="#" method="post">@csrf @method('POST')
-                                        <input type="text" value="{{ (new AESCipher)->encrypt($project_title_id) }}" class="form-control d-none" name="current_project_code">
-                                        <input type="text" class="form-control d-none" name="remaining_balance" value="{{ $allocated_budgets[0]->remaining_balance }}">
-                                        <input type="text" class="form-control d-none" name="total_estimated_price" value="{{ $total_estimated_price }}">
-                                        <input type="text" class="form-control d-none" name="allocated_budget" value="{{ $allocated_budgets[0]->id }}">
-                                        <input type="text" class="form-control d-none" name="deadline_of_submission" value="{{ $allocated_budgets[0]->deadline_of_submission }}">
-                                        <button type="submit" class="btn btn-primary form-control">Add PPMP to request</button>
-                                    </form>
-                                </div>
+                                <div class="container">
+                                    <div class="alert show col-12 text-center" role="alert">
+                                        <strong>Issue!</strong> This PPMP has exceeded it's deadline of Submission. Check, <a href="{{ route('show_ppmp_submission') }}">PPMP Submission Page</a>!
+                                    </div>
+                               </div>
                             </div>
                         @else
                             <div class="form-group p-1 row justify-content-center">

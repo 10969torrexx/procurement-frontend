@@ -10,7 +10,7 @@
 @endphp
 @extends('layouts.contentLayoutMaster')
 {{-- title --}}
-@section('title','Upload PPMP')
+@section('title','PPMP Submission')
 {{-- vendor css --}}
 @section('vendor-styles')
 <link rel="stylesheet" type="text/css" href="{{asset('vendors/css/charts/apexcharts.css')}}">

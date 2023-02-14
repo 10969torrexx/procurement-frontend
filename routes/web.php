@@ -727,8 +727,7 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
             # export approved ppmp | this will generate PDF file of the Approved PPMP data
             Route::get('export-ppmp', [DepartmentController::class, 'export_approved_ppmp'])->name('export_ppmp');
 
-            # ppmp submission | request for PPMP Submission
-            Route::get('ppmp-submission', [DepartmentPagesController::class, 'show_ppmp_submission'])->name('show_ppmp_submission');
+           
 
             # upload ppmp | upload signed ppmp
             Route::get('upload-ppmp', [DepartmentPagesController::class, 'show_upload_ppmp'])->name('show_upload_ppmp');
@@ -746,6 +745,8 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
             Route::post('edit-uploaded-ppmp', [DepartmentController::class, 'edit_uploaded_ppmp'])->name('edit_ppmp');
             
             // *TODO: request to submit PPMP Submission
+                // * ppmp submission | request for PPMP Submission
+                    Route::get('ppmp-submission', [DepartmentPagesController::class, 'show_ppmp_submission'])->name('show_ppmp_submission');
                 // ! add ppmp to request ppmp submission
                 Route::get('/add-ppmp-request-submission', [DepartmentController::class, 'add_pppmp_to_request'])->name('add_pppmp_to_request');
             // *END:
