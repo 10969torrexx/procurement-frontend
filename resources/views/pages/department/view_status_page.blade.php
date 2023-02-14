@@ -31,7 +31,7 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <div class="col-md-12" style="padding-top:30px;padding-left:30px">
+                <div class="col-md-12" style="padding-top:30px;padding-left:190px">
                     <a href = "{{ route('trackPR') }}" class = "btn btn-primary mr-1 mb-1"><i class="bx bx-left-arrow"></i> Back</a>
                 </div>
                 <div class="card-header">
@@ -61,7 +61,7 @@
                         <thead>
                             <tr class="header" style=" border-top: 1px solid black;">
                                 <td  colspan="2" style="width: 500px;">OFFICE / ACTIVITY</td>
-                                <td  style="width: 100px;">CHECK FOR VERIFICATION</td>
+                                <td  style="width: 80px;">CHECK FOR VERIFICATION</td>
                                 <td  style="width: 100px;">DATE & TIME RECEIVED</td>
                                 <td  style="width: 100px;">DATE & TIME RELEASED</td>
                                 <td  style="width: 200px;">REMARKS</td>
@@ -70,8 +70,8 @@
                         </thead>
                         <tbody>
                             <tr class="office" style=" border-top: 1px solid black;">
-                                <td  colspan="2" style="width: 500px;">BAC Secretariat</td>
-                                <td  style="width: 100px;"></td>
+                                <td  class="office_title" colspan="2" style="width: 500px;">BAC Secretariat</td>
+                                <td  style="width: 80px;"></td>
                                 <td  style="width: 100px;"></td>
                                 <td  style="width: 100px;"></td>
                                 <td  style="width: 200px;"></td>
@@ -80,7 +80,7 @@
                             <tr >
                                 <td  class="numbering" style="width: 3px;">1</td>
                                 <td  class="activity" style="width: 500px;">Receive approved PR.</td>
-                                <td  class="blank" style="width: 100px; text-align:center; vertical-align: middle;"><input type="checkbox" name="query_myTextEditBox"> </td>
+                                <td  class="blank" style="width: 80px; text-align:center; vertical-align: middle;"><input type="checkbox"  name="query_myTextEditBox" onclick="return false" checked> </td>
                                 <td  class="blank" style="width: 100px;"></td>
                                 <td  class="blank" style="width: 100px;"></td>
                                 <td  class="blank" style="width: 200px;"></td>
@@ -89,14 +89,14 @@
                             <tr  style="">
                                 <td  class="numbering" style="width: 3px;">2</td>
                                 <td  class="activity" style="width: 500px; " >Attach BAC Resolution and facilitate signatures of the BAC members and forward to HOPE.</td>
-                                <td  class="blank" style="width: 100px;text-align:center; vertical-align: middle;"><input type="checkbox" name="query_myTextEditBox"> </td>
+                                <td  class="blank" style="width: 100px;text-align:center; vertical-align: middle;"><input type="checkbox" id="checkbox"  name="query_myTextEditBox"> </td>
                                 <td  class="blank" style="width: 100px;"></td>
                                 <td  class="blank" style="width: 100px;"></td>
                                 <td  class="blank" style="width: 200px;"></td>
                                 <td  class="blank" style="width: 150px;"></td>
                             </tr>
                             <tr class="office" style=" border-top: 1px solid black;">
-                                <td  colspan="2" style="width: 500px;">HoPE or Authorized Representative</td>
+                                <td  class="office_title" colspan="2" style="width: 500px;">HoPE or Authorized Representative</td>
                                 <td  style="width: 100px;"></td>
                                 <td  style="width: 100px;"></td>
                                 <td  style="width: 100px;"></td>
@@ -113,7 +113,7 @@
                                 <td  class="blank" style="width: 150px;"></td>
                             </tr>
                             <tr class="office" style=" border-top: 1px solid black;">
-                                <td  colspan="2" style="width: 500px;">BAC Secretariat</td>
+                                <td  class="office_title" colspan="2" style="width: 500px;">BAC Secretariat</td>
                                 <td  style="width: 100px;"></td>
                                 <td  style="width: 100px;"></td>
                                 <td  style="width: 100px;"></td>
@@ -130,7 +130,7 @@
                                 <td  class="blank" style="width: 150px;"></td>
                             </tr>
                             <tr class="office" style=" border-top: 1px solid black;">
-                                <td  colspan="2" style="width: 500px;">Procurement Office</td>
+                                <td  class="office_title" colspan="2" style="width: 500px;">Procurement Office</td>
                                 <td  style="width:100px;"></td>
                                 <td  style="width: 100px;"></td>
                                 <td  style="width: 100px;"></td>
@@ -165,7 +165,7 @@
                                 <td  class="blank" style="width: 150px;"></td>
                             </tr>
                             <tr class="office" style=" border-top: 1px solid black;">
-                                <td  colspan="2" style="width: 500px;">BAC Secretariat</td>
+                                <td  class="office_title" colspan="2" style="width: 500px;">BAC Secretariat</td>
                                 <td  style="width:100px;"></td>
                                 <td  style="width: 100px;"></td>
                                 <td  style="width: 100px;"></td>
@@ -182,7 +182,7 @@
                                 <td  class="blank" style="width: 150px;"></td>
                             </tr>
                             <tr class="office" style=" border-top: 1px solid black;">
-                                <td  colspan="2" style="width: 500px;">BAC Office</td>
+                                <td  class="office_title" colspan="2" style="width: 500px;">BAC Office</td>
                                 <td  style="width:100px;"></td>
                                 <td  style="width: 100px;"></td>
                                 <td  style="width: 100px;"></td>
@@ -217,7 +217,7 @@
                                 <td  class="blank" style="width: 150px;"></td>
                             </tr>
                             <tr class="office" style=" border-top: 1px solid black;">
-                                <td  colspan="2" style="width: 500px;">HoPE</td>
+                                <td  class="office_title" colspan="2" style="width: 500px;">HoPE</td>
                                 <td  style="width:100px;"></td>
                                 <td  style="width: 100px;"></td>
                                 <td  style="width: 100px;"></td>
@@ -234,7 +234,7 @@
                                 <td  class="blank" style="width: 150px;"></td>
                             </tr>
                             <tr class="office" style=" border-top: 1px solid black;">
-                                <td  colspan="2" style="width: 500px;">Procurement Office</td>
+                                <td  class="office_title" colspan="2" style="width: 500px;">Procurement Office</td>
                                 <td  style="width:100px;"></td>
                                 <td  style="width: 100px;"></td>
                                 <td  style="width: 100px;"></td>
@@ -251,7 +251,7 @@
                                 <td  class="blank" style="width: 150px;"></td>
                             </tr>
                             <tr class="office" style=" border-top: 1px solid black;">
-                                <td  colspan="2" style="width: 500px;">Accounting Office</td>
+                                <td  class="office_title" colspan="2" style="width: 500px;">Accounting Office</td>
                                 <td  style="width:100px;"></td>
                                 <td  style="width: 100px;"></td>
                                 <td  style="width: 100px;"></td>
@@ -277,7 +277,7 @@
                                 <td  class="blank" style="width: 150px;"></td>
                             </tr>
                             <tr class="office" style=" border-top: 1px solid black;">
-                                <td  colspan="2" style="width: 500px;">HoPE or Authorized Representative</td>
+                                <td  class="office_title" colspan="2" style="width: 500px;">HoPE or Authorized Representative</td>
                                 <td  style="width:100px;"></td>
                                 <td  style="width: 100px;"></td>
                                 <td  style="width: 100px;"></td>
@@ -294,7 +294,7 @@
                                 <td  class="blank" style="width: 150px;"></td>
                             </tr>
                             <tr class="office" style=" border-top: 1px solid black;">
-                                <td  colspan="2" style="width: 500px;">Procurement Office</td>
+                                <td  class="office_title" colspan="2" style="width: 500px;">Procurement Office</td>
                                 <td  style="width:100px;"></td>
                                 <td  style="width: 100px;"></td>
                                 <td  style="width: 100px;"></td>
@@ -320,7 +320,7 @@
                                 <td  class="blank" style="width: 150px;"></td>
                             </tr>
                             <tr class="office" style=" border-top: 1px solid black;">
-                                <td  colspan="2" style="width: 500px;">BAC Secretariat</td>
+                                <td  class="office_title" colspan="2" style="width: 500px;">BAC Secretariat</td>
                                 <td  style="width:100px;"></td>
                                 <td  style="width: 100px;"></td>
                                 <td  style="width: 100px;"></td>
@@ -337,7 +337,7 @@
                                 <td  class="blank" style="width: 150px;"></td>
                             </tr>
                             <tr class="office" style=" border-top: 1px solid black;">
-                                <td  colspan="2" style="width: 500px;">Procurement Office</td>
+                                <td  class="office_title" colspan="2" style="width: 500px;">Procurement Office</td>
                                 <td  style="width:100px;"></td>
                                 <td  style="width: 100px;"></td>
                                 <td  style="width: 100px;"></td>
@@ -363,7 +363,7 @@
                                 <td  class="blank" style="width: 150px;"></td>
                             </tr>
                             <tr class="office" style=" border-top: 1px solid black;">
-                                <td  colspan="2" style="width: 500px;">Supply and Property Management</td>
+                                <td  class="office_title" colspan="2" style="width: 500px;" >Supply and Property Management</td>
                                 <td  style="width:100px;"></td>
                                 <td  style="width: 100px;"></td>
                                 <td  style="width: 100px;"></td>
@@ -433,9 +433,196 @@
                                 <td  class="blank" style="width: 200px;"></td>
                                 <td  class="blank" style="width: 150px;"></td>
                             </tr>
-                            <tr class="last_one">
+                            <tr>
                                 <td  class="numbering" style="width: 3px;">8</td>
                                 <td  class="activity" style="width: 500px;">Submit voucher to Budget Office.</td>
+                                <td  class="blank" style="width:100px; text-align:center; vertical-align: middle;"><input type="checkbox" name="query_myTextEditBox"> </td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 200px;"></td>
+                                <td  class="blank" style="width: 150px;"></td>
+                            </tr>
+
+                            <tr class="office" style=" border-top: 1px solid black;">
+                                <td  class="office_title" colspan="2" style="width: 500px;">Budget Office</td>
+                                <td  style="width:100px;"></td>
+                                <td  style="width: 100px;"></td>
+                                <td  style="width: 100px;"></td>
+                                <td  style="width: 200px;"></td>
+                                <td  style="width: 150px;"></td>
+                            </tr>
+                            <tr >
+                                <td  class="numbering" style="width: 3px;">1</td>
+                                <td  class="activity" style="width: 500px;">Receive & Log documents for Obligation.</td>
+                                <td  class="blank" style="width:100px; text-align:center; vertical-align: middle;"><input type="checkbox" name="query_myTextEditBox"> </td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 200px;"></td>
+                                <td  class="blank" style="width: 150px;"></td>
+                            </tr>
+                            <tr >
+                                <td  class="numbering" style="width: 3px;">2</td>
+                                <td  class="activity" style="width: 500px;">Make initial pre audit then determine the fund source / Assign Obligation no.</td>
+                                <td  class="blank" style="width:100px; text-align:center; vertical-align: middle;"><input type="checkbox" name="query_myTextEditBox"> </td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 200px;"></td>
+                                <td  class="blank" style="width: 150px;"></td>
+                            </tr>
+                            <tr >
+                                <td  class="numbering" style="width: 3px;">3</td>
+                                <td  class="activity" style="width: 500px;">Facilitate signature of the ORS.</td>
+                                <td  class="blank" style="width:100px; text-align:center; vertical-align: middle;"><input type="checkbox" name="query_myTextEditBox"> </td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 200px;"></td>
+                                <td  class="blank" style="width: 150px;"></td>
+                            </tr>
+                            <tr >
+                                <td  class="numbering" style="width: 3px;">4</td>
+                                <td  class="activity" style="width: 500px;">Signs the ORS.</td>
+                                <td  class="blank" style="width:100px; text-align:center; vertical-align: middle;"><input type="checkbox" name="query_myTextEditBox"> </td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 200px;"></td>
+                                <td  class="blank" style="width: 150px;"></td>
+                            </tr>
+                            <tr>
+                                <td  class="numbering" style="width: 3px;">5</td>
+                                <td  class="activity" style="width: 500px;">Release the documents with signed ORS to the Accountinbgs' pre audit section.</td>
+                                <td  class="blank" style="width:100px; text-align:center; vertical-align: middle;"><input type="checkbox" name="query_myTextEditBox"> </td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 200px;"></td>
+                                <td  class="blank" style="width: 150px;"></td>
+                            </tr>
+                            <tr class="office" style=" border-top: 1px solid black;">
+                                <td  class="office_title" colspan="2" style="width: 500px;">Accounting Office</td>
+                                <td  style="width:100px;"></td>
+                                <td  style="width: 100px;"></td>
+                                <td  style="width: 100px;"></td>
+                                <td  style="width: 200px;"></td>
+                                <td  style="width: 150px;"></td>
+                            </tr>
+                            <tr >
+                                <td  class="numbering" style="width: 3px;">1</td>
+                                <td  class="activity" style="width: 500px;">Check the disbursement vouchers as to its computation and completeness of its supporting</td>
+                                <td  class="blank" style="width:100px; text-align:center; vertical-align: middle;"><input type="checkbox" name="query_myTextEditBox"> </td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 200px;"></td>
+                                <td  class="blank" style="width: 150px;"></td>
+                            </tr>
+                            <tr >
+                                <td  class="numbering" style="width: 3px;">2</td>
+                                <td  class="activity" style="width: 500px;">Input tax withheld in the BIR Data Entry System.</td>
+                                <td  class="blank" style="width:100px; text-align:center; vertical-align: middle;"><input type="checkbox" name="query_myTextEditBox"> </td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 200px;"></td>
+                                <td  class="blank" style="width: 150px;"></td>
+                            </tr>
+                            <tr >
+                                <td  class="numbering" style="width: 3px;">3</td>
+                                <td  class="activity" style="width: 500px;">Post tax withheld in the supplier's ledger cards.</td>
+                                <td  class="blank" style="width:100px; text-align:center; vertical-align: middle;"><input type="checkbox" name="query_myTextEditBox"> </td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 200px;"></td>
+                                <td  class="blank" style="width: 150px;"></td>
+                            </tr>
+                            <tr >
+                                <td  class="numbering" style="width: 3px;">4</td>
+                                <td  class="activity" style="width: 500px;">Print and attach BIR Forms 2307 to the disbursement voucher.</td>
+                                <td  class="blank" style="width:100px; text-align:center; vertical-align: middle;"><input type="checkbox" name="query_myTextEditBox"> </td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 200px;"></td>
+                                <td  class="blank" style="width: 150px;"></td>
+                            </tr>
+                            <tr>
+                                <td  class="numbering" style="width: 3px;">5</td>
+                                <td  class="activity" style="width: 500px;">Review and certify the propriety of the amount claimed and the supporting documents attached.</td>
+                                <td  class="blank" style="width:100px; text-align:center; vertical-align: middle;"><input type="checkbox" name="query_myTextEditBox"> </td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 200px;"></td>
+                                <td  class="blank" style="width: 150px;"></td>
+                            </tr>
+                            <tr >
+                                <td  class="numbering" style="width: 3px;">6</td>
+                                <td  class="activity" style="width: 500px;">Prepare and sign the JEV.</td>
+                                <td  class="blank" style="width:100px; text-align:center; vertical-align: middle;"><input type="checkbox" name="query_myTextEditBox"> </td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 200px;"></td>
+                                <td  class="blank" style="width: 150px;"></td>
+                            </tr>
+                            <tr >
+                                <td  class="numbering" style="width: 3px;">7</td>
+                                <td  class="activity" style="width: 500px;">Forward to the Approving Authority for signature and retrieval of the DV.</td>
+                                <td  class="blank" style="width:100px; text-align:center; vertical-align: middle;"><input type="checkbox" name="query_myTextEditBox"> </td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 200px;"></td>
+                                <td  class="blank" style="width: 150px;"></td>
+                            </tr>
+                            <tr >
+                                <td  class="numbering" style="width: 3px;">8</td>
+                                <td  class="activity" style="width: 500px;">Forward to the Cashier's Office.</td>
+                                <td  class="blank" style="width:100px; text-align:center; vertical-align: middle;"><input type="checkbox" name="query_myTextEditBox"> </td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 200px;"></td>
+                                <td  class="blank" style="width: 150px;"></td>
+                            </tr>
+                            <tr class="office" style=" border-top: 1px solid black;">
+                                <td  class="office_title" colspan="2" style="width: 500px;">Cash Office</td>
+                                <td  style="width:100px;"></td>
+                                <td  style="width: 100px;"></td>
+                                <td  style="width: 100px;"></td>
+                                <td  style="width: 200px;"></td>
+                                <td  style="width: 150px;"></td>
+                            </tr>
+                            <tr >
+                                <td  class="numbering" style="width: 3px;">1</td>
+                                <td  class="activity" style="width: 500px;">Receive approved DV.</td>
+                                <td  class="blank" style="width:100px; text-align:center; vertical-align: middle;"><input type="checkbox" name="query_myTextEditBox"> </td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 200px;"></td>
+                                <td  class="blank" style="width: 150px;"></td>
+                            </tr>
+                            <tr >
+                                <td  class="numbering" style="width: 3px;">2</td>
+                                <td  class="activity" style="width: 500px;">Segregate DV as to fund cluster.</td>
+                                <td  class="blank" style="width:100px; text-align:center; vertical-align: middle;"><input type="checkbox" name="query_myTextEditBox"> </td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 200px;"></td>
+                                <td  class="blank" style="width: 150px;"></td>
+                            </tr>
+                            <tr >
+                                <td  class="numbering" style="width: 3px;">3</td>
+                                <td  class="activity" style="width: 500px;">Prepare and Issue check.</td>
+                                <td  class="blank" style="width:100px; text-align:center; vertical-align: middle;"><input type="checkbox" name="query_myTextEditBox"> </td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 200px;"></td>
+                                <td  class="blank" style="width: 150px;"></td>
+                            </tr>
+                            <tr >
+                                <td  class="numbering" style="width: 3px;">4</td>
+                                <td  class="activity" style="width: 500px;">Forward check to the signatories.</td>
+                                <td  class="blank" style="width:100px; text-align:center; vertical-align: middle;"><input type="checkbox" name="query_myTextEditBox"> </td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 100px;"></td>
+                                <td  class="blank" style="width: 200px;"></td>
+                                <td  class="blank" style="width: 150px;"></td>
+                            </tr>
+                            <tr class="last_one">
+                                <td  class="numbering" style="width: 3px;">5</td>
+                                <td  class="activity" style="width: 500px;">Pay either check, cash or through bank account to payees.</td>
                                 <td  class="blank" style="width:100px; text-align:center; vertical-align: middle;"><input type="checkbox" name="query_myTextEditBox"> </td>
                                 <td  class="blank" style="width: 100px;"></td>
                                 <td  class="blank" style="width: 100px;"></td>
@@ -531,7 +718,6 @@
 <script src="{{asset('vendors/js/tables/datatable/buttons.bootstrap.min.js')}}"></script>
 <script src="{{asset('vendors/js/tables/datatable/pdfmake.min.js')}}"></script>
 <script src="{{asset('vendors/js/tables/datatable/vfs_fonts.js')}}"></script>
-
 {{-- <script src="{{asset('vendors/js/extensions/sweetalert2.all.min.js')}}"></script> --}}
 <script src="{{asset('vendors/js/extensions/polyfill.min.js')}}"></script>
 
@@ -582,6 +768,7 @@
     .numbering{
         border-left: 1px solid black;
         padding-right: 20px;
+        padding-left: 10px;
         font-family: "Times New Roman", ;
         /* border-right: 1px solid black; */
         /* border-bottom: 1px solid black; */
@@ -616,10 +803,14 @@
     padding: 10px;
     width: 500px
     }
+    .office_title{
+        padding-left: 10px
+    }
     .office{
         font-weight: bold;
         font-style: italic;
         text-align: left;
+
     }
     .topp td, .card-title{
         font-family: "Georgia", serif;
@@ -644,6 +835,5 @@
     .table-responsive{
         padding: 20px;
     }
-
     
 </style>

@@ -79,12 +79,14 @@
                                                         <div class="dropdown-menu dropdown-menu-left">
                                                             <a class="dropdown-item" ctr = "<?=$ctr?>" href = "{{ route('view_pr', ['id' => $aes->encrypt($data->id)]) }}" >
                                                                 <i class="bx bx-show-alt mr-1"></i>View PR</a>
+                                                            @if($data->status == 2)
                                                             <a class="dropdown-item" ctr = "<?=$ctr?>" href = "{{ route('view_status', ['id' => $aes->encrypt($data->id)]) }}">
                                                                 <i class="bx bx-task mr-1"></i>View Status</a>
+                                                            @endif
                                                             @if($data->status == 0 || $data->status == 1 || $data->status == 3)
                                                             <a class="dropdown-item" ctr = "<?=$ctr?>" href = "{{ route('edit_pr', ['id' => $aes->encrypt($data->id) , 'pr_no' => $aes->encrypt($data->pr_no)]) }}" >
                                                                 <i class="bx bx-edit-alt mr-1"></i> Edit</a>
-                                                            <a class="dropdown-item deletebutton" ctr = "<?=$ctr?>" href = "{{ $aes->encrypt($data->id) }}" rel = "{{ $aes->encrypt($data->pr_no) }}">
+                                                            <a class="dropdown-item deletebutton" ctr = "<?=$ctr?>" href = "{{ $aes->encrypt($data->id) }}" rel = "{{ $aes->encrypt($data->pr_no) }}" >
                                                                 <i class="bx bx-trash mr-1"></i> Delete </a>
                                                             @endif
                                                             

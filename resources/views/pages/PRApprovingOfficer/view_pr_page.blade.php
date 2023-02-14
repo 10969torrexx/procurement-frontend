@@ -122,7 +122,11 @@
                           <label>STATUS:  </label>
                           <div class="badge badge-pill badge-light-danger ml-1">Disapproved</div>
                         </div>
-                        
+                        <div>
+                          <label>REMARK:  </label>
+                          <div class="badge badge-pill badge-light-danger ml-1">{{ $data->remark  }}</div>
+                          {{-- <label>&nbsp&nbsp&nbsp{{ $data->remark  }}</label> --}}
+                        </div>
 
                         @endif
                       </div>
@@ -236,15 +240,15 @@
                             <tr>
                               <td style="border-left:1px solid black; border-bottom: none;border-right: none;border-top: none;font-weight:bold;padding-left:10px">Printed Name:</td>
                               <td colspan="2" style="border-right: none;border-top: none;text-align:center;font-weight:bold;">{{ strtoupper($data->name) }}</td>
-                              {{-- @foreach($hope as $hope) --}}
+                              @foreach($hope as $hope)
 
                 {{-- <td colspan="2" style="border-right: none;border-top: none;text-align:center;font-weight:bold;"  class="selectEmployee" id="selectEmployee" value="">-- Select Employee --<i class="fa-solid fa-pen-to-square employeeEdit" value="" style="margin-left:5px;"></i></td> --}}
                               {{-- @if($total >= 100000)
                                 <td colspan="3" style="border-top: none;text-align:center;font-weight:bold;">{{  strtoupper($hope->name) }}</td> --}}
                               {{-- @if($total >= 25000) --}}
-                                {{-- <td colspan="3" style="border-top: none;text-align:center;font-weight:bold;"> {{ strtoupper($hope->name) }}</td> --}}
+                                <td colspan="3" style="border-top: none;text-align:center;font-weight:bold;"> {{ strtoupper($hope->name) }}</td>
                               {{-- @elseif($total >= 0 && $total < 25000) --}}
-                                <td colspan="3" style="border-top: none;text-align:center;font-weight:bold;"> {{ strtoupper('Susana B. Ceniza') }}</td>
+                                {{-- <td colspan="3" style="border-top: none;text-align:center;font-weight:bold;"> {{ strtoupper('Susana B. Ceniza') }}</td> --}}
                               {{-- @endif --}}
                             </tr>
                             <tr>
@@ -256,7 +260,7 @@
                               <td colspan="3" style="text-align:center;">Alternate</td>
                               @endif
                             </tr>
-                            {{-- @endforeach --}}
+                            @endforeach
                             <tr><td colspan="6" style="border-left: 1px solid black;height:20px;"></td></tr>
                             
                           </tfoot>

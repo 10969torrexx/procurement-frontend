@@ -109,14 +109,45 @@
                         {{-- <a href = "#" class = "btn btn-success mr-1 mb-1"><i class="bx bx-edit"></i> Edit</a> --}}
                         <a href = "#" class = "print btn btn-success mr-1 mb-1"><i class="bx bx-printer"></i> Print</a>
                     </div>
+                    @foreach($purchase_request as $data)
+                    @endforeach
+                    <div class="col-md-12 text-left mt-2">
+                        @if($data->status == 0)
+                        <div>
+                          <label>STATUS:  </label>
+                          <div class="badge badge-pill badge-light-warning ml-1">Draft</div>
+                        </div>
+                        @elseif($data->status == 1)
+                        <div>
+                          <label>STATUS:  </label>
+                          <div class="badge badge-pill badge-light-primary ml-1">Pending</div>
+                        </div>
+
+                        @elseif($data->status == 2)
+                        <div>
+                          <label>STATUS:  </label>
+                          <div class="badge badge-pill badge-light-success ml-1">Approved</div>
+                        </div>
+                        
+
+                        @elseif($data->status == 3)
+                        <div>
+                          <label>STATUS:  </label>
+                          <div class="badge badge-pill badge-light-danger ml-1">Disapproved</div>
+                        </div>
+                        <div>
+                          <label>REMARK:  </label>
+                          <div class="badge badge-pill badge-light-danger ml-1">{{ $data->remark  }}</div>
+                        </div>
+                        @endif
+                      </div>
                       <div class="table-responsive">
                         <table class="PR">
                           <thead class="head1">
                             <tr>
                               <td class="title" colspan="6" style="border-bottom : none;font-weight:bold;padding-bottom:20px;font-size: 25px;">PURCHASE REQUEST</td>
                             </tr>
-                            @foreach($purchase_request as $data)
-                            @endforeach
+                            
                             <tr>
                               <td style="font-weight:bold;border-left:1px solid black;border-bottom : none;border-top : none;border-right : none;text-align:left;padding-left:10px;">Entity Name:</td>
                               <td colspan="2" style="border-bottom : none;border-top : none;border-right : none"><div class="" style="margin-top:1%;border-bottom:1px solid black;text-align:left;padding-left:10px"> Southern Leyte State University - {{ (new GlobalDeclare())->Campus(session('campus')) }} Campus</div></td>
@@ -225,18 +256,18 @@
                 {{-- <td colspan="2" style="border-right: none;border-top: none;text-align:center;font-weight:bold;"  class="selectEmployee" id="selectEmployee" value="">-- Select Employee --<i class="fa-solid fa-pen-to-square employeeEdit" value="" style="margin-left:5px;"></i></td> --}}
                               {{-- @if($total >= 100000)
                                 <td colspan="3" style="border-top: none;text-align:center;font-weight:bold;">{{  strtoupper($hope->name) }}</td> --}}
-                              @if($total >= 25000)
+                              @if($total > 25000)
                                 <td colspan="3" style="border-top: none;text-align:center;font-weight:bold;"> {{ strtoupper($hope->name) }}</td>
-                              @elseif($total >= 0 && $total < 25000)
+                              @elseif($total >= 0 && $total <= 25000)
                                 <td colspan="3" style="border-top: none;text-align:center;font-weight:bold;"> {{ strtoupper('Susana B. Ceniza') }}</td>
                               @endif
                             </tr>
                             <tr>
                               <td style="border-left:1px solid black; border-top: none;border-right: none;font-weight:bold;padding-left:10px">Designation:</td>
                               <td colspan="2" style="border-right: none;text-align:center;">{{ $data->designation }}</td>
-                              @if($total >= 25000)
+                              @if($total > 25000)
                               <td colspan="3" style="text-align:center;">University President</td>
-                              @elseif($total >= 0 && $total < 25000)
+                              @elseif($total >= 1 && $total <= 25000)
                               <td colspan="3" style="text-align:center;">Alternate</td>
                               @endif
                             </tr>

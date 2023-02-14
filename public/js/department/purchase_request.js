@@ -1,5 +1,7 @@
 $(document).ready(function() {
-
+ 
+  // $('table input[type=checkbox]').attr('disabled', 'true');
+  $("input:checkbox").click(function() { return false; });
     var project_code = $(".project_code").val();
     var employee = $( "#selectEmployee option:selected" ).val();
     // var data:  {somekey:$('#AttorneyEmpresa').val()}
@@ -742,6 +744,56 @@ $(document).on('click', '.edit_SignedPR_button', function (e) {
 
 });
 
+$("form#createPR").submit(function(e) {
+  e.preventDefault();
+//  alert('success')
+  var formData = new FormData(this);    
+  
+  $.ajax({
+      url:'/PR/purchaseRequest/addItem',
+      type: 'POST',
+      data: formData,
+      success: function (response) {
+          // alert(data)
+          if (response.status == 200) {
+              Swal.fire({
+                title: 'Saved',
+                icon: 'success',
+                html: response.message,
+                timer: 1000,
+                timerProgressBar: true,
+                didOpen: () => {
+                  Swal.showLoading()
+                  const b = Swal.getHtmlContainer().querySelector('b')
+                  timerInterval = setInterval(() => {
+                    b.textContent = Swal.getTimerLeft()
+                  }, 100)
+                },
+                willClose: () => {
+                  clearInterval(timerInterval)
+                }
+              }).then((result) => {
+                if (result.dismiss === Swal.DismissReason.timer) {
+                  location.reload();
+                }
+              })
+          }
+          if (response.status == 400) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: response.message,
+              })
+          }
+      },
+      cache: false,
+      contentType: false,
+      processData: false
+  });
+
+
+});
+
 $("form#updateSignedPR").submit(function(e) {
   e.preventDefault();
  
@@ -1154,3 +1206,4 @@ $(document).on('click', '.disapprove_pr', function (e) {
   }
   
 });
+

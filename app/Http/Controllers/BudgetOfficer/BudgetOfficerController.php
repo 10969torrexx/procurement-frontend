@@ -843,7 +843,7 @@ class BudgetOfficerController extends Controller
                     'campus' => session("campus"),
                     'created_at' => Carbon::now()
                 ]);
-                
+
             (new HistoryLogController)->store(
                 session('department_id'),
                 session('employee_id'),
@@ -1037,7 +1037,7 @@ class BudgetOfficerController extends Controller
             if(count($deadlinechecker) == 1){
                 return response()->json([
                         'status' => 400, 
-                        'message' => 'Deadline for '.$Type.' for the Year '.$Year.' is already set!',
+                        'message' => 'Deadline for the selected type for the Year '.$Year.' is already set!',
                         ]);  
             }else if(count($deadlinechecker) == 0){
                 $deadline= DB::table('ppmp_deadline')

@@ -175,9 +175,9 @@
                 </td>
 
                 {{-- <td colspan="2" style="border-right: none;border-top: none;text-align:center;font-weight:bold;"  class="selectEmployee" id="selectEmployee" value="">-- Select Employee --<i class="fa-solid fa-pen-to-square employeeEdit" value="" style="margin-left:5px;"></i></td> --}}
-                @if($total >= 25000)
+                @if($total > 25000)
                   <td colspan="3" style="border-top: none;text-align:center;font-weight:bold;"> {{ strtoupper($hope) }}</td>
-                @elseif($total >= 0 && $total < 25000)
+                @elseif($total >= 1 && $total <= 25000)
                   <td colspan="3" style="border-top: none;text-align:center;font-weight:bold;"> {{ strtoupper('Susana B. Ceniza') }}</td>
                 @endif
               </tr>
@@ -187,9 +187,9 @@
                   <div style="border-bottom:1px solid black">
                   <input type="text" name="add1" value="{{ $designation }}" placeholder="Enter designation here" class="designation_input border-none" style="width: 100%;text-align:center;">
                 </div></td>
-                @if($total >= 25000)
+                @if($total > 25000)
                 <td colspan="3" style="text-align:center;">University President</td>
-                @elseif($total >= 0 && $total < 25000)
+                @elseif($total >= 1 && $total <= 25000)
                 <td colspan="3" style="text-align:center;">Alternate</td>
                 @endif
               </tr>

@@ -86,7 +86,7 @@
                                                         </div>
                                                     </div>   
                                                 </td>
-                                                <td>{{$data->procurement_type}}</td>
+                                                <td>{{(new GlobalDeclare())->project_category($data->procurement_type)}}</td>
                                                 <td>{{ $data->department_name }}</td>
                                                 <td>{{ $data->fund_source }}</td>
                                                 <td>Php {{number_format($data->allocated_budget,2,'.',',')}}</td>

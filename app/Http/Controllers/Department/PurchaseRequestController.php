@@ -215,7 +215,7 @@ class PurchaseRequestController extends Controller
           $designation = "";
           $remaining = $items - $pri;
           if($remaining == 0){
-            session(['globalerror' => "Sorry! There are no remaining items for you to PR in this Project! "]);
+            session(['globalerror' => "There are no remaining items for you to PR in this Project."]);
           }else{
               Session::forget('globalerror');
           }
@@ -694,17 +694,19 @@ class PurchaseRequestController extends Controller
              }
           }
           if($is_valid == false) {
-              return back()->with([
-                  'error' => 'Invalid file format!'
-              ]);
+            return response()->json([
+                  'status' => 400, 
+                  'message' => 'Invalid file format!',
+              ]); 
           }
 
       $id = $request->item;
       $quantityToPR = $request->quantity;
       if($quantityToPR == 0){
-        return back()->with([
-          'error' => 'Quantity cannot be zero!'
-      ]);
+        return response()->json([
+          'status' => 400, 
+          'message' => 'Quantity cannot be zero!',
+        ]); 
       }
       $specification = $request->specification;
       $project_code = $this->aes->decrypt($request->project_code);
@@ -728,9 +730,6 @@ class PurchaseRequestController extends Controller
       }
       
       if($quantityFromPPMP[0]->quantity < $quantity){
-        return back()->with([
-          'error' => 'The quantity exceeds the remaining item(s)!'
-        ]);
         return response()->json([
           'status' => 400, 
           'message' => 'The quantity exceeds the remaining item(s)!',
@@ -748,13 +747,10 @@ class PurchaseRequestController extends Controller
                         ->count();
                         // dd($itemCheck);
           if($itemCheck == 1){
-            return back()->with([
-              'error' => 'Item already exist in the draft!'
-            ]);
-            // return response()->json([
-            //     'status' => 400, 
-            //     'message' => 'Item already exist in the draft!',
-            // ]); 
+            return response()->json([
+                'status' => 400, 
+                'message' => 'Item already exist in the draft!',
+            ]); 
           }else{
               $item = DB::table('ppmps')
                     ->select('item_name')
@@ -796,21 +792,15 @@ class PurchaseRequestController extends Controller
                               ]);
               }
               if($response){
-                return back()->with([
-                  'success' => 'Item added successfully!'
-                ]);
-                // return response()->json([
-                //   'status' => 200, 
-                //   'message' => 'Item Added Successfully!',
-                // ]); 
+                return response()->json([
+                  'status' => 200, 
+                  'message' => 'Item Added Successfully!',
+                ]); 
               }else{
-                return back()->with([
-                  'error' => 'Failed!'
-                ]);
-                // return response()->json([
-                //   'status' => 400, 
-                //   'message' => 'Failed!',
-                // ]);    
+                return response()->json([
+                  'status' => 400, 
+                  'message' => 'Failed!',
+                ]);    
               }
           }
       }
@@ -836,7 +826,12 @@ class PurchaseRequestController extends Controller
                       ->where('specification',$request->updatespecification)
                       ->whereNull('deleted_at')
                       ->get();
-      
+      if($updatequantity == 0){
+        return response()->json([
+          'status' => 400, 
+          'message' => 'Quantity cannot be zero!',
+        ]); 
+      }
       if(count($checkItem) == 1){
         return response()->json([
           'status' => 400,
@@ -1162,6 +1157,7 @@ class PurchaseRequestController extends Controller
                                 'department_id' => $department_id,
                                 'project_code' => $project_code,
                                 'pr_no' => $pr_no,
+                                'status' => 1,
                                 'campus' => $campus,
                                 'fund_source_id' => $fund_source,
                                 'purpose' => $purpose,

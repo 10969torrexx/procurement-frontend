@@ -594,7 +594,10 @@ class PresidentHopeController extends Controller
       ["name" => "View PR"]
     ];
     $pr_no = (new AESCipher())->decrypt($request->pr_no);
-
+    $hope = DB::table('users')
+              ->where('role',12)
+              ->where('campus',session('campus'))
+              ->get();
     $purchase_request = DB::table("purchase_request as pr")
                           ->select("pr.*","fs.fund_source","d.department_name","u.name")
                           ->join("fund_sources as fs","pr.fund_source_id","fs.id")
@@ -605,16 +608,29 @@ class PresidentHopeController extends Controller
                           ->whereNull('pr.deleted_at')
                           ->get();
 
+    foreach($purchase_request as $data){
+      $id = $data->id;
+    }
+    
     $itemsForPR = DB::table("purchase_request_items as pri")
               ->select('pri.*','p.unit_of_measurement','p.item_description','p.unit_price')
               ->join('ppmps as p','pri.item_id','p.id')
               ->where('pri.pr_no',$pr_no)
               ->whereNull('pri.deleted_at')
               ->get();
-
+              
+              (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                $id,
+                'Viewed Purchase Request',
+                'View',
+                $request->ip()
+              );
           
 
-    return view('pages.PRApprovingOfficer.view_pr_page',compact('purchase_request','itemsForPR'), [
+    return view('pages.PRApprovingOfficer.view_pr_page',compact('hope','purchase_request','itemsForPR'), [
                 'pageConfigs'=>$pageConfigs,
                 'breadcrumbs'=>$breadcrumbs,
             ]); 
