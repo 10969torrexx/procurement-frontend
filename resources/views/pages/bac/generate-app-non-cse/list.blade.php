@@ -260,6 +260,7 @@
           <div class="card-header" >
             <div class="generate" {{-- style="background-color: #bf5279" --}}>
               <input type="hidden" class="campusCheck" value="{{ $campuscount }}">
+              <input type="hidden" name="project_category" id="project_category" value="{{ $project_category}}">
               <input type="hidden" name="app_type" class="app_type" value="{{ $appType }}">
               @if (count($campusCheck) > 0)
                 <button  type="button" class="btn btn-danger form-control col-sm-1 mt-1 generatepdf" value="{{ $campuscount }}"><i class="fa-solid fa-file-pdf"></i> &nbsp; PDF</button>
@@ -286,6 +287,7 @@
                         $pres_status = $presStatus->status;
                     @endphp
                 @endforeach
+                
                 @if(session('role') == 10)
                   @if($pres_status == 0)
                     <button  type="button" class="btn btn-primary form-control col-sm-1 mt-1 submittopresident " value="4" data-id="{{ $project_category}}">SUBMIT</button>
