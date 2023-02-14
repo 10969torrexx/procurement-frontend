@@ -576,6 +576,7 @@ class PresidentHopeController extends Controller
           ->where("pr.status", '!=', 0)
           ->where("pr.campus", session('campus'))
           ->whereNull("pr.deleted_at")
+          ->orderBy('pr.status')
           ->get();
           // dd($response);
 
@@ -611,7 +612,7 @@ class PresidentHopeController extends Controller
     foreach($purchase_request as $data){
       $id = $data->id;
     }
-    
+
     $itemsForPR = DB::table("purchase_request_items as pri")
               ->select('pri.*','p.unit_of_measurement','p.item_description','p.unit_price')
               ->join('ppmps as p','pri.item_id','p.id')

@@ -32,8 +32,9 @@ class PurchaseRequestController extends Controller
                 ->select('project_titles.id','project_titles.project_title','project_titles.project_year','fund_sources.fund_source')
                 ->join('fund_sources', 'fund_sources.id', '=', 'project_titles.fund_source')
                 ->where('department_id',$department_id)
-                // ->where('project_year',$year+1)
+                // ->where('project_year',$year)
                 ->where('status',4)
+                ->orderBy('project_year','DESC')
                 ->get();
       return view('pages.department.purchase-request-index',compact('ppmps'), [
           'pageConfigs'=>$pageConfigs,
@@ -622,10 +623,23 @@ class PurchaseRequestController extends Controller
             ]);
           }
 
+          $validatePRNo = DB::table('purchase_request')
+                          ->where('pr_no',$pr_no)
+                          ->where('status',2)
+                          ->where('department_id', session('department_id'))
+                          ->whereNull('deleted_at')
+                          ->get();
+          if(count($validatePRNo)==0){
+            return response()->json([
+              'status' => 400, 
+              'message' => 'PR '.$pr_no.' is not yet approved!',
+            ]);
+          }   
           $checkPRNo = DB::table('signed_purchase_request')
-          ->where('pr_no',$pr_no)
-          ->whereNull('deleted_at')
-          ->get();
+                          ->where('pr_no',$pr_no)
+                          ->where('department_id', session('department_id'))
+                          ->whereNull('deleted_at')
+                          ->get();
 
           if(count($checkPRNo) == 1){
             return response()->json([
