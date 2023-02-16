@@ -39,10 +39,9 @@ class DepartmentController extends Controller
         return $response;
     }
     /**
-     * Store a newly created resource in storage for the Project Titles Table.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * * Submit PPMP | Create Project Title
+     * TODO: Enable the submission of project title
+     * TODO: Save project title as draft status
      */
     public function createProjectTitle(Request $request)
     {
@@ -232,48 +231,89 @@ class DepartmentController extends Controller
                 'success'   => 'Project Updated Successfully!'
             ]);
     }
-     /**
-     * Store a newly created resource in storage for the Project Titles Table.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+    /**
+     * * Submit PPMP | add item to project
+     * TODO 1: Validate Input
+     * TODO 2: Check if estimated price has exceeded the remaining balance
+     * TODO 3: Check if project has exceeded the deadline of submission
+     * TODO 4: Add items to project | Implement insert
+     * TODO 5: Insert data to history logs
+     * ? ----------------------------------------
+     * ? KEY 1: Check if project is for request ppmp submission or else
+     * * if project is for request ignore the deadline of submission
+     * ? KEY 2: deterine the deadline of submission
      */
     public function createPPMPs(Request $request)
     {
         try {
-            # form fields validation
-            $this->validate($request, [
-                # field validation | disabled
-                    'item_name'     =>  'required',
-                    'item_category' =>  'required',
-                    'app_type' =>  'required',
-                    'unit_price'     =>  'required',
-                    'estimated_price'     =>  'required',
-                    'quantity'  =>  'required',
-                    'item_description'  =>  'required',
-                    'mode_of_procurement'  =>  'required',
-                    'expected_month'    =>  'required',
-                    'unit_of_measurement'  =>  'required',
-            ]); 
-            $__total_estimated_price = $request->total_estimated_price + doubleval($request->estimated_price);
-            # comparing total estimated price to remaining balance
-            if($__total_estimated_price > doubleval($request->remaining_balance)) {
-                return back()->with([
-                    'failed' => 'Your total estimated price has exceeded your remaining balance. Please make necessary adjustments!'
-                ]);
-            }
-
-            # comparing current date to deadline of submission
-            $_deadline_of_submission = Carbon::parse($request->deadline_of_submission)->format('Y-m-d');
-            $current_date = Carbon::now()->format('Y-m-d');
-            if($current_date > $_deadline_of_submission) {
-                return back()->with([
-                    'failed'    => 'You\'ve exceeded the alloted deadline of submission.'
-                ]);
-            } 
-            
-            # this will send data to project titles table using api
-                $create_items = \DB::table('ppmps')
+            // TODO 1
+                $this->validate($request, [
+                    // * field validation | disabled
+                        'item_name'     =>  'required',
+                        'item_category' =>  'required',
+                        'app_type' =>  'required',
+                        'unit_price'     =>  'required',
+                        'estimated_price'     =>  'required',
+                        'quantity'  =>  'required',
+                        'item_description'  =>  'required',
+                        'mode_of_procurement'  =>  'required',
+                        'expected_month'    =>  'required',
+                        'unit_of_measurement'  =>  'required',
+                ]); 
+            // TODO 2
+                $__total_estimated_price = $request->total_estimated_price + doubleval($request->estimated_price);
+                # comparing total estimated price to remaining balance
+                if($__total_estimated_price > doubleval($request->remaining_balance)) {
+                    return back()->with([
+                        'failed' => 'Your total estimated price has exceeded your remaining balance. Please make necessary adjustments!'
+                    ]);
+                }
+                // ? KEY 1
+                if($request->has('for_request')) {
+                    // TODO 4
+                    $ppmps = \DB::table('ppmps')
+                        ->insert([
+                            'employee_id' => session('employee_id'),
+                            'department_id' => session('department_id'),
+                            'campus' => session('campus'),
+                            'project_code'  =>  (new AESCipher)->decrypt($request->project_code),
+                            'item_name' => $request->item_name,
+                            'unit_price'    =>  $request->unit_price,
+                            'app_type'  => $request->app_type,
+                            'estimated_price'  => $request->estimated_price,
+                            'item_description' =>  $request->item_description,
+                            'item_category'     =>  $request->item_category,
+                            'quantity'  => $request->quantity,
+                            'unit_of_measurement'   =>  $request->unit_of_measurement,
+                            'mode_of_procurement'   =>  $request->mode_of_procurement,
+                            'expected_month'    => (new AESCipher)->decrypt($request->expected_month),
+                            'created_at'    =>  Carbon::now(),
+                            'updated_at'    =>  Carbon::now(),
+                    ]);
+                    // TODO 5
+                    (new HistoryLogController)->store(
+                        session('department_id'),
+                        session('employee_id'),
+                        session('campus'),
+                        (new AESCipher)->decrypt($request->project_code),
+                        'Added item for ppmp request submission as  request details',
+                        'create',
+                        $request->ip(),
+                    );
+                    return back()->with([
+                        'success'   => 'Item added as request Draft! (PPMP Request details)'
+                    ]);
+                } 
+            // TODO 3
+                $_deadline_of_submission = Carbon::parse($request->deadline_of_submission)->format('Y-m-d');
+                $current_date = Carbon::now()->format('Y-m-d');
+                if($current_date > $_deadline_of_submission) { // * if current date is greater than deadline of submission
+                    return back()->with([
+                        'failed'    => 'You\'ve exceeded the alloted deadline of submission.'
+                    ]);
+                } 
+            // TODO 4
+                \DB::table('ppmps')
                     ->insert([
                         'employee_id' => session('employee_id'),
                         'department_id' => session('department_id'),
@@ -293,7 +333,7 @@ class DepartmentController extends Controller
                         'updated_at'    =>  Carbon::now(),
                     ]);
             
-            # this will created history_log
+            // TODO 5
                 (new HistoryLogController)->store(
                     session('department_id'),
                     session('employee_id'),
@@ -303,13 +343,12 @@ class DepartmentController extends Controller
                     'create',
                     $request->ip(),
                 );
-            # end
             
             return back()->with([
                 'success'   => 'Item added as Draft!'
             ]);
         } catch (\Throwable $th) {
-            throw $th;
+            // throw $th;
             return view('pages.error-500');
         }
     }
@@ -851,15 +890,16 @@ class DepartmentController extends Controller
                 ]);
             }
         } catch (\Throwable $th) {
-            throw $th;
+            // throw $th;
             return view('pages.error-500');
         }
     }
 
-    /* Download Uplooded PPMP
+    /** 
+     * * Download Uplooded PPMP
      * - this will enable downlaod uploade PPMP
      * - based on: Employee id, campus, department_id
-     * - get file from storage upload id search
+     * TODO: get file from storage upload id search
      */
     public function download_uploaded_PPMP(Request $request) {
         try {
@@ -883,7 +923,7 @@ class DepartmentController extends Controller
                     $request->ip(),
                 );
             # end
-            return \Storage::download(env('APP_NAME').'\\department_upload\\signed_ppmp\\'.$response[0]->signed_ppmp);
+            return \Storage::download('storage/department_upload/signed_ppmp/'.$response[0]->signed_ppmp);
         } catch (\Throwable $th) {
             throw $th;
             return view('pages.error-500');
@@ -1083,12 +1123,46 @@ class DepartmentController extends Controller
     }
 
     /**
-     * ! add ppmp to request PPMP Submission
-     * ? TODO add selected ppmp as request to submit PPMP Submission
+     * * Request for PPMP Submission
+     * TODO 1: Get the project title id
+     * TODO 2: Valdate the request fields
+     * TODO 3: Enable Submission of request
+     * TODO 4: Save log to history logs table
+     * ? ---------------
+     * ? KEY 1: project title id is included with the requests
      */
-    public function add_pppmp_to_request(Request $request) {
+    public function request_submission(Request $request) {
         try {
-            dd($request->all());
+            // TODO 2
+                $this->validate($request, [
+                    'reason' => 'required'
+                ]);
+            // TODO 3
+                \DB::table('ppmp_request_submission')
+                    ->insert([
+                        'employee_id' => session('employee_id'),
+                        'department_id' => session('department_id'),
+                        'campus' => session('campus'),
+                        'project_id'    => (new AESCipher)->decrypt($request->project_id),
+                        'reason'    => $request->reason,
+                        'created_at'    => Carbon::now(),
+                        'updated_at'    => Carbon::now()
+                    ]);
+            // TODO 4
+                # this will created history_log
+                    (new HistoryLogController)->store(
+                        session('department_id'),
+                        session('employee_id'),
+                        session('campus'),
+                        (new AESCipher)->decrypt($request->project_id),
+                        'Submitted a request for PPMP submission',
+                        'Created',
+                        $request->ip(),
+                    );
+                # end  
+            return redirect(route('show_ppmp_submission'))->with([
+                'success'   => 'Project has been requested for PPMP Submission'
+            ]);
         } catch (\Throwable $th) {
             // throw $th;
             return view('pages.error-500');

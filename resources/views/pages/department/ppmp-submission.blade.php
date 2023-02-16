@@ -21,148 +21,241 @@
 <link rel="stylesheet" type="text/css" href="{{asset('css/plugins/extensions/toastr.css')}}">
 @endsection
 @section('content')
-<!-- Zero configuration table -->
-{{-- preview uploaded ppmp --}}
-    <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" id="preview-ppmp" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Preview File:</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <div class="p-1" id="content">
-              </div>
-            </div>
-            <div class="modal-footer">
-                <button data-dismiss="modal" class="btn btn-secondary">Close</button>
-            </div>
-        </div>
-      </div>
-    </div>
-{{-- end --}}
-{{-- edit uploaded ppmp --}}
-  <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" id="edit-uploaded-ppmp" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Edit Uploaded PPMP</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <div class="" id="uploaded-ppmp-content">
-              <div class="row justify-content-center">
-                    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
-                      <form action="{{ route('edit_ppmp') }}" method="POST" enctype="multipart/form-data"> 
-                        @csrf
-                        <div class="form-group row">
-                            <input type="text" name="id" id="default-id" class="form-control d-none">
-                            <div class="col-sm-6 col-md-6 col-lg-6 col-12">
-                                <label for="">PPMP / Project Category</label>
-                                <select name="project_category" id="project-category" class="form-control" required>
-                                  <option value="" id="default-project-category">-- Select Project Category --</option>
-                                  @for ($i = 0; $i < 3; $i++)
-                                      <option value="{{ (new AESCipher)->encrypt($i) }}">{{ (new GlobalDeclare)->project_category($i) }}</option>
-                                  @endfor
-                              </select>
-                            </div>
-                            <div class="col-sm-6 col-md-6 col-lg-6 col-12">
-                                <label for="">Year Created</label>
-                                <select name="year_created" id="year-created" class="form-control" required>
-                                  <option value="" id="default-year-created">-- Select Year --</option>
-                                  @for ($i = 5; $i > 0; $i--)
-                                      <option value="{{ (new AESCipher)->encrypt(Carbon::now()->subYears($i)->format('Y')) }}">{{ Carbon::now()->subYear($i)->format('Y') }}</option>
-                                  @endfor
-                                  @for ($i = 0; $i < 5; $i++)
-                                      <option value="{{ (new AESCipher)->encrypt(Carbon::now()->subYears($i)->format('Y')) }}">{{ Carbon::now()->addYear($i)->format('Y') }}</option>
-                                  @endfor
-                              </select>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                          <label for="">File name</label>
-                          <textarea name="file_name" id="default-file-name" class="form-control" id="" cols="30" rows="1" required></textarea>
-                        </div>
-                        <div class="form-group">
-                          <label for="">Signed PPMP File</label>
-                          <input type="file" name="signed_ppmp" id="default-signed-ppmp" class="form-control">
-                          <p class="card-text alert bg-rgba-info">Attach desired file here (.pdf, .jpeg, .jpg, .png) files</p>
-                        </div>
-                        <button type="submit" class="btn btn-success text-white" id="update-ppmp">Update PPMP</button>
-                      </form>
-                    </div>
-                </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          </div>
-      </div>
-    </div>
-  </div>
-{{-- end --}}
+<style>
+  #t-table, #t-th, #t-td  {
+    border: 1px solid;
+    font-size: 11px;
+    padding: 5px;
+    text-align: center;
+  }
+  #t-table{
+    width: 100%;
+  }
+  .tbg-secondary {
+    background-color: rgba(71, 95, 123, 0.9) !important;
+  }
+</style>
+  {{-- MODALS --}}
+  {{-- MODALS --}}
+  {{-- message and errors --}}
+    @if(Session::has('success'))
+      <script>
+          Swal.fire({
+              title: 'Success',
+              icon: 'success',
+              html: "{{ Session::get('success') }}",
+          });
+      </script>
+    @endif
+    @if($errors->all())
+      <script>
+          Swal.fire({
+              title: 'Error',
+              icon: 'error',
+              html: "Please make sure fields are well accounted for!",
+          });
+      </script>
+    @endif
+    @if(Session::has('failed'))
+      <script>
+          Swal.fire({
+              title: 'Error',
+              icon: 'error',
+              html: "{{ Session::get('failed') }}",
+          });
+      </script>
+    @endif
+  {{-- message and errors --}}
+  <div class="row col-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="card col-12 col-sm-12 col-md-12 col-lg-12">
+          <div class="card-header p-1">
+              <h5 class="card-title">
+                <strong>Request for Submission</strong>
+              </h5>
 
-<section id="dropzone-examples">
-    <!-- Upload signed ppmp starts -->
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                <div class="card-header p-1">
-                    <h4 class="card-title text-primary border-bottom pb-1">
-                    <strong> Request for PPMP Submission</strong>
-                    </h4>
-                </div>
-                <div class="card-content">
-                    <div class="card-body">
-                        <div class="row justify-content-center">
-                            <div class="col-5 col-sm-5 col-md-5 col-lg-5">
-                            <form action="{{ route('upload_ppmp') }}" method="POST" enctype="multipart/form-data"> @csrf
-                                <div class="form-group row">
-                                    <div class="col-sm-6 col-md-6 col-lg-6 col-12">
-                                        <label for="">PPMP / Project Category</label>
-                                        <select name="project_category" id="project-category" class="form-control" required>
-                                        <option value="">-- Select Project Category --</option>
-                                        @for ($i = 0; $i < 3; $i++)
-                                            <option value="{{ (new AESCipher)->encrypt($i) }}">{{ (new GlobalDeclare)->project_category($i) }}</option>
-                                        @endfor
-                                    </select>
-                                    </div>
-                                    <div class="col-sm-6 col-md-6 col-lg-6 col-12">
-                                        <label for="">Year Created</label>
-                                        <select name="year_created" id="year-created" class="form-control" required>
-                                        <option value="">-- Select Year --</option>
-                                        @for ($i = 5; $i > 0; $i--)
-                                            <option value="{{ (new AESCipher)->encrypt(Carbon::now()->subYears($i)->format('Y')) }}">{{ Carbon::now()->subYear($i)->format('Y') }}</option>
-                                        @endfor
-                                        @for ($i = 0; $i < 5; $i++)
-                                            <option value="{{ (new AESCipher)->encrypt(Carbon::now()->subYears($i)->format('Y')) }}">{{ Carbon::now()->addYear($i)->format('Y') }}</option>
-                                        @endfor
-                                    </select>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                <label for="">File name</label>
-                                <textarea name="file_name" class="form-control" id="" cols="30" rows="1" required></textarea>
-                                </div>
-                                <div class="form-group">
-                                <label for="">Signed PPMP File</label>
-                                <input type="file" name="signed_ppmp" id="signed-ppmp" class="form-control" required>
-                                <p class="card-text alert bg-rgba-info">This can only process (.pdf, .jpeg, .jpg, .png) files</p>
-                                </div>
-                                <button type="submit" class="btn btn-success text-white" id="upload-signed-ppmp">Send Request</button>
-                            </form>
-                            </div>
-                        </div>
+              <ul class="nav nav-tabs m-1" role="tablist">
+                {{-- 1st Tab | PPMP --}}
+                    <li class="nav-item">
+                        <a class="nav-link active" id="my-ppmp-tab" data-toggle="tab" href="#my-ppmp" aria-controls="regular" role="tab" aria-selected="true">
+                          <i class="fa-solid fa-box-open"></i>
+                            {{ (new GlobalDeclare)->project_category(1) }}
+                        </a>
+                    </li>
+                {{-- end --}}
+                {{-- 2nd Tab | Indicative --}}
+                    <li class="nav-item">
+                        <a class="nav-link" id="dissapproved-ppmp-tab" data-toggle="tab" href="#dissapproved" aria-controls="regular9" role="tab" aria-selected="false">
+                          <i class="fa-regular fa-clock"></i>
+                            {{ (new GlobalDeclare)->project_category(0) }} &nbsp; <strong></strong>
+                        </a>
+                    </li>
+                {{-- end --}}
+                {{-- 2nd Tab | Supplemental --}}
+                    <li class="nav-item">
+                        <a class="nav-link" id="approved-ppmp-tab" data-toggle="tab" href="#approved" aria-controls="regular9" role="tab" aria-selected="false">
+                          <i class="fa-sharp fa-solid fa-cart-shopping"></i>
+                            {{ (new GlobalDeclare)->project_category(2) }} &nbsp; <strong></strong>
+                        </a>
+                    </li>
+                {{-- end --}}
+              </ul>
+
+          </div>
+          <div class="card-body p-1">
+              <div class="tab-content p-1">
+                {{-- 1st Tab--}}
+                  <div class="tab-pane active" id="my-ppmp" aria-labelledby="my-ppmp-tab" role="tabpanel">
+                      <div class="table-responsive col-12 container">
+                        <table class="table zero-configuration item-table" id="item-table t-table">
+                            <thead>
+                                <tr id="t-tr">
+                                    <th id="t-td">#</th>
+                                    <th id="t-td">Project Title</th>
+                                    <th id="t-td">Year</th>
+                                    <th id="t-td">status</th>
+                                    <th id="t-td">Immediate SUPERVISOR</th>
+                                    <th id="t-td">Project Type</th>
+                                    <th id="t-td">Project Category</th>
+                                    <th id="t-td">Fund Source</th>
+                                    <th id="t-td" class="text-nowrap">Total Estimated Price</th>
+                                    <th id="t-td" class="text-nowrap">Deadline of Submission</th>
+                                    <th id="t-td">Date Added</th>
+                                    <th id="t-td">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{-- showing ppmp data based on department and user --}}
+                                    @foreach ($ppmp_project_titles as $item)
+                                        <tr id="t-tr">
+                                            <td id="t-td">{{ $loop->iteration }}</td>
+                                            <td id="t-td"  class="text-nowrap">{{ $item->project_title }}</td>
+                                            <td id="t-td">{{ $item->project_year }}</td>
+                                            <td id="t-td" class="text-nowrap">{{ (new GlobalDeclare)->status($item->status) }}</td>
+                                            <td id="t-td">{{ $item->immediate_supervisor }}</td>
+                                            <td id="t-td">{{ $item->project_type }}</td>
+                                            <td id="t-td">{{ (new GlobalDeclare)->project_category($item->project_category) }}</td>
+                                            <td id="t-td" class="text-nowrap">{{ $item->fund_source }}</td>
+                                            <td id="t-td">₱ {{ number_format($ppmp_total_estimated_price[ ($loop->iteration - 1) ],2,'.',',') }}</td>
+                                            <td id="t-td">{{ explode('-', date('j F, Y-', strtotime($item->deadline_of_submission)))[0]  }}</td>
+                                            <td id="t-td" class="text-nowrap"> {{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0] }}</td>
+                                            <td id="t-td">
+                                              <a href="{{ route('show_ppmp_submission_items', ['project_title_id' => (new AESCipher)->encrypt($item->id), 'project_category' => (new AESCipher)->encrypt($item->project_category) ]) }}" class="btn text-secondary">
+                                                <i class="fa-regular fa-paper-plane"></i>
+                                              </a>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                {{-- showing ppmp data based on department and user --}}
+                            </tbody>
+                        </table>
+                        {{ $ppmp_project_titles->onEachSide(1)->links() }}
+                      </div>
+                  </div>
+                {{-- 2nd Tab--}}
+                  <div class="tab-pane" id="dissapproved" aria-labelledby="dissapproved-ppmp-tab" role="tabpanel">
+                    <div class="tab-pane active" id="my-ppmp" aria-labelledby="my-ppmp-tab" role="tabpanel">
+                      <div class="table-responsive col-12 container">
+                        <table class="table zero-configuration item-table" id="item-table t-table">
+                            <thead>
+                                <tr id="t-tr">
+                                    <th id="t-td">#</th>
+                                    <th id="t-td">Project Title</th>
+                                    <th id="t-td">Year</th>
+                                    <th id="t-td">status</th>
+                                    <th id="t-td">Immediate SUPERVISOR</th>
+                                    <th id="t-td">Project Type</th>
+                                    <th id="t-td">Project Category</th>
+                                    <th id="t-td">Fund Source</th>
+                                    <th id="t-td" class="text-nowrap">Total Estimated Price</th>
+                                    <th id="t-td" class="text-nowrap">Deadline of Submission</th>
+                                    <th id="t-td">Date Added</th>
+                                    <th id="t-td">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{-- showing ppmp data based on department and user --}}
+                                    @foreach ($indicative_project_titles as $item)
+                                        <tr id="t-tr">
+                                            <td id="t-td">{{ $loop->iteration }}</td>
+                                            <td id="t-td"  class="text-nowrap">{{ $item->project_title }}</td>
+                                            <td id="t-td">{{ $item->project_year }}</td>
+                                            <td id="t-td" class="text-nowrap">{{ (new GlobalDeclare)->status($item->status) }}</td>
+                                            <td id="t-td">{{ $item->immediate_supervisor }}</td>
+                                            <td id="t-td">{{ $item->project_type }}</td>
+                                            <td id="t-td">{{ (new GlobalDeclare)->project_category($item->project_category) }}</td>
+                                            <td id="t-td" class="text-nowrap">{{ $item->fund_source }}</td>
+                                            <td id="t-td">₱ {{ number_format($indicative_total_estimated_price[ ($loop->iteration - 1) ],2,'.',',') }}</td>
+                                            <td id="t-td">{{ explode('-', date('j F, Y-', strtotime($item->deadline_of_submission)))[0]  }}</td>
+                                            <td id="t-td" class="text-nowrap"> {{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0] }}</td>
+                                            <td id="t-td">
+                                                <a href="{{ route('show_ppmp_submission_items', ['project_title_id' => (new AESCipher)->encrypt($item->id)]) }}" class="btn text-secondary">
+                                                  <i class="fa-regular fa-paper-plane"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                {{-- showing ppmp data based on department and user --}}
+                            </tbody>
+                        </table>
+                        {{ $ppmp_project_titles->onEachSide(1)->links() }}
+                      </div>
                     </div>
-                </div>
-                </div>
-            </div>
-        </div>
-    <!-- single file upload starts -->
+                  </div>
+                {{-- 3rd Tab--}}
+                  <div class="tab-pane" id="approved" aria-labelledby="approved-ppmp-tab" role="tabpanel">
+                    <div class="tab-pane active" id="my-ppmp" aria-labelledby="my-ppmp-tab" role="tabpanel">
+                      <div class="table-responsive col-12 container">
+                        <table class="table zero-configuration item-table" id="item-table t-table">
+                            <thead>
+                                <tr id="t-tr">
+                                    <th id="t-td">#</th>
+                                    <th id="t-td">Project Title</th>
+                                    <th id="t-td">Year</th>
+                                    <th id="t-td">status</th>
+                                    <th id="t-td">Immediate SUPERVISOR</th>
+                                    <th id="t-td">Project Type</th>
+                                    <th id="t-td">Project Category</th>
+                                    <th id="t-td">Fund Source</th>
+                                    <th id="t-td" class="text-nowrap">Total Estimated Price</th>
+                                    <th id="t-td" class="text-nowrap">Deadline of Submission</th>
+                                    <th id="t-td">Date Added</th>
+                                    <th id="t-td">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{-- showing ppmp data based on department and user --}}
+                                    @foreach ($supplemental_project_titles as $item)
+                                        <tr id="t-tr">
+                                            <td id="t-td">{{ $loop->iteration }}</td>
+                                            <td id="t-td"  class="text-nowrap">{{ $item->project_title }}</td>
+                                            <td id="t-td">{{ $item->project_year }}</td>
+                                            <td id="t-td" class="text-nowrap">{{ (new GlobalDeclare)->status($item->status) }}</td>
+                                            <td id="t-td">{{ $item->immediate_supervisor }}</td>
+                                            <td id="t-td">{{ $item->project_type }}</td>
+                                            <td id="t-td">{{ (new GlobalDeclare)->project_category($item->project_category) }}</td>
+                                            <td id="t-td" class="text-nowrap">{{ $item->fund_source }}</td>
+                                            <td id="t-td">₱ {{ number_format($supplemental_total_estimated_price[ ($loop->iteration - 1) ],2,'.',',') }}</td>
+                                            <td id="t-td">{{ explode('-', date('j F, Y-', strtotime($item->deadline_of_submission)))[0]  }}</td>
+                                            <td id="t-td" class="text-nowrap"> {{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0] }}</td>
+                                            <td id="t-td">
+                                              <a href="" class="btn text-secondary btn-success">
+                                                <i class="fa-regular fa-paper-plane"></i>
+                                              </a>
+                                          </td>
+                                        </tr>
+                                    @endforeach
+                                {{-- showing ppmp data based on department and user --}}
+                            </tbody>
+                        </table>
+                        {{ $ppmp_project_titles->onEachSide(1)->links() }}
+                      </div>
+                    </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+
  
 </section>
 {{-- Torrexx | Code not mine --}}

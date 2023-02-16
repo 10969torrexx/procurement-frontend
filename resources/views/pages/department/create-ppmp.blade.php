@@ -40,15 +40,11 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <ul class="nav nav-tabs m-1" role="tablist">
-                    {{-- 1st Tab | Create PPMP --}}
-                    <li class="nav-item">
-                        <a class="nav-link active" id="create-ppmp-tab" data-toggle="tab" href="#create-ppmp" aria-controls="regular" role="tab" aria-selected="true">
-                            <i class="fa-solid fa-cart-plus"></i>
-                            Create PPMP
-                        </a>
-                    </li>
-                </ul>
+                <div class="card-header p-1">
+                    <h5 class="card-title">
+                      <strong>Create {{ (new GlobalDeclare)->project_category( (new AESCipher)->decrypt($project_category) ) }}</strong>
+                    </h5>
+                </div>
                     {{-- edit project title modal --}}
                         <div class="modal fade" id="viewmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                             <div class="modal-dialog modal-lg modal-dialog" role="document">
@@ -252,7 +248,7 @@
                                                                         </a>
                                                                     {{-- END --}}
                                                                     {{-- add item form --}}
-                                                                        <a href = "{{ route('department-addItem', ['id' => $aes->encrypt($item->id), 'allocated_budget' => $aes->encrypt($item->allocated_budget) ]) }}" class="dropdown-item">
+                                                                        <a href = "{{ route('department-addItem', ['id' => $aes->encrypt($item->id), 'allocated_budget' => $aes->encrypt($item->allocated_budget), 'procurement_type' => $project_category ]) }}" class="dropdown-item">
                                                                             <i class="fa-regular fa-plus mr-1"></i>Add Item
                                                                         </a>
                                                                     {{-- end add item form --}}

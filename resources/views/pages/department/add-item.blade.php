@@ -324,11 +324,11 @@
                     <div class="card-header">
                     <div class="row border-bottom p-1">
                         <div class="form-group col-6 text-left">
-                            <h4 class="text-primary"><strong>Add Item to PPMP</strong></h4>
+                            <h5 class="text-primary"><strong>Add Item to PPMP</strong></h5>
                         </div>
 
                         <div class="form-group col-6 text-right">
-                            <h6 class=""><strong class="text-secondary">Start of Submission:</strong> {{ explode('-', date('F j, Y', strtotime($allocated_budgets[0]->start_date )))[0] }}  </h6>
+                            {{-- <h6 class=""><strong class="text-secondary">Start of Submission:</strong> {{ explode('-', date('F j, Y', strtotime($allocated_budgets[0]->start_date )))[0] }}  </h6> --}}
                             <h5 class=""><strong class="text-danger">Deadline of Submission:</strong> {{ explode('-', date('F j, Y', strtotime($allocated_budgets[0]->end_date )))[0] }}  </h5>
                         </div>
                     </div>
@@ -504,7 +504,7 @@
                                                         <input type="text" class="form-control d-none" name="remaining_balance" value="{{ $allocated_budgets[0]->remaining_balance }}">
                                                         <input type="text" class="form-control d-none" name="total_estimated_price" value="{{ $total_estimated_price }}">
                                                         <input type="text" class="form-control d-none" name="allocated_budget" value="{{ $allocated_budgets[0]->id }}">
-                                                        <input type="text" class="form-control d-none" name="deadline_of_submission" value="{{ $allocated_budgets[0]->deadline_of_submission }}">
+                                                        <input type="text" class="form-control d-none" name="deadline_of_submission" value="{{ $allocated_budgets[0]->end_date }}">
                                                         &nbsp; Add item
                                                     </button>
                                                 </div>
@@ -592,7 +592,7 @@
                         </table>
                 </div>
                     {{-- adding submit ppmp feature --}}
-                        @if (Carbon::now()->format('Y-m-d') > $allocated_budgets[0]->end_date )
+                        @if ( Carbon::now()->format('Y-m-d') > $allocated_budgets[0]->end_date )
                             <div class="form-group p-1 row justify-content-center">
                                 <div class="container">
                                     <div class="alert show col-12 text-center" role="alert">
@@ -608,7 +608,7 @@
                                         <input type="text" class="form-control d-none" name="remaining_balance" value="{{ $allocated_budgets[0]->remaining_balance }}">
                                         <input type="text" class="form-control d-none" name="total_estimated_price" value="{{ $total_estimated_price }}">
                                         <input type="text" class="form-control d-none" name="allocated_budget" value="{{ $allocated_budgets[0]->id }}">
-                                        <input type="text" class="form-control d-none" name="deadline_of_submission" value="{{ $allocated_budgets[0]->deadline_of_submission }}">
+                                        <input type="text" class="form-control d-none" name="deadline_of_submission" value="{{ $allocated_budgets[0]->end_date }}">
                                         <button type="submit" class="btn btn-success form-control">Submit PPMP</button>
                                     </form>
                                 </div>

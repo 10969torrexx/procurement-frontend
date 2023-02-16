@@ -744,12 +744,7 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
             Route::get('get-uploaded-ppmp', [DepartmentController::class, 'get_edit_ppmp'])->name('get_edit_ppmp');
             Route::post('edit-uploaded-ppmp', [DepartmentController::class, 'edit_uploaded_ppmp'])->name('edit_ppmp');
             
-            // *TODO: request to submit PPMP Submission
-                // * ppmp submission | request for PPMP Submission
-                    Route::get('ppmp-submission', [DepartmentPagesController::class, 'show_ppmp_submission'])->name('show_ppmp_submission');
-                // ! add ppmp to request ppmp submission
-                Route::get('/add-ppmp-request-submission', [DepartmentController::class, 'add_pppmp_to_request'])->name('add_pppmp_to_request');
-            // *END:
+           
         /** END */
 
         /** Gettin data from the database */
@@ -767,6 +762,23 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
             Route::post('live-search-item', [DepartmentController::class, 'live_search_item'])->name('live_search_item');
     /** END | TORREXX */
 });
+
+/**
+ * * TORREXX additionals
+ * 
+ */
+    Route::group(['prefix' => 'request-ppmp-submission', 'middleware' => ['authuser']], function() {
+         // *TODO: request to submit PPMP Submission
+                // * ppmp submission | request for PPMP Submission
+                    Route::get('ppmp-submission', [DepartmentPagesController::class, 'show_ppmp_submission'])->name('show_ppmp_submission');
+                // * add ppmp to request ppmp submission
+                    Route::get('ppmp-submission-items', [DepartmentPagesController::class, 'show_ppmp_submission_items'])->name('show_ppmp_submission_items');
+                // * add item  to request details
+                    Route::post('ppmp-submission-items', [DepartmentController::class, 'ppmp_response_items'])->name('ppmp_response_items');
+                // * add submit ppmp request
+                    Route::post('/ppmp-request-submission', [DepartmentController::class, 'request_submission'])->name('request_submission');
+            // *END:
+    });
 
 /** TORREXX Additionals
  * ! BOR Secretary
