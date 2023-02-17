@@ -825,6 +825,12 @@ class BudgetOfficerController extends Controller
                                     ->where('campus',session('campus'))
                                     ->whereNull('deleted_at')
                                     ->sum('price');
+            if($total_expenditures == 0){
+                return response()->json([
+                    'status' => 400, 
+                    'message' => 'No Mandatory Expenditure(s)!',
+                    ]); 
+            }
             $department_checker = DB::table('allocated__budgets')
                                     ->where('department_id',$department_id,'and')
                                     ->where('procurement_type',$type,'and')
