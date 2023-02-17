@@ -72,6 +72,37 @@ class PurchaseRequestController extends Controller
           ]); 
   }
 
+  public function RoutingSlipIndex(){
+    $pageConfigs = ['pageHeader' => true];
+    $breadcrumbs = [
+      ["link" => "/", "name" => "Home"],["name" => "Approved PRs "]
+    ];
+    // return view('pages.budgetofficer.allocatebudget',['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs]);
+    $hope = DB::table('users')
+    ->where('role',12)
+    ->where('campus',session('campus'))
+    ->get();
+    // dd($users);
+    $department_id = session('department_id');
+    $pr = DB::table("purchase_request as pr")
+          ->select("pr.*","fs.fund_source","u.name","d.department_name")
+          ->join("departments as d", "pr.department_id", "=", "d.id")
+          ->join("fund_sources as fs", "pr.fund_source_id", "=", "fs.id")
+          ->join("users as u", "pr.printed_name", "=", "u.id")
+          ->where("pr.department_id", $department_id)
+          ->where("pr.status", 2)
+          ->whereNull("pr.deleted_at")
+          ->orderBy('pr.created_at')
+          ->get();
+          // dd($pr);
+
+        return view('pages.department.pr-routing-slip-index',compact('pr','hope'), [
+            'pageConfigs'=>$pageConfigs,
+            'breadcrumbs'=>$breadcrumbs,
+            // 'error' => $error,
+        ]); 
+}
+
   public function SignedPRIndex(){
     $pageConfigs = ['pageHeader' => true];
     $breadcrumbs = [
@@ -156,6 +187,7 @@ class PurchaseRequestController extends Controller
           $itemsForPR = DB::table("purchase_request_items as pri")
                     ->select('pri.*','p.item_name','p.item_description','p.unit_price')
                     ->join("ppmps as p", "pri.item_id", "=", "p.id")
+                    // ->where('p.app_type','Non-CSE')
                     ->where('pri.project_code',$id)
                     ->where('pri.pr_no',0)
                     ->whereNull('pri.deleted_at')
@@ -164,11 +196,11 @@ class PurchaseRequestController extends Controller
           $itemsFromPRI = DB::table("purchase_request_items as pri")
                     ->select('pri.*','p.unit_of_measurement','p.item_description','p.unit_price')
                     ->join("ppmps as p", "pri.item_id", "=", "p.id")
+                    ->where('p.app_type','Non-CSE')
                     ->where('pri.project_code',$id)
                     ->where('pri.pr_no',0)
                     ->whereNull('pri.deleted_at')
                     ->get();
-                    // dd($id);
 
           $details = DB::table("project_titles as pt")
                     ->select("pt.campus","pt.project_title","pt.fund_source","d.department_name")
@@ -188,8 +220,7 @@ class PurchaseRequestController extends Controller
                     // ->select('id','item_name','quantity')
                     ->where('project_code','=',$id)
                     ->where('mode_of_procurement','!=',33)
-                    // ->where('quantity','!=',0)
-                    ->whereNull('deleted_at')
+                    ->where('app_type','Non-CSE')
                     ->orderBy('item_name')
                     ->whereNull('deleted_at')
                     ->sum('quantity');
@@ -197,9 +228,10 @@ class PurchaseRequestController extends Controller
           $pri = DB::table('purchase_request_items')
                     // ->select('item_id','quantity')
                     ->where('project_code','=',$id)
-                    ->where('quantity','!=',0)
+                    // ->where('quantity','!=',0)
                     ->whereNull('deleted_at')
                     ->sum('quantity');
+                    // dd($pri);
 
           // $quantity = 0;
           // $quantityPRI = 0;
@@ -294,10 +326,9 @@ class PurchaseRequestController extends Controller
                   // ->select('id','item_name','quantity')
                   ->where('project_code','=',$project_code)
                   ->where('mode_of_procurement','!=',33)
-                  // ->where('quantity','!=',0)
+                  ->where('app_type','Non-CSE')
                   ->where('pr_no','!=',0)
                   ->whereNull('deleted_at')
-                  // ->orderBy('item_name')
                   ->sum('quantity');
 
         $pri = DB::table('purchase_request_items')
@@ -627,17 +658,21 @@ class PurchaseRequestController extends Controller
                           ->where('pr_no',$pr_no)
                           ->where('status',2)
                           ->where('department_id', session('department_id'))
+                          ->where('campus', session('campus'))
                           ->whereNull('deleted_at')
                           ->get();
+
           if(count($validatePRNo)==0){
             return response()->json([
               'status' => 400, 
               'message' => 'PR '.$pr_no.' is not yet approved!',
             ]);
           }   
+          
           $checkPRNo = DB::table('signed_purchase_request')
                           ->where('pr_no',$pr_no)
                           ->where('department_id', session('department_id'))
+                          ->where('campus', session('campus'))
                           ->whereNull('deleted_at')
                           ->get();
 
@@ -984,7 +1019,7 @@ class PurchaseRequestController extends Controller
                       ->select('id','item_name','quantity')
                       ->where('project_code','=',$project_code)
                       ->where('mode_of_procurement','!=',33)
-                      // ->where('quantity','!=',0)
+                      ->where('app_type','Non-CSE')
                       ->whereNull('deleted_at')
                       ->orderBy('item_name')
                       ->get();
@@ -1067,6 +1102,7 @@ class PurchaseRequestController extends Controller
         $item = DB::table('ppmps')
                       ->select('quantity','item_name')
                       ->where('project_code','=',$project_code)
+                      ->where('app_type','Non-CSE')
                       ->where('id','=',$id)
                       ->whereNull('deleted_at')
                       ->get();
@@ -1162,13 +1198,16 @@ class PurchaseRequestController extends Controller
           if($pr_no == $data->pr_no){
             $count++;}
         }
+
         #END Code For Replacing the Deleted PR   
         
         #NOTE: DON'T DELETE THIS CODE
         #THIS Continues the sequence of PR No
-        // $pr_no = $date.'-'.str_pad(0000+$count,4,"0",STR_PAD_LEFT);
+        $pr_no = $date.'-'.str_pad(0000+$count,4,"0",STR_PAD_LEFT);
 
         if($has_pr_no=="0000-00-0000"){
+          // dd($pr_no);
+
           $purchaseRequest = DB::table('purchase_request')
                               ->insert([
                                 'department_id' => $department_id,
@@ -1182,12 +1221,23 @@ class PurchaseRequestController extends Controller
                                 'designation' => $designation,
                                 'created_at' =>  Carbon::now()
                             ]);
+
           DB::table('purchase_request_items')
               ->where('project_code', $project_code)
               ->where('pr_no', 0)
               ->update([
                 'pr_no' => $pr_no
               ]);
+
+              (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                null,
+                'Created Purchase Request with PR No '.$pr_no,
+                'Create',
+                $request->ip(),
+            );
 
           if($purchaseRequest){
             return response()->json([
@@ -1212,6 +1262,16 @@ class PurchaseRequestController extends Controller
                                   'designation' => $designation,
                                   'updated_at' =>  Carbon::now()
                                 ]);
+
+          (new HistoryLogController)->store(
+            session('department_id'),
+            session('employee_id'),
+            session('campus'),
+            null,
+            'Updated Purchase Request with PR No '.$pr_no,
+            'Update',
+            $request->ip(),
+        );
 
           if($purchaseRequest){
             return response()->json([
@@ -1252,12 +1312,60 @@ class PurchaseRequestController extends Controller
                           ->where("pr.id",$id)
                           ->get();
 
+                          (new HistoryLogController)->store(
+                            session('department_id'),
+                            session('employee_id'),
+                            session('campus'),
+                            $id,
+                            'Viewed Purchase Request Status',
+                            'View',
+                            $request->ip(),
+                        );
+
       return view('pages.department.view_status_page',compact('purchase_request'),  [
                   'pageConfigs'=>$pageConfigs,
                   'breadcrumbs'=>$breadcrumbs,
                   // 'error' => $error,
               ]); 
   }
+
+  public function pr_routing_slip(Request $request){
+    // dd($request->all());
+    // dd($id);
+    $pageConfigs = ['pageHeader' => true];
+    $breadcrumbs = [
+      ["link" => "/", "name" => "Home"],
+      ["link" => "/department/trackPR", "name" => "Approved PRs"],
+      // ["link" => "/department/purchaseRequest/createPR", "name" => "Create PR"],
+      ["name" => "Routing Slip"]
+    ];
+
+    $id = (new AESCipher())->decrypt($request->id);
+
+    $purchase_request = DB::table("purchase_request as pr")
+                        ->select("pr.*","fs.fund_source","d.department_name","u.name")
+                        ->join("fund_sources as fs","pr.fund_source_id","fs.id")
+                        ->join("departments as d","pr.department_id","d.id")
+                        ->join("users as u","pr.printed_name","u.id")
+                        ->where("pr.id",$id)
+                        ->get();
+
+                        (new HistoryLogController)->store(
+                          session('department_id'),
+                          session('employee_id'),
+                          session('campus'),
+                          $id,
+                          'Viewed Purchase Request Status',
+                          'View',
+                          $request->ip(),
+                      );
+
+    return view('pages.department.pr-routing-slip',compact('purchase_request'),  [
+                'pageConfigs'=>$pageConfigs,
+                'breadcrumbs'=>$breadcrumbs,
+                // 'error' => $error,
+            ]); 
+}
 
   public function view_pr(Request $request){
       // dd($request->all());
@@ -1297,7 +1405,15 @@ class PurchaseRequestController extends Controller
                 ->get();
                 // dd($itemsForPR);
 
-            
+              //   (new HistoryLogController)->store(
+              //     session('department_id'),
+              //     session('employee_id'),
+              //     session('campus'),
+              //     null,
+              //     'Viewed Purchase Request with PR No '.$pr_no,
+              //     'View',
+              //     $request->ip(),
+              // );
 
       return view('pages.department.view_pr_page',compact('hope','purchase_request','itemsForPR','id'), [
                   'pageConfigs'=>$pageConfigs,
@@ -1453,7 +1569,15 @@ class PurchaseRequestController extends Controller
               ->get();
               // dd($itemsForPR);
 
-          
+            //   (new HistoryLogController)->store(
+            //     session('department_id'),
+            //     session('employee_id'),
+            //     session('campus'),
+            //     null,
+            //     'Printed Purchase Request with PR No '.$pr_no,
+            //     'Print',
+            //     $request->ip(),
+            // );
 
     return view('pages.department.print_pr',compact('hope','purchase_request','itemsForPR','date','id'), [
                 // 'pageConfigs'=>$pageConfigs,
@@ -1491,6 +1615,16 @@ class PurchaseRequestController extends Controller
       $oldfilename = $data->file_name;
       Storage::delete($destination_path.$oldfilename);
     }
+
+    (new HistoryLogController)->store(
+      session('department_id'),
+      session('employee_id'),
+      session('campus'),
+      null,
+      'Deleted Purchase Request with PR No '.$pr_no,
+      'Delete',
+      $request->ip(),
+    );
 
     if($response)
     {

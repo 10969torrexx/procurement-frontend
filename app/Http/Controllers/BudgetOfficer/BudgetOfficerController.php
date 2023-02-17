@@ -1263,6 +1263,180 @@ class BudgetOfficerController extends Controller
         }
     }
 
+    public function pending_ppmp_request(){
+        $pageConfigs = ['pageHeader' => true];
+        $breadcrumbs = [
+          ["link" => "/", "name" => "Home"],["name" => "Pending PPMP Request"]
+        ];
+
+        try {
+            $response = DB::table('ppmp_request_submission as prs')
+                            ->select('prs.id','prs.remark','prs.reason','prs.created_at','prs.status','u.name','d.department_name','ab.deadline_of_submission')
+                            ->join('users as u','prs.employee_id','u.employee_id')
+                            ->join('departments as d','prs.department_id','d.id')
+                            ->join('allocated__budgets as ab','prs.allocated_budget','ab.id')
+                            ->where('prs.campus', session('campus'))
+                            ->whereNull('prs.deleted_at')
+                            ->get();
+
+                // dd($response);
+            return view('pages.budgetofficer.ppmp-request-index', compact('response'), [
+                'pageConfigs'=>$pageConfigs,
+                'breadcrumbs'=>$breadcrumbs,
+            ]);
+           
+        } catch (\Throwable $th) {
+            throw $th;
+            // return view('pages.error-500');
+        }
+    }
+
+    public function appdis_request(Request $request){
+        try {
+            // dd($request->all());
+            $status = $request->status;
+            $edit = $request->edit;
+            $date = $request->date;
+            $id = (new AESCipher())->decrypt($request->id);
+            $remark = $request->remark;
+
+            if($status == 1){
+                $statusCheck = DB::table('ppmp_request_submission')
+                                ->where('id',$id)
+                                ->where('status','!=',$status)
+                                ->where('campus',session('campus'))
+                                ->whereNull('deleted_at')
+                                ->get([
+                                    'allocated_budget'
+                                ]);
+                if($edit == 1){
+                    $statusCheck = DB::table('ppmp_request_submission')
+                                ->where('id',$id)
+                                ->where('status',$status)
+                                ->where('campus',session('campus'))
+                                ->whereNull('deleted_at')
+                                ->get([
+                                    'allocated_budget'
+                                ]);
+
+                    foreach($statusCheck as $data){
+                        $allocated_budget_id = $data->allocated_budget;
+                    }
+
+                    DB::table('allocated__budgets')
+                        ->where('id',$allocated_budget_id)
+                        ->update([
+                            'deadline_of_submission' => $date,
+                        ]);
+
+                        (new HistoryLogController)->store(
+                            session('department_id'),
+                            session('employee_id'),
+                            session('campus'),
+                            $id,
+                            'Updated PPMP Request Submission Deadline',
+                            'Update',
+                            $request->ip()
+                          );
+
+                    return response()->json([
+                        'status' => 200,
+                        'message' => 'Deadline Updated Successfully!'
+                        ]);  
+                }
+                if(count($statusCheck) == 1){
+                  (new HistoryLogController)->store(
+                        session('department_id'),
+                        session('employee_id'),
+                        session('campus'),
+                        $id,
+                        'Approved PPMP Request Submission ',
+                        'Approve',
+                        $request->ip()
+                      );
+        
+                  $response = DB::table('ppmp_request_submission')
+                                ->where('id',$id)
+                                ->update([
+                                  'status' => $status,
+                                  'remark' => $remark,
+                                ]);
+
+                                foreach($statusCheck as $data){
+                                    $allocated_budget_id = $data->allocated_budget;
+                                }
+                                DB::table('allocated__budgets')
+                                ->where('id',$allocated_budget_id)
+                                ->update([
+                                  'deadline_of_submission' => $date,
+                                ]);
+                                // dd($statusCheck);
+                  return response()->json([
+                    'status' => 200,
+                    'message' => 'Request Successfully Approved!'
+                  ]);          
+                }
+
+                return response()->json([
+                  'status' => 400,
+                  'message' => 'Request is already approved!'
+                ]);
+              }
+              if($status == 2){
+                $statusCheck = DB::table('ppmp_request_submission')
+                                ->where('id',$id)
+                                ->where('status','!=',$status)
+                                ->where('campus',session('campus'))
+                                ->whereNull('deleted_at')
+                                ->get();
+                                // dd($statusCheck);
+        
+                if(count($statusCheck) == 1){
+                  (new HistoryLogController)->store(
+                        session('department_id'),
+                        session('employee_id'),
+                        session('campus'),
+                        $id,
+                        'Disapproved PPMP Request Submission with remark: '.$remark,
+                        'Disapprove',
+                        $request->ip()
+                      );
+        
+                  $response = DB::table('ppmp_request_submission')
+                                ->where('id',$id)
+                                ->update([
+                                  'status' => $status,
+                                  'remark' => $remark,
+                                ]);
+
+                                foreach($statusCheck as $data){
+                                    $allocated_budget_id = $data->allocated_budget;
+                                }
+                                DB::table('allocated__budgets')
+                                ->where('id',$allocated_budget_id)
+                                ->update([
+                                  'deadline_of_submission' => null,
+                                ]);
+
+                                // dd($statusCheck);
+                  return response()->json([
+                    'status' => 200,
+                    'message' => 'Request Successfully Disapproved!'
+                  ]);          
+                }
+                return response()->json([
+                  'status' => 400,
+                  'message' => 'Request is already disapproved!'
+                ]);
+              }
+           
+        } catch (\Throwable $th) {
+            throw $th;
+            // return view('pages.error-500');
+        }
+    }
+
+
     public function my_par(){
         return view('pages.page-maintenance');
     }

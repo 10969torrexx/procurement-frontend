@@ -459,6 +459,10 @@ Route::group(['prefix' => 'budgetofficer','middleware' => ['authuser']], functio
     Route::post('/view_ppmp/showPPMP/ppmp-timeline', 'BudgetOfficer\BudgetOfficerController@timeline')->name('ppmp-timeline');
     Route::post('/view_ppmp/showPPMP/accept-reject-all', 'BudgetOfficer\BudgetOfficerController@accept_reject_all')->name('accept-reject-all');
 
+    Route::get('/pending_ppmp_request','BudgetOfficer\BudgetOfficerController@pending_ppmp_request');
+    Route::post('/pending_ppmp_request/appdis_request','BudgetOfficer\BudgetOfficerController@appdis_request');
+
+
 });
 #End Route for Budget Officer
 
@@ -691,6 +695,8 @@ Route::group(['prefix' => 'PR','middleware' => ['authuser']], function() {
     Route::post('/signed_pr/view_signed_pr', 'Department\PurchaseRequestController@view_signed_pr')->name('view_signed_pr');
     Route::get('/signed_pr/download_signed_pr', 'Department\PurchaseRequestController@download_signed_pr')->name('download_signed_pr');
 
+    Route::get('/routing_slip', 'Department\PurchaseRequestController@RoutingSlipIndex')->name('routing_slip');
+    Route::get('/routing_slip/pr_routing_slip', 'Department\PurchaseRequestController@pr_routing_slip')->name('pr_routing_slip');
 
     
 });

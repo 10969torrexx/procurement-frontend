@@ -625,7 +625,7 @@ class PresidentHopeController extends Controller
                 session('employee_id'),
                 session('campus'),
                 $id,
-                'Viewed Purchase Request',
+                'Viewed Purchase Request with PR No '.$pr_no,
                 'View',
                 $request->ip()
               );
@@ -659,7 +659,7 @@ class PresidentHopeController extends Controller
                 session('employee_id'),
                 session('campus'),
                 null,
-                'Approved Purchase Request',
+                'Approved Purchase Request with PR No '.$pr_no,
                 'Approve',
                 $request->ip()
               );
@@ -697,7 +697,7 @@ class PresidentHopeController extends Controller
                 session('employee_id'),
                 session('campus'),
                 null,
-                'Disapproved Purchase Request',
+                'Disapproved Purchase Request with PR No '.$pr_no,
                 'Disapprove',
                 $request->ip()
               );

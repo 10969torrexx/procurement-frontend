@@ -1,7 +1,7 @@
 $(document).ready(function() {
  
   // $('table input[type=checkbox]').attr('disabled', 'true');
-  $("input:checkbox").click(function() { return false; });
+  
     var project_code = $(".project_code").val();
     var employee = $( "#selectEmployee option:selected" ).val();
     // var data:  {somekey:$('#AttorneyEmpresa').val()}
@@ -529,6 +529,7 @@ $(document).on('click', '.removebutton', function (e) {
       })
 });
 
+
 $(document).on('click', '.print', function (e) {
   var data = {
       // 'fund_cluster' :  $(".fund_cluster").text(),
@@ -547,12 +548,13 @@ $(document).on('click', '.print', function (e) {
     headers: {'X-CSRF-TOKEN' : $('meta[name="csrf-token"]').attr('content')},
     data: data,
     success: function(viewContent) {
-    console.log(viewContent);
+    // console.log(viewContent);
         if(viewContent){
             var css = '@page { size: A4 portrait; }',
             head = document.head || document.getElementsByTagName('head')[0],
             style = document.createElement('style');
-
+            
+          
             style.type = 'text/css';
             style.media = 'print';
 
@@ -568,7 +570,7 @@ $(document).on('click', '.print', function (e) {
               document.body.innerHTML = viewContent;
               window.print();
               document.body.innerHTML = originalContents;
-              location.reload();
+              // location.reload();
         }else{
             toastr.error('Can\'t print. Error!')
         }
@@ -606,7 +608,7 @@ $(document).on('click', '.print', function (e) {
           document.body.innerHTML = viewContent;
           window.print();
           document.body.innerHTML = originalContents;
-          location.reload();
+          // location.reload();
     }else{
         toastr.error('Can\'t print. Error!')
     }

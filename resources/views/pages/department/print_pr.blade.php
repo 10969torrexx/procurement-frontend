@@ -51,7 +51,7 @@
                     </table> --}}
                     <style>
                         table.PR{
-                          
+                          page-break-after:always;
                           width:100%;
                           border-collapse: collapse;
                           height: 200px;
@@ -88,11 +88,15 @@
                         input{
                           border: none;
                         }
+                        .page-break{
+                          page-break-inside: avoid;
+                          page-break-after:auto
+                        }
                       </style>
-                      <div style="padding-top:50px"></div>
+                      {{-- <div style="padding-top:50px"></div> --}}
                       <div class="table-responsive">
                         <table class="PR">
-                          <thead class="head1">
+                          <thead class="head1" >
                             <tr>
                               <td class="title" colspan="6" style="border-bottom : none;font-weight:bold;padding-bottom:20px;font-size: 25px;">PURCHASE REQUEST</td>
                             </tr>
@@ -143,11 +147,11 @@
                               <td style="width:15%;">Total Cost</td>
                             </tr>
                           </thead>
+                          <?php $i=0; $counter=35; $total = 0;?>
+                          @foreach($itemsForPR as $itemsForPR)
+                          <?php $i++; $counter--;?>
                           <tbody>
-                            <?php $i=0; $counter=27; $total = 0;?>
-                            @foreach($itemsForPR as $itemsForPR)
-                            <?php $i++; $counter--;?>
-                            <tr>
+                            <tr class="{{ $counter }}">
                               <td class="first" style="text-align: right;font-style: italic;padding-right:10px">{{ $i }}</td>
                               <td style="text-align: center">{{ $itemsForPR->unit_of_measurement }}</td>
                               <td style="text-align: left;padding-left:10px">{{ $itemsForPR->item_description }}</td>
@@ -159,14 +163,25 @@
                             </tr>
                             @endforeach
                             @for($a = 1; $a < $counter; $a++)
-                            <tr class="blank">
-                              <td class="first"></td>
-                              <td></td>
-                              <td></td>
-                              <td></td>
-                              <td></td>
-                              <td></td>
+                            @if($a == 35)
+                            <tr class="page-break">
+                                <td></td>
+                                <td>xcvbs fd</td>
+                                <td>zdfvxc</td>
+                                <td>zxcvxc</td>
+                                <td>xcvzx</td>
+                                <td>zxcvzxgfd </td>
                             </tr>
+                            @else
+                            <tr class="blank">
+                                <td class="first"></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            @endif
                             @endfor
                             @if ($a==$counter)
                               <td class="first"></td>
@@ -177,7 +192,8 @@
                               <td  style="text-align: right;font-weight:bold;padding-right:10px">{{number_format($total,2,'.',',')}}</td>
                               @endif
                           </tbody>
-                          <tfoot>
+
+                          <tfoot class="foot">
                             
 
                             <tr>
@@ -216,7 +232,7 @@
                               <td colspan="3" style="text-align:center;">Alternate</td>
                               @endif
                             </tr>
-                            <tr><td colspan="6" style="border-left: 1px solid black;height:20px;"></td></tr>
+                            <tr><td colspan="6" style="border-left: 1px solid black;height:20px;" ></td></tr>
                             
                           </tfoot>
                         </table>

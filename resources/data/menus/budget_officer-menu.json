@@ -75,6 +75,12 @@
       "name": "View Signed PPMP",
       "i18n": "User",
       "icon": "search"
+    } ,
+    {
+      "url": "budgetofficer/pending_ppmp_request",
+      "name": "Pending Requests",
+      "i18n": "User",
+      "icon": "list"
     }
   ]
 }
