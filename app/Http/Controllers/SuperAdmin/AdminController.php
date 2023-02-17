@@ -456,7 +456,7 @@ class AdminController extends Controller
     }
     public function get_Departments(Request $request)
     {
-        // dd($request->all());
+        dd($request->all());
         try {
             $departments =  Http::withToken(session('token'))->get(env('APP_API'). "/api/department/get_Departments")->json();
         //   dd($departments);

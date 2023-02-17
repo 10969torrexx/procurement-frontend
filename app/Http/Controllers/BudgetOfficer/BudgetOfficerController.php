@@ -712,11 +712,21 @@ class BudgetOfficerController extends Controller
 
     public function getDepartments(Request $request){
         try {
-            $departments =  DB::table('departments')
-            ->where('campus',session('campus'))
-            ->whereNull('deleted_at')
-            ->orderBy('department_name')
-            ->get();
+            // dd($request->all());
+            if(session('role')==2){
+                $departments =  DB::table('departments')
+                ->where('campus',session('campus'))
+                ->whereNull('deleted_at')
+                ->orderBy('department_name')
+                ->get();
+            }else{
+                $departments =  DB::table('departments')
+                ->whereNull('deleted_at')
+                ->orderBy('department_name')
+                ->get();
+            // dd($departments);
+
+            }
           return $departments;
         } catch (\Throwable $th) {
             dd($th);
@@ -919,6 +929,7 @@ class BudgetOfficerController extends Controller
     }
 
     public function edit_allocated_budget(Request $request){
+        // dd($request->all());
         $id = (new AESCipher())->decrypt($request->id);
         $response = DB::table("allocated__budgets as ab")
                         ->select("ab.procurement_type","ab.mandatory_expenditures","ab.allocated_budget","fs.fund_source","fs.id as fund_source_id","d.department_name","d.id as department_id","ab.year")
@@ -927,12 +938,21 @@ class BudgetOfficerController extends Controller
                         ->whereNull("ab.deleted_at") 
                         ->where("ab.id","=", $id)
                         ->get();
-        $department_ids = DB::table('departments')
-                            ->select('id')
-                            ->where('campus',session('campus'))
-                            ->whereNull('deleted_at')
-                            ->orderBy('department_name')
-                            ->get();
+        if(session('role') == 2){
+            $department_ids = DB::table('departments')
+            ->select('id')
+            ->where('campus',session('campus'))
+            ->whereNull('deleted_at')
+            ->orderBy('department_name')
+            ->get();
+        }else{
+            $department_ids = DB::table('departments')
+            ->select('id')
+            ->whereNull('deleted_at')
+            ->orderBy('department_name')
+            ->get();
+        }
+        
         $fund_source_ids = DB::table('fund_sources')
                             ->select('id')
                             ->whereNull('deleted_at')

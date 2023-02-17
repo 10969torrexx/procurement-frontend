@@ -343,7 +343,7 @@ $(document).on('click', '.hrefdelete', function (e) {
 
         $.ajax({
           type: "GET",
-          url: "getDepartments",
+          url: "/budgetofficer/getDepartments",
           success: function (response) {
                 $('.update_department').empty()
                 $('.update_department').append('<option value="" selected disabled>-- Select Department --</option>')
@@ -454,7 +454,7 @@ $(document).on('click', '.editbutton', function (e) {
           var department_index = array_department.indexOf(department_id);
           var fundsource_index = array_fundsources.indexOf(parseInt(fund_source_id));
           var year_index = array_years.indexOf(year.toString());
-          // console.log(type);
+          // console.log(array_department);
           
             document.getElementById('update_type').getElementsByTagName('option')[type+1].selected = 'selected';
             document.getElementById('update_department').getElementsByTagName('option')[department_index+1].selected = 'selected';
