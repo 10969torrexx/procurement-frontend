@@ -425,7 +425,7 @@ $(document).on('click', '.editbutton', function (e) {
         // console.log(response);
           if (response.status == 200) {
 
-          var array_type = ['Indicative','Supplemental','PPMP'];
+          // var array_type = ['Indicative','Supplemental','PPMP'];
             // for (let i = 0; i < response['department_ids'].length; i++) {
             //   array_department.push(response['department_ids'][i]['id']);
             // }
@@ -445,18 +445,18 @@ $(document).on('click', '.editbutton', function (e) {
             array_years.push(response['years'][i]['year']);
           }
 
-          var type = response['data'][0]['procurement_type'];
+          var type = parseInt(response['data'][0]['procurement_type']);
           var department_id = response['data'][0]['department_id'];
           var fund_source_id = response['data'][0]['fund_source_id'];
           var year = response['data'][0]['year'];
           
-          var type_index = array_type.indexOf(type);
+          // var type_index = array_type.indexOf(type);
           var department_index = array_department.indexOf(department_id);
           var fundsource_index = array_fundsources.indexOf(parseInt(fund_source_id));
           var year_index = array_years.indexOf(year.toString());
-          // console.log(array_years);
+          // console.log(type);
           
-            document.getElementById('update_type').getElementsByTagName('option')[type_index+1].selected = 'selected';
+            document.getElementById('update_type').getElementsByTagName('option')[type+1].selected = 'selected';
             document.getElementById('update_department').getElementsByTagName('option')[department_index+1].selected = 'selected';
             document.getElementById('update_fund_source').getElementsByTagName('option')[fundsource_index+1].selected = 'selected';
             document.getElementById('update_year').getElementsByTagName('option')[year_index+1].selected = 'selected';

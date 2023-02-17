@@ -773,14 +773,25 @@ class BudgetOfficerController extends Controller
           ["link" => "/", "name" => "Home"],["name" => "Allocate Budget"]
         ];
         $date = Carbon::now()->format('Y');
-        $allocate_budget = DB::table('allocated__budgets')
-                            ->select('departments.id', 'departments.department_name','allocated__budgets.*', 'fund_sources.fund_source')
-                            ->join('departments', 'departments.id', '=', 'allocated__budgets.department_id')
-                            ->join('fund_sources', 'fund_sources.id', '=', 'allocated__budgets.fund_source_id')
-                            ->whereNull('allocated__budgets.deleted_at')
-                            ->where("allocated__budgets.campus", session("campus"))
-                            ->orderBy("departments.department_name")
-                            ->get();
+        if(session('role') == 2){
+            $allocate_budget = DB::table('allocated__budgets')
+            ->select('departments.id', 'departments.department_name','allocated__budgets.*', 'fund_sources.fund_source')
+            ->join('departments', 'departments.id', '=', 'allocated__budgets.department_id')
+            ->join('fund_sources', 'fund_sources.id', '=', 'allocated__budgets.fund_source_id')
+            ->whereNull('allocated__budgets.deleted_at')
+            ->where("allocated__budgets.campus", session("campus"))
+            ->orderBy("departments.department_name")
+            ->get();
+        }else{
+            $allocate_budget = DB::table('allocated__budgets')
+            ->select('departments.id', 'departments.department_name','allocated__budgets.*', 'fund_sources.fund_source')
+            ->join('departments', 'departments.id', '=', 'allocated__budgets.department_id')
+            ->join('fund_sources', 'fund_sources.id', '=', 'allocated__budgets.fund_source_id')
+            ->whereNull('allocated__budgets.deleted_at')
+            ->orderBy("departments.department_name")
+            ->get();
+        }
+        
         $ppmp_deadline = DB::table('ppmp_deadline')->where('campus',session('campus'))->where('year',$date+1)->whereNull('deleted_at')->get();
         // $ppmp_deadlines = DB::table('ppmp_deadline')->where('campus',session('campus'))->whereNull('deleted_at')->get();
         if(count($ppmp_deadline)==0){

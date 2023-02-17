@@ -369,7 +369,7 @@ class AdminController extends Controller
 
         
         $ppmp_deadline =  Http::withToken(session('token'))->get(env('APP_API'). "/api/allocateBudget/allocated_budget")->json();
-            // dd($ppmp_deadline);
+            dd($ppmp_deadline);
             $error="";
             if($ppmp_deadline['status']==400){
                 $error=$ppmp_deadline['message'];

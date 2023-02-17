@@ -55,9 +55,9 @@
                             <label for="selecttype" >Select Procurement Type</label>
                             <select id="update_type" class="update_type form-control"  required>
                                 <option value="" selected disabled>Select Type</option>
-                                <option value="{{$aes->encrypt("Indicative")}}">Indicative</option>
-                                <option value="{{$aes->encrypt("Supplemental")}}">Supplemental</option>
-                                <option value="{{$aes->encrypt("PPMP")}}">PPMP</option>
+                                <option value="{{$aes->encrypt("0")}}">Indicative</option>
+                                <option value="{{$aes->encrypt("1")}}">PPMP</option>
+                                <option value="{{$aes->encrypt("2")}}">Supplemental</option>
                             </select>
                         </fieldset>
                     </div>
