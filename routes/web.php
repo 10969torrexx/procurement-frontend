@@ -697,6 +697,8 @@ Route::group(['prefix' => 'PR','middleware' => ['authuser']], function() {
 
     Route::get('/routing_slip', 'Department\PurchaseRequestController@RoutingSlipIndex')->name('routing_slip');
     Route::get('/routing_slip/pr_routing_slip', 'Department\PurchaseRequestController@pr_routing_slip')->name('pr_routing_slip');
+    Route::post('/routing_slip/pr_routing_slip/saveChanges', 'Department\PurchaseRequestController@saveChanges')->name('saveChanges');
+    Route::get('/routing_slip/pr_routing_slip/getData', 'Department\PurchaseRequestController@getData')->name('getData');
 
     
 });

@@ -10,7 +10,9 @@
             <div class="modal-body">
  
                 <input type="text" class="form-control id" placeholder="" value="" hidden>
+                {{-- @if($data->status != 0) --}}
                 <input type="text" class="form-control status" placeholder="" value="{{ $data->status }}" hidden>
+                {{-- @endif --}}
 
                 <label>REMARKS:  </label>
                 <input type="text" class="form-control reject_remarks" placeholder="-- Enter --" value="">

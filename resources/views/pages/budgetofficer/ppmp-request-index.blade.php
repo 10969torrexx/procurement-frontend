@@ -99,6 +99,7 @@
                                                 <td>{{ date('M. j, Y', strtotime($data->created_at))}}</td>
                                             </tr>
                                             <?php $ctr = $ctr + 1 ?>
+                                            
                                         @endforeach
                                    @endif
                                 </tbody>
@@ -109,8 +110,10 @@
             </div>
         </div>
     </div>
-@include('pages.budgetofficer.disapprove-request-modal')
-@include('pages.budgetofficer.approve-request-modal')
+    @if($countPending != 0)
+    @include('pages.budgetofficer.disapprove-request-modal')
+    @include('pages.budgetofficer.approve-request-modal')
+    @endif
 {{-- @include('pages.department.signed-pr-modal') --}}
 </section>
 {{-- @include('pages.department.view-pr') --}}

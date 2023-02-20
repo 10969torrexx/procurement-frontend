@@ -1,11 +1,12 @@
 $(document).ready(function() {
  
   // $('table input[type=checkbox]').attr('disabled', 'true');
+  var pr_no = $('.pr_no').text();
   
     var project_code = $(".project_code").val();
     var employee = $( "#selectEmployee option:selected" ).val();
     // var data:  {somekey:$('#AttorneyEmpresa').val()}
-    // alert(employee);
+    // alert(pr_no);
     var quantity = 0;
     $.ajaxSetup({
       headers: {
@@ -31,6 +32,24 @@ $(document).ready(function() {
             '<option value="'+ response['data'][i]['id'] + ' ">' 
                               + response['data'][i]['item_name']+ '</option>')
         }
+      }
+    });
+
+    $.ajax({
+      type: "GET",
+      url: "/PR/routing_slip/pr_routing_slip/getData",
+      data: {pr_no},
+      success: function (response) {
+// console.log(response)
+      response['data'].forEach(element => {
+        // console.log(element.date_received)
+        $('#myCheckbox'+element.activity).attr('checked', true);
+        $('.received'+element.activity).append(element.date_received);
+        $('.released'+element.activity).append(element.date_released);
+        $('.remark'+element.activity).append(element.remark);
+        $('.name'+element.activity).append((element.name).toUpperCase());
+      });
+        // $('#myCheckbox1').attr('checked', true); 
       }
     });
 
@@ -1227,3 +1246,109 @@ $(document).on('click', '.disapprove_pr', function (e) {
   
 });
 
+$("form#RSSubmit").submit(function(e) {
+  e.preventDefault();
+//  alert('success')
+  var formData = new FormData(this);    
+
+$.ajax({
+  type: 'POST',
+  url: "/PR/routing_slip/pr_routing_slip/saveChanges",
+  data: formData,
+  success: function(response) {
+    // ! show when success
+      if(response.status == 200) {
+        $('#RoutingSlipModal').modal('hide');
+        
+        Swal.fire({ 
+          icon: 'success',
+          title: 'Success',
+          text: response['message'],
+          timer: 1000,
+          timerProgressBar: true,
+          didOpen: () => {
+            Swal.showLoading()
+            const b = Swal.getHtmlContainer().querySelector('b')
+            timerInterval = setInterval(() => {
+              b.textContent = Swal.getTimerLeft()
+            }, 100)
+          },
+          willClose: () => {
+            clearInterval(timerInterval)
+          }
+        }).then((result) => {
+          if (result.dismiss === Swal.DismissReason.timer) {
+            location.reload();
+          }
+        })
+      } 
+    // ! show when error
+      if(response['status'] == 400) {
+        Swal.fire({ 
+          icon: 'info',
+          title: 'Information',
+          text: response['message'],
+        })
+      }
+    },
+    cache: false,
+    contentType: false,
+    processData: false
+  });
+
+});
+
+$(document).on('click','.saveChanges', function (e) {
+  e.preventDefault();
+  // alert('azdfg');
+    var countCheckbox = $('input[type="checkbox"]').length-1;
+    // var checkboxes = $('input:checkbox:checked').length-1;
+    // var checkboxes = $('input:checkbox:not(":checked")').length;
+    // var checkboxes = $('#myCheckbox').val(1);
+
+    // var checkboxes = document.getElementById('myCheckbox');
+    var checkedArray = [];
+    var date= $('#received'+'1').val();
+    var date= $('#received'+'1').val();
+    // alert(date)
+      $("input:checkbox:checked").each(function(){
+          checkedArray.push($(this).val());
+      });
+
+     
+  
+    // console.log(checkedArray)
+});
+
+
+$("input[type='checkbox']").change(function() {
+  // e.preventDefault();
+  if(this.checked){
+    var activityNumber =  $(this).val();
+    $('.activityNumber').val(activityNumber);
+    $('#RoutingSlipModal').modal('show');
+  }
+  
+//   var value = $(this).val()
+//   var countCheckbox = $('input[type="checkbox"]').length;
+// // alert(countCheckbox)
+// $("input:checkbox[id=myCheckbox"+value+"]:checked").each(function(){
+//   $('#received'+value).removeAttr('hidden');
+//   $('#released'+value).removeAttr('hidden');
+//   $('#remark'+value).removeAttr('hidden');
+
+
+// });
+
+// if(this.checked==false){
+//     for (let i = 0; i < countCheckbox; i++) {
+//       if(i ==value){
+//         // $("#reeived2").show();
+//         $("#received"+value).attr("hidden",true);
+//         $("#released"+value).attr("hidden",true);
+//         $("#remark"+value).attr("hidden",true);
+
+//       }
+//     }
+//   }
+});

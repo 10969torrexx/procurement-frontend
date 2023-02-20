@@ -111,10 +111,30 @@
         "icon": "notebook"
       },
       {
-        "url": "superadmin/purchase_request",
+        "url": "PR/purchaseRequest",
         "name": "Purchase Request",
         "i18n": "Shoppingcart",
-        "icon": "shoppingcart"
+        "icon": "shoppingcart",
+        "submenu": [
+          {
+            "url": "PR/purchaseRequest",
+            "name": "Create PR",
+            "i18n": "User",
+            "icon": "like"
+          },
+          {
+            "url": "PR/trackPR",
+            "name": "Track PR",
+            "i18n": "User",
+            "icon": "shoppingcart-in"
+          },
+          {
+            "url": "PR/signed_pr",
+            "name": "Signed PR",
+            "i18n": "User",
+            "icon": "shoppingcart-in"
+          }
+        ]
       },
       {
         "navheader": "immediate supervisor"
@@ -223,6 +243,18 @@
         "name": "BOR Resolutions",
         "i18n": "User",
         "icon": "envelope-pull"
+      },
+      {
+        "url": "purchase_request/signed_pr",
+        "name": "Signed PRs",
+        "i18n": "User",
+        "icon": "search"
+      },
+      {
+        "url": "PR/routing_slip",
+        "name": "PR Routing Slip",
+        "i18n": "User",
+        "icon": "search"
       }
     ]
   }

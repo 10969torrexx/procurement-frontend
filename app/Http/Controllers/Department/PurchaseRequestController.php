@@ -28,14 +28,27 @@ class PurchaseRequestController extends Controller
     ];
     $year = Carbon::now()->format('Y');
     $department_id = session('department_id');
-    $ppmps = DB::table("project_titles")
+    $campus = session('campus');
+    if(session('role') != null){
+      $ppmps = DB::table("project_titles")
                 ->select('project_titles.id','project_titles.project_title','project_titles.project_year','fund_sources.fund_source')
                 ->join('fund_sources', 'fund_sources.id', '=', 'project_titles.fund_source')
                 ->where('department_id',$department_id)
+                ->where('campus',$campus)
                 // ->where('project_year',$year)
                 ->where('status',4)
                 ->orderBy('project_year','DESC')
                 ->get();
+    }else{
+      $ppmps = DB::table("project_titles")
+              ->select('project_titles.id','project_titles.project_title','project_titles.project_year','fund_sources.fund_source')
+              ->join('fund_sources', 'fund_sources.id', '=', 'project_titles.fund_source')
+              // ->where('project_year',$year)
+              ->where('status',4)
+              ->orderBy('project_year','DESC')
+              ->get();
+    }
+    
       return view('pages.department.purchase-request-index',compact('ppmps'), [
           'pageConfigs'=>$pageConfigs,
           'breadcrumbs'=>$breadcrumbs,
@@ -54,17 +67,29 @@ class PurchaseRequestController extends Controller
       ->get();
       // dd($users);
       $department_id = session('department_id');
+      $campus = session('campus');
+      if(session('role') != null){
       $pr = DB::table("purchase_request as pr")
             ->select("pr.*","fs.fund_source","u.name","d.department_name")
             ->join("departments as d", "pr.department_id", "=", "d.id")
             ->join("fund_sources as fs", "pr.fund_source_id", "=", "fs.id")
             ->join("users as u", "pr.printed_name", "=", "u.id")
             ->where("pr.department_id", $department_id)
+            ->where("pr.campus", $campus)
             ->whereNull("pr.deleted_at")
             ->orderBy('pr.created_at')
             ->get();
             // dd($pr);
-
+      }else{
+        $pr = DB::table("purchase_request as pr")
+                ->select("pr.*","fs.fund_source","u.name","d.department_name")
+                ->join("departments as d", "pr.department_id", "=", "d.id")
+                ->join("fund_sources as fs", "pr.fund_source_id", "=", "fs.id")
+                ->join("users as u", "pr.printed_name", "=", "u.id")
+                ->whereNull("pr.deleted_at")
+                ->orderBy('pr.created_at')
+                ->get();
+      }
           return view('pages.department.track-pr-index',compact('pr','hope'), [
               'pageConfigs'=>$pageConfigs,
               'breadcrumbs'=>$breadcrumbs,
@@ -84,16 +109,29 @@ class PurchaseRequestController extends Controller
     ->get();
     // dd($users);
     $department_id = session('department_id');
-    $pr = DB::table("purchase_request as pr")
-          ->select("pr.*","fs.fund_source","u.name","d.department_name")
-          ->join("departments as d", "pr.department_id", "=", "d.id")
-          ->join("fund_sources as fs", "pr.fund_source_id", "=", "fs.id")
-          ->join("users as u", "pr.printed_name", "=", "u.id")
-          ->where("pr.department_id", $department_id)
-          ->where("pr.status", 2)
-          ->whereNull("pr.deleted_at")
-          ->orderBy('pr.created_at')
-          ->get();
+    if(session('role') != null){
+      $pr = DB::table("purchase_request as pr")
+      ->select("pr.*","fs.fund_source","u.name","d.department_name")
+      ->join("departments as d", "pr.department_id", "=", "d.id")
+      ->join("fund_sources as fs", "pr.fund_source_id", "=", "fs.id")
+      ->join("users as u", "pr.printed_name", "=", "u.id")
+      ->where("pr.department_id", $department_id)
+      ->where("pr.status", 2)
+      ->whereNull("pr.deleted_at")
+      ->orderBy('pr.created_at')
+      ->get();
+    }else{
+      $pr = DB::table("purchase_request as pr")
+      ->select("pr.*","fs.fund_source","u.name","d.department_name")
+      ->join("departments as d", "pr.department_id", "=", "d.id")
+      ->join("fund_sources as fs", "pr.fund_source_id", "=", "fs.id")
+      ->join("users as u", "pr.printed_name", "=", "u.id")
+      ->where("pr.status", 2)
+      ->whereNull("pr.deleted_at")
+      ->orderBy('pr.created_at')
+      ->get();
+    }
+   
           // dd($pr);
 
         return view('pages.department.pr-routing-slip-index',compact('pr','hope'), [
@@ -108,7 +146,7 @@ class PurchaseRequestController extends Controller
     $breadcrumbs = [
       ["link" => "/", "name" => "Home"],["name" => "Signed PR"]
     ];
-
+    if(session('role') != null){
     $response = DB::table("signed_purchase_request as spr")
           ->select('spr.*','u.name')
           ->join('users as u','spr.employee_id','u.employee_id')
@@ -117,7 +155,13 @@ class PurchaseRequestController extends Controller
           ->whereNull("spr.deleted_at")
           ->get();
           // dd($response);
-
+    }else{
+      $response = DB::table("signed_purchase_request as spr")
+                    ->select('spr.*','u.name')
+                    ->join('users as u','spr.employee_id','u.employee_id')
+                    ->whereNull("spr.deleted_at")
+                    ->get();
+    }
         return view('pages.department.signed-pr-index',compact('response'), [
             'pageConfigs'=>$pageConfigs,
             'breadcrumbs'=>$breadcrumbs,
@@ -1341,6 +1385,14 @@ class PurchaseRequestController extends Controller
     ];
 
     $id = (new AESCipher())->decrypt($request->id);
+    
+    $pr_no = DB::table('purchase_request')
+                ->where('id',$id)
+                ->get(['pr_no']);
+
+    foreach($pr_no as $data){
+      $pr_no = $data->pr_no;
+    }
 
     $purchase_request = DB::table("purchase_request as pr")
                         ->select("pr.*","fs.fund_source","d.department_name","u.name")
@@ -1350,22 +1402,112 @@ class PurchaseRequestController extends Controller
                         ->where("pr.id",$id)
                         ->get();
 
-                        (new HistoryLogController)->store(
-                          session('department_id'),
-                          session('employee_id'),
-                          session('campus'),
-                          $id,
-                          'Viewed Purchase Request Status',
-                          'View',
-                          $request->ip(),
-                      );
+    $response = DB::table('routing_slip')
+                  ->where('pr_no',$pr_no)
+                  ->get();
 
-    return view('pages.department.pr-routing-slip',compact('purchase_request'),  [
+                  // dd($response);
+              
+      (new HistoryLogController)->store(
+        session('department_id'),
+        session('employee_id'),
+        session('campus'),
+        $id,
+        'Viewed Purchase Request Status',
+        'View',
+        $request->ip(),
+      );
+
+    return view('pages.department.pr-routing-slip',compact('purchase_request','response'),  [
                 'pageConfigs'=>$pageConfigs,
                 'breadcrumbs'=>$breadcrumbs,
                 // 'error' => $error,
             ]); 
-}
+  }
+
+  public function saveChanges(Request $request){
+    try {
+      // dd($request->all());
+      $pr_no = $request->pr_no;
+      $activityNumber = $request->activityNumber;
+      $date_received = $request->date_received;
+      $date_released = $request->date_released;      
+      $time_received = $request->time_received;
+      $time_released = $request->time_released;
+      $remark = $request->remark;
+      $role = session('role');
+      $campus = session('campus');
+      $employee_id = session('employee_id');
+
+      $checkActivity = DB::table('routing_slip')
+                        ->where('activity',$activityNumber)
+                        ->where('campus',$campus)
+                        ->whereNull('deleted_at')
+                        ->count();
+
+      if($checkActivity==1){
+        $response = DB::table('routing_slip')
+        ->where('pr_no',$pr_no)
+        ->where('activity',$activityNumber)
+        ->where('campus',$campus)
+        ->update([
+          'date_received' => $date_received.' '.$time_received,
+          'date_released' => $date_released.' '.$time_released,
+          'remark' => $remark,
+          'updated_at' => Carbon::now(),
+          
+        ]);
+        return response()->json([
+          'status' => 200,
+          'message' => 'Saved Successfully!'
+        ]);
+      }
+      $response = DB::table('routing_slip')
+          ->insert([
+            'pr_no' => $pr_no,
+            'employee_id' => $employee_id,
+            'role' => $role,
+            'campus' => $campus,
+            'activity' => $activityNumber,
+            'date_received' => $date_received.' '.$time_received,
+            'date_released' => $date_released.' '.$time_released,
+            'remark' => $remark,
+            'created_at' => Carbon::now(),
+            
+          ]);
+
+          return response()->json([
+            'status' => 200,
+            'message' => 'Saved Successfully!'
+          ]);
+
+    } catch (\Throwable $th) {
+      throw $th;
+    }
+  }
+
+  public function getData(Request $request){
+    try {
+      // dd($request->all()); 
+      $pr_no = $request->pr_no;
+      $response = DB::table('routing_slip as rs')
+                    ->select('rs.*','u.name')
+                    ->join('users as u','rs.employee_id','u.employee_id')
+                    ->where('rs.pr_no',$pr_no)
+                    ->where('rs.campus',session('campus'))
+                    ->get();
+            //  dd($response);       
+
+      return response()->json([
+        'status' => 200,
+        'message' => 'Success',
+        'data' => $response,
+      ]);
+
+      } catch (\Throwable $th) {
+        dd('getData FUNCTION '+$th);
+      }
+  }
 
   public function view_pr(Request $request){
       // dd($request->all());

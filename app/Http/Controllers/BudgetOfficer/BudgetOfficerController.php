@@ -1315,9 +1315,9 @@ class BudgetOfficerController extends Controller
                             ->where('prs.campus', session('campus'))
                             ->whereNull('prs.deleted_at')
                             ->get();
-
-                // dd($response);
-            return view('pages.budgetofficer.ppmp-request-index', compact('response'), [
+            $countPending = count($response);
+                // dd($countPending);
+            return view('pages.budgetofficer.ppmp-request-index', compact('response','countPending'), [
                 'pageConfigs'=>$pageConfigs,
                 'breadcrumbs'=>$breadcrumbs,
             ]);

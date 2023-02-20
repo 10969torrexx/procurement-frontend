@@ -116,7 +116,7 @@
         </div>
     </div>
 </section>
-{{-- @include('pages.department.preview-PR-modal') --}}
+{{-- @include('pages.department.routing-slip-modal') --}}
 {{-- @include('pages.department.view-pr') --}}
 
 @if(Session::has('success'))
