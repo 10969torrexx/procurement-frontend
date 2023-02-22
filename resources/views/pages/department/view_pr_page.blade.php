@@ -251,27 +251,14 @@
                             <tr>
                               <td style="border-left:1px solid black; border-bottom: none;border-right: none;border-top: none;font-weight:bold;padding-left:10px">Printed Name:</td>
                               <td colspan="2" style="border-right: none;border-top: none;text-align:center;font-weight:bold;">{{ strtoupper($data->name) }}</td>
-                              @foreach($hope as $hope)
-
-                {{-- <td colspan="2" style="border-right: none;border-top: none;text-align:center;font-weight:bold;"  class="selectEmployee" id="selectEmployee" value="">-- Select Employee --<i class="fa-solid fa-pen-to-square employeeEdit" value="" style="margin-left:5px;"></i></td> --}}
-                              {{-- @if($total >= 100000)
-                                <td colspan="3" style="border-top: none;text-align:center;font-weight:bold;">{{  strtoupper($hope->name) }}</td> --}}
-                              @if($total > 25000)
-                                <td colspan="3" style="border-top: none;text-align:center;font-weight:bold;"> {{ strtoupper($hope->name) }}</td>
-                              @elseif($total >= 0 && $total <= 25000)
-                                <td colspan="3" style="border-top: none;text-align:center;font-weight:bold;"> {{ strtoupper('Susana B. Ceniza') }}</td>
-                              @endif
+                              
+                                <td colspan="3" style="border-top: none;text-align:center;font-weight:bold;"> {{ strtoupper($data->ao_name).', '.$data->ao_title }}</td>
                             </tr>
                             <tr>
                               <td style="border-left:1px solid black; border-top: none;border-right: none;font-weight:bold;padding-left:10px">Designation:</td>
                               <td colspan="2" style="border-right: none;text-align:center;">{{ $data->designation }}</td>
-                              @if($total > 25000)
-                              <td colspan="3" style="text-align:center;">University President</td>
-                              @elseif($total >= 1 && $total <= 25000)
-                              <td colspan="3" style="text-align:center;">Alternate</td>
-                              @endif
+                              <td colspan="3" style="text-align:center;">{{ $data->ao_designation }}</td>
                             </tr>
-                            @endforeach
                             <tr><td colspan="6" style="border-left: 1px solid black;height:20px;"></td></tr>
                             
                           </tfoot>

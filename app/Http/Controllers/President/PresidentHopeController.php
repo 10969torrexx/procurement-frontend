@@ -569,10 +569,14 @@ class PresidentHopeController extends Controller
       ["link" => "/", "name" => "Home"],["name" => "Pending PR"]
     ];
 
+    // dd(session('name'));
+
     $response = DB::table("purchase_request as pr")
           ->select('pr.*','u.name','d.department_name')
           ->join('users as u','pr.printed_name','u.id')
           ->join('departments as d','pr.department_id','d.id')
+          ->join('pr_signatories as prs','pr.approving_officer','prs.id')
+          ->where('prs.name',session('name'))
           ->where("pr.status", '!=', 0)
           ->where("pr.campus", session('campus'))
           ->whereNull("pr.deleted_at")

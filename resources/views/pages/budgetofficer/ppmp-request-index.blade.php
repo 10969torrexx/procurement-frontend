@@ -82,7 +82,7 @@
                                                 </td>
                                                 <td>{{$data->name }}</td>
                                                 <td>{{$data->department_name}}</td>
-                                                <td style='text-align:justify;'>@php echo wordwrap( $data->reason, 50, "<br />\n") @endphp</td>
+                                                <td style='text-align:justify;'>@php echo wordwrap( $data->reason, 70, "<br />\n") @endphp</td>
                                                 @if($data->status == 0 )
                                                 <td><div class="badge badge-pill badge-light-primary mr-1">Pending</div></td>
                                                 @elseif($data->status == 1)

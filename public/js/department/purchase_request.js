@@ -5,8 +5,9 @@ $(document).ready(function() {
   
     var project_code = $(".project_code").val();
     var employee = $( "#selectEmployee option:selected" ).val();
+    var approving_officer = $( "#selectApprovingOfficer option:selected" ).val();
     // var data:  {somekey:$('#AttorneyEmpresa').val()}
-    // alert(pr_no);
+    // alert(approving_officer);
     var quantity = 0;
     $.ajaxSetup({
       headers: {
@@ -60,6 +61,7 @@ $(document).ready(function() {
         $('.selectEmployee').html('<option class="spinner-border spinner-border-sm">Please wait... </option>');
       },
       success: function (response) {
+        console.log(response)
         $('.selectEmployee').empty()
         $('.selectEmployee').append('<option value="" style="border: none;text-align:center;font-weight:bold;" selected disabled>-- Select Employee --</option>')
         for(var i = 0; i < response['data'].length; i++) {
@@ -78,13 +80,53 @@ $(document).ready(function() {
       }
   });
 
+  var total = $(".total").val();
+  // alert(total)
+    $.ajax({
+      type: "GET",
+      url: "/PR/purchaseRequest/getApprovingOfficers",
+      data: {total},
+      beforeSend : function(){
+        $('.selectApprovingOfficer').html('<option class="spinner-border spinner-border-sm">Please wait... </option>');
+      },
+      success: function (response) {
+        console.log(response)
+        $('.selectApprovingOfficer').empty()
+        $('.selectApprovingOfficer').append('<option value="" style="border: none;text-align:center;font-weight:bold;" selected disabled>-- Select Approving Officer --</option>')
+        for(var i = 0; i < response['data'].length; i++) {
+          if(response['data'][i]['name'] == approving_officer){
+            $('.selectApprovingOfficer').append(
+              '<option style="border: none;text-align:center;font-weight:bold;" value="'+ response['data'][i]['id'] + '*'+ response['data'][i]['designation'] +  ' " selected>' 
+                                + response['data'][i]['name'] + ', '+ response['data'][i]['title'] + '</option>')
+            $(".designationApprovingOfficer").text(response['data'][i]['designation']);
+            
+          }else{
+            $('.selectApprovingOfficer').append(
+              '<option style="border: none;text-align:center;font-weight:bold;" value="'+ response['data'][i]['id'] + '*'+ response['data'][i]['designation'] + ' ">' 
+                                + response['data'][i]['name'] +', '+response['data'][i]['title'] +'</option>')
+          }
+        }
+        // $('#EmployeeEditModal').modal('show')
+
+        // $(".designationApprovingOfficer").text("drgtdfgh");
+      }
+  });
+
+
+  $(function(){$(".selectApprovingOfficer").change(function(){
+
+    var designation = $( ".selectApprovingOfficer option:selected" ).val();
+    var splitDesignation = designation.split('*');
+    $(".designationApprovingOfficer").text(splitDesignation[1]);
+  
+    });
+  })
+  
 });
 
-$("#PreviewPRModal").on("hidden.bs.modal", function(e){
-  // location.reload();
-      // $('.designation_input').val('');
-      // $('.purpose_input').val('');
-      // document.getElementById('selectEmployee').getElementsByTagName('option')[0].selected = 'selected';
+$("#PreviewPRModal").on("shown.bs.modal", function(e){
+
+
 
 })
 
@@ -337,6 +379,7 @@ $(document).on('click', '.btnCompletePR', function (e) {
   var purpose_input = $(".purpose_input").val();
   var designation_input = $(".designation_input").val();
   var selectEmployee = $(".selectEmployee").val();
+  var approvingOfficer = $(".selectApprovingOfficer").val();
 
       if(purpose_input==''){
           Swal.fire({
@@ -356,16 +399,20 @@ $(document).on('click', '.btnCompletePR', function (e) {
             title: 'Incomplete',
             text: 'Please select Employee!',
             })
+      }else if(approvingOfficer==null){
+        Swal.fire({
+            icon: 'error',
+            title: 'Incomplete',
+            text: 'Please select Approving Officer!',
+            })
       }else{
-        var selectEmployee = $(".selectEmployee").val();
-        var purpose_input = $(".purpose_input").val();
-        var designation_input = $(".designation_input").val()
         var fund_source = $(".fund_source_id").val()
         var project_code = $(".project_code").val()
         var pr_no = $(".pr_no").val();
 
         var data = {
                 'employee': selectEmployee,
+                'approvingOfficer': approvingOfficer,
                 'purpose': purpose_input,
                 'designation': designation_input,
                 'fund_source': fund_source,

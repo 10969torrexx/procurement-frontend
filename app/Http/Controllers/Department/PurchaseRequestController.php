@@ -289,7 +289,9 @@ class PurchaseRequestController extends Controller
           // }
           $purpose = "";
           $name = "";
+          $ao_name = "";
           $designation = "";
+          $ao_designation = "";
           $remaining = $items - $pri;
           if($remaining == 0){
             session(['globalerror' => "There are no remaining items for you to PR in this Project."]);
@@ -302,7 +304,7 @@ class PurchaseRequestController extends Controller
           // }else{
           //       Session::forget('globalerror');
           // }
-          return view('pages.department.create-purchase-request',compact('hope','purpose','name','designation','itemsForPR','pr_no','itemsForPRCount','itemsFromPRI','date','details','fund_source','project_code'),
+          return view('pages.department.create-purchase-request',compact('hope','purpose','name','designation','ao_name','ao_designation','itemsForPR','pr_no','itemsForPRCount','itemsFromPRI','date','details','fund_source','project_code'),
               ['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs]
               );
           # end
@@ -383,15 +385,18 @@ class PurchaseRequestController extends Controller
                   ->sum('quantity');
                   // dd($pri);
         $information = DB::table('purchase_request as pr')
-                    ->select('pr.purpose','u.name','pr.designation')
+                    ->select('pr.purpose','u.name','pr.designation','ps.name as ao_name','ps.designation as ao_designation')
                     ->join('users as u','pr.printed_name','=','u.id')
+                    ->join('pr_signatories as ps','pr.approving_officer','=','ps.id')
                     ->where('pr.id',$id)
                     ->get();
                     
           foreach($information as $data){
             $purpose = $data->purpose;
             $name = $data->name;
+            $ao_name = $data->ao_name;
             $designation = $data->designation;
+            $ao_designation = $data->ao_designation;
           }
         $remaining = $items - $pri;
         // dd($information); 
@@ -409,7 +414,7 @@ class PurchaseRequestController extends Controller
         $project_code = $this->aes->encrypt($project_code);
         // dd($project_code); 
 
-        return view('pages.department.edit-purchase-request',compact('hope','purpose','name','designation','itemsForPR','pr_no','itemsForPRCount','itemsFromPRI','date','details','fund_source','project_code'),
+        return view('pages.department.edit-purchase-request',compact('hope','purpose','name','designation','ao_name','ao_designation','itemsForPR','pr_no','itemsForPRCount','itemsFromPRI','date','details','fund_source','project_code'),
             ['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs]
             );
         # end
@@ -1053,6 +1058,54 @@ class PurchaseRequestController extends Controller
       }
   }
 
+  public function getApprovingOfficers(Request $request){
+    try {
+      // dd($request->all()); 
+      $total = $request->total;
+
+      if($total > 100000){
+        $ApprovingOfficer = DB::table('pr_signatories')
+                ->where('amount','>',100000)
+                ->orderBy('name')
+                ->get();
+      }else if($total > 25000 && $total <= 100000){
+        // dd('sadfdsfg');
+        $ApprovingOfficer = DB::table('pr_signatories')
+                ->where([
+                  ['amount','>','25000'],
+                  ['amount','<=','100000'],
+                ])
+                ->orderBy('name')
+                ->get();
+      }else if($total <= 25000){
+        $ApprovingOfficer = DB::table('pr_signatories')
+                ->where('amount','<=',25000)
+                ->orderBy('name')
+                ->get();
+      }
+      // $department_id = session('department_id');
+      // $employees = DB::table('users')
+      //               ->select('users.id','users.name')
+      //               ->where('department_id','=',$department_id)
+      //               ->orderBy('users.name')
+      //               ->get();
+      // dd($ApprovingOfficer);  
+      if($ApprovingOfficer){
+        return response()->json([
+            'status' => 200,
+            'message' => 'Success',
+            'data' => $ApprovingOfficer,
+        ]);
+      }
+      return response()->json([
+          'status' => 400,
+          'message' => 'Error'
+      ]);
+    } catch (\Throwable $th) {
+      dd('add_Items_To_PR FUNCTION '+$th);
+    }
+}
+
   public function getItems(Request $request){
       try {
         // dd($request->all()); 
@@ -1219,7 +1272,10 @@ class PurchaseRequestController extends Controller
       try {
         // dd($request->all());  
         $has_pr_no = (new AESCipher)->decrypt($request->pr_no);
+        $approvingOfficer = $request->approvingOfficer;
+        $approving_officer = explode('*',$approvingOfficer);
         
+        // dd($approving_officer[0]);
         $current = Carbon::now();
         $department_id = session('department_id');
         $campus = session('campus');
@@ -1262,6 +1318,7 @@ class PurchaseRequestController extends Controller
                                 'fund_source_id' => $fund_source,
                                 'purpose' => $purpose,
                                 'printed_name' => $employee,
+                                'approving_officer' => $approving_officer[0],
                                 'designation' => $designation,
                                 'created_at' =>  Carbon::now()
                             ]);
@@ -1303,6 +1360,7 @@ class PurchaseRequestController extends Controller
                                   'status' => 1,
                                   'purpose' => $purpose,
                                   'printed_name' => $employee,
+                                  'approving_officer' => $approving_officer[0],
                                   'designation' => $designation,
                                   'updated_at' =>  Carbon::now()
                                 ]);
@@ -1457,9 +1515,18 @@ class PurchaseRequestController extends Controller
           'updated_at' => Carbon::now(),
           
         ]);
+        (new HistoryLogController)->store(
+          session('department_id'),
+          session('employee_id'),
+          session('campus'),
+          null,
+          'Updated Purchase Status',
+          'Update',
+          $request->ip(),
+      );
         return response()->json([
           'status' => 200,
-          'message' => 'Saved Successfully!'
+          'message' => 'Updated Successfully!'
         ]);
       }
       $response = DB::table('routing_slip')
@@ -1473,9 +1540,17 @@ class PurchaseRequestController extends Controller
             'date_released' => $date_released.' '.$time_released,
             'remark' => $remark,
             'created_at' => Carbon::now(),
-            
           ]);
 
+          (new HistoryLogController)->store(
+            session('department_id'),
+            session('employee_id'),
+            session('campus'),
+            null,
+            'Saved Purchase Status',
+            'Save',
+            $request->ip(),
+        );
           return response()->json([
             'status' => 200,
             'message' => 'Saved Successfully!'
@@ -1519,45 +1594,59 @@ class PurchaseRequestController extends Controller
         // ["link" => "/department/purchaseRequest/createPR", "name" => "Create PR"],
         ["name" => "View PR"]
       ];
-      $hope = DB::table('users')
-      ->where('role',12)
-      ->where('campus',session('campus'))
-      ->get();
+      // $hope = DB::table('users')
+      // ->where('role',12)
+      // ->where('campus',session('campus'))
+      // ->get();
       $id = (new AESCipher())->decrypt($request->id);
       // $date = Carbon::now()->format('m/d/Y');
 
       $purchase_request = DB::table("purchase_request as pr")
-                            ->select("pr.*","fs.fund_source","d.department_name","u.name")
+                            ->select("pr.*","fs.fund_source","u.name","d.department_name","ps.name as ao_name","ps.designation as ao_designation","ps.title as ao_title")
                             ->join("fund_sources as fs","pr.fund_source_id","fs.id")
                             ->join("departments as d","pr.department_id","d.id")
                             ->join("users as u","pr.printed_name","u.id")
+                            ->join("pr_signatories as ps","pr.approving_officer","ps.id")
                             ->where("pr.id",$id)
                             ->get();
-
+                            
       $pr_no = '';
       foreach($purchase_request as $data){
         $pr_no = $data->pr_no;
       }
-                      // dd($pr_no);
       $itemsForPR = DB::table("purchase_request_items as pri")
                 ->select('pri.*','p.unit_of_measurement','p.item_description','p.unit_price')
                 ->join('ppmps as p','pri.item_id','p.id')
                 ->where('pri.pr_no',$pr_no)
                 ->whereNull('pri.deleted_at')
                 ->get();
-                // dd($itemsForPR);
 
-              //   (new HistoryLogController)->store(
-              //     session('department_id'),
-              //     session('employee_id'),
-              //     session('campus'),
-              //     null,
-              //     'Viewed Purchase Request with PR No '.$pr_no,
-              //     'View',
-              //     $request->ip(),
-              // );
+      $totalcost = 0;
+      foreach($itemsForPR as $data){
+        $totalcost += $data->unit_price * $data->quantity ;
+      }
 
-      return view('pages.department.view_pr_page',compact('hope','purchase_request','itemsForPR','id'), [
+
+      // $signatory 
+                // $sum = DB::table("purchase_request_items as pri")
+                // ->select('pri.*','p.unit_of_measurement','p.item_description','p.unit_price')
+                // ->join('ppmps as p','pri.item_id','p.id')
+                // ->where('pri.pr_no',$pr_no)
+                // ->whereNull('pri.deleted_at')
+                // ->get
+                // dd($totalcost);
+
+                (new HistoryLogController)->store(
+                  session('department_id'),
+                  session('employee_id'),
+                  session('campus'),
+                  null,
+                  'Viewed Purchase Request with PR No '.$pr_no,
+                  'View',
+                  $request->ip(),
+              );
+
+      return view('pages.department.view_pr_page',compact('purchase_request','itemsForPR','id'), [
                   'pageConfigs'=>$pageConfigs,
                   'breadcrumbs'=>$breadcrumbs,
                   // 'error' => $error,
@@ -1685,19 +1774,14 @@ class PurchaseRequestController extends Controller
     $date = Carbon::now()->format('Y-m-d');
 
     $purchase_request = DB::table("purchase_request as pr")
-                          ->select("pr.*","fs.fund_source","d.department_name","u.name")
+                          ->select("pr.*","fs.fund_source","d.department_name","u.name","ps.name as ao_name","ps.designation as ao_designation","ps.title as ao_title")
                           ->join("fund_sources as fs","pr.fund_source_id","fs.id")
                           ->join("departments as d","pr.department_id","d.id")
                           ->join("users as u","pr.printed_name","u.id")
+                          ->join("pr_signatories as ps","pr.approving_officer","ps.id")
                           ->where("pr.id",$id)
                           ->get();
-    $hope = DB::table('users')
-              ->where('role',12)
-              ->where('campus',session('campus'))
-              ->get();
-    foreach($hope as $data){
-      $hope = $data->name;
-    }
+   
     $pr_no = '';
     foreach($purchase_request as $data){
       $pr_no = $data->pr_no;
@@ -1711,17 +1795,17 @@ class PurchaseRequestController extends Controller
               ->get();
               // dd($itemsForPR);
 
-            //   (new HistoryLogController)->store(
-            //     session('department_id'),
-            //     session('employee_id'),
-            //     session('campus'),
-            //     null,
-            //     'Printed Purchase Request with PR No '.$pr_no,
-            //     'Print',
-            //     $request->ip(),
-            // );
+              (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                null,
+                'Printed Purchase Request with PR No '.$pr_no,
+                'Print',
+                $request->ip(),
+            );
 
-    return view('pages.department.print_pr',compact('hope','purchase_request','itemsForPR','date','id'), [
+    return view('pages.department.print_pr',compact('purchase_request','itemsForPR','date','id'), [
                 // 'pageConfigs'=>$pageConfigs,
                 // 'breadcrumbs'=>$breadcrumbs,
                 // 'error' => $error,

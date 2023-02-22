@@ -675,6 +675,7 @@ Route::group(['prefix' => 'PR','middleware' => ['authuser']], function() {
     Route::get('/purchaseRequest/createPR', 'Department\PurchaseRequestController@createPR')->name('createPR');
     Route::post('/purchaseRequest/createPR/remove_item', 'Department\PurchaseRequestController@remove_item')->name('remove_item');
     Route::get('/purchaseRequest/getEmployees', 'Department\PurchaseRequestController@getEmployees');
+    Route::get('/purchaseRequest/getApprovingOfficers', 'Department\PurchaseRequestController@getApprovingOfficers');
     Route::get('/purchaseRequest/getItems', 'Department\PurchaseRequestController@getItems');
     Route::get('/purchaseRequest/getItem', 'Department\PurchaseRequestController@getItem');
     Route::get('/purchaseRequest/editPRItem', 'Department\PurchaseRequestController@editPRItem');

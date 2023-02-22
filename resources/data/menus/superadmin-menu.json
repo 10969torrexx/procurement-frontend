@@ -89,6 +89,12 @@
         "icon": "pen"
       },
       {
+        "url": "budgetofficer/pending_ppmp_request",
+        "name": "Pending Requests",
+        "i18n": "User",
+        "icon": "list"
+      },
+      {
         "navheader": "End-user"
       },
       {
