@@ -1138,7 +1138,7 @@
 
                 // formating _unit_price
                 _unit_price_format = "₱" + _unit_price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                _estimated_price_format = "₱" + _calculate.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                _estimated_price_format = "₱" + Math.round(_calculate/1).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 $('#unit-price').val('');
                 $('#unit-price').val(_unit_price_format);
                 // appending the calculated estimated price
@@ -1209,7 +1209,7 @@
                     _unit_price.toString().replace('₱','');
                 // formating _unit_price
                 var _unit_price_format = "₱" + _unit_price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                var _estimated_price_format = "₱" + _calculate.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                var _estimated_price_format = "₱" + Math.round(_calculate/1).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                 $('#edit-unit-price').val('');
                 $('#edit-unit-price').val(_unit_price_format);
                 // appending the calculated estimated price

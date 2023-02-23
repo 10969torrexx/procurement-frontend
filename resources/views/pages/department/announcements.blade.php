@@ -35,9 +35,9 @@
         <div class="col-12">
             <div class="card p-1">
                 <div class="card-header p-1">
-                    <h4 class="text-primary border-bottom pb-1">
+                    <h6 class="card-title border-bottom pb-1">
                        <strong> Budget Allocation</strong>
-                    </h4>
+                    </h5>
                 </div>
                 <div class="card-body">
                   <div class="table-responsive col-12 container">

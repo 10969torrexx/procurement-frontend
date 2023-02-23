@@ -77,40 +77,40 @@ class PpmpController extends Controller
     public function re_submitPPMP(Request $request)
     {
         try {
-                # this will update the project title status 
-                    $_project_title = Project_titles::
-                        where('id', (new AESCipher)->decrypt($request->current_project_code))
-                        ->where('employee_id', session('employee_id'))
-                        ->where('department_id', session('department_id'))
-                        ->where('campus', session('campus'))
-                        ->update([
-                            'status'    =>  6
-                        ]);
-                # end
-                # this will update the status in the ppmps table based on the project code, employee id, department id
-                    $pmmp_response = ppmp::
-                        where('project_code', (new AESCipher)->decrypt($request->current_project_code))
-                        ->where('employee_id', session('employee_id'))
-                        ->where('department_id', session('department_id'))
-                        ->where('campus', session('campus'))
-                        ->whereRaw("status = '3' OR status = '5'")
-                        ->update([
-                            'status'    =>  6
-                        ]);
-                # end
-                # this will update remaining balance allocated budgets
-                    $allocated_budgets = Allocated_Budgets::where('id', $request->allocated_budget)->update([
-                        'remaining_balance' => doubleval($request->f_remaining_balance),
-                        'procurement_type' => 'Supplemental'
+            # this will update the project title status 
+                $_project_title = Project_titles::
+                    where('id', (new AESCipher)->decrypt($request->current_project_code))
+                    ->where('employee_id', session('employee_id'))
+                    ->where('department_id', session('department_id'))
+                    ->where('campus', session('campus'))
+                    ->update([
+                        'status'    =>  6
                     ]);
-                # end
-                # this will store project as pending on project timeline
-                    $project_timeline = (new ProjectTimelineController)->store($request, 6, 'Your revised PPMP is currently Pending of Immediates Supervisor\'s Approval.');
-                # end
-                return [
-                    'status' => 200,
-                    'message'   => 'You\'ve successfully submitted your PPMP.'
-                ];
+            # end
+            # this will update the status in the ppmps table based on the project code, employee id, department id
+                $pmmp_response = ppmp::
+                    where('project_code', (new AESCipher)->decrypt($request->current_project_code))
+                    ->where('employee_id', session('employee_id'))
+                    ->where('department_id', session('department_id'))
+                    ->where('campus', session('campus'))
+                    ->whereRaw("status = '3' OR status = '5'")
+                    ->update([
+                        'status'    =>  6
+                    ]);
+            # end
+            # this will update remaining balance allocated budgets
+                $allocated_budgets = Allocated_Budgets::where('id', $request->allocated_budget)->update([
+                    'remaining_balance' => doubleval($request->f_remaining_balance),
+                    // 'procurement_type' => 2
+                ]);
+            # end
+            # this will store project as pending on project timeline
+                $project_timeline = (new ProjectTimelineController)->store($request, 6, 'Your revised PPMP is currently Pending of Immediates Supervisor\'s Approval.');
+            # end
+            return [
+                'status' => 200,
+                'message'   => 'You\'ve successfully submitted your PPMP.'
+            ];
         } catch (\Throwable $th) {
                 throw $th;
         }

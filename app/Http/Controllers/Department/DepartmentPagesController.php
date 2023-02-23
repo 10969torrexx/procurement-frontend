@@ -32,7 +32,16 @@ class DepartmentPagesController extends Controller
                 return view('pages.page-maintenance');
             }
         # end
-        # this function will show the dashboard for the department users
+        /**
+         * * Show Announcement Page
+         * TODO 1: Get all allocated budget for the department
+         * TODO 2: Get the associated fund sources for each allocated budget
+         * TODO 3: Get total mandatory expenditures per budget allocation
+         * TODO 4: Get total used budget by project for allocated budgets
+         * ? -----------------------------------------
+         * ? KEY 1: 
+         * ? KEY 2: (TODO 4) 
+         */
             public function showAnnouncementPage(){
                try {
                     /** This will join the allocated__budgets table and fundsources table
@@ -50,7 +59,10 @@ class DepartmentPagesController extends Controller
                         ->groupBy('fund_sources.fund_source', 'allocated__budgets.year')
                         ->orderBy('allocated__budgets.year')
                         ->get([
-                            'fund_sources.id', 'allocated__budgets.*', 'fund_sources.fund_source', \DB::raw('sum(allocated__budgets.allocated_budget) as SumBudget')
+                            'fund_sources.id', 
+                            'allocated__budgets.*', 
+                            'fund_sources.fund_source', 
+                            \DB::raw('sum(allocated__budgets.allocated_budget) as SumBudget')
                         ]); 
                     
                     $mandatory_expeditures = \DB::table("mandatory_expenditures as me")
@@ -65,7 +77,8 @@ class DepartmentPagesController extends Controller
                 /** This will return table and page configs */
                     $pageConfigs = ['pageHeader' => true];
                     $breadcrumbs = [
-                    ["link" => "/", "name" => "Home"],["name" => "Announcements"]
+                    ["link" => "/", "name" => "Home"],
+                    ["name" => "Announcements"]
                     ];
                     return view('pages.department.announcements',
                         ['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs],
@@ -78,7 +91,7 @@ class DepartmentPagesController extends Controller
                     return view('pages.error-500');
                }
             }
-        # end
+        
         /**
          * * Show project category page
          * TODO: show the project category choices for the users
