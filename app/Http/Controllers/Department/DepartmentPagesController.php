@@ -110,7 +110,8 @@ class DepartmentPagesController extends Controller
          * ? KEY 1: make sure that fund souces end date (deadline of submission) hasn't exceeded the current date
          * ? KEY 2: Compare current date to the fund source END DATE
          * ? KEY 3: get all ppmp deadline year based on the procurement type
-         * ? KEY 4: Determine if project title does not exist in the ppmp request submission table
+         * ? KEY 4: Check if ppmp deadline of submission is 
+         * * if null, then check if ppmp deadline of submission end date is not null
          */
             public function showCreatePPMP(Request $request){
                 try {
@@ -120,10 +121,9 @@ class DepartmentPagesController extends Controller
                             ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
                             ->join('allocated__budgets', 'allocated__budgets.id', 'project_titles.allocated_budget')
                             ->join('ppmp_deadline', 'ppmp_deadline.year', 'allocated__budgets.year')
-                            ->join('ppmp_request_submission', 'ppmp_request_submission.project_id', '!=', 'project_titles.id') // ? KEY 4
                             ->where('project_titles.project_category', (new AESCipher)->decrypt($request->project_category))
                             ->where('ppmp_deadline.procurement_type', (new AESCipher)->decrypt($request->project_category))
-                            ->where('allocated__budgets.procurement_type', (new AESCipher)->decrypt($request->project_category))
+                            // ->where('allocated__budgets.procurement_type', (new AESCipher)->decrypt($request->project_category))
                             ->where('project_titles.status', 0) // * check if project is draft
                             ->whereNull('project_titles.deleted_at')
                             ->whereNull('users.deleted_at')
@@ -132,13 +132,14 @@ class DepartmentPagesController extends Controller
                                 'users.name as immediate_supervisor',
                                 'fund_sources.fund_source',
                                 'allocated__budgets.id as allocated_budget',
-                                'ppmp_deadline.end_date as deadline_of_submission'
+                                'allocated__budgets.deadline_of_submission',
+                                'ppmp_deadline.end_date',
+                                'ppmp_deadline.start_date',
                             ]);
                     // TODO 2
                         $fund_sources = \DB::table('allocated__budgets')
                             ->join('fund_sources', 'fund_sources.id', 'allocated__budgets.fund_source_id')
                             ->join('ppmp_deadline', 'ppmp_deadline.year', 'allocated__budgets.year')
-                            ->where('ppmp_deadline.end_date', '<', Carbon::now()->format('Y-m-d') ) // ? KEY 1, KEY 2
                             ->where('allocated__budgets.campus', session('campus')) 
                             ->where('department_id', session('department_id'))
                             ->where('ppmp_deadline.procurement_type', (new AESCipher)->decrypt($request->project_category)) // ? KEY 3
@@ -208,7 +209,7 @@ class DepartmentPagesController extends Controller
                         ]);
                     # end
                 } catch (\Throwable $th) {
-                    // throw $th;
+                    throw $th;
                     return view('pages.error-500');
                 }
             }
@@ -269,7 +270,6 @@ class DepartmentPagesController extends Controller
                         ->where('allocated__budgets.department_id', session('department_id'))
                         ->where('allocated__budgets.procurement_type', intval((new AESCipher)->decrypt($request->procurement_type)))
                         ->where('ppmp_deadline.procurement_type', intval((new AESCipher)->decrypt($request->procurement_type)))
-                        // ->where('ppmp_deadline.end_date', '<', Carbon::now()->format('Y-m-d')) // ? KEY 7
                         ->whereNull('allocated__budgets.deleted_at')
                         ->get([
                             'ppmp_deadline.start_date',
@@ -840,306 +840,25 @@ class DepartmentPagesController extends Controller
 
         /**
          * * Request for PPMP Submission | all project view
-         * TODO 1: Get all the ppmp and/or projects that has gone beyond their deadlines of submissions.
-         * TODO 2: Join project_titles and allocated__budgets tables
-         * TODO 3: Join allocated__budgets and ppmp_deadline tables
-         * TODO 4: Get all PPMP Project
-         * TODO 5: Get all Indicative Project
-         * TODO 6: Get all Supplemental Project
-         * TODO 7: Get total estimted price for PPMP
-         * TODO 8: Get total estimted price for Indicative
-         * TODO 9: Get total estimted price for Supplemental
-         * TODO 10: Get all allocated budgets for PPMP Procurement Type
-         * TODO 11: Get all allocated budgets for Indicative Procurement Type
-         * TODO 12: Get all allocated budgets for Supplemental Procurement Type
-         * ? -----------------------------------------------
-         * ? KEY 1: Determine all the projects that is draft
-         * ? KEY 2: Determine if allocated__budgets deadline_of_submission is null
-         * ? KEY 3: Determine if current date has exceeded beyond ppmp_deadline.end_date deadline
-         * ? KEY 4: Get all project titles & ppmps according to project category/proocurment type
-         * ? KEY 5: Get all allocated budgets according to project category/proocurment type
-         * ? KEY 6: Get all ppmp deadline according to project category/proocurment type
+         * TODO 1: Get all the allocated budgets that are sent for PPMP request submission
          */
         public function show_ppmp_submission() {
-            try {
-                // TODO 4
-                    $ppmp_project_titles = \DB::table('project_titles') // TODO 1
-                        ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
-                        ->join('allocated__budgets', 'allocated__budgets.id', 'project_titles.allocated_budget') // TODOI 2
-                        ->join('users', 'users.id', 'project_titles.immediate_supervisor') // * join to user table to get immediate supervisor name
-                        ->join('ppmp_deadline', 'ppmp_deadline.year', 'allocated__budgets.year') // TODO 3
-                        ->where('project_titles.department_id', session('department_id'))
-                        ->where('allocated__budgets.department_id', session('department_id'))
-                        ->where('project_titles.employee_id', session('employee_id'))
-                        ->where('project_titles.campus', session('campus'))
-                        ->whereNull('project_titles.deleted_at')
-                        ->where('project_titles.status', 0) // ? KEY 1
-                        ->whereNull('allocated__budgets.deadline_of_submission') // ? KEY 2
-                        ->where('ppmp_deadline.end_date', '<', Carbon::now()->format('Y-m-d')) // ? KEY 3
-                        ->where('project_titles.project_category', 1) // ? KEY 4
-                        ->where('allocated__budgets.procurement_type', 1) // ? KEY 5
-                        ->where('ppmp_deadline.procurement_type', 1) // ? KEY 5
-                        ->select([
-                            'project_titles.*',
-                            'fund_sources.fund_source as fund_source',
-                            'users.name as immediate_supervisor',
-                            'allocated__budgets.allocated_budget',
-                            'allocated__budgets.remaining_balance',
-                            'ppmp_deadline.end_date as deadline_of_submission'
-                        ])
-                        ->paginate(10);
-                // TODO 7
-                    $ppmp_total_estimated_price = array(); // * hold the total estimated prices for each ppmps basd on project
-                        if(count($ppmp_project_titles) > 0) {
-                            // * get the pppmps for each project title
-                            foreach ($ppmp_project_titles as $_project_title) {
-                                $ppmps = \DB::table('ppmps')
-                                    ->where('campus', session('campus'))
-                                    ->where('department_id', session('department_id'))
-                                    ->where('employee_id', session('employee_id'))
-                                    ->where('project_code', $_project_title->id)
-                                    ->whereNull('ppmps.deleted_at')
-                                    ->get();
-                                    $estimated_price = 0.0; // * hold the total estimated prices for each added item from each ppmp
-                                if(count($ppmps) > 0) {
-                                    // * get the total estimated prices of ppmps based on the project
-                                    foreach ($ppmps as $_ppmp) {
-                                        $estimated_price += $_ppmp->estimated_price;
-                                    }
-                                } else {
-                                    $estimated_price = 0.0;
-                                }
-                                array_push($ppmp_total_estimated_price, $estimated_price);
-                            }
-                        }
-                // TODO 5
-                    $indicative_project_titles = \DB::table('project_titles') // TODO 1
-                        ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
-                        ->join('allocated__budgets', 'allocated__budgets.id', 'project_titles.allocated_budget') // TODOI 2
-                        ->join('users', 'users.id', 'project_titles.immediate_supervisor') // * join to user table to get immediate supervisor name
-                        ->join('ppmp_deadline', 'ppmp_deadline.year', 'allocated__budgets.year') // TODO 3
-                        ->where('project_titles.department_id', session('department_id'))
-                        ->where('allocated__budgets.department_id', session('department_id'))
-                        ->where('project_titles.employee_id', session('employee_id'))
-                        ->where('project_titles.campus', session('campus'))
-                        ->whereNull('project_titles.deleted_at')
-                        ->where('project_titles.status', 0) // ? KEY 1
-                        ->whereNull('allocated__budgets.deadline_of_submission') // ? KEY 2
-                        ->where('ppmp_deadline.end_date', '<', Carbon::now()->format('Y-m-d')) // ? KEY 3
-                        ->where('project_titles.project_category', 0) // ? KEY 4
-                        ->where('allocated__budgets.procurement_type', 0) // ? KEY 5
-                        ->where('ppmp_deadline.procurement_type', 0) // ? KEY 5
-                        ->select([
-                            'project_titles.*',
-                            'fund_sources.fund_source as fund_source',
-                            'users.name as immediate_supervisor',
-                            'allocated__budgets.allocated_budget',
-                            'allocated__budgets.remaining_balance',
-                            'ppmp_deadline.end_date as deadline_of_submission'
-                        ])
-                        ->paginate(10);
-                        
-                // TODO 8
-                    $indicative_total_estimated_price = array(); // * hold the total estimated prices for each ppmps basd on project
-                        if(count($indicative_project_titles) > 0) {
-                            // * get the pppmps for each project title
-                            foreach ($indicative_project_titles as $_project_title) {
-                                $ppmps = \DB::table('ppmps')
-                                    ->where('campus', session('campus'))
-                                    ->where('department_id', session('department_id'))
-                                    ->where('employee_id', session('employee_id'))
-                                    ->where('project_code', $_project_title->id)
-                                    ->whereNull('ppmps.deleted_at')
-                                    ->get();
-                                    $estimated_price = 0.0; // * hold the total estimated prices for each added item from each ppmp
-                                if(count($ppmps) > 0) {
-                                    // * get the total estimated prices of ppmps based on the project
-                                    foreach ($ppmps as $_ppmp) {
-                                        $estimated_price += $_ppmp->estimated_price;
-                                    }
-                                } else {
-                                    $estimated_price = 0.0;
-                                }
-                                array_push($indicative_total_estimated_price, $estimated_price);
-                            }
-                        }
-                // TODO 6
-                    $supplemental_project_titles = \DB::table('project_titles') // TODO 1
-                        ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
-                        ->join('allocated__budgets', 'allocated__budgets.id', 'project_titles.allocated_budget') // TODOI 2
-                        ->join('users', 'users.id', 'project_titles.immediate_supervisor') // * join to user table to get immediate supervisor name
-                        ->join('ppmp_deadline', 'ppmp_deadline.year', 'allocated__budgets.year') // TODO 3
-                        ->where('project_titles.department_id', session('department_id'))
-                        ->where('allocated__budgets.department_id', session('department_id'))
-                        ->where('project_titles.employee_id', session('employee_id'))
-                        ->where('project_titles.campus', session('campus'))
-                        ->whereNull('project_titles.deleted_at')
-                        ->where('project_titles.status', 0) // ? KEY 1
-                        ->whereNull('allocated__budgets.deadline_of_submission') // ? KEY 2
-                        ->where('ppmp_deadline.end_date', '<', Carbon::now()->format('Y-m-d')) // ? KEY 3
-                        ->where('project_titles.project_category', 2) // ? KEY 4
-                        ->where('allocated__budgets.procurement_type', 2) // ? KEY 5
-                        ->where('ppmp_deadline.procurement_type', 2) // ? KEY 5
-                        ->select([
-                            'project_titles.*',
-                            'fund_sources.fund_source as fund_source',
-                            'users.name as immediate_supervisor',
-                            'allocated__budgets.allocated_budget',
-                            'allocated__budgets.remaining_balance',
-                            'ppmp_deadline.end_date as deadline_of_submission'
-                        ])
-                        ->paginate(10);
-                // TODO 9
-                    $supplemental_total_estimated_price = array(); // * hold the total estimated prices for each ppmps basd on project
-                        if(count($supplemental_project_titles) > 0) {
-                            // * get the pppmps for each project title
-                            foreach ($supplemental_project_titles as $_project_title) {
-                                $ppmps = \DB::table('ppmps')
-                                    ->where('campus', session('campus'))
-                                    ->where('department_id', session('department_id'))
-                                    ->where('employee_id', session('employee_id'))
-                                    ->where('project_code', $_project_title->id)
-                                    ->whereNull('ppmps.deleted_at')
-                                    ->get();
-                                    $estimated_price = 0.0; // * hold the total estimated prices for each added item from each ppmp
-                                if(count($ppmps) > 0) {
-                                    // * get the total estimated prices of ppmps based on the project
-                                    foreach ($ppmps as $_ppmp) {
-                                        $estimated_price += $_ppmp->estimated_price;
-                                    }
-                                } else {
-                                    $estimated_price = 0.0;
-                                }
-                                array_push($supplemental_total_estimated_price, $estimated_price);
-                            }
-                        }
-                $pageConfigs = ['pageHeader' => true];
-                $breadcrumbs = [
-                    ["link" => "/", "name" => "Home"],
-                    ["name" => "PPMP Submission"]
-                ];
-                return view('pages.department.ppmp-submission', 
-                    compact(
-                        'ppmp_project_titles', 'ppmp_total_estimated_price',
-                        'indicative_project_titles', 'indicative_total_estimated_price',
-                        'supplemental_project_titles', 'supplemental_total_estimated_price',
-                    ));
-            } catch (\Throwable $th) {
-                // throw $th;
-                return view('pages.error-500');
-            }
-        }
-
-        /**
-         * * Request for PPMP Submission | Add items
-         * TODO 1: Get project title based
-         * TODO 2: Get project deadline of submission
-         * TODO 3: Get project allocated budget
-         * TODO 4: Get project ppmp deadline
-         * TODO 5: Get project items or ppmps if any
-         * TODO 6: Get all mode of procurements
-         * ? --------------------------------
-         * ? KEY 1: join project tiles, users, fund sources
-         * ? KEY 2: join allocated budgets & ppmp deadline
-         * ? KEY 3: check if allocated budget deadline of submission is null
-         */
-        public function show_ppmp_submission_items(Request $request) {
-            try {
-                // TODO 1, 2, 3, 4
-                    $project_titles = \DB::table('project_titles') 
-                        ->join('users', 'users.id', 'project_titles.immediate_supervisor') // ? KEY 1
-                        ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
-                        ->join('allocated__budgets', 'allocated__budgets.id', 'project_titles.allocated_budget') // TODO 3
-                        ->join('ppmp_deadline', 'ppmp_deadline.year', 'allocated__budgets.year') // TODO 4
-                        ->where('project_titles.id', (new AESCipher)->decrypt($request->project_title_id))
-                        ->where('project_titles.campus', session('campus'))
-                        ->where('project_titles.employee_id', session('employee_id'))
-                        ->where('project_titles.department_id', session('department_id'))
-                        ->whereNull('project_titles.deleted_at')
-                        ->whereNull('allocated__budgets.deadline_of_submission') // ? KEY 3
-                        ->whereNull('ppmp_deadline.deleted_at')
-                        ->whereNull('users.deleted_at')
-                        ->whereNull('fund_sources.deleted_at')
-                        ->where('allocated__budgets.procurement_type', (new AESCipher)->decrypt($request->project_category))
-                        ->where('ppmp_deadline.procurement_type', (new AESCipher)->decrypt($request->project_category))
-                        ->get([
-                            'project_titles.*',
-                            'project_titles.id as project_id',
-                            'fund_sources.fund_source as fund_source',
-                            'users.name as immediate_supervisor',
-                            'allocated__budgets.*',
-                            'ppmp_deadline.*'
-                        ]);
-                // TODO 5
-                    $ppmp_response = \DB::table('ppmps')
-                        ->join('mode_of_procurement', 'mode_of_procurement.id', 'ppmps.mode_of_procurement')
-                        ->where('ppmps.campus', session('campus'))
-                        ->where('ppmps.employee_id', session('employee_id'))
-                        ->where('ppmps.department_id', session('department_id'))
-                        ->whereNull('ppmps.deleted_at')
-                        ->whereNull('mode_of_procurement.deleted_at')
-                        ->where('project_code', (new AESCipher)->decrypt($request->project_title_id))
-                        ->select([
-                            'ppmps.*',
-                            'ppmps.id as ppmps_id',
-                            'mode_of_procurement.mode_of_procurement as mode_of_procurement'
-                        ])
-                        ->paginate(10);
-                // TODO 6
-                    $mode_of_procurements = \DB::table('mode_of_procurement')
-                        ->whereNull('deleted_at')
-                        ->get();
-                    // ? KEY 4
-                    if((count($mode_of_procurements) <= 0) || $mode_of_procurements == null) {
-                        return back()->with([
-                            'failed' => 'You\'ve no mode of procurment. Contact your campus BAC Secretariat'
-                        ]);
-                    }
-                // TODO 7
-                    $items = \DB::table('items')
-                        ->join('mode_of_procurement', 'mode_of_procurement.id', 'items.mode_of_procurement_id')
-                        ->whereNull('mode_of_procurement.deleted_at')
-                        ->whereNull('items.deleted_at')
-                        ->get();
-                    // ? KEY 6
-                    if((count($items) <= 0) || $items == null) {
-                        return back()->with([
-                            'failed' => 'You\'ve no items. Contact your campus BAC Secretariat'
-                        ]);
-                    }
-                // TODO 8
-                    $unit_of_measurement = \DB::table('unit_of_measurements')
-                        ->whereNull('deleted_at')
-                        ->get();
-                    // ? KEY 5
-                    if((count($unit_of_measurement) <= 0) || $unit_of_measurement == null) {
-                        return back()->with([
-                            'failed' => 'You\'ve no unit of measurement. Contact your campus BAC Secretariat'
-                        ]);
-                    }
-
+           try {
                 /** This will return table and page configs */
                     $pageConfigs = ['pageHeader' => true];
                     $breadcrumbs = [
                         ["link" => "/", "name" => "Home"],
-                        ["link" => "/request-ppmp-submission/ppmp-submission", "name" => "PPMP Submission"],
-                        ["name" => "Request Details"]
+                        ["name" => "PPMP Submission"]
                     ];
-                    return view('pages.department.ppmp-submission-item',
+                    return view('pages.department.ppmp-submission',
                         ['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs],
                         [
-                            'project_titles'   =>  $project_titles,
-                            // 'allocated_budgets'   =>  $allocated_budgets,
-                            'items' => $items,
-                            'mode_of_procurements'  =>  $mode_of_procurements,
-                            'unit_of_measurements'  =>  $unit_of_measurement,
-                            'ppmp_response' => $ppmp_response,
+                          
                         ]);
-                    
-            } catch (\Throwable $th) {
-                // throw $th;
+           } catch (\Throwable $th) {
+                //throw $th;
                 return view('pages.error-500');
-            }
+           }
         }
-
+        
 }

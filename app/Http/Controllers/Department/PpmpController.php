@@ -59,7 +59,7 @@ class PpmpController extends Controller
             # this will update remaining balance allocated budgets
                  $allocated_budgets = Allocated_Budgets::where('id', $request->allocated_budget)->update([
                     'remaining_balance' => doubleval($request->f_remaining_balance),
-                    'procurement_type' => 'Supplemental'
+                    // 'procurement_type' => 2
                  ]);
             # end
             # this will store project as pending on project timeline

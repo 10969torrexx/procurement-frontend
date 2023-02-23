@@ -30,7 +30,6 @@
     #t-table{
         width: 100%;
     }
-
     .tbg-secondary {
         background-color: rgba(71, 95, 123, 0.9) !important;
     }
@@ -219,7 +218,7 @@
                                             {{-- showing ppmp data based on department and user --}}
                                                 @foreach ($project_titles as $item)
                                                     <tr>
-                                                        <td id="t-td"><input type="checkbox" name="" class="project-checkbox" value="{{ $item->id }}" data-status="{{ $item->status }}"></td>
+                                                        <td id="t-td"><input type="checkbox" name="" class="project-checkbox" value="{{ $item->id }}" data-status="{{ $item->status }}" data-allocated_budget="{{ $item->allocated_budget }}" data-procurement_type="{{ $item->project_category }}"></td>
                                                         <td id="t-td">{{ $loop->iteration }}</td>
                                                         <td id="t-td">{{ $item->project_title }}</td>
                                                         <td id="t-td">{{ $item->project_year }}</td>
@@ -228,7 +227,13 @@
                                                         <td id="t-td">{{ $item->project_type }}</td>
                                                         <td id="t-td">{{ $item->fund_source }}</td>
                                                         <td id="t-td">₱ {{ number_format($total_estimated_price[ ($loop->iteration - 1) ],2,'.',',') }}</td>
-                                                        <td id="t-td">{{ explode('-', date('j F, Y-', strtotime($item->deadline_of_submission)))[0]  }}</td>
+                                                        {{-- checking deadline of submmission --}}
+                                                            @if ($item->deadline_of_submission == null)
+                                                                <td id="t-td">{{ explode('-', date('j F, Y-', strtotime($item->end_date)))[0]  }}</td>
+                                                            @else
+                                                                <td id="t-td">{{ explode('-', date('j F, Y-', strtotime($item->deadline_of_submission)))[0]  }}</td>
+                                                            @endif
+                                                        {{-- end --}}
                                                         <td id="t-td">{{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0]  }}</td>
                                                         <td id="t-td">
                                                             <div class="dropdown">
@@ -289,42 +294,48 @@
     <script src="{{asset('vendors/js/extensions/polyfill.min.js')}}"></script> --}}
 {{-- Torrexx | Code not mine --}}
 <script>
-    $(document).on('click', '#edit-title-btn', function(e) {
-       e.preventDefault();
-       $('#viewmodal').modal('show');
-        $.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $("meta[name='csrf-token']").attr('content')
-            },
-            url: "{{ route('department-get-project') }}",
-            method: 'GET',
-            data: {
-                'id' : $(this).attr('data-id')
-            }, success: function(response) { 
-                console.log(response);
-                $('#project-id').val(response[0]['id']);
-                $('#modal-header').text('Edit - ' + response[0][['project_title']]);
-                $('#project-title').val(response[0]['project_title']);
-                $('#default-project-type').val(response[0]['project_type']);
-                $('#default-project-type').text(response[0]['project_type']);
-                $('#default-year').val(response[0]['project_year']);
-                $('#default-year').text(response[0]['project_year']);
-                $('#default-fund-source').val(response[0]['allocated_budget']+'**'+response[0]['fund_source_id']);
-                $('#default-fund-source').text(response[0]['fund_source']);
-            } 
+    // edit title btn
+        $(document).on('click', '#edit-title-btn', function(e) {
+        e.preventDefault();
+        $('#viewmodal').modal('show');
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $("meta[name='csrf-token']").attr('content')
+                },
+                url: "{{ route('department-get-project') }}",
+                method: 'GET',
+                data: {
+                    'id' : $(this).attr('data-id')
+                }, success: function(response) { 
+                    console.log(response);
+                    $('#project-id').val(response[0]['id']);
+                    $('#modal-header').text('Edit - ' + response[0][['project_title']]);
+                    $('#project-title').val(response[0]['project_title']);
+                    $('#default-project-type').val(response[0]['project_type']);
+                    $('#default-project-type').text(response[0]['project_type']);
+                    $('#default-year').val(response[0]['project_year']);
+                    $('#default-year').text(response[0]['project_year']);
+                    $('#default-fund-source').val(response[0]['allocated_budget']+'**'+response[0]['fund_source_id']);
+                    $('#default-fund-source').text(response[0]['fund_source']);
+                } 
+            });
         });
-    });
-
+    
     // function for submitting all projects
         $(document).on('click', '#submit-projects-btn', function(e) {
             e.preventDefault();
             var _project_checkbox = $('.project-checkbox');
             var _checked_project = [];
             var _checked_status = [];
+            var _checked_allocated_budget = [];
+            var _checked_procurement_type = [];
+        
             for (let index = 0; index < $('#item-count').val(); index++) {
                if(_project_checkbox[index].checked) {
                     _checked_project.push(_project_checkbox[index].value);
                     _checked_status.push(_project_checkbox[index].dataset.status);
+                    _checked_allocated_budget.push(_project_checkbox[index].dataset.allocated_budget);
+                    _checked_procurement_type.push(_project_checkbox[index].dataset.procurement_type);
                }
             }
             if(_checked_project == null || _checked_project.length <= 0) {
@@ -342,7 +353,9 @@
                     },
                     data: {
                         'project_titles'    :   _checked_project,
-                        'project_status'    :   _checked_status
+                        'project_status'    :   _checked_status,
+                        'allocated_budget' : _checked_allocated_budget,
+                        'procurement_type' : _checked_procurement_type
                     },
                     dataType: "json",
                     success: function (response) {
@@ -354,15 +367,31 @@
                                 html: response['message'],
                             });
                         } 
-
                         if(response['status'] == 200) {
                             Swal.fire({
-                                title: 'Success',
-                                icon: 'success',
+                                title: 'Updated!!!',
                                 html: response['message'],
+                                icon: 'success',
+                                timer: 1000,
+                                timerProgressBar: true,
+                                didOpen: () => {
+                                    Swal.showLoading()
+                                    const b = Swal.getHtmlContainer().querySelector('b')
+                                    timerInterval = setInterval(() => {
+                                    b.textContent = Swal.getTimerLeft()
+                                    }, 100)
+                                },
+                                willClose: () => {
+                                    clearInterval(timerInterval)
+                                }
+                                }).then((result) => {
+                                    /* Read more about handling dismissals below */
+                                    if (result.dismiss === Swal.DismissReason.timer) {
+                                        location.reload();
+                                        console.log('I was closed by the timer')
+                                    }
                             });
                         } 
-                        
                     }
                 });
             }
