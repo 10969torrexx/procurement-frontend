@@ -539,7 +539,7 @@ class DepartmentController extends Controller
                         );
                     # end
                     // this will update the procurement type of the allocated budget
-                    return back()->with([
+                    return redirect(route('derpartment-project-category'))->with([
                         'success' => $response['message']
                     ]);
                 } 
