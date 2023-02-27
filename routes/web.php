@@ -715,7 +715,7 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
             # this will show the my ppmp page based on the department id
             Route::get('/myPPMP', [DepartmentPagesController::class, 'showMyPPMP'])->name('department-showMyPPMP');
             # this will show the status of the project along with its item
-            Route::post('/project/status', [DepartmentPagesController::class, 'showProjectStatus'])->name('department-showProjectStatus');
+            Route::get('/project/status', [DepartmentPagesController::class, 'showProjectStatus'])->name('showProjectStatus');
                 # this will re-submit ppmp | revised PPMP
                 Route::post('/re-sumbit/ppmp', [DepartmentController::class, 'resubmitPPMP'])->name('department-re_submit-ppmp');
                 # this route will display the disapproved items
