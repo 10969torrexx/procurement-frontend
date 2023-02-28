@@ -51,6 +51,7 @@ class DepartmentPagesController extends Controller
                     $departmentID = \session('department_id');
                     $array_fund_id = [];
                     $mandatory_expeditures = [];
+                    $total_estimated_price = [];
                     $allocated_budgets = \DB::table('allocated__budgets')
                         ->join('fund_sources', 'allocated__budgets.fund_source_id', 'fund_sources.id')
                         ->where('allocated__budgets.department_id', $departmentID)
@@ -74,6 +75,27 @@ class DepartmentPagesController extends Controller
                         ->groupBy("me.year")
                         ->groupBy("me.fund_source_id")
                         ->get();
+
+                   foreach ($allocated_budgets as $item) {
+                        $ppmps = \DB::table('ppmps')
+                            ->join('project_titles', 'project_titles.id', 'ppmps.project_code')
+                            ->whereNull('ppmps.deleted_at')
+                            ->where('project_titles.allocated_budget', $item->id)
+                            ->get([
+                                'estimated_price'
+                            ]);
+                        $_estimated_price = 0.0;
+                        if(count($ppmps) > 0) {
+                            // * get the total estimated prices of ppmps based on the project
+                            foreach ($ppmps as $_ppmp) {
+                                $_estimated_price += $_ppmp->estimated_price;
+                            }
+                        } else {
+                            $_estimated_price = 0.0;
+                        }
+                        array_push($total_estimated_price, $_estimated_price);
+                   }
+                  
                 /** This will return table and page configs */
                     $pageConfigs = ['pageHeader' => true];
                     $breadcrumbs = [
@@ -85,9 +107,10 @@ class DepartmentPagesController extends Controller
                         [
                             'mandatory_expeditures'   =>  $mandatory_expeditures,
                             'allocated_budgets'   =>  $allocated_budgets,
+                            'total_estimated_price' => $total_estimated_price
                         ]);
                } catch (\Throwable $th) {
-                    //throw $th;
+                    throw $th;
                     return view('pages.error-500');
                }
             }
