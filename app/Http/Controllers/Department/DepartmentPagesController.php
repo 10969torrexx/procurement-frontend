@@ -12,6 +12,7 @@ use App\Http\Controllers\Department\FundSourcesController;
 use App\Http\Controllers\Department\ItemsController;
 use App\Http\Controllers\Department\DepartmentController;
 use App\Http\Controllers\GlobalDeclare;
+use App\Http\Controllers\HistoryLogController;
 
 use App\Http\Controllers\ProjectTimelineController;
 use App\Models\Departments;
@@ -697,6 +698,8 @@ class DepartmentPagesController extends Controller
                         'file_name' => ['required'],
                     ]);
                     # get uplpaded ppmp
+                (new HistoryLogController)->store(session('department_id'),session('employee_id'),session('campus'),null,'Searched Signed PPMP: '.$request->file_name,'Search',$request->ip());
+
                     $response = \DB::table('signed_ppmp')
                         ->where('employee_id', session('employee_id'))
                         ->where('department_id', session('department_id'))
@@ -707,6 +710,9 @@ class DepartmentPagesController extends Controller
                         ->whereNull('deleted_at')
                         ->get();
                     # return page
+                    if(session('role') == 2){
+                    return view('pages.budgetofficer.signed-ppmp', compact('response'));
+                    }
                     return view('pages.department.upload-ppmp', compact('response'));
                 } catch (\Throwable $th) {
                     // throw $th;

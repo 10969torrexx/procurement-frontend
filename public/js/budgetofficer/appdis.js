@@ -242,24 +242,6 @@ $(document).on('click', '.done', function (e) {
                     console.log('I was closed by the timer')
                   }
                 })
-               // console.log(i );
-               // $('#status'+ i).text("Approved");
-               // var element = document.getElementById("status"+i);
-               // element.style.color = "green";
-   
-               
-               // var btn = document.getElementById("action"+i);
-               // btn.style.display = 'none';
-
-               // var i = $('.approve').val();
-               // console.log(i);
-               // // for(var i = 0; i < value; i++) {
-               //    var element = document.getElementById("status"+i);
-               //    // element.innerHTML= "approved";
-               //    $('.status'+i).text("approved")
-               //    element.style.color = "green";
-                     //  $('.status'+i).style.color = "blue";
-               // }
             }
          }
       });
@@ -504,3 +486,188 @@ $(document).on('click', '.edit', function (e) {
       btn.style.display = 'none';
    }
 });
+
+$(document).on('click', '.approveRequest_modal', function (e) {
+   e.preventDefault();
+ 
+   var id = $(this).attr("href");
+   var status = $('.status').val();
+   $('.id').val(id);
+   if (status == 1) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Request is already approved!',
+        })
+    }else{
+      $('#ApproveRequestModal').modal('show');
+    }
+ });
+
+$(document).on('click', '.approveRequest_button', function (e) {
+   e.preventDefault();  
+   // alert($(this).attr("href"))
+   // $("#reject_all_ppmp_modal").modal('show');
+   // $('.reject_val').val($(this).val());
+   // $('.reject_id').val($(this).attr("data-id"));
+   var data = {
+      'id': $('.id').val(),
+      'date': $('.new_deadline').val(),
+      'status': 1,
+      'edit': $('.edit').val(),
+      'remark': null,
+   }
+   $.ajaxSetup({
+      headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      }
+      });
+
+   $.ajax({
+      type: "post",
+      url: "/budgetofficer/pending_ppmp_request/appdis_request",
+      data:data,
+      beforeSend : function(html){
+      },
+      success: function (response) {
+         if(response['status'] == 200) { 
+            // alert('success');
+            $('#ApproveRequestModal').modal('hide');
+
+            Swal.fire({
+               title: 'Saved!',
+               icon: 'success',
+               html: response.message,
+               timer: 1000,
+               timerProgressBar: true,
+               didOpen: () => {
+                 Swal.showLoading()
+                 const b = Swal.getHtmlContainer().querySelector('b')
+                 timerInterval = setInterval(() => {
+                   b.textContent = Swal.getTimerLeft()
+                 }, 100)
+               },
+               willClose: () => {
+                 clearInterval(timerInterval)
+               }
+             }).then((result) => {
+               /* Read more about handling dismissals below */
+               if (result.dismiss === Swal.DismissReason.timer) {
+                 $('#SetDeadlineModal').modal('hide');
+                 location.reload();
+                 console.log('I was closed by the timer')
+               }
+             })
+         }
+         if (response.status == 400) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: response.message,
+              })
+          }
+      }
+   });
+
+ });
+
+ $(document).on('click', '.disapproveRequest_modal', function (e) {
+   e.preventDefault();
+ 
+   var id = $(this).attr("href");
+   $('.id').val(id);
+
+   var status = $('.status').val();
+   if (status == 2) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Request is already disapproved!',
+        })
+    }else{
+      $('#DisapproveRequestModal').modal('show');
+    }
+ });
+ 
+ $(document).on('click', '.disapproveRequest_button', function (e) {
+   e.preventDefault();
+ 
+   // var pr_no = $(".pr_no").text();
+   var remark = $(".reject_remarks").val();
+ 
+   if(remark == ''){
+     Swal.fire({ 
+       icon: 'error',
+       title: 'Error',
+       text: 'Please enter remark!',
+     })
+   }else{
+ 
+     $.ajaxSetup({
+       headers: {
+           'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+       }
+     });
+ 
+     $.ajax({
+       type: 'POST',
+       url: "/budgetofficer/pending_ppmp_request/appdis_request",
+       headers: {'X-CSRF-TOKEN' : $('meta[name="csrf-token"]').attr('content')},
+       data: {
+         'id': $('.id').val(),
+         'date': null,
+         'status': 2,
+         'remark': remark,
+       },
+       success: function(response) {
+         // ! show when success
+           if(response.status == 200) {
+             
+             $('#DisapproveRequestModal').modal('hide');
+             
+             Swal.fire({ 
+               icon: 'success',
+               title: 'Success',
+               text: response['message'],
+               timer: 1000,
+               timerProgressBar: true,
+               didOpen: () => {
+                 Swal.showLoading()
+                 const b = Swal.getHtmlContainer().querySelector('b')
+                 timerInterval = setInterval(() => {
+                   b.textContent = Swal.getTimerLeft()
+                 }, 100)
+               },
+               willClose: () => {
+                 clearInterval(timerInterval)
+               }
+             }).then((result) => {
+               if (result.dismiss === Swal.DismissReason.timer) {
+                 location.reload();
+               }
+             })
+ 
+           } 
+         // ! show when error
+           if(response['status'] == 400) {
+             Swal.fire({ 
+               icon: 'error',
+               title: 'Error',
+               text: response['message'],
+             })
+           }
+       }
+     });
+   }
+   
+ });
+
+ $(document).on('click', '.editRequest_modal', function (e) {
+   e.preventDefault();
+ 
+   var id = $(this).attr("href");
+   
+   $('.id').val(id);
+      $('#ApproveRequestModal').modal('show');
+      
+ });

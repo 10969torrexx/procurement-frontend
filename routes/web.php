@@ -459,6 +459,10 @@ Route::group(['prefix' => 'budgetofficer','middleware' => ['authuser']], functio
     Route::post('/view_ppmp/showPPMP/ppmp-timeline', 'BudgetOfficer\BudgetOfficerController@timeline')->name('ppmp-timeline');
     Route::post('/view_ppmp/showPPMP/accept-reject-all', 'BudgetOfficer\BudgetOfficerController@accept_reject_all')->name('accept-reject-all');
 
+    Route::get('/pending_ppmp_request','BudgetOfficer\BudgetOfficerController@pending_ppmp_request');
+    Route::post('/pending_ppmp_request/appdis_request','BudgetOfficer\BudgetOfficerController@appdis_request');
+
+
 });
 #End Route for Budget Officer
 
@@ -567,6 +571,10 @@ Route::group(['prefix' => 'bac','middleware' => ['authuser']], function() {
     
 });
 
+
+
+
+
 Route::group(['prefix' => 'supervisor','middleware' => ['authuser']], function() {
     //Supervisor Side
     Route::get('/traditional', 'Supervisor\SupervisorController@Traditional_index');
@@ -665,6 +673,15 @@ Route::group(['prefix' => 'supply_custodian','middleware' => ['authuser']], func
 
 });
 
+Route::group(['prefix' => 'purchase_request','middleware' => ['authuser']], function() {
+
+    Route::get('/signed_pr', 'BAC\SignedPRsController@SignedPRIndex')->name('signed_pr');
+    Route::get('/pending_prs', 'President\PresidentHopeController@PendingPRIndex')->name('pending_prs');
+    Route::get('/pending_prs/view_pending_pr', 'President\PresidentHopeController@view_pending_pr')->name('view_pending_pr');
+    Route::post('/pending_prs/approve_or_disapprove', 'President\PresidentHopeController@approve_or_disapprove')->name('approve_or_disapprove');
+
+});
+
 Route::group(['prefix' => 'PR','middleware' => ['authuser']], function() {
     Route::get('/purchaseRequest', 'Department\PurchaseRequestController@PurchaseRequestIndex')->name('purchaseRequest');
     Route::post('/purchaseRequest/add_Items_To_PR', 'Department\PurchaseRequestController@add_Items_To_PR');
@@ -673,6 +690,7 @@ Route::group(['prefix' => 'PR','middleware' => ['authuser']], function() {
     Route::get('/purchaseRequest/createPR', 'Department\PurchaseRequestController@createPR')->name('createPR');
     Route::post('/purchaseRequest/createPR/remove_item', 'Department\PurchaseRequestController@remove_item')->name('remove_item');
     Route::get('/purchaseRequest/getEmployees', 'Department\PurchaseRequestController@getEmployees');
+    Route::get('/purchaseRequest/getApprovingOfficers', 'Department\PurchaseRequestController@getApprovingOfficers');
     Route::get('/purchaseRequest/getItems', 'Department\PurchaseRequestController@getItems');
     Route::get('/purchaseRequest/getItem', 'Department\PurchaseRequestController@getItem');
     Route::get('/purchaseRequest/editPRItem', 'Department\PurchaseRequestController@editPRItem');
@@ -684,6 +702,19 @@ Route::group(['prefix' => 'PR','middleware' => ['authuser']], function() {
     Route::get('/trackPR/view_pr', 'Department\PurchaseRequestController@view_pr')->name('view_pr');
     Route::post('/trackPR/delete_pr', 'Department\PurchaseRequestController@delete_pr')->name('delete_pr');
     Route::get('/trackPR/edit_pr', 'Department\PurchaseRequestController@editPR')->name('edit_pr');
+
+    Route::get('/signed_pr', 'Department\PurchaseRequestController@SignedPRIndex')->name('signed_pr');
+    Route::post('/signed_pr/upload_signed_pr', 'Department\PurchaseRequestController@upload_signed_pr')->name('upload_signed_pr');
+    Route::get('/signed_pr/edit_signed_pr', 'Department\PurchaseRequestController@edit_signed_pr')->name('edit_signed_pr');
+    Route::post('/signed_pr/update_signed_pr', 'Department\PurchaseRequestController@update_signed_pr')->name('update_signed_pr');
+    Route::post('/signed_pr/delete_signed_pr', 'Department\PurchaseRequestController@delete_signed_pr')->name('delete_signed_pr');
+    Route::post('/signed_pr/view_signed_pr', 'Department\PurchaseRequestController@view_signed_pr')->name('view_signed_pr');
+    Route::get('/signed_pr/download_signed_pr', 'Department\PurchaseRequestController@download_signed_pr')->name('download_signed_pr');
+
+    Route::get('/routing_slip', 'Department\PurchaseRequestController@RoutingSlipIndex')->name('routing_slip');
+    Route::get('/routing_slip/pr_routing_slip', 'Department\PurchaseRequestController@pr_routing_slip')->name('pr_routing_slip');
+    Route::post('/routing_slip/pr_routing_slip/saveChanges', 'Department\PurchaseRequestController@saveChanges')->name('saveChanges');
+    Route::get('/routing_slip/pr_routing_slip/getData', 'Department\PurchaseRequestController@getData')->name('getData');
 
     
 });
