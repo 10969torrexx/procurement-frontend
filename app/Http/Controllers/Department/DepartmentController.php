@@ -956,7 +956,8 @@ class DepartmentController extends Controller
             ->where('id', (new AESCipher)->decrypt($request->id))
             ->whereNull('deleted_at')
             ->get([
-                'signed_ppmp'
+                'signed_ppmp',
+                'file_directory'
             ]);
             # this will created history_log
                 (new HistoryLogController)->store(
@@ -969,9 +970,9 @@ class DepartmentController extends Controller
                     $request->ip(),
                 );
             # end
-            return \Storage::download('storage/department_upload/signed_ppmp/'.$response[0]->signed_ppmp);
+            return \Storage::download('storage/'.$response[0]->file_directory);
         } catch (\Throwable $th) {
-            throw $th;
+            // throw $th;
             return view('pages.error-500');
         }
     }
