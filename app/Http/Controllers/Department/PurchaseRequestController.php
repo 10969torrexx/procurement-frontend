@@ -1499,6 +1499,7 @@ class PurchaseRequestController extends Controller
 
       $checkActivity = DB::table('routing_slip')
                         ->where('activity',$activityNumber)
+                        ->where('pr_no',$pr_no)
                         ->where('campus',$campus)
                         ->whereNull('deleted_at')
                         ->count();
@@ -1523,39 +1524,43 @@ class PurchaseRequestController extends Controller
           'Updated Purchase Status',
           'Update',
           $request->ip(),
-      );
+        );
         return response()->json([
           'status' => 200,
           'message' => 'Updated Successfully!'
         ]);
+
+      }else{
+        $response = DB::table('routing_slip')
+        ->insert([
+          'pr_no' => $pr_no,
+          'employee_id' => $employee_id,
+          'role' => $role,
+          'campus' => $campus,
+          'activity' => $activityNumber,
+          'date_received' => $date_received.' '.$time_received,
+          'date_released' => $date_released.' '.$time_released,
+          'remark' => $remark,
+          'created_at' => Carbon::now(),
+        ]);
+
+            (new HistoryLogController)->store(
+              session('department_id'),
+              session('employee_id'),
+              session('campus'),
+              null,
+              'Saved Purchase Status',
+              'Save',
+              $request->ip(),
+            );
+
+        return response()->json([
+          'status' => 200,
+          'message' => 'Saved Successfully!'
+        ]);
+
       }
-      $response = DB::table('routing_slip')
-          ->insert([
-            'pr_no' => $pr_no,
-            'employee_id' => $employee_id,
-            'role' => $role,
-            'campus' => $campus,
-            'activity' => $activityNumber,
-            'date_received' => $date_received.' '.$time_received,
-            'date_released' => $date_released.' '.$time_released,
-            'remark' => $remark,
-            'created_at' => Carbon::now(),
-          ]);
-
-          (new HistoryLogController)->store(
-            session('department_id'),
-            session('employee_id'),
-            session('campus'),
-            null,
-            'Saved Purchase Status',
-            'Save',
-            $request->ip(),
-        );
-          return response()->json([
-            'status' => 200,
-            'message' => 'Saved Successfully!'
-          ]);
-
+      
     } catch (\Throwable $th) {
       throw $th;
     }
@@ -1795,17 +1800,20 @@ class PurchaseRequestController extends Controller
               ->get();
               // dd($itemsForPR);
 
-              (new HistoryLogController)->store(
-                session('department_id'),
-                session('employee_id'),
-                session('campus'),
-                null,
-                'Printed Purchase Request with PR No '.$pr_no,
-                'Print',
-                $request->ip(),
-            );
+    // $itemCount = 150;
+    $itemCount = count($itemsForPR);
 
-    return view('pages.department.print_pr',compact('purchase_request','itemsForPR','date','id'), [
+            //   (new HistoryLogController)->store(
+            //     session('department_id'),
+            //     session('employee_id'),
+            //     session('campus'),
+            //     null,
+            //     'Printed Purchase Request with PR No '.$pr_no,
+            //     'Print',
+            //     $request->ip(),
+            // );
+
+    return view('pages.department.print_pr',compact('purchase_request','itemsForPR','itemCount','date','id'), [
                 // 'pageConfigs'=>$pageConfigs,
                 // 'breadcrumbs'=>$breadcrumbs,
                 // 'error' => $error,

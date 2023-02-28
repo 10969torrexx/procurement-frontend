@@ -625,7 +625,7 @@ $(document).on('click', '.print', function (e) {
             style.media = 'print';
 
             if (style.styleSheet){
-            style.styleSheet.cssText = css;
+            style.styleSheet.cssText = css;  
             } else {
             style.appendChild(document.createTextNode(css));
             }

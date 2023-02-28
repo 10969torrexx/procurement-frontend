@@ -571,7 +571,19 @@ class PresidentHopeController extends Controller
 
     // dd(session('name'));
 
-    $response = DB::table("purchase_request as pr")
+    if(session('role')==1 || session('role') == null){
+      $response = DB::table("purchase_request as pr")
+      ->select('pr.*','u.name','d.department_name')
+      ->join('users as u','pr.printed_name','u.id')
+      ->join('departments as d','pr.department_id','d.id')
+      ->join('pr_signatories as prs','pr.approving_officer','prs.id')
+      ->where("pr.status", '!=', 0)
+      ->where("pr.campus", session('campus'))
+      ->whereNull("pr.deleted_at")
+      ->orderBy('pr.status')
+      ->get();
+    }else{
+      $response = DB::table("purchase_request as pr")
           ->select('pr.*','u.name','d.department_name')
           ->join('users as u','pr.printed_name','u.id')
           ->join('departments as d','pr.department_id','d.id')
@@ -582,6 +594,8 @@ class PresidentHopeController extends Controller
           ->whereNull("pr.deleted_at")
           ->orderBy('pr.status')
           ->get();
+    }
+    
           // dd($response);
 
         return view('pages.PRApprovingOfficer.pending-pr-index',compact('response'), [
@@ -599,15 +613,13 @@ class PresidentHopeController extends Controller
       ["name" => "View PR"]
     ];
     $pr_no = (new AESCipher())->decrypt($request->pr_no);
-    $hope = DB::table('users')
-              ->where('role',12)
-              ->where('campus',session('campus'))
-              ->get();
+   
     $purchase_request = DB::table("purchase_request as pr")
-                          ->select("pr.*","fs.fund_source","d.department_name","u.name")
+                          ->select("pr.*","fs.fund_source","d.department_name","u.name","ps.name as ao_name","ps.designation as ao_designation","ps.title as ao_title")
                           ->join("fund_sources as fs","pr.fund_source_id","fs.id")
                           ->join("departments as d","pr.department_id","d.id")
                           ->join("users as u","pr.printed_name","u.id")
+                          ->join("pr_signatories as ps","pr.approving_officer","ps.id")
                           ->where("pr.campus",session('campus'))
                           ->where("pr.pr_no",$pr_no)
                           ->whereNull('pr.deleted_at')
@@ -635,7 +647,7 @@ class PresidentHopeController extends Controller
               );
           
 
-    return view('pages.PRApprovingOfficer.view_pr_page',compact('hope','purchase_request','itemsForPR'), [
+    return view('pages.PRApprovingOfficer.view_pr_page',compact('purchase_request','itemsForPR'), [
                 'pageConfigs'=>$pageConfigs,
                 'breadcrumbs'=>$breadcrumbs,
             ]); 
