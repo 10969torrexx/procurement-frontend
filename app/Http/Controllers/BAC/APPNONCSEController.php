@@ -13,9 +13,11 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\GlobalDeclare;
+use App\Http\Controllers\HistoryLogController;
 use Pdf;
 use Carbon\Carbon;
-use App\Http\Controllers\HistoryLogController;
+use Validator;
 
 class APPNONCSEController extends Controller
 {
@@ -46,10 +48,10 @@ class APPNONCSEController extends Controller
     $Categories = DB::table("ppmps as p")
         ->join("project_titles as pt", "p.project_code", "=", "pt.id")
         ->whereNull("p.deleted_at")
+        ->whereNull("pt.deleted_at")
         ->where("pt.project_year","=",$val)
         ->where("p.app_type", 'Non-CSE')
         ->where("pt.project_category", "=", 1)
-        // ->where("pt.project_category", "=", 1)
         ->where("p.status", "=", 4)
         ->where("pt.status", "=", 4)
         ->where("p.campus", session('campus'))
@@ -57,6 +59,7 @@ class APPNONCSEController extends Controller
         ->groupBy("p.item_category")
         ->orderBy("p.campus","ASC")
         ->get();
+        // dd($Categories);
 
     $ppmps = DB::table("ppmps as p")
           ->select("pt.project_title", "d.department_name", "p.*", "pt.fund_source","pt.project_code as ProjectCode","ab.allocated_budget","ab.remaining_balance","fs.fund_source","m.mode_of_procurement as procurementName")
@@ -469,7 +472,7 @@ class APPNONCSEController extends Controller
           ->where("p.status", "=", 4)
           ->where("pt.status", "=", 4)
           ->where("pt.project_year",$val)
-          ->where("pt.campus",session('campus'))
+          // ->where("pt.campus",session('campus'))
           ->groupBy("pt.campus")
           ->get();
 
@@ -579,7 +582,7 @@ class APPNONCSEController extends Controller
   }
 
   public function submit_to_president(Request $request){
-    dd($request->all());
+    // dd($request->all());
 
       $check = DB::table("signatories_app_non_cse")
           ->where("Year",$request->year)
@@ -609,8 +612,9 @@ class APPNONCSEController extends Controller
       $done = DB::table("signatories_app_non_cse")
           ->where("Year","=",$request->year)
           ->where("users_id",'=',session('user_id'))
+          ->where("campus", session('campus'))
           ->update([
-            'status' => $request->value,
+            'status' => $request->submit,
             'pres_created_at' => Carbon::now()
           ]);
             
@@ -621,7 +625,7 @@ class APPNONCSEController extends Controller
                   session('campus'),
                   NULL,
                   'Submit to Pres APP NON-CSE , '.'Category: '.$request->category.', Year: '.$request->year,
-                  'Submit/Not:'.$request->value,
+                  'Submit/Not:'.$request->submit,
                   $request->ip(),
               );
           # end
@@ -630,7 +634,7 @@ class APPNONCSEController extends Controller
             return response()->json([
               'status' => 200, 
               // 'data' => $supplier,
-          ]); 
+            ]);
           }else{
             return response()->json([
               'status' => 400, 
@@ -1881,4 +1885,325 @@ class APPNONCSEController extends Controller
         throw $th;
     }
   }
+
+  public function signed_app_non_cse_index(Request $request){
+    try {
+      $response = DB::table('signed_app')
+                    ->whereNull('deleted_at')
+                    ->get();
+
+      return view('pages.bac.generate-app-non-cse.upload-signed-app', compact('response'));
+    } catch (\Throwable $th) {
+      throw $th;
+    }
+  }
+
+  /* Upload Signed PPMP
+  * - Creating files for Signed PPMP 
+  * - Downloadable PPMP
+  */
+  public function upload_app(Request $request) {
+      try {
+          $validate = Validator::make($request->all(), [
+              'project_category'  => ['required'],
+              'year_created'  =>  ['required'],
+              'file_name' => ['required'],
+              'signed_app'   => ['required', 'mimes:pdf, jpeg, jpg, png', 'max:2048']
+          ]);
+          if($request->hasFile('signed_app')) {
+              $file = $request->file('signed_app');
+              $extension = $request->file('signed_app')->getClientOriginalExtension();
+            
+              $is_valid = false;
+              # validate extension
+                  $allowed_extensions = ['pdf', 'jpeg', 'jpg', 'png'];
+                  for ($i = 0; $i < count($allowed_extensions) ; $i++) { 
+                    if($allowed_extensions[$i] == $extension) {
+                          $is_valid = true;
+                    }
+                  }
+                  if($is_valid == false) {
+                      return back()->with([
+                          'error' => 'Invalid file format!'
+                      ]);
+                  }
+              # end
+              # moving of the actual file
+                  $file_name = (new GlobalDeclare)->project_category((new AESCipher)->decrypt($request->project_category)) .'-'. time();
+                  $destination_path = env('APP_NAME').'\\bac_sec_upload\\signed_app\\';
+                  if (!\Storage::exists($destination_path)) {
+                      \Storage::makeDirectory($destination_path);
+                  }
+                  $file->storeAs($destination_path, $file_name.'.'.$extension);
+                  $file->move('storage/'. $destination_path, $file_name.'.'.$extension);
+              # end
+              # storing data to signed_app table
+                  \DB::table('signed_app')
+                  ->insert([
+                      'employee_id'   => session('employee_id'),
+                      'department_id'   => session('department_id'),
+                      'campus'   => session('campus'),
+                      'year_created'   => (new AESCipher)->decrypt($request->year_created),
+                      'project_category'  => (new AESCipher)->decrypt($request->project_category),
+                      'file_name'   => $request->file_name,
+                      'file_directory'    => $destination_path .''. $file_name.'.'.$extension,
+                      'signed_app' =>  $file_name.'.'.$extension,
+                      'created_at'    => Carbon::now(),
+                      'updated_at'    => Carbon::now()
+                  ]);
+              # this will created history_log
+                  (new HistoryLogController)->store(
+                      session('department_id'),
+                      session('employee_id'),
+                      session('campus'),
+                      null,
+                      'Uploaded sigend ppmp',
+                      'upload',
+                      $request->ip(),
+                  );
+              # end
+              return back()->with([
+                  'success' => 'APP uploaded successfully!'
+              ]);
+          } else {
+              return back()->with([
+                  'error' => 'Please fill the form accordingly!'
+              ]);
+          }
+      } catch (\Throwable $th) {
+          throw $th;
+          return view('pages.error-500');
+      }
+  }
+
+  /* Download Uplooded PPMP
+  * - this will enable downlaod uploade PPMP
+  * - based on: Employee id, campus, department_id
+  * - get file from storage upload id search
+  */
+  public function download_uploaded_app(Request $request) {
+      try {
+          $response = \DB::table('signed_app')
+          ->where('employee_id', session('employee_id'))
+          ->where('department_id', session('department_id'))
+          ->where('campus', session('campus'))
+          ->where('id', (new AESCipher)->decrypt($request->id))
+          ->whereNull('deleted_at')
+          ->get([
+              'signed_app'
+          ]);
+          # this will created history_log
+              (new HistoryLogController)->store(
+                  session('department_id'),
+                  session('employee_id'),
+                  session('campus'),
+                  null,
+                  'Downloaded sigend ppmp',
+                  'Download',
+                  $request->ip(),
+              );
+          # end
+          return \Storage::download(env('APP_NAME').'\\bac_sec_upload\\signed_app\\'.$response[0]->signed_app);
+      } catch (\Throwable $th) {
+          throw $th;
+          return view('pages.error-500');
+      }
+  }
+
+  /* Delete Uploaded Signed PPMP
+  * - this will delete the uploaded PPMP
+  * - based on: Employee id, campus, department_id
+  */
+  public function delete_uploaded_app(Request $request) {
+      try {
+          $response = \DB::table('signed_app')
+          ->where('employee_id', session('employee_id'))
+          ->where('department_id', session('department_id'))
+          ->where('campus', session('campus'))
+          ->where('id', (new AESCipher)->decrypt($request->id))
+          ->whereNull('deleted_at')
+          ->update([
+              'updated_at'    => Carbon::now(),
+              'deleted_at'    => Carbon::now()
+          ]);
+          # this will created history_log
+              (new HistoryLogController)->store(
+                  session('department_id'),
+                  session('employee_id'),
+                  session('campus'),
+                  (new AESCipher)->decrypt($request->id),
+                  'Deleted sigend ppmp',
+                  'Delete',
+                  $request->ip(),
+              );
+          # end
+          return back()->with([
+              'success'   => 'Uploaded PPMP successfully deleted!'
+          ]);
+      } catch (\Throwable $th) {
+          return view('pages.error-500');
+          // throw $th;
+      }
+  }
+
+  /* View uploaded PPMP
+  * - this will allow preview of the uploaded PPMP
+  */
+  public function view_uploaded_app(Request $request) {
+      try {
+          $response = \DB::table('signed_app')
+              ->where('employee_id', session('employee_id'))
+              ->where('department_id', session('department_id'))
+              ->where('campus', session('campus'))
+              ->where('id', (new AESCipher)->decrypt($request->id))
+              ->whereNull('deleted_at')
+              ->get([
+                  'file_directory',
+                  'signed_app'
+              ]);
+          # this will created history_log
+              (new HistoryLogController)->store(
+                  session('department_id'),
+                  session('employee_id'),
+                  session('campus'),
+                  (new AESCipher)->decrypt($request->id),
+                  'Viewed sigend ppmp',
+                  'View',
+                  $request->ip(),
+              );
+          # end
+          return response ([
+              'status'    => 200,
+              'data'  => $response
+          ]);
+      } catch (\Throwable $th) {
+          return view('pages.error-500');
+          throw $th;
+      }
+  }
+
+  /* GET Edit Uploaded PPMP
+  * - get uploaded ppmp for edit feature
+  */
+  public function get_edit_app(Request $request) {
+      try {
+          $response = \DB::table('signed_app')
+              ->where('employee_id', session('employee_id'))
+              ->where('department_id', session('department_id'))
+              ->where('campus', session('campus'))
+              ->where('id', (new AESCipher)->decrypt($request->id))
+              ->whereNull('deleted_at')
+              ->get();
+
+          return ([
+              'status'    => 200,
+              'data'  => $response,
+          ]);
+        
+      } catch (\Throwable $th) {
+          return view('pages.error-500');
+          throw $th;
+      }
+  }
+
+  /* GET Edit Uploaded PPMP
+  * - edit / update uploaded ppmp
+  * ! wadwadaw
+  * ? awdawdaw
+  */
+  public function edit_uploaded_app(Request $request) {
+      try {
+        // dd($request->year_created);
+          $validate = Validator::make($request->all(), [
+              'project_category'  => ['required'],
+              'year_created'  =>  ['required'],
+              'file_name' => ['required'],
+              'signed_app'   => ['required', 'mimes:pdf, jpeg, jpg, png', 'max:2048']
+          ]);
+          if($request->hasFile('signed_app')) {
+              $file = $request->file('signed_app');
+              $extension = $request->file('signed_app')->getClientOriginalExtension();
+              $is_valid = false;
+              # validate extension
+                  $allowed_extensions = ['pdf', 'jpeg', 'jpg', 'png'];
+                  for ($i = 0; $i < count($allowed_extensions) ; $i++) { 
+                    if($allowed_extensions[$i] == $extension) {
+                          $is_valid = true;
+                    }
+                  }
+                  if($is_valid == false) {
+                      return back()->with([
+                          'error' => 'Invalid file format!'
+                      ]);
+                  }
+              # end
+              $file_name = (new GlobalDeclare)->project_category((new AESCipher)->decrypt($request->project_category)) .'-'. time();
+              $destination_path = env('APP_NAME').'\\bac_sec_upload\\signed_app\\';
+              if (!\Storage::exists($destination_path)) {
+                  \Storage::makeDirectory($destination_path);
+              }
+              $file->storeAs($destination_path, $file_name.'.'.$extension);
+              // \Storage::put($destination_path, $file_name.'.'.$extension);
+              $file->move('storage/'. $destination_path, $file_name.'.'.$extension);
+              # storing data to signed_app table
+                  \DB::table('signed_app')
+                  ->where('id', $request->id)
+                  ->update([
+                      'year_created'   => $request->year_created,
+                      'project_category'  => (new AESCipher)->decrypt($request->project_category),
+                      'file_name'   => $request->file_name,
+                      'file_directory'    => $destination_path .''. $file_name.'.'.$extension,
+                      'signed_app' =>  $file_name.'.'.$extension,
+                      'updated_at'    => Carbon::now()
+                  ]);
+              # this will created history_log
+                  (new HistoryLogController)->store(
+                      session('department_id'),
+                      session('employee_id'),
+                      session('campus'),
+                      null,
+                      'Viewed sigend ppmp',
+                      'View',
+                      $request->ip(),
+                  );
+              # end
+              return back()->with([
+                  'success' => 'APP uploaded successfully!'
+              ]);
+          } else {
+              return back()->with([
+                  'error' => 'Please fill the form accordingly!'
+              ]);
+          }
+      } catch (\Throwable $th) {
+          // throw $th;
+          return view('pages.error-500');
+      }
+  }
+
+  # upload ppmp | signed ppmp
+      public function get_upload_app(Request $request) {
+          try {
+              $this->validate($request, [
+                  'project_category'  => ['required'],
+                  'year_created'  =>  ['required'],
+                  'file_name' => ['required'],
+              ]);
+              # get uplpaded ppmp
+              $response = \DB::table('signed_app')
+                  ->where('employee_id', session('employee_id'))
+                  ->where('department_id', session('department_id'))
+                  ->where('campus', session('campus'))
+                  ->where('project_category', (new AESCipher)->decrypt($request->project_category))
+                  ->where('year_created', (new AESCipher)->decrypt($request->year_created))
+                  ->where('file_name', 'like', '%'. $request->file_name .'%')
+                  ->whereNull('deleted_at')
+                  ->get();
+              # return page
+              return view('pages.bac.generate-app-non-cse.upload-signed-app', compact('response'));
+          } catch (\Throwable $th) {
+              throw $th;
+              return view('pages.error-500');
+          }
+      }
 }

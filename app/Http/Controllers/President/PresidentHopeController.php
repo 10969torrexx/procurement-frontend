@@ -163,7 +163,7 @@ class PresidentHopeController extends Controller
           ->get();
 
       $campusCheck = DB::table("project_titles as pt")
-          ->select("pt.campus","pt.endorse","pt.project_category","pt.project_year","p.app_type")
+          ->select("pt.*","p.app_type")
           ->join("ppmps as p", "p.project_code", "=", "pt.id")
           ->whereNull("pt.deleted_at")
           ->where("p.app_type", 'Non-CSE')
