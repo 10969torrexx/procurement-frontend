@@ -873,7 +873,7 @@ class DepartmentController extends Controller
                 'project_category'  => ['required'],
                 'year_created'  =>  ['required'],
                 'file_name' => ['required'],
-                'signed_ppmp'   => ['required', 'mimes:pdf, jpeg, jpg, png', 'max:2048']
+                'signed_ppmp'   => ['required', 'mimes:pdf', 'max:2048']
             ]);
             if($request->hasFile('signed_ppmp')) {
                 $file = $request->file('signed_ppmp');
@@ -881,7 +881,8 @@ class DepartmentController extends Controller
                
                 $is_valid = false;
                 # validate extension
-                    $allowed_extensions = ['pdf', 'jpeg', 'jpg', 'png'];
+                    $allowed_extensions = ['pdf'];
+                    // $allowed_extensions = ['pdf', 'jpeg', 'jpg', 'png'];
                     for ($i = 0; $i < count($allowed_extensions) ; $i++) { 
                        if($allowed_extensions[$i] == $extension) {
                             $is_valid = true;
@@ -950,15 +951,15 @@ class DepartmentController extends Controller
     public function download_uploaded_PPMP(Request $request) {
         try {
             $response = \DB::table('signed_ppmp')
-            ->where('employee_id', session('employee_id'))
-            ->where('department_id', session('department_id'))
-            ->where('campus', session('campus'))
-            ->where('id', (new AESCipher)->decrypt($request->id))
-            ->whereNull('deleted_at')
-            ->get([
-                'signed_ppmp',
-                'file_directory'
-            ]);
+                ->where('employee_id', session('employee_id'))
+                ->where('department_id', session('department_id'))
+                ->where('campus', session('campus'))
+                ->where('id', (new AESCipher)->decrypt($request->id))
+                ->whereNull('deleted_at')
+                ->get([
+                    'signed_ppmp',
+                    'file_directory'
+                ]);
             # this will created history_log
                 (new HistoryLogController)->store(
                     session('department_id'),
@@ -970,13 +971,13 @@ class DepartmentController extends Controller
                     $request->ip(),
                 );
             # end
-            return \Storage::download('storage/'.$response[0]->file_directory);
+            // return \Storage::download('storage\\'.$response[0]->file_directory);
+            return response()->download('storage\\'.$response[0]->file_directory, $response[0]->signed_ppmp);
         } catch (\Throwable $th) {
-            // throw $th;
+            throw $th;
             return view('pages.error-500');
         }
     }
-
     /* Delete Uploaded Signed PPMP
      * - this will delete the uploaded PPMP
      * - based on: Employee id, campus, department_id
