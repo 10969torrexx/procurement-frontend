@@ -23,6 +23,9 @@ use App\Http\Controllers\BAC\UnitofMeasurementController;
         use App\Http\Controllers\BOR_Secretary\BOR_SecretaryPagesController;
         use App\Http\Controllers\BOR_Secretary\BOR_SecretaryController;
     // ! END
+    // ! BAC Commitee imports
+        use App\Http\Controllers\BACCommittee\BACCommitteeController;
+    // ! END
     
 /*
 |--------------------------------------------------------------------------
@@ -842,10 +845,10 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
     /** END | TORREXX */
 });
 
-/**
- * * TORREXX additionals
- * 
- */
+    /**
+     * * TORREXX additionals
+     * TODO: Enable request to submit PPMP Submission
+     */
     Route::group(['prefix' => 'request-ppmp-submission', 'middleware' => ['authuser']], function() {
          // *TODO: request to submit PPMP Submission
             // * ppmp submission | request for PPMP Submission
@@ -861,7 +864,14 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
             // * get pending requests
                 Route::post('get-pending-request', [DepartmentController::class, 'get_pending_request'])->name('get_pending_request');
     });
-
+    /**
+     * * TORREXX additionals
+     * TODO: Enable Generate request for qoutation form & notice (RFQ)
+     */
+    Route::group(['prefix' => 'generate-rfq', 'middleware' => ['authuser']], function () {
+        //* show generate rfq page
+            Route::get('generate-rfq', [BACCommitteeController::class, 'show_generate_rfq'])->name('show_generate_rfq');
+    });
 /** TORREXX Additionals
  * ! BOR Secretary
  * ? this will show routes under BOR Secretary

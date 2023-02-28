@@ -555,6 +555,25 @@ class GlobalDeclare extends Controller
         return $out;
     }
 
+
+    /**
+     * * TORREXX additionals
+     * TODO 1: Get the department
+     */
+    public function get_department($in) {
+        try {
+            $department = \DB::table('departments')
+                ->where('id', $in)
+                ->whereNull('deleted_at')
+                ->get([
+                    'department_name',
+                    'description'
+                ]);
+            return $department;
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+
     # this will determine the statuses of the ppmp, Project title
     public function ppmp_status($id) {
         $out = '';
