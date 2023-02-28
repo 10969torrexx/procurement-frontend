@@ -8,6 +8,7 @@ use App\Supplier;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AESCipher;
 use App\Http\Controllers\GlobalDeclare;
+use App\Http\Controllers\HistoryLogController;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -28,8 +29,7 @@ class SupplierController extends Controller
         $this->global = new GlobalDeclare();
     }
     
-    public function index()
-    {
+    public function index(){
 
         // $suppliers = Supplier::all();
         $suppliers = DB::table("store")
@@ -62,6 +62,18 @@ class SupplierController extends Controller
                             'created_at' => Carbon::now(),
                             'updated_at' => Carbon::now(),
                         ]);
+
+                        # this will created history_log
+                            (new HistoryLogController)->store(
+                                session('department_id'),
+                                session('employee_id'),
+                                session('campus'),
+                                NULL,
+                                'Add Supplier.',
+                                'Add',
+                                $request->ip(),
+                                );
+                        # end 
 
             if($supplier){
                 return response()->json([
@@ -141,6 +153,18 @@ class SupplierController extends Controller
                                 'Description' => $request->Description,
                                 'update_at' => Carbon::now(),
                             ]);
+
+                            # this will created history_log
+                                (new HistoryLogController)->store(
+                                    session('department_id'),
+                                    session('employee_id'),
+                                    session('campus'),
+                                    $request->id,
+                                    'Edit Supplier.',
+                                    'Edit',
+                                    $request->ip(),
+                                    );
+                            # end 
                     return response()->json([
                         'status' => 200, 
                         // 'data' => $supplier,
@@ -156,6 +180,18 @@ class SupplierController extends Controller
                                 'Description' => $request->Description,
                                 'update_at' => Carbon::now(),
                             ]);
+
+                            # this will created history_log
+                                (new HistoryLogController)->store(
+                                    session('department_id'),
+                                    session('employee_id'),
+                                    session('campus'),
+                                    $request->id,
+                                    'Edit Supplier.',
+                                    'Edit',
+                                    $request->ip(),
+                                    );
+                            # end 
                     return response()->json([
                         'status' => 200, 
                         // 'data' => $supplier,
@@ -188,6 +224,18 @@ class SupplierController extends Controller
                         ->where("id",$aes->decrypt($request->id))
                         ->update(['deleted_at' => Carbon::now()]);
 
+            # this will created history_log
+                (new HistoryLogController)->store(
+                    session('department_id'),
+                    session('employee_id'),
+                    session('campus'),
+                    $aes->decrypt($request->id),
+                    'Delete Supplier.',
+                    'Delete',
+                    $request->ip(),
+                    );
+            # end 
+
             if($supplier){
                 return response()->json([
                     'status' => 200, 
@@ -208,6 +256,4 @@ class SupplierController extends Controller
             ]);
         }
     }
-
-
 }

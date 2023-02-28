@@ -6,7 +6,6 @@
     $aes = new AESCipher();
     $immediate_supervisor = '';
     $current_year = Carbon::now();
-    // dd((new AESCipher)->decrypt($project_type));
 @endphp
 @extends('layouts.contentLayoutMaster')
 {{-- title --}}
@@ -31,7 +30,6 @@
     #t-table{
         width: 100%;
     }
-
     .tbg-secondary {
         background-color: rgba(71, 95, 123, 0.9) !important;
     }
@@ -41,15 +39,11 @@
     <div class="row">
         <div class="col-12">
             <div class="card">
-                <ul class="nav nav-tabs m-1" role="tablist">
-                    {{-- 1st Tab | Create PPMP --}}
-                    <li class="nav-item">
-                        <a class="nav-link active" id="create-ppmp-tab" data-toggle="tab" href="#create-ppmp" aria-controls="regular" role="tab" aria-selected="true">
-                            <i class="fa-solid fa-cart-plus"></i>
-                            Create PPMP
-                        </a>
-                    </li>
-                </ul>
+                <div class="card-header p-1">
+                    <h5 class="card-title">
+                      <strong>Create {{ (new GlobalDeclare)->project_category( (new AESCipher)->decrypt($project_category) ) }}</strong>
+                    </h5>
+                </div>
                     {{-- edit project title modal --}}
                         <div class="modal fade" id="viewmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                             <div class="modal-dialog modal-lg modal-dialog" role="document">
@@ -163,71 +157,41 @@
                                 @else
                                    <div class="container">
                                         <div class="alert alert-danger alert-dismissible fade show col-12" role="alert">
-                                            <strong>Failed!</strong> No allocated budget. Please contact campus budget officer!
+                                            <strong>Issue!</strong> No allocated budget for this type of PPMP. Please contact campust budget officer!
                                         </div>
                                    </div>
                                 @endif
                             </div>
 
-                            <div class="row justify-content-center form-group">
-                                <div class="container">
-                                    {{-- Displaying Error Messages --}}
-                                        {{-- displaying error message for appended element with null values --}}
-                                            @if($nullValues = Session::get('nullValues'))
-                                                <div class="alert alert-damger alert-dismissible fade show" role="alert">
-                                                    <strong>Failed!</strong> Please fill all the required fields
-                                                    <p>
-                                                        @foreach ($nullValues as $error)
-                                                            {{ $error  }}
-                                                        @endforeach
-                                                    </p>
-                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                            @endif
-                                        {{-- displaying error message for laravel form validation --}}
-                                            @if($errors->all())
-                                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                                    <strong>Failed!</strong> Please fill all the required fields
-                                                    <p>
-                                                        @foreach ($errors->all() as $error)
-                                                            <div>{{ $error }}</div>
-                                                        @endforeach
-                                                    </p>
-                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                            @endif
-                                            @if($message = Session::get('error'))
-                                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                                    <strong>Failed!</strong> 
-                                                    <p>
-                                                        {{ $message }}
-                                                    </p>
-                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                            @endif
-                                        {{-- Displaying Success Message --}}
-                                        {{-- this will display success message if ppmp was successfully created --}}
-                                            @if($message = Session::get('success'))
-                                                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                                    <strong>Success!</strong> 
-                                                    <p>
-                                                        {{ $message }}
-                                                    </p>
-                                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                            @endif
-                                        {{-- Displaying Success Message --}}
-                                    {{-- Displaying Error Messages --}}
-                                </div>
-                            </div>
+                            {{-- message and errors --}}
+                                @if(Session::has('success'))
+                                    <script>
+                                        Swal.fire({
+                                            title: 'Success',
+                                            icon: 'success',
+                                            html: "{{ Session::get('success') }}",
+                                        });
+                                    </script>
+                                @endif
+                                @if($errors->all())
+                                    <script>
+                                        Swal.fire({
+                                            title: 'Error',
+                                            icon: 'error',
+                                            html: "Please make sure fields are well accounted for!",
+                                        });
+                                    </script>
+                                @endif
+                                @if(Session::has('failed'))
+                                    <script>
+                                        Swal.fire({
+                                            title: 'Error',
+                                            icon: 'error',
+                                            html: "{{ Session::get('failed') }}",
+                                        });
+                                    </script>
+                                @endif
+                            {{-- message and errors --}}
 
                             {{-- creating data tables for the list of project titles --}}
                                 <div class="table-responsive col-12 col-md-12 col-sm-12 container">
@@ -243,6 +207,7 @@
                                                 <th id="t-td">Immediate SUPERVISOR</th>
                                                 <th id="t-td">Project Type</th>
                                                 <th id="t-td">Fund Source</th>
+                                                <th id="t-td" class="text-nowrap">Total Estimated Price</th>
                                                 <th id="t-td">Deadline</th>
                                                 <th id="t-td">Date Added</th>
                                                 <th id="t-td">Action</th>
@@ -253,7 +218,7 @@
                                             {{-- showing ppmp data based on department and user --}}
                                                 @foreach ($project_titles as $item)
                                                     <tr>
-                                                        <td id="t-td"><input type="checkbox" name="" class="project-checkbox" value="{{ $item->id }}" data-status="{{ $item->status }}"></td>
+                                                        <td id="t-td"><input type="checkbox" name="" class="project-checkbox" value="{{ $item->id }}" data-status="{{ $item->status }}" data-allocated_budget="{{ $item->allocated_budget }}" data-procurement_type="{{ $item->project_category }}"></td>
                                                         <td id="t-td">{{ $loop->iteration }}</td>
                                                         <td id="t-td">{{ $item->project_title }}</td>
                                                         <td id="t-td">{{ $item->project_year }}</td>
@@ -261,7 +226,14 @@
                                                         <td id="t-td">{{ $item->immediate_supervisor }}</td>
                                                         <td id="t-td">{{ $item->project_type }}</td>
                                                         <td id="t-td">{{ $item->fund_source }}</td>
-                                                        <td id="t-td">{{ explode('-', date('j F, Y-', strtotime($item->deadline_of_submission)))[0]  }}</td>
+                                                        <td id="t-td">₱ {{ number_format($total_estimated_price[ ($loop->iteration - 1) ],2,'.',',') }}</td>
+                                                        {{-- checking deadline of submmission --}}
+                                                            @if ($item->deadline_of_submission == null)
+                                                                <td id="t-td">{{ explode('-', date('j F, Y-', strtotime($item->end_date)))[0]  }}</td>
+                                                            @else
+                                                                <td id="t-td">{{ explode('-', date('j F, Y-', strtotime($item->deadline_of_submission)))[0]  }}</td>
+                                                            @endif
+                                                        {{-- end --}}
                                                         <td id="t-td">{{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0]  }}</td>
                                                         <td id="t-td">
                                                             <div class="dropdown">
@@ -281,7 +253,7 @@
                                                                         </a>
                                                                     {{-- END --}}
                                                                     {{-- add item form --}}
-                                                                        <a href = "{{ route('department-addItem', ['id' => $aes->encrypt($item->id), 'allocated_budget' => $aes->encrypt($item->allocated_budget) ]) }}" class="dropdown-item">
+                                                                        <a href = "{{ route('department-addItem', ['id' => $aes->encrypt($item->id), 'allocated_budget' => $aes->encrypt($item->allocated_budget), 'procurement_type' => $project_category ]) }}" class="dropdown-item">
                                                                             <i class="fa-regular fa-plus mr-1"></i>Add Item
                                                                         </a>
                                                                     {{-- end add item form --}}
@@ -322,44 +294,48 @@
     <script src="{{asset('vendors/js/extensions/polyfill.min.js')}}"></script> --}}
 {{-- Torrexx | Code not mine --}}
 <script>
-    $(document).on('click', '#edit-title-btn', function(e) {
-       e.preventDefault();
-       $('#viewmodal').modal('show');
-        $.ajax({
-            headers: {
-                'X-CSRF-TOKEN': $("meta[name='csrf-token']").attr('content')
-            },
-            url: "{{ route('department-get-project') }}",
-            method: 'GET',
-            data: {
-                'id' : $(this).attr('data-id')
-            }, success: function(response) { 
-                // console.log(response[0]['id']);
-                console.log(response);
-                $('#project-id').val(response[0]['id']);
-                $('#modal-header').text('Edit - ' + response[0][['project_title']]);
-                $('#project-title').val(response[0]['project_title']);
-                $('#default-project-type').val(response[0]['project_type']);
-                $('#default-project-type').text(response[0]['project_type']);
-                $('#default-year').val(response[0]['project_year']);
-                $('#default-year').text(response[0]['project_year']);
-                $('#default-fund-source').val(response[0]['allocated_budget']+'**'+response[0]['fund_source_id']);
-                $('#default-fund-source').text(response[0]['fund_source']);
-            } 
+    // edit title btn
+        $(document).on('click', '#edit-title-btn', function(e) {
+        e.preventDefault();
+        $('#viewmodal').modal('show');
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $("meta[name='csrf-token']").attr('content')
+                },
+                url: "{{ route('department-get-project') }}",
+                method: 'GET',
+                data: {
+                    'id' : $(this).attr('data-id')
+                }, success: function(response) { 
+                    console.log(response);
+                    $('#project-id').val(response[0]['id']);
+                    $('#modal-header').text('Edit - ' + response[0][['project_title']]);
+                    $('#project-title').val(response[0]['project_title']);
+                    $('#default-project-type').val(response[0]['project_type']);
+                    $('#default-project-type').text(response[0]['project_type']);
+                    $('#default-year').val(response[0]['project_year']);
+                    $('#default-year').text(response[0]['project_year']);
+                    $('#default-fund-source').val(response[0]['allocated_budget']+'**'+response[0]['fund_source_id']);
+                    $('#default-fund-source').text(response[0]['fund_source']);
+                } 
+            });
         });
-    });
-
+    
     // function for submitting all projects
         $(document).on('click', '#submit-projects-btn', function(e) {
             e.preventDefault();
             var _project_checkbox = $('.project-checkbox');
-            // var _project_checkbox = document.getElementsByClassName('project-checkbox');
             var _checked_project = [];
             var _checked_status = [];
+            var _checked_allocated_budget = [];
+            var _checked_procurement_type = [];
+        
             for (let index = 0; index < $('#item-count').val(); index++) {
                if(_project_checkbox[index].checked) {
                     _checked_project.push(_project_checkbox[index].value);
                     _checked_status.push(_project_checkbox[index].dataset.status);
+                    _checked_allocated_budget.push(_project_checkbox[index].dataset.allocated_budget);
+                    _checked_procurement_type.push(_project_checkbox[index].dataset.procurement_type);
                }
             }
             if(_checked_project == null || _checked_project.length <= 0) {
@@ -377,61 +353,45 @@
                     },
                     data: {
                         'project_titles'    :   _checked_project,
-                        'project_status'    :   _checked_status
+                        'project_status'    :   _checked_status,
+                        'allocated_budget' : _checked_allocated_budget,
+                        'procurement_type' : _checked_procurement_type
                     },
                     dataType: "json",
                     success: function (response) {
                         console.log(response);
                         if(response['status'] == 400) {
                             Swal.fire({
-                                  title: 'Error',
-                                  icon: 'error',
-                                  html: response['message'],
-                                  timer: 1000,
-                                  timerProgressBar: true,
-                                  didOpen: () => {
-                                    Swal.showLoading()
-                                    const b = Swal.getHtmlContainer().querySelector('b')
-                                    timerInterval = setInterval(() => {
-                                      b.textContent = Swal.getTimerLeft()
-                                    }, 100)
-                                  },
-                                  willClose: () => {
-                                    clearInterval(timerInterval)
-                                  }
-                            }).then((result) => {
-                                  if (result.dismiss === Swal.DismissReason.timer) {
-                                    location.reload();
-                                    console.log('I was closed by the timer')
-                                  }
+                                title: 'Error',
+                                icon: 'error',
+                                html: response['message'],
                             });
                         } 
-
                         if(response['status'] == 200) {
                             Swal.fire({
-                                  title: 'Success',
-                                  icon: 'success',
-                                  html: response['message'],
-                                  timer: 1000,
-                                  timerProgressBar: true,
-                                  didOpen: () => {
+                                title: 'Updated!!!',
+                                html: response['message'],
+                                icon: 'success',
+                                timer: 1000,
+                                timerProgressBar: true,
+                                didOpen: () => {
                                     Swal.showLoading()
                                     const b = Swal.getHtmlContainer().querySelector('b')
                                     timerInterval = setInterval(() => {
-                                      b.textContent = Swal.getTimerLeft()
+                                    b.textContent = Swal.getTimerLeft()
                                     }, 100)
-                                  },
-                                  willClose: () => {
+                                },
+                                willClose: () => {
                                     clearInterval(timerInterval)
-                                  }
-                            }).then((result) => {
-                                  if (result.dismiss === Swal.DismissReason.timer) {
-                                    location.reload();
-                                    console.log('I was closed by the timer')
-                                  }
+                                }
+                                }).then((result) => {
+                                    /* Read more about handling dismissals below */
+                                    if (result.dismiss === Swal.DismissReason.timer) {
+                                        location.reload();
+                                        console.log('I was closed by the timer')
+                                    }
                             });
                         } 
-                        
                     }
                 });
             }
