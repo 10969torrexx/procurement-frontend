@@ -6,7 +6,17 @@
     $immediate_supervisor = '';
     $status = 0;
 @endphp
-
+<style>
+    #t-table, #t-th, #t-td  {
+        border: 1px solid;
+        font-size: 11px;
+        padding: 5px;
+        text-align: center;
+    }
+    #t-table{
+        width: 100%;
+    }
+</style>
 @extends('layouts.contentLayoutMaster')
 {{-- title --}}
 @section('title','ANNOUNCEMENTS')
@@ -35,35 +45,36 @@
         <div class="col-12">
             <div class="card p-1">
                 <div class="card-header p-1">
-                    <h4 class="text-primary border-bottom pb-1">
+                    <h6 class="card-title border-bottom pb-1">
                        <strong> Budget Allocation</strong>
-                    </h4>
+                    </h5>
                 </div>
                 <div class="card-body">
                   <div class="table-responsive col-12 container">
-                    <table class="table zero-configuration item-table" id="item-table">
+                    <table class="table zero-configuration item-table" id="item-table t-table">
                         <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Fund Source</th>
-                                <th>year</th>
-                                <th>Allocated Budget</th>
-                                <th>Expenditure</th>
-                                <th>Mandatory Expenditure</th>
-                                <th>Balance</th>
+                            <tr id="t-tr">
+                                <th id="t-td">#</th>
+                                <th id="t-td">Fund Source</th>
+                                <th id="t-td">year</th>
+                                <th id="t-td">Allocated Budget</th>
+                                <th id="t-td">Expenditure</th>
+                                <th id="t-td">Mandatory Expenditure</th>
+                                <th id="t-td">Budget Used</th>
+                                <th id="t-td">Remaining Balance</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($allocated_budgets as $item)
-                              <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ $item->fund_source }}</td>
-                                <td>{{ $item->year }}</td>
-                                <td>₱{{ number_format($item->SumBudget,2,'.',',') }}</td>
-                                  <?php
+                              <tr id="t-tr">
+                                <td id="t-td">{{ $loop->iteration }}</td>
+                                <td id="t-td">{{ $item->fund_source }}</td>
+                                <td id="t-td">{{ $item->year }}</td>
+                                <td id="t-td">₱{{ number_format($item->SumBudget,2,'.',',') }}</td>
+                                  @php
                                     $sumMandatory = 0;
                                     $expenditure = 0;
-                                  ?>
+                                  @endphp
                                   @foreach ($mandatory_expeditures as $item2)
                                     @if ($item->year == $item2->year && $item->fund_source_id == $item2->fund_source_id) 
                                         <?php
@@ -71,9 +82,10 @@
                                         ?>
                                     @endif
                                   @endforeach
-                                <td>₱{{ number_format($expenditure,2,'.',',') }}</td>
-                                <td>₱{{ number_format($sumMandatory,2,'.',',') }}</td>
-                                <td>₱{{ number_format(($item->SumBudget - ($expenditure + $sumMandatory) ),2,'.',',') }}</td>
+                                <td id="t-td">₱{{ number_format($expenditure,2,'.',',') }}</td>
+                                <td id="t-td">₱{{ number_format($sumMandatory,2,'.',',') }}</td>
+                                <td id="t-td">₱{{ number_format($total_estimated_price[ $loop->iteration - 1],2,'.',',') }}</td>
+                                <td id="t-td">₱{{ number_format(($item->SumBudget - ($expenditure + $sumMandatory + $total_estimated_price[$loop->iteration - 1]) ),2,'.',',') }}</td>
                               </tr>
                             @endforeach
                         </tbody>

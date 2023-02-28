@@ -715,7 +715,7 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
             # this will show the my ppmp page based on the department id
             Route::get('/myPPMP', [DepartmentPagesController::class, 'showMyPPMP'])->name('department-showMyPPMP');
             # this will show the status of the project along with its item
-            Route::post('/project/status', [DepartmentPagesController::class, 'showProjectStatus'])->name('department-showProjectStatus');
+            Route::get('/project/status', [DepartmentPagesController::class, 'showProjectStatus'])->name('showProjectStatus');
                 # this will re-submit ppmp | revised PPMP
                 Route::post('/re-sumbit/ppmp', [DepartmentController::class, 'resubmitPPMP'])->name('department-re_submit-ppmp');
                 # this route will display the disapproved items
@@ -726,9 +726,7 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
 
             # export approved ppmp | this will generate PDF file of the Approved PPMP data
             Route::get('export-ppmp', [DepartmentController::class, 'export_approved_ppmp'])->name('export_ppmp');
-
-            # ppmp submission | request for PPMP Submission
-            Route::get('ppmp-submission', [DepartmentPagesController::class, 'show_ppmp_submission'])->name('show_ppmp_submission');
+           
 
             # upload ppmp | upload signed ppmp
             Route::get('upload-ppmp', [DepartmentPagesController::class, 'show_upload_ppmp'])->name('show_upload_ppmp');
@@ -744,11 +742,6 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
             # edit upload
             Route::get('get-uploaded-ppmp', [DepartmentController::class, 'get_edit_ppmp'])->name('get_edit_ppmp');
             Route::post('edit-uploaded-ppmp', [DepartmentController::class, 'edit_uploaded_ppmp'])->name('edit_ppmp');
-            
-            // *TODO: request to submit PPMP Submission
-                // ! add ppmp to request ppmp submission
-                Route::get('/add-ppmp-request-submission', [DepartmentController::class, 'add_pppmp_to_request'])->name('add_pppmp_to_request');
-            // *END:
         /** END */
 
         /** Gettin data from the database */
@@ -764,8 +757,33 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
             Route::get('/get-ppms', [DepartmentController::class, 'get_ppmps'])->name('get_ppmps');
             # live search item(s)
             Route::post('live-search-item', [DepartmentController::class, 'live_search_item'])->name('live_search_item');
+            //* get all unit of measurements
+            Route::get('get-measurements', [DepartmentController::class, 'get_measurements'])->name('get_measurements');
+            //* get live search unit of measure
+            Route::post('live-search-measurement', [DepartmentController::class, 'live_search_measurement'])->name('live_search_measurement');
+           
     /** END | TORREXX */
 });
+
+/**
+ * * TORREXX additionals
+ * 
+ */
+    Route::group(['prefix' => 'request-ppmp-submission', 'middleware' => ['authuser']], function() {
+         // *TODO: request to submit PPMP Submission
+            // * ppmp submission | request for PPMP Submission
+                Route::get('ppmp-submission', [DepartmentPagesController::class, 'show_ppmp_submission'])->name('show_ppmp_submission');
+            // * add item  to request details
+                Route::post('ppmp-submission-items', [DepartmentController::class, 'ppmp_response_items'])->name('ppmp_response_items');
+            // * add submit ppmp request
+                Route::post('/ppmp-request-submission', [DepartmentController::class, 'request_submission'])->name('request_submission');
+            // * get allocated budget
+                Route::post('get-allocated-budget', [DepartmentController::class, 'get_allocated_budget'])->name('get_allocated_budget');
+            // * get project based on allocated budgets
+                Route::post('get-projects', [DepartmentController::class, 'get_projects'])->name('get_projects');
+            // * get pending requests
+                Route::post('get-pending-request', [DepartmentController::class, 'get_pending_request'])->name('get_pending_request');
+    });
 
 /** TORREXX Additionals
  * ! BOR Secretary

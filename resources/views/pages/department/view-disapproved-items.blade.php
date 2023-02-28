@@ -40,6 +40,21 @@
     <link rel="stylesheet" type="text/css" href="{{asset('css/plugins/extensions/toastr.css')}}">
 @endsection
 @section('content')
+<style>
+    #t-table, #t-th, #t-td  {
+        border: 1px solid;
+        font-size: 11px;
+        padding: 5px;
+        text-align: center;
+    }
+    #t-table{
+        width: 100%;
+    }
+
+    .tbg-secondary {
+        background-color: rgba(71, 95, 123, 0.9) !important;
+    }
+</style>
 <!-- Zero configuration table -->
 <section id="horizontal-vertical">
     {{-- item names modal --}}
@@ -266,7 +281,7 @@
                             <h4 class="text-primary"><strong>Disapproved PPMP</strong></h4>
                         </div>
                         <div class="form-group col-6 text-right">
-                            <h4 class=""><strong class="text-danger">Deadline of Submission:</strong> {{ explode('-', date('F j, Y', strtotime($allocated_budgets[0]->deadline_of_submission)))[0] }}  </h4>
+                            <h4 class=""><strong class="text-danger">Deadline of Submission:</strong> {{ explode('-', date('F j, Y', strtotime($allocated_budgets[0]->end_date)))[0] }}  </h4>
                             
                         </div>
                     </div>
@@ -283,92 +298,59 @@
                                                         <th>Project Type</th>
                                                         <th>Immediate Supervisor</th>
                                                         <th>Fund Source</th>
-                                                        <th>Year</th>
+                                                        <th>Project Year</th>
+                                                        <th>Year Created</th>
                                                         <th>Status</th>
                                                     </tr>
                                                     <tbody>
                                                         <tr class="border-zero">
-                                                            @for ($i = 0; $i < count($ProjectTitleResponse); $i++)
+                                                            @foreach ($project_titles as $item)
                                                                 <tr class="border-zero">
-                                                                    @php  $project_title_id = $ProjectTitleResponse[$i]['id']; @endphp
-                                                                    <!-- <td class="border-zero">{{ $current_project_code = $ProjectTitleResponse[$i]['year_created'] }}-{{ ($i) + 1}}</td> -->
-                                                                    <td>{{ $ProjectTitleResponse[$i]['project_title'] }}</td>
-                                                                    <td>{{ $ProjectTitleResponse[$i]['project_type'] }}</td>
-                                                                    <td>{{ $ProjectTitleResponse[$i]['immediate_supervisor'] }}</td>
-                                                                    <td>{{ $ProjectTitleResponse[$i]['fund_source'] }}</td>
-                                                                    <td>{{ $ProjectTitleResponse[$i]['project_year'] }}</td>
-                                                                        @if( Str::ucfirst((new GlobalDeclare)->status($ProjectTitleResponse[$i]['status'])) == 'approved' )
-                                                                            <td class="text-success">{{ Str::ucfirst((new GlobalDeclare)->status($ProjectTitleResponse[$i]['status'])) }}</td>
-                                                                        @else
-                                                                            <td class="text-danger">{{ Str::ucfirst((new GlobalDeclare)->status($ProjectTitleResponse[$i]['status'])) }}</td>
-                                                                        @endif
+                                                                    @php  $project_title_id = $item->id; @endphp
+                                                                    <td>{{ $item->project_title }}</td>
+                                                                    <td>{{ $item->project_type }}</td>
+                                                                    <td>{{ $item->immediate_supervisor }}</td>
+                                                                    <td>{{ $item->fund_source }}</td>
+                                                                    <td>{{ $item->project_year }}</td>
+                                                                    <td>{{ $item->year_created }}</td>
+                                                                    <td>{{ (new GlobalDeclare)->status($item->status) }}</td>
                                                                 </tr>
-                                                            @endfor
+                                                            @endforeach
                                                         </tr>
                                                     </tbody>
                                                 </table>
                                             </div>
                                         </div>
 
-                                        <div class="row justify-content-center form-group">
-                                            <div class="container">
-                                                {{-- Displaying Error Messages --}}
-                                                    {{-- displaying error message for appended element with null values --}}
-                                                        @if($nullValues = Session::get('nullValues'))
-                                                            <div class="alert alert-damger alert-dismissible fade show" role="alert">
-                                                                <strong>Failed!</strong> Please fill all the required fields
-                                                                <p>
-                                                                    @foreach ($nullValues as $error)
-                                                                        {{ $error  }}
-                                                                    @endforeach
-                                                                </p>
-                                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                                    <span aria-hidden="true">&times;</span>
-                                                                </button>
-                                                            </div>
-                                                        @endif
-                                                    {{-- displaying error message for laravel form validation --}}
-                                                        @if($errors->all())
-                                                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                                                <strong>Failed!</strong> Please fill all the required fields
-                                                                <p>
-                                                                    @foreach ($errors->all() as $error)
-                                                                        <div>{{ $error }}</div>
-                                                                    @endforeach
-                                                                </p>
-                                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                                    <span aria-hidden="true">&times;</span>
-                                                                </button>
-                                                            </div>
-                                                        @endif
-                                                    {{-- Displaying Success Message --}}
-                                                    {{-- this will display success message if ppmp was successfully created --}}
-                                                        @if($message = Session::get('success'))
-                                                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                                                <strong>Success!</strong> 
-                                                                <p>
-                                                                    {{ $message }}
-                                                                </p>
-                                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                                    <span aria-hidden="true">&times;</span>
-                                                                </button>
-                                                            </div>
-                                                        @endif
-                                                        @if($message = Session::get('failed'))
-                                                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                                                <strong>Failed!</strong> 
-                                                                <p>
-                                                                    {{ $message }}
-                                                                </p>
-                                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                                    <span aria-hidden="true">&times;</span>
-                                                                </button>
-                                                            </div>
-                                                        @endif
-                                                    {{-- Displaying Success Message --}}
-                                                {{-- Displaying Error Messages --}}
-                                            </div>
-                                        </div>
+                                        {{-- message and errors --}}
+                                            @if(Session::has('success'))
+                                                <script>
+                                                    Swal.fire({
+                                                        title: 'Success',
+                                                        icon: 'success',
+                                                        html: "{{ Session::get('success') }}",
+                                                    });
+                                                </script>
+                                            @endif
+                                            @if($errors->all())
+                                                <script>
+                                                    Swal.fire({
+                                                        title: 'Error',
+                                                        icon: 'error',
+                                                        html: "Please make sure fields are well accounted for!",
+                                                    });
+                                                </script>
+                                            @endif
+                                            @if(Session::has('failed'))
+                                                <script>
+                                                    Swal.fire({
+                                                        title: 'Error',
+                                                        icon: 'error',
+                                                        html: "{{ Session::get('failed') }}",
+                                                    });
+                                                </script>
+                                            @endif
+                                        {{-- message and errors --}}
                                     </div>
                             </div>
                         </div>
@@ -394,63 +376,58 @@
                 
                 {{-- creating data tables for the list of project titles --}}
                     <div class="table-responsive col-12 container scrollable">
-                        <table class="table  scrollable zero-configuration item-table " id="item-table">
+                        <table class="table  scrollable zero-configuration item-table " id="item-table t-table">
                             <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Item name</th>
-                                    <th class="text-nowrap">app type</th>
-                                    <th>quantity</th>
-                                    <th>Unit Price</th>
-                                    <th class="text-nowrap">estimated price</th>
-                                    <th>item description</th>
-                                    <th>unit of measurement</th>
-                                    <th>mode of procurement</th>
-                                    <th class="text-nowrap">expected month</th>
-                                    <th>status</th>
-                                    <th>date created</th>
-                                    <th>Action</th>
+                                <tr id="t-tr">
+                                    <th id="t-td">#</th>
+                                    <th id="t-td">Item name</th>
+                                    <th id="t-td" class="text-nowrap">app type</th>
+                                    <th id="t-td">quantity</th>
+                                    <th id="t-td">Unit Price</th>
+                                    <th id="t-td" class="text-nowrap">estimated price</th>
+                                    <th id="t-td">item description</th>
+                                    <th id="t-td">unit of measurement</th>
+                                    <th id="t-td">mode of procurement</th>
+                                    <th id="t-td" class="text-nowrap">expected month</th>
+                                    <th id="t-td">status</th>
+                                    <th id="t-td">date created</th>
+                                    <th id="t-td">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                    {{-- showing ppmp data based on department and user --}}
-                                        @foreach ($ppmp_response as $item)
-                                            <tr>
-                                                <td>{{ $loop->iteration }}</td>
-                                                <td class="text-nowrap">{{ $item->item_name }}</td>
-                                                <td>{{ $item->app_type }}</td>
-                                                <td>{{ $item->quantity }}</td>
-                                                <td>₱{{ number_format($item->unit_price,2,'.',',')  }}</td>
-                                                <td>₱{{ number_format($item->estimated_price,2,'.',',')  }}</td>
-                                                <td>{{ $item->item_description }}</td>
-                                                <td>{{ $item->unit_of_measurement }}</td>
-                                                <td>{{ $item->mode_of_procurement }}</td>
-                                                <td>{{  (new GlobalDeclare)->Month( $item->expected_month) }}</td>
-                                                    @if (Str::ucfirst((new GlobalDeclare)->status($item->status)) == 'approved')
-                                                        <td class="text-success">{{ Str::ucfirst((new GlobalDeclare)->status($item->status))  }}</td>
-                                                    @else
-                                                        <td class="text-danger">{{ Str::ucfirst((new GlobalDeclare)->status($item->status)) }}</td>
-                                                    @endif
-                                                <td class="text-nowrap">{{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0] }}</td>
-                                                <td>
-                                                    <div class="dropdown">
-                                                        <span
-                                                            class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
-                                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu">
-                                                        </span>
-                                                        <div class="dropdown-menu dropdown-menu-left">
-                                                            <a class="dropdown-item" data-id = "{{ $item->ppmps_id }}" id="edit-ppmp-btn" href = "#">
-                                                                <i class="bx bx-edit-alt mr-1"></i> edit
-                                                            </a>
-                                                            <a href="{{ route('department-delete-item', ['id'=> (new AESCipher)->encrypt($item->ppmps_id)]) }}" class="dropdown-item" id="delete-item-btn">
-                                                                <i class="bx bx-trash mr-1"></i> delete
-                                                            </a>
-                                                        </div>
-                                                    </div> 
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    
+                                {{-- showing ppmp data based on department and user --}}
+                                    @foreach ($ppmp_response as $item)
+                                        <tr id="t-tr">
+                                            <td id="t-td">{{ $loop->iteration }}</td>
+                                            <td id="t-td" class="text-nowrap">{{ $item->item_name }}</td>
+                                            <td id="t-td">{{ $item->app_type }}</td>
+                                            <td id="t-td">{{ $item->quantity }}</td>
+                                            <td id="t-td">₱{{ number_format($item->unit_price,2,'.',',')  }}</td>
+                                            <td id="t-td">₱{{ number_format($item->estimated_price,2,'.',',')  }}</td>
+                                            <td id="t-td">{{ $item->item_description }}</td>
+                                            <td id="t-td">{{ $item->unit_of_measurement }}</td>
+                                            <td id="t-td">{{ $item->mode_of_procurement }}</td>
+                                            <td id="t-td">{{  (new GlobalDeclare)->Month( $item->expected_month) }}</td>
+                                            <td id="t-td">{{ Str::ucfirst((new GlobalDeclare)->status($item->status))  }}</td>
+                                            <td id="t-td" class="text-nowrap">{{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0] }}</td>
+                                            <td id="t-td">
+                                                <div class="dropdown">
+                                                    <span
+                                                        class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
+                                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu">
+                                                    </span>
+                                                    <div class="dropdown-menu dropdown-menu-left">
+                                                        <a class="dropdown-item" data-id = "{{ $item->ppmps_id }}" id="edit-ppmp-btn" href = "#">
+                                                            <i class="bx bx-edit-alt mr-1"></i> edit
+                                                        </a>
+                                                        <a href="{{ route('department-delete-item', ['id'=> (new AESCipher)->encrypt($item->ppmps_id)]) }}" class="dropdown-item" id="delete-item-btn">
+                                                            <i class="bx bx-trash mr-1"></i> delete
+                                                        </a>
+                                                    </div>
+                                                </div> 
+                                            </td>
+                                        </tr>
+                                    @endforeach
                                 {{-- showing ppmp data based on department and user --}}
                             </tbody>
                         </table>
@@ -463,7 +440,7 @@
                                 <input type="text" class="form-control d-none" name="remaining_balance" value="{{ $allocated_budgets[0]->remaining_balance }}">
                                 <input type="text" class="form-control d-none" name="total_estimated_price" value="{{ $total_estimated_price }}">
                                 <input type="text" class="form-control d-none" name="allocated_budget" value="{{ $allocated_budgets[0]->id }}">
-                                <input type="text" class="form-control d-none" name="deadline_of_submission" value="{{ $allocated_budgets[0]->deadline_of_submission }}">
+                                <input type="text" class="form-control d-none" name="deadline_of_submission" value="{{ $allocated_budgets[0]->end_date }}">
                                 <button type="submit" class="btn btn-success form-control">Re-Submit PPMP</button>
                             </form>
                         </div>
