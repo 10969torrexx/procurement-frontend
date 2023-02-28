@@ -172,6 +172,7 @@ $(document).on('click', '.submitedit', function (e) {
     'Profession': $('#inputProfession').val(),
     'Title': $('#edutitle').val(),
     'id': $(this).val(),
+    'project_category': $(".project_category").val(),
   }
   // console.log(data);
   if(data.Name == "" || data.Profession == "" || data.Title == ""){
@@ -531,6 +532,7 @@ $(document).on('click', '.submitprepared', function (e) {
     'Profession': $('.preparedProfession').val(),
     'Title': $('.preparedtitle').val(),
     'Year': $(".year").val(),
+    'project_category': $(".project_category").val(),
   }
   console.log(data);
   if(data.Name == "" || data.Profession == "" || data.Title == ""){
@@ -598,6 +600,7 @@ $(document).on('click', '.submitapproval', function (e) {
     'Profession': $('.approvedProfession').val(),
     'Title': $('.approvededutitle').val(),
     'Year': $(".year").val(),
+    'project_category': $(".project_category").val(),
   }
   if(data.Name == "choose" || data.Profession == "" || data.Title == ""){
     Swal.fire('Complete the needed data', '', 'info')
@@ -710,6 +713,7 @@ $(document).on('click', '.submitrecommendingapproval', function (e) {
     'Profession': $('.recommendingapprovalProfession').val(),
     'Title': $('.recommendingapprovaltitle').val(),
     'Year': $(".year").val(),
+    'project_category': $(".project_category").val(),
   }
   
   console.log(data);
@@ -770,18 +774,27 @@ $(document).on('click', '.submitrecommendingapproval', function (e) {
 $(document).on('click', '.endorse', function (e) {
   var year = $(".Year").val();
   var data = {
-    'year' :  $(".Year").val(),
-    'endorse' : $(".endorse").val(),
-    'category' : $("#project_category").val()
+    'year_created' :  $(".Year").val(),
+    'endorse' : $(".endorseval").val(),
+    'project_category' : $("#project_category").val(),
+    'signed_app' : $(".signed_app").val(),
+    'file_name' : $(".file_name").val()
   }
-console.log($(".president_stat").val());
+// console.log($(".president_stat").val());
+console.log(data);
   if ($(".president_stat").val() == 0 && $(".bac_committee_stat").val() == 0) {
     Swal.fire({
       icon: 'info',
       title: 'Oops...',
       text: 'Signatories must be recommended and approved',
     })
-  } else {
+  } else if(data.file_name == "" || data.signed_app == ""){
+    // Swal.fire({
+    //   icon: 'info',
+    //   title: 'Oops...',
+    //   text: 'Fill-in the needed data !!',
+    // })
+  }else {
     console.log(data);
     $.ajaxSetup({
       headers: {
@@ -838,6 +851,7 @@ console.log($(".president_stat").val());
         }
       }
     })
+
   }
 });
 
@@ -846,65 +860,84 @@ $(document).on('click', '.submittopresident', function (e) {
   var year = $(".Year").val();
   var data = {
     'year' :  $(".Year").val(),
-    'submit' : $(this).val(),
+    'scope' :  $(".scope").val(),
+    'submit' : $('.submittopresident').val(),
     'category' : $(this).attr("data-id")
   }
   console.log(data);
-  $.ajaxSetup({
-    headers: {
-        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+  
+  Swal.fire({
+    title: 'Submit to President?',
+    showDenyButton: true,
+    confirmButtonText: 'Continue',
+    icon: 'question',
+    denyButtonText: 'No',
+    customClass: {
+      actions: 'my-actions',
+      confirmButton: 'order-2',
+      denyButton: 'order-3',
     }
-  });
-
-  $.ajax({
-    type: "POST",
-    url: "app-non-cse-submitpres",
-    data: data,
-    dataType: "json",
-    success: function (response) {
-      // console.log(response);
-      if(response['status'] == 200) {
-        Swal.fire({
-          title: '',
-          html: 'Loading...',
-          icon: 'success',
-          timer: 1000,
-          timerProgressBar: true,
-          didOpen: () => {
-            Swal.showLoading()
-            const b = Swal.getHtmlContainer().querySelector('b')
-            timerInterval = setInterval(() => {
-              b.textContent = Swal.getTimerLeft()
-            }, 100)
-          },
-          willClose: () => {
-            clearInterval(timerInterval)
+  }).then((result) => {
+      $.ajaxSetup({
+          headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
           }
-          }).then((result) => {
-            /* Read more about handling dismissals below */
-            if (result.dismiss === Swal.DismissReason.timer) {
-              location.reload();
-              console.log('I was closed by the timer')
+      });
+      if (result.isConfirmed) {
+        $.ajax({
+          type: "POST",
+          url: "app-non-cse-submitpres",
+          data: data,
+          dataType: "json",
+          success: function (response) {
+            // console.log(response);
+            if(response['status'] == 200) {
+              Swal.fire({
+                title: '',
+                html: 'Loading...',
+                icon: 'success',
+                timer: 1000,
+                timerProgressBar: true,
+                didOpen: () => {
+                  Swal.showLoading()
+                  const b = Swal.getHtmlContainer().querySelector('b')
+                  timerInterval = setInterval(() => {
+                    b.textContent = Swal.getTimerLeft()
+                  }, 100)
+                },
+                willClose: () => {
+                  clearInterval(timerInterval)
+                }
+                }).then((result) => {
+                  /* Read more about handling dismissals below */
+                  if (result.dismiss === Swal.DismissReason.timer) {
+                    location.reload();
+                    console.log('I was closed by the timer')
+                  }
+                  location.reload();
+                })
+            }else if(response['status'] == 500){
+              Swal.fire({
+                icon: 'info',
+                title: 'Oops...',
+                text: 'Incomplete Signatories',
+              })
+              // $(this).text('Shared');
+            }else{
+              Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Already Exist',
+              })
+              // $(this).text('Shared');
             }
-            location.reload();
-          })
-      }else if(response['status'] == 500){
-        Swal.fire({
-          icon: 'info',
-          title: 'Oops...',
-          text: 'Incomplete Signatories',
+          }
         })
-        // $(this).text('Shared');
-      }else{
-        Swal.fire({
-          icon: 'error',
-          title: 'Oops...',
-          text: 'Already Exist',
-        })
-        // $(this).text('Shared');
+      } else if (result.isDenied) {
+        Swal.fire('Changes are not saved', '', 'info')
       }
-    }
   })
+
 });
 
 $(document).on('click', '.univ_wide', function (e) {
@@ -1089,10 +1122,5 @@ $("form#CampusLogo").submit(function(e) {
 
 
 });
-//trigger edit new recommendingapproval modal
-// $(document).on('click', '.newrecommendingapproval', function (e) {
-//   $("#edit_newrecommendingapproval").modal('show');  
-//   $(".year").val($(".Year").val());
-// });
 
 

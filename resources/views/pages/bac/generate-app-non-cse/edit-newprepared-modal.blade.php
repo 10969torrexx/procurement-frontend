@@ -20,9 +20,10 @@
 
                 <label for="preparedProffession" class="mt-1" >Suffix:</label>
                 <input type="text" class="form-control preparedtitle" id="preparedtitle" value="" placeholder="eg. Phd">
-
+                
+                <div class="form-control mt-1 bg-rgba-info text-info" style="font-size:13px"><i class="fa-solid fa-circle-info"></i> &nbsp;<span >If designation is more than one, put period (.) after each designation.</span> </div>
                 <label for="preparedProffession" class="mt-1" >Designation:</label>
-                <input type="text" class="form-control preparedProfession" id="preparedProfession" value="" placeholder="--Enter--">
+                <input type="text" class="form-control preparedProfession" id="preparedProfession" value="" pplaceholder="eg. Chairperson - UBAC Infra. Chairperson - BAC Sogod Campus">
                 <input type="hidden" class="form-control year"value="">
                 
                 <button type="button" class="btn btn-success form-control col-sm-3 ml-9 mt-1 float-right submitprepared" value="">Submit</button>

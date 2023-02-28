@@ -7,9 +7,9 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\AESCipher;
 use App\Http\Controllers\GlobalDeclare;
 // use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\HistoryLogController;
 use App\Employee;
 use App\PropertySub;
-
 use DB;
 use Carbon\Carbon;
 
@@ -150,6 +150,18 @@ class PropertyController extends Controller
                     'created_at'            => Carbon::now(),
                     'updated_at'            => Carbon::now(),
                 ]);
+
+                # this will created history_log
+                  (new HistoryLogController)->store(
+                    session('department_id'),
+                    session('employee_id'),
+                    session('campus'),
+                    NULL,
+                    'Add PAR Property',
+                    'Add',
+                    $request->ip(),
+                  );
+                # end 
             
                 if($par){
                     return response()->json([
@@ -284,6 +296,18 @@ class PropertyController extends Controller
             ->update([
                 'finalize'        => 1,
             ]);
+
+        # this will created history_log
+            (new HistoryLogController)->store(
+            session('department_id'),
+            session('employee_id'),
+            session('campus'),
+            $id,
+            'Finalize PAR Property',
+            'Finalize',
+            $request->ip(),
+            );
+        # end 
         
         if($par){
             return response()->json([
@@ -311,6 +335,17 @@ class PropertyController extends Controller
             ->update([
                 'deleted_at'     => Carbon::now(),
             ]);
+            # this will created history_log
+                (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                $id,
+                'Delete PAR Property',
+                'Delete',
+                $request->ip(),
+                );
+            # end 
         
         if($par){
             return response()->json([
@@ -325,6 +360,24 @@ class PropertyController extends Controller
             ]); 
         }
     
+    }
+
+    public function edit_par(Request $request){
+        // dd($request->all());
+        $aes = new AESCipher();
+        $global = new GlobalDeclare();
+        $id = $aes->decrypt($request->id);
+        // dd($id);
+        $par = DB::table("property as p")
+            ->select('p.*','u.name as EmployeeName','us.name as IssuedbyName','s.SupplierName as Storename','um.unit_of_measurement as unit','um.id as umID')
+            ->join('unit_of_measurements as um','um.id','=','p.Unit')
+            ->join('users as u','u.id','=','p.EmployeeID')
+            ->join('users as us','us.id','=','p.IssuedBy')
+            ->join('store as s','s.id','=','p.StoreName')
+            ->where("p.id", $id)
+            ->get();
+        
+        return $par;
     }
 
     public function submitEdit_par(Request $request){
@@ -387,6 +440,18 @@ class PropertyController extends Controller
                         'DateTransferred'       => $request->DateAcquired,
                         'updated_at'     => Carbon::now(),
                     ]);
+
+                    # this will created history_log
+                        (new HistoryLogController)->store(
+                        session('department_id'),
+                        session('employee_id'),
+                        session('campus'),
+                        $request->id,
+                        'Edit PAR Property',
+                        'Edit',
+                        $request->ip(),
+                        );
+                    # end 
                 
                 if($par){
                     return response()->json([
@@ -404,6 +469,7 @@ class PropertyController extends Controller
         }
     
     }
+    
     public function additem_par(Request $request){
         // dd($request->all());
         $aes = new AESCipher();
@@ -455,6 +521,18 @@ class PropertyController extends Controller
                 'created_at'     => Carbon::now(),
                 'updated_at'     => Carbon::now(),
             ]);
+
+            # this will created history_log
+                (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                NULL,
+                'Add Item for this PAR Num.'.$request->PARNo,
+                'Add Item',
+                $request->ip(),
+                );
+            # end 
         
         if($par){
             return response()->json([
@@ -525,6 +603,17 @@ class PropertyController extends Controller
                 'updated_at'            => Carbon::now(),
             ]);
         }
+        # this will created history_log
+            (new HistoryLogController)->store(
+            session('department_id'),
+            session('employee_id'),
+            session('campus'),
+            $request->id,
+            'Dispose PAR Property.',
+            'Dispose',
+            $request->ip(),
+            );
+        # end 
         
         if($par){
             return response()->json([
@@ -640,6 +729,18 @@ class PropertyController extends Controller
         }
         
                 // dd($check);
+
+        # this will created history_log
+            (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                NULL,
+                'Transfer PAR Property.',
+                'Transfer',
+                $request->ip(),
+                );
+        # end 
         if($par){
             return response()->json([
                 'status' => 200, 
@@ -652,24 +753,6 @@ class PropertyController extends Controller
                 'message' => 'Error!.',
             ]); 
         }
-    }
-
-    public function edit_par(Request $request){
-        // dd($request->all());
-        $aes = new AESCipher();
-        $global = new GlobalDeclare();
-        $id = $aes->decrypt($request->id);
-        // dd($id);
-        $par = DB::table("property as p")
-            ->select('p.*','u.name as EmployeeName','us.name as IssuedbyName','s.SupplierName as Storename','um.unit_of_measurement as unit','um.id as umID')
-            ->join('unit_of_measurements as um','um.id','=','p.Unit')
-            ->join('users as u','u.id','=','p.EmployeeID')
-            ->join('users as us','us.id','=','p.IssuedBy')
-            ->join('store as s','s.id','=','p.StoreName')
-            ->where("p.id", $id)
-            ->get();
-        
-        return $par;
     }
 
     public function print_par(Request $request){
@@ -722,6 +805,18 @@ class PropertyController extends Controller
             ->where("p.campus", session('campus'))
             ->orderBy('p.DateIssued', "desc")
             ->get();
+
+            # this will created history_log
+                (new HistoryLogController)->store(
+                    session('department_id'),
+                    session('employee_id'),
+                    session('campus'),
+                    $request->id,
+                    'Print PAR Property.',
+                    'Print',
+                    $request->ip(),
+                    );
+            # end 
 
         // $par = DB::table("property")
         //     ->where("id",$id)

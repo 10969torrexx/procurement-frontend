@@ -1,9 +1,13 @@
 $(document).ready(function() {
-
+ 
+  // $('table input[type=checkbox]').attr('disabled', 'true');
+  var pr_no = $('.pr_no').text();
+  
     var project_code = $(".project_code").val();
     var employee = $( "#selectEmployee option:selected" ).val();
+    var approving_officer = $( "#selectApprovingOfficer option:selected" ).val();
     // var data:  {somekey:$('#AttorneyEmpresa').val()}
-    // alert(employee);
+    // alert(approving_officer);
     var quantity = 0;
     $.ajaxSetup({
       headers: {
@@ -34,11 +38,30 @@ $(document).ready(function() {
 
     $.ajax({
       type: "GET",
+      url: "/PR/routing_slip/pr_routing_slip/getData",
+      data: {pr_no},
+      success: function (response) {
+// console.log(response)
+      response['data'].forEach(element => {
+        // console.log(element.date_received)
+        $('#myCheckbox'+element.activity).attr('checked', true);
+        $('.received'+element.activity).append(element.date_received);
+        $('.released'+element.activity).append(element.date_released);
+        $('.remark'+element.activity).append(element.remark);
+        $('.name'+element.activity).append((element.name).toUpperCase());
+      });
+        // $('#myCheckbox1').attr('checked', true); 
+      }
+    });
+
+    $.ajax({
+      type: "GET",
       url: "/PR/purchaseRequest/getEmployees",
       beforeSend : function(){
         $('.selectEmployee').html('<option class="spinner-border spinner-border-sm">Please wait... </option>');
       },
       success: function (response) {
+        console.log(response)
         $('.selectEmployee').empty()
         $('.selectEmployee').append('<option value="" style="border: none;text-align:center;font-weight:bold;" selected disabled>-- Select Employee --</option>')
         for(var i = 0; i < response['data'].length; i++) {
@@ -57,13 +80,53 @@ $(document).ready(function() {
       }
   });
 
+  var total = $(".total").val();
+  // alert(total)
+    $.ajax({
+      type: "GET",
+      url: "/PR/purchaseRequest/getApprovingOfficers",
+      data: {total},
+      beforeSend : function(){
+        $('.selectApprovingOfficer').html('<option class="spinner-border spinner-border-sm">Please wait... </option>');
+      },
+      success: function (response) {
+        console.log(response)
+        $('.selectApprovingOfficer').empty()
+        $('.selectApprovingOfficer').append('<option value="" style="border: none;text-align:center;font-weight:bold;" selected disabled>-- Select Approving Officer --</option>')
+        for(var i = 0; i < response['data'].length; i++) {
+          if(response['data'][i]['name'] == approving_officer){
+            $('.selectApprovingOfficer').append(
+              '<option style="border: none;text-align:center;font-weight:bold;" value="'+ response['data'][i]['id'] + '*'+ response['data'][i]['designation'] +  ' " selected>' 
+                                + response['data'][i]['name'] + ', '+ response['data'][i]['title'] + '</option>')
+            $(".designationApprovingOfficer").text(response['data'][i]['designation']);
+            
+          }else{
+            $('.selectApprovingOfficer').append(
+              '<option style="border: none;text-align:center;font-weight:bold;" value="'+ response['data'][i]['id'] + '*'+ response['data'][i]['designation'] + ' ">' 
+                                + response['data'][i]['name'] +', '+response['data'][i]['title'] +'</option>')
+          }
+        }
+        // $('#EmployeeEditModal').modal('show')
+
+        // $(".designationApprovingOfficer").text("drgtdfgh");
+      }
+  });
+
+
+  $(function(){$(".selectApprovingOfficer").change(function(){
+
+    var designation = $( ".selectApprovingOfficer option:selected" ).val();
+    var splitDesignation = designation.split('*');
+    $(".designationApprovingOfficer").text(splitDesignation[1]);
+  
+    });
+  })
+  
 });
 
-$("#PreviewPRModal").on("hidden.bs.modal", function(e){
-  // location.reload();
-      // $('.designation_input').val('');
-      // $('.purpose_input').val('');
-      // document.getElementById('selectEmployee').getElementsByTagName('option')[0].selected = 'selected';
+$("#PreviewPRModal").on("shown.bs.modal", function(e){
+
+
 
 })
 
@@ -92,8 +155,8 @@ $(function(){$(".item").change(function(){
       if (response.status == 400) {
         $('.quantity').val(''); 
         Swal.fire({
-          icon: 'error',
-          title: 'Error',
+          icon: 'info',
+          title: 'Information',
           text: response.message,
           })
         document.getElementById('item').getElementsByTagName('option')[0].selected = 'selected';
@@ -316,6 +379,7 @@ $(document).on('click', '.btnCompletePR', function (e) {
   var purpose_input = $(".purpose_input").val();
   var designation_input = $(".designation_input").val();
   var selectEmployee = $(".selectEmployee").val();
+  var approvingOfficer = $(".selectApprovingOfficer").val();
 
       if(purpose_input==''){
           Swal.fire({
@@ -335,16 +399,20 @@ $(document).on('click', '.btnCompletePR', function (e) {
             title: 'Incomplete',
             text: 'Please select Employee!',
             })
+      }else if(approvingOfficer==null){
+        Swal.fire({
+            icon: 'error',
+            title: 'Incomplete',
+            text: 'Please select Approving Officer!',
+            })
       }else{
-        var selectEmployee = $(".selectEmployee").val();
-        var purpose_input = $(".purpose_input").val();
-        var designation_input = $(".designation_input").val()
         var fund_source = $(".fund_source_id").val()
         var project_code = $(".project_code").val()
         var pr_no = $(".pr_no").val();
 
         var data = {
                 'employee': selectEmployee,
+                'approvingOfficer': approvingOfficer,
                 'purpose': purpose_input,
                 'designation': designation_input,
                 'fund_source': fund_source,
@@ -365,6 +433,9 @@ $(document).on('click', '.btnCompletePR', function (e) {
             dataType: "json",
             success: function (response) {
                 if (response.status == 200) {
+                  
+                      $('#PreviewPRModal').modal('hide')
+
                         Swal.fire({
                           title: 'Saved',
                           icon: 'success',
@@ -524,6 +595,7 @@ $(document).on('click', '.removebutton', function (e) {
       })
 });
 
+
 $(document).on('click', '.print', function (e) {
   var data = {
       // 'fund_cluster' :  $(".fund_cluster").text(),
@@ -535,24 +607,25 @@ $(document).on('click', '.print', function (e) {
       // 'value' : $(this).val()
   };
 
-console.log(data);
+// console.log(data);
     $.ajax({
     type: 'post',
     url: "/department/trackPR/view_pr/printPR",
     headers: {'X-CSRF-TOKEN' : $('meta[name="csrf-token"]').attr('content')},
     data: data,
     success: function(viewContent) {
-    console.log(viewContent);
+    // console.log(viewContent);
         if(viewContent){
             var css = '@page { size: A4 portrait; }',
             head = document.head || document.getElementsByTagName('head')[0],
             style = document.createElement('style');
-
+            
+          
             style.type = 'text/css';
             style.media = 'print';
 
             if (style.styleSheet){
-            style.styleSheet.cssText = css;
+            style.styleSheet.cssText = css;  
             } else {
             style.appendChild(document.createTextNode(css));
             }
@@ -563,7 +636,7 @@ console.log(data);
               document.body.innerHTML = viewContent;
               window.print();
               document.body.innerHTML = originalContents;
-              location.reload();
+              // location.reload();
         }else{
             toastr.error('Can\'t print. Error!')
         }
@@ -601,7 +674,7 @@ console.log(data);
           document.body.innerHTML = viewContent;
           window.print();
           document.body.innerHTML = originalContents;
-          location.reload();
+          // location.reload();
     }else{
         toastr.error('Can\'t print. Error!')
     }
@@ -707,7 +780,146 @@ $(document).on('click', '.editbutton', function (e) {
 
 });
 // END EDIT BUTTON
+$(document).on('click', '.edit_SignedPR_button', function (e) {
+  e.preventDefault();
 
+  var id = $(this).attr("href");
+  var data = {
+      'id': id,
+    } 
+    $.ajax({
+      type: "GET",
+      url: "/PR/signed_pr/edit_signed_pr",
+      data: data,
+      success: function (response) {
+        if (response.status == 200) {
+          console.log(response)
+          response['data'].forEach(element => {
+            $('#signedPR_id').val(element.id);
+            $('#update_pr_no').val(element.pr_no);
+           });
+          $('#update_file_name').val(response['file_name'][0]);
+          $('#EditSignedPRModal').modal('show');
+        }
+        if (response.status == 400) {
+          $('.quantity').val(''); 
+          Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: response.message,
+            })
+        }
+      }
+  });
+
+
+});
+
+$("form#createPR").submit(function(e) {
+  e.preventDefault();
+//  alert('success')
+  var formData = new FormData(this);    
+  
+  $.ajax({
+      url:'/PR/purchaseRequest/addItem',
+      type: 'POST',
+      data: formData,
+      success: function (response) {
+          // alert(data)
+          if (response.status == 200) {
+              Swal.fire({
+                title: 'Saved',
+                icon: 'success',
+                html: response.message,
+                timer: 1000,
+                timerProgressBar: true,
+                didOpen: () => {
+                  Swal.showLoading()
+                  const b = Swal.getHtmlContainer().querySelector('b')
+                  timerInterval = setInterval(() => {
+                    b.textContent = Swal.getTimerLeft()
+                  }, 100)
+                },
+                willClose: () => {
+                  clearInterval(timerInterval)
+                }
+              }).then((result) => {
+                if (result.dismiss === Swal.DismissReason.timer) {
+                  location.reload();
+                }
+              })
+          }
+          if (response.status == 400) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: response.message,
+              })
+          }
+      },
+      cache: false,
+      contentType: false,
+      processData: false
+  });
+
+
+});
+
+$("form#updateSignedPR").submit(function(e) {
+  e.preventDefault();
+ 
+  var formData = new FormData(this);    
+  
+  $.ajax({
+      url:'/PR/signed_pr/update_signed_pr',
+      type: 'POST',
+      data: formData,
+      success: function (response) {
+          // alert(data)
+          if (response.status == 200) {
+            // Swal.fire({
+            //   icon: 'success',
+            //   title: 'Success',
+            //   text: response.message,
+            //   })
+              $('#EditSignedPRModal').modal('hide');
+              Swal.fire({
+                title: 'Saved',
+                icon: 'success',
+                html: response.message,
+                timer: 1000,
+                timerProgressBar: true,
+                didOpen: () => {
+                  Swal.showLoading()
+                  const b = Swal.getHtmlContainer().querySelector('b')
+                  timerInterval = setInterval(() => {
+                    b.textContent = Swal.getTimerLeft()
+                  }, 100)
+                },
+                willClose: () => {
+                  clearInterval(timerInterval)
+                }
+              }).then((result) => {
+                if (result.dismiss === Swal.DismissReason.timer) {
+                  location.reload();
+                }
+              })
+          }
+          if (response.status == 400) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: response.message,
+              })
+          }
+      },
+      cache: false,
+      contentType: false,
+      processData: false
+  });
+
+
+});
 
 $("form#updateItem").submit(function(e) {
   e.preventDefault();
@@ -727,6 +939,61 @@ $("form#updateItem").submit(function(e) {
             //   text: response.message,
             //   })
               $('#EditPRModal').modal('hide');
+              Swal.fire({
+                title: 'Saved',
+                icon: 'success',
+                html: response.message,
+                timer: 1000,
+                timerProgressBar: true,
+                didOpen: () => {
+                  Swal.showLoading()
+                  const b = Swal.getHtmlContainer().querySelector('b')
+                  timerInterval = setInterval(() => {
+                    b.textContent = Swal.getTimerLeft()
+                  }, 100)
+                },
+                willClose: () => {
+                  clearInterval(timerInterval)
+                }
+              }).then((result) => {
+                if (result.dismiss === Swal.DismissReason.timer) {
+                  location.reload();
+                }
+              })
+          }
+          if (response.status == 400) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: response.message,
+              })
+          }
+      },
+      cache: false,
+      contentType: false,
+      processData: false
+  });
+
+
+});
+
+$("form#upload_signed_pr").submit(function(e) {
+  e.preventDefault();
+//  alert('success');  
+ var formData = new FormData(this);    
+  
+  $.ajax({
+      url:'/PR/signed_pr/upload_signed_pr',
+      type: 'POST',
+      data: formData,
+      success: function (response) {
+          // alert(data)
+          if (response.status == 200) {
+            // Swal.fire({
+            //   icon: 'success',
+            //   title: 'Success',
+            //   text: response.message,
+            //   })
               Swal.fire({
                 title: 'Saved',
                 icon: 'success',
@@ -799,6 +1066,74 @@ $(document).on('click', '.deletebutton', function (e) {
                 data:data,
                 success: function (response) {
                       if(response['status'] == 200) {
+                        Swal.fire({ 
+                          icon: 'success',
+                          title: 'Success',
+                          text: response['message'],
+                          timer: 1000,
+                          timerProgressBar: true,
+                          didOpen: () => {
+                            Swal.showLoading()
+                            const b = Swal.getHtmlContainer().querySelector('b')
+                            timerInterval = setInterval(() => {
+                              b.textContent = Swal.getTimerLeft()
+                            }, 100)
+                          },
+                          willClose: () => {
+                            clearInterval(timerInterval)
+                          }
+                        }).then((result) => {
+                          if (result.dismiss === Swal.DismissReason.timer) {
+                            location.reload();
+                          }
+                        })
+                      }if(response.status == 400){
+                        Swal.fire({ 
+                          icon: 'error',
+                          title: 'Error',
+                          text: response.message,
+                        })
+                      }
+                }
+            });
+            }else if (result.isDenied) {
+              Swal.fire('Changes are not saved', '', 'info')
+            }
+      })
+});
+
+$(document).on('click', '.delete_SignedPR_button', function (e) {
+  e.preventDefault();
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    var id = $(this).attr("href");
+    var data = {
+      'id': id,
+      };
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',  
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes',
+      confirmButtonClass: 'btn btn-primary',
+      cancelButtonClass: 'btn btn-danger ml-1',
+      buttonsStyling: false,
+    }).then((result) => {
+            if (result.isConfirmed) {
+              $.ajax({
+                type: "POST",
+                url: "/PR/signed_pr/delete_signed_pr",
+                data:data,
+                success: function (response) {
+                      if(response['status'] == 200) {
                       location.reload();
                         Swal.fire({
                           title: 'Success',
@@ -818,4 +1153,249 @@ $(document).on('click', '.deletebutton', function (e) {
               Swal.fire('Changes are not saved', '', 'info')
             }
       })
+});
+
+$(document).on('click', '.approve_pr', function (e) {
+  e.preventDefault();
+
+  var pr_no = $(".pr_no").text();
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+    
+    $.ajax({
+      type: 'POST',
+      url: "/purchase_request/pending_prs/approve_or_disapprove",
+      headers: {'X-CSRF-TOKEN' : $('meta[name="csrf-token"]').attr('content')},
+      data: {
+        'status'  : 2,
+        'pr_no'  : pr_no,
+        'remark'  : 'Approved',
+      },
+      success: function(response) {
+        // ! show when success
+          if(response.status == 200) {
+            
+            Swal.fire({ 
+              icon: 'success',
+              title: 'Success',
+              text: response['message'],
+              timer: 1000,
+              timerProgressBar: true,
+              didOpen: () => {
+                Swal.showLoading()
+                const b = Swal.getHtmlContainer().querySelector('b')
+                timerInterval = setInterval(() => {
+                  b.textContent = Swal.getTimerLeft()
+                }, 100)
+              },
+              willClose: () => {
+                clearInterval(timerInterval)
+              }
+            }).then((result) => {
+              if (result.dismiss === Swal.DismissReason.timer) {
+                location.reload();
+              }
+            })
+          } 
+        // ! show when error
+          if(response['status'] == 400) {
+            Swal.fire({ 
+              icon: 'info',
+              title: 'Information',
+              text: response['message'],
+            })
+          }
+      }
+    });
+  
+});
+
+$(document).on('click', '.disapprove_pr_modal', function (e) {
+  e.preventDefault();
+
+    $('#DisapprovePRModal').modal('show');
+  
+});
+
+$(document).on('click', '.disapprove_pr', function (e) {
+  e.preventDefault();
+
+  var pr_no = $(".pr_no").text();
+  var remark = $(".reject_remarks").val();
+
+  if(remark == ''){
+    Swal.fire({ 
+      icon: 'error',
+      title: 'Error',
+      text: 'Please enter remark!',
+    })
+  }else{
+
+    $.ajaxSetup({
+      headers: {
+          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      }
+    });
+
+    $.ajax({
+      type: 'POST',
+      url: "/purchase_request/pending_prs/approve_or_disapprove",
+      headers: {'X-CSRF-TOKEN' : $('meta[name="csrf-token"]').attr('content')},
+      data: {
+        'status'  : 3,
+        'pr_no'  : pr_no,
+        'remark'  : remark,
+      },
+      success: function(response) {
+        // ! show when success
+          if(response.status == 200) {
+            
+            $('#DisapprovePRModal').modal('hide');
+            
+            Swal.fire({ 
+              icon: 'success',
+              title: 'Success',
+              text: response['message'],
+              timer: 1000,
+              timerProgressBar: true,
+              didOpen: () => {
+                Swal.showLoading()
+                const b = Swal.getHtmlContainer().querySelector('b')
+                timerInterval = setInterval(() => {
+                  b.textContent = Swal.getTimerLeft()
+                }, 100)
+              },
+              willClose: () => {
+                clearInterval(timerInterval)
+              }
+            }).then((result) => {
+              if (result.dismiss === Swal.DismissReason.timer) {
+                location.reload();
+              }
+            })
+
+          } 
+        // ! show when error
+          if(response['status'] == 400) {
+            Swal.fire({ 
+              icon: 'info',
+              title: 'Information',
+              text: response['message'],
+            })
+          }
+      }
+    });
+  }
+  
+});
+
+$("form#RSSubmit").submit(function(e) {
+  e.preventDefault();
+//  alert('success')
+  var formData = new FormData(this);    
+
+$.ajax({
+  type: 'POST',
+  url: "/PR/routing_slip/pr_routing_slip/saveChanges",
+  data: formData,
+  success: function(response) {
+    // ! show when success
+      if(response.status == 200) {
+        $('#RoutingSlipModal').modal('hide');
+        
+        Swal.fire({ 
+          icon: 'success',
+          title: 'Success',
+          text: response['message'],
+          timer: 1000,
+          timerProgressBar: true,
+          didOpen: () => {
+            Swal.showLoading()
+            const b = Swal.getHtmlContainer().querySelector('b')
+            timerInterval = setInterval(() => {
+              b.textContent = Swal.getTimerLeft()
+            }, 100)
+          },
+          willClose: () => {
+            clearInterval(timerInterval)
+          }
+        }).then((result) => {
+          if (result.dismiss === Swal.DismissReason.timer) {
+            location.reload();
+          }
+        })
+      } 
+    // ! show when error
+      if(response['status'] == 400) {
+        Swal.fire({ 
+          icon: 'info',
+          title: 'Information',
+          text: response['message'],
+        })
+      }
+    },
+    cache: false,
+    contentType: false,
+    processData: false
+  });
+
+});
+
+$(document).on('click','.saveChanges', function (e) {
+  e.preventDefault();
+  // alert('azdfg');
+    var countCheckbox = $('input[type="checkbox"]').length-1;
+    // var checkboxes = $('input:checkbox:checked').length-1;
+    // var checkboxes = $('input:checkbox:not(":checked")').length;
+    // var checkboxes = $('#myCheckbox').val(1);
+
+    // var checkboxes = document.getElementById('myCheckbox');
+    var checkedArray = [];
+    var date= $('#received'+'1').val();
+    var date= $('#received'+'1').val();
+    // alert(date)
+      $("input:checkbox:checked").each(function(){
+          checkedArray.push($(this).val());
+      });
+
+     
+  
+    // console.log(checkedArray)
+});
+
+
+$("input[type='checkbox']").change(function() {
+  // e.preventDefault();
+  if(this.checked){
+    var activityNumber =  $(this).val();
+    $('.activityNumber').val(activityNumber);
+    $('#RoutingSlipModal').modal('show');
+  }
+  
+//   var value = $(this).val()
+//   var countCheckbox = $('input[type="checkbox"]').length;
+// // alert(countCheckbox)
+// $("input:checkbox[id=myCheckbox"+value+"]:checked").each(function(){
+//   $('#received'+value).removeAttr('hidden');
+//   $('#released'+value).removeAttr('hidden');
+//   $('#remark'+value).removeAttr('hidden');
+
+
+// });
+
+// if(this.checked==false){
+//     for (let i = 0; i < countCheckbox; i++) {
+//       if(i ==value){
+//         // $("#reeived2").show();
+//         $("#received"+value).attr("hidden",true);
+//         $("#released"+value).attr("hidden",true);
+//         $("#remark"+value).attr("hidden",true);
+
+//       }
+//     }
+//   }
 });

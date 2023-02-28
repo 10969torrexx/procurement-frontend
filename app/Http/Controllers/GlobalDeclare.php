@@ -33,6 +33,31 @@ class GlobalDeclare extends Controller
         return $out;
     }
 
+    public function Campus_location($id){
+        $out = "";
+        switch ($id){
+            case 1:
+                $out = "Sogod";
+                break;
+            case 2:
+                $out = "Maasin";
+                break;  
+            case 3:
+                $out = "Tomas Oppus";
+                break;
+            case 4:
+                $out = "Bontoc";
+                break;
+            case 5:
+                $out = "San Juan";
+                break;
+            case 6:
+                $out = "Hinunangan";
+                break;
+        }
+        return $out;
+    }
+
     public function Campus($id){
         $out = "";
         switch ($id){
@@ -375,38 +400,74 @@ class GlobalDeclare extends Controller
     }
 
     # this will determine the app is approved or disaaproved
-    public function pres_status($id) {
+    public function app_status($id,$code) {
         $out = '';
-        switch ($id) {
-            case 0:
-                $out = 'Pending';
-            break;
-            case 1:
-                $out = 'Approved';
-            break;
-            case 2:
-                $out = 'Disapproved';
-            break;
+        if($code == "list"){
+            switch ($id) {
+                case 0:
+                    $out = 'Pending';
+                break;
+                case 1:
+                    $out = 'Approved by the BAC Committee';
+                break;
+                case 2:
+                    $out = 'Disapproved by the BAC Committee';
+                break;
+                case 3:
+                    $out = 'Approved by the President / Hope';
+                break;
+                case 4:
+                    $out = 'Disapproved by the BAC Committee';
+                break;
+            }
+            return $out;
+        }else{
+            switch ($id) {
+                case 0:
+                    $out = 'Pending';
+                break;
+                case 1:
+                    $out = 'Approved ';
+                break;
+            }
+            return $out;
         }
-        return $out;
     }
 
     # this will determine the color of status
-    public function pres_status_color($id) {
+    public function app_status_color($id,$code) {
         $out = '';
-        switch ($id) {
-            case 0:
-                $out = 'blue';
-            break;
-            case 1:
-                $out = 'green';
-            break;
-            case 2:
-                $out = 'red';
-            break;
+        if($code == "list"){
+            switch ($id) {
+                case 0:
+                    $out = 'primary';
+                break;
+                case 1:
+                    $out = 'success';
+                break;
+                case 2:
+                    $out = 'danger';
+                break;
+                case 3:
+                    $out = 'success';
+                break;
+                case 4:
+                    $out = 'danger';
+                break;
+            }
+            return $out;
+        }else{
+            switch ($id) {
+                case 0:
+                    $out = 'primary';
+                break;
+                case 1:
+                    $out = 'success';
+                break;
+            }
+            return $out;
         }
         
-        return $out;
     }
 
     # this will determine the app is approved or disaaproved
@@ -427,18 +488,32 @@ class GlobalDeclare extends Controller
     }
 
     # this will determine the color of status
-    public function endorse_color($id) {
+    public function endorse_color($id,$code) {
         $out = '';
-        switch ($id) {
-            case 0:
-                $out = 'blue';
-            break;
-            case 1:
-                $out = 'coral';
-            break;
-            // case 3:
-            //     $out = 'red';
-            // break;
+        if($code == "html"){
+            switch ($id) {
+                case 0:
+                    $out = 'blue';
+                break;
+                case 1:
+                    $out = 'coral';
+                break;
+                // case 3:
+                //     $out = 'red';
+                // break;
+            }
+        }else{
+            switch ($id) {
+                case 0:
+                    $out = 'primary';
+                break;
+                case 1:
+                    $out = 'warning';
+                break;
+                // case 3:
+                //     $out = 'red';
+                // break;
+            }
         }
         
         return $out;
@@ -467,18 +542,19 @@ class GlobalDeclare extends Controller
         $out = '';
         switch ($id) {
             case 0:
-                $out = 'blue';
+                $out = 'primary';
             break;
             case 1:
-                $out = 'green';
+                $out = 'success';
             break;
             case 2:
-                $out = 'red';
+                $out = 'danger';
             break;
         }
         
         return $out;
     }
+
 
     /**
      * * TORREXX additionals
@@ -497,5 +573,62 @@ class GlobalDeclare extends Controller
         } catch (\Throwable $th) {
             throw $th;
         }
+
+    # this will determine the statuses of the ppmp, Project title
+    public function ppmp_status($id) {
+        $out = '';
+        switch($id) {
+            case 0:
+                $out = "Draft";
+                break;
+            case 1:
+                $out = "Pending";
+                break;
+            case 2:
+                $out = "Accepted by Supervisor";
+                break;  
+            case 3:
+                $out = "To be Revise";
+                break;
+            case 4:
+                $out = "Accepted by Budget Officer";
+                break;
+            case 5:
+                $out = "Disapproved by Budget Officer";
+                break;
+            case 6:
+                $out = "Revised";
+                break;
+        }
+        return $out;
+    }
+    
+    # this will determine the color of the statuses of the ppmp, Project title
+    public function ppmp_status_color($id) {
+        $out = '';
+        switch($id) {
+            case 0:
+                $out = "Draft";
+                break;
+            case 1:
+                $out = "primary";
+                break;
+            case 2:
+                $out = "success";
+                break;  
+            case 3:
+                $out = "danger";
+                break;
+            case 4:
+                $out = "info";
+                break;
+            case 5:
+                $out = "danger";
+                break;
+            case 6:
+                $out = "warning";
+                break;
+        }
+        return $out;
     }
 }

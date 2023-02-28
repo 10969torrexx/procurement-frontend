@@ -60,7 +60,7 @@ class SupervisorController extends Controller
       $aes = new AESCipher();
       $id = $aes->decrypt($request->project_code);
       $data = DB::table("ppmps as p")
-                ->select("pt.project_code as code","pt.status as projectStatus","pt.id as pt_id","pt.project_title as title","p.*","pt.year_created","m.mode_of_procurement as procurementName")
+                ->select("pt.project_code as code","pt.status as projectStatus","pt.id as pt_id","pt.project_title as title","p.*","pt.year_created","m.mode_of_procurement as procurementName","pt.project_category")
                 ->join('project_titles as pt','pt.id','=','p.project_code')
                 ->join('mode_of_procurement as m','m.id','=','p.mode_of_procurement')
                 ->where('p.project_code','=',$id)
@@ -74,7 +74,7 @@ class SupervisorController extends Controller
       // dd($data);
       $pageConfigs = ['pageHeader' => true];
       $breadcrumbs = [
-        ["link" => "/", "name" => "Home"],["link" => "/supervisor","name" =>"Supervisor"],["name" =>"PPMP"]
+        ["link" => "/", "name" => "Home"],["link" => "/supervisor/traditional","name" =>"Supervisor"],["name" =>"PPMP"]
       ];
       return view('pages.supervisor.traditional.supervisor_check_ppmp',compact('data'),
       [
@@ -130,15 +130,13 @@ class SupervisorController extends Controller
       $aes = new AESCipher();
       $id = $aes->decrypt($request->project_code);
       $data = DB::table("ppmps as p")
-                ->select("pt.project_code as code","pt.status as projectStatus","pt.id as pt_id","pt.project_title as title","p.*","pt.year_created","m.mode_of_procurement as procurementName")
+                ->select("pt.project_code as code","pt.status as projectStatus","pt.id as pt_id","pt.project_title as title","p.*","pt.year_created","m.mode_of_procurement as procurementName","pt.project_category")
                 ->join('project_titles as pt','pt.id','=','p.project_code')
                 ->join('mode_of_procurement as m','m.id','=','p.mode_of_procurement')
                 ->where('p.project_code','=',$id)
                 ->whereNull("p.deleted_at")
                 ->where("pt.project_category","=", 2)
                 ->where("p.status","!=", 0)  
-                // ->orwhere("p.status","=", 2)  
-                // ->orwhere("p.status","=", 3)   
                 -> get();
       // $title = $data->title;
       // dd($data);
@@ -200,12 +198,12 @@ class SupervisorController extends Controller
       $aes = new AESCipher();
       $id = $aes->decrypt($request->project_code);
       $data = DB::table("ppmps as p")
-                ->select("pt.project_code as code","pt.status as projectStatus","pt.id as pt_id","pt.project_title as title","p.*","pt.year_created","m.mode_of_procurement as procurementName")
+                ->select("pt.project_code as code","pt.status as projectStatus","pt.id as pt_id","pt.project_title as title","p.*","pt.year_created","m.mode_of_procurement as procurementName","pt.project_category")
                 ->join('project_titles as pt','pt.id','=','p.project_code')
                 ->join('mode_of_procurement as m','m.id','=','p.mode_of_procurement')
                 ->where('p.project_code','=',$id)
                 ->whereNull("p.deleted_at")
-                ->where("pt.project_category","=", 2)
+                ->where("pt.project_category","=", 0)
                 ->where("p.status","!=", 0)  
                 // ->orwhere("p.status","=", 2)  
                 // ->orwhere("p.status","=", 3)   

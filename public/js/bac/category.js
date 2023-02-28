@@ -13,81 +13,81 @@
 
 //Save
 
-var input = document.getElementById("category");
-input.addEventListener("keypress", function(event) {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      var data = {
-          // 'item id': $('.item-id').val(),
-          'category': $('.category').val(),
-      }
-      console.log(data);
-      if( data.category == "")
-      {
-        Swal.fire('Complete the needed data', '', 'info')
-      }
-      else{
-        // $(this).text('Saving..');
-        $.ajaxSetup({
-          headers: {
-              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-          }
-        });
+// var input = document.getElementById("category");
+// input.addEventListener("keypress", function(event) {
+//     if (event.key === "Enter") {
+//       event.preventDefault();
+//       var data = {
+//           // 'item id': $('.item-id').val(),
+//           'category': $('.category').val(),
+//       }
+//       console.log(data);
+//       if( data.category == "")
+//       {
+//         Swal.fire('Complete the needed data', '', 'info')
+//       }
+//       else{
+//         // $(this).text('Saving..');
+//         $.ajaxSetup({
+//           headers: {
+//               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+//           }
+//         });
   
-        $.ajax({
-          type: "POST",
-          url: "add-category",
-          data: data,
-          dataType: "json",
-          success: function (response) {
-              if (response.status == 200) {
+//         $.ajax({
+//           type: "POST",
+//           url: "add-category",
+//           data: data,
+//           dataType: "json",
+//           success: function (response) {
+//               if (response.status == 200) {
                 
-                      // console.log(response);
-                      Swal.fire({
-                        title: 'Saved',
-                        html: 'Saved Successfully!',
-                        icon: 'success',
-                        timer: 2000,
-                        timerProgressBar: true,
-                        didOpen: () => {
-                          Swal.showLoading()
-                          const b = Swal.getHtmlContainer().querySelector('b')
-                          timerInterval = setInterval(() => {
-                            b.textContent = Swal.getTimerLeft()
-                          }, 100)
-                        },
-                        willClose: () => {
-                          clearInterval(timerInterval)
-                        }
-                      }).then((result) => {
-                        /* Read more about handling dismissals below */
-                        if (result.dismiss === Swal.DismissReason.timer) {
-                          $('.add-category').text('Add');
-                          $('.category').val('');
-                          // $('#item-table').DataTable().ajax.reload();
-                          location.reload();
-                          console.log('I was closed by the timer')
-                        }
-                      })
+//                       // console.log(response);
+//                       Swal.fire({
+//                         title: 'Saved',
+//                         html: 'Saved Successfully!',
+//                         icon: 'success',
+//                         timer: 2000,
+//                         timerProgressBar: true,
+//                         didOpen: () => {
+//                           Swal.showLoading()
+//                           const b = Swal.getHtmlContainer().querySelector('b')
+//                           timerInterval = setInterval(() => {
+//                             b.textContent = Swal.getTimerLeft()
+//                           }, 100)
+//                         },
+//                         willClose: () => {
+//                           clearInterval(timerInterval)
+//                         }
+//                       }).then((result) => {
+//                         /* Read more about handling dismissals below */
+//                         if (result.dismiss === Swal.DismissReason.timer) {
+//                           $('.add-category').text('Add');
+//                           $('.category').val('');
+//                           // $('#item-table').DataTable().ajax.reload();
+//                           location.reload();
+//                           console.log('I was closed by the timer')
+//                         }
+//                       })
                   
-              } else {
+//               } else {
                 
-                $('.add-category').text('Add');
-                Swal.fire({
-                  icon: 'error',
-                  title: 'Oops...',
-                  text: 'Already Exist',
-                })
-                $('.add-category').text('Add');
-                $('.category').val('');
-              }
-          }
-        });
-      }
-             console.log(data);
+//                 $('.add-category').text('Add');
+//                 Swal.fire({
+//                   icon: 'error',
+//                   title: 'Oops...',
+//                   text: 'Already Exist',
+//                 })
+//                 $('.add-category').text('Add');
+//                 $('.category').val('');
+//               }
+//           }
+//         });
+//       }
+//              console.log(data);
      
-    }
-  });
+//     }
+//   });
   
   $(document).on('click', '.add-category', function (e) {
       e.preventDefault();
@@ -272,72 +272,72 @@ input.addEventListener("keypress", function(event) {
   
   //update
   
-  var input = document.getElementById("update");
-  input.addEventListener("keypress", function(event) {
-    if (event.key === "Enter") {
-      event.preventDefault();
+  // var input = document.getElementById("update");
+  // input.addEventListener("keypress", function(event) {
+  //   if (event.key === "Enter") {
+  //     event.preventDefault();
   
-      var data = {
-        'category': $('.update').val(),
-        'id': $('.update-id').val(),
-    }
-    if( data.category == "")
-    {
-      Swal.fire('Complete the needed data', '', 'info')
-    }
-    else{
-      // $(this).text('Saving..');
-      $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-      });
-        $.ajax({
-          type: "POST",
-          url: "update-category",
-          data: data,
-          dataType: "json",
-          success: function (response) {
-            // console.log(response);
-            if(response['status'] == 200) {
+  //     var data = {
+  //       'category': $('.update').val(),
+  //       'id': $('.update-id').val(),
+  //   }
+  //   if( data.category == "")
+  //   {
+  //     Swal.fire('Complete the needed data', '', 'info')
+  //   }
+  //   else{
+  //     // $(this).text('Saving..');
+  //     $.ajaxSetup({
+  //       headers: {
+  //           'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+  //       }
+  //     });
+  //       $.ajax({
+  //         type: "POST",
+  //         url: "update-category",
+  //         data: data,
+  //         dataType: "json",
+  //         success: function (response) {
+  //           // console.log(response);
+  //           if(response['status'] == 200) {
               
-              $("#editmodal").modal('hide');
-              Swal.fire({
-                title: 'Updated!!!',
-                html: 'Update Successfully!',
-                icon: 'success',
-                timer: 1000,
-                timerProgressBar: true,
-                didOpen: () => {
-                  Swal.showLoading()
-                  const b = Swal.getHtmlContainer().querySelector('b')
-                  timerInterval = setInterval(() => {
-                    b.textContent = Swal.getTimerLeft()
-                  }, 100)
-                },
-                willClose: () => {
-                  clearInterval(timerInterval)
-                }
-                }).then((result) => {
-                  /* Read more about handling dismissals below */
-                  if (result.dismiss === Swal.DismissReason.timer) {
-                    location.reload();
-                    console.log('I was closed by the timer')
-                  }
-                })
-              }else{
-                Swal.fire({
-                  icon: 'error',
-                  title: 'Oops...',
-                  text: 'Already Exist',
-                })
-                $(this).text('Update');
-              }
-          }
-        })   
-      } 
-    }
-  });
+  //             $("#editmodal").modal('hide');
+  //             Swal.fire({
+  //               title: 'Updated!!!',
+  //               html: 'Update Successfully!',
+  //               icon: 'success',
+  //               timer: 1000,
+  //               timerProgressBar: true,
+  //               didOpen: () => {
+  //                 Swal.showLoading()
+  //                 const b = Swal.getHtmlContainer().querySelector('b')
+  //                 timerInterval = setInterval(() => {
+  //                   b.textContent = Swal.getTimerLeft()
+  //                 }, 100)
+  //               },
+  //               willClose: () => {
+  //                 clearInterval(timerInterval)
+  //               }
+  //               }).then((result) => {
+  //                 /* Read more about handling dismissals below */
+  //                 if (result.dismiss === Swal.DismissReason.timer) {
+  //                   location.reload();
+  //                   console.log('I was closed by the timer')
+  //                 }
+  //               })
+  //             }else{
+  //               Swal.fire({
+  //                 icon: 'error',
+  //                 title: 'Oops...',
+  //                 text: 'Already Exist',
+  //               })
+  //               $(this).text('Update');
+  //             }
+  //         }
+  //       })   
+  //     } 
+  //   }
+  // });
   
   $(document).on('click', '.update-btn', function (e) {
     e.preventDefault();

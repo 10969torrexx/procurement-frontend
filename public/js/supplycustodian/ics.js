@@ -731,7 +731,7 @@ $(document).on('click', '.print', function (e) {
           }
 
         }
-      });
+  });
 });
 
 $(document).on('click', '.closeIcs', function (e) {

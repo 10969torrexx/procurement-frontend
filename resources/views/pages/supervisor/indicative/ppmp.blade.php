@@ -67,7 +67,10 @@
 
                                                 Php {{ number_format($total) }}
                                         </td>
-                                        <?php
+                                        <td> 
+                                            <div class="badge badge-pill badge-light-{{ (new GlobalDeclare)->ppmp_status_color($data->status) }} mr-1">{{ (new GlobalDeclare)->ppmp_status($data->status) }}</div>
+                                        </td>
+                                        {{-- <?php
                                         if($data->status == 1)
                                         {
                                             ?>
@@ -95,7 +98,7 @@
                                         <td style="text-align: left; color:red;">Rejected by Budget Officer</td>
                                         <?php
                                         }
-                                        ?>
+                                        ?> --}}
                                         <td>
                                             <form action="{{ route('show-indicative-ppmp') }}" method="post">
                                                 @csrf

@@ -61,7 +61,7 @@
                                 <option value="{{$aes->encrypt(11)}}">Immediate Supervisor</option>
                                 <option value="{{$aes->encrypt(12)}}">President/HOPE</option>
                                 <option value="{{$aes->encrypt(13)}}">BOR Secretariat</option>
-                                <option value="{{$aes->encrypt(14)}}">BAC Committee</option>
+                                <option value="{{$aes->encrypt(14)}}">BAC Member</option>
                             </select>
                             
                         </fieldset>
