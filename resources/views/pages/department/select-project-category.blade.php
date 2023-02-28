@@ -31,8 +31,10 @@
 <section id="horizontal-vertical">
     <div class="row">
         <div class="card col-12">
-            <div class="card-header">
-                <h4 class="text-primary"><strong>Project Category</strong></h4>
+            <div class="card-header p-1">
+                <h5 class="card-title">
+                  <strong>Select Project Category</strong>
+                </h5>
             </div>
             <div class="card-header">
                 <div class="row col-12">
@@ -47,7 +49,7 @@
                                     </lord-icon>
                                 </div>
                                 <a href="{{ route('department-showCreatetPPMP', ['project_category' => (new AESCipher)->encrypt(0)]) }}" class="btn btn-primary col-12">
-                                    <strong class="text-white">Indicative PPMP</strong>
+                                    <strong class="text-white">Indicative</strong>
                                 </a>
                             </div>
                         </div>
@@ -83,7 +85,7 @@
                                     </lord-icon>
                                 </div>
                                 <a href="{{ route('department-showCreatetPPMP', ['project_category' => (new AESCipher)->encrypt(2)]) }}" class="btn btn-primary col-12">
-                                    <strong class="text-white">Supplemental PPMP</strong>
+                                    <strong class="text-white">Supplemental</strong>
                                 </a>
                             </div>
                         </div>

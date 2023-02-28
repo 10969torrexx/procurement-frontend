@@ -32,7 +32,9 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title">Purchase Request</h4>
+                    <h4 class="card-title text-center mt-2">
+                        <strong>PURCHASE REQUEST</strong>
+                    </h4>
                 </div>
                 <div class="card-content">
                     <div class="card-body card-dashboard">
@@ -77,12 +79,14 @@
                                                         <div class="dropdown-menu dropdown-menu-left">
                                                             <a class="dropdown-item" ctr = "<?=$ctr?>" href = "{{ route('view_pr', ['id' => $aes->encrypt($data->id)]) }}" >
                                                                 <i class="bx bx-show-alt mr-1"></i>View PR</a>
+                                                            @if($data->status == 2)
                                                             <a class="dropdown-item" ctr = "<?=$ctr?>" href = "{{ route('view_status', ['id' => $aes->encrypt($data->id)]) }}">
                                                                 <i class="bx bx-task mr-1"></i>View Status</a>
-                                                            @if($data->status == 0 || $data->status == 1)
+                                                            @endif
+                                                            @if($data->status == 0 || $data->status == 1 || $data->status == 3)
                                                             <a class="dropdown-item" ctr = "<?=$ctr?>" href = "{{ route('edit_pr', ['id' => $aes->encrypt($data->id) , 'pr_no' => $aes->encrypt($data->pr_no)]) }}" >
                                                                 <i class="bx bx-edit-alt mr-1"></i> Edit</a>
-                                                            <a class="dropdown-item deletebutton" ctr = "<?=$ctr?>" href = "{{ $aes->encrypt($data->id) }}" rel = "{{ $aes->encrypt($data->pr_no) }}">
+                                                            <a class="dropdown-item deletebutton" ctr = "<?=$ctr?>" href = "{{ $aes->encrypt($data->id) }}" rel = "{{ $aes->encrypt($data->pr_no) }}" >
                                                                 <i class="bx bx-trash mr-1"></i> Delete </a>
                                                             @endif
                                                             
@@ -103,6 +107,8 @@
                                                 <td style="color:blue;"><div class="badge badge-pill badge-light-primary mr-1">Pending</div></td>
                                                 @elseif($data->status == 2)
                                                 <td style="color:green;"><div class="badge badge-pill badge-light-success mr-1">Approved</div></td>
+                                                @elseif($data->status == 3)
+                                                <td ><div class="badge badge-pill badge-light-danger mr-1">Disapproved</div></td>
                                                 @endif
                                                 <td>{{ date('M. j, Y', strtotime($data->created_at))}}</td>
                                             </tr>

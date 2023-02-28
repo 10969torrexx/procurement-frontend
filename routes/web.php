@@ -459,6 +459,10 @@ Route::group(['prefix' => 'budgetofficer','middleware' => ['authuser']], functio
     Route::post('/view_ppmp/showPPMP/ppmp-timeline', 'BudgetOfficer\BudgetOfficerController@timeline')->name('ppmp-timeline');
     Route::post('/view_ppmp/showPPMP/accept-reject-all', 'BudgetOfficer\BudgetOfficerController@accept_reject_all')->name('accept-reject-all');
 
+    Route::get('/pending_ppmp_request','BudgetOfficer\BudgetOfficerController@pending_ppmp_request');
+    Route::post('/pending_ppmp_request/appdis_request','BudgetOfficer\BudgetOfficerController@appdis_request');
+
+
 });
 #End Route for Budget Officer
 
@@ -574,6 +578,10 @@ Route::group(['prefix' => 'bac','middleware' => ['authuser']], function() {
     //Ammendments
     Route::get('/request-for-amendments', 'BAC\RequestforAmendmentsController@index');
 });
+
+
+
+
 
 Route::group(['prefix' => 'supervisor','middleware' => ['authuser']], function() {
     //Supervisor Side
@@ -696,6 +704,15 @@ Route::group(['prefix' => 'supply_custodian','middleware' => ['authuser']], func
 
 });
 
+Route::group(['prefix' => 'purchase_request','middleware' => ['authuser']], function() {
+
+    Route::get('/signed_pr', 'BAC\SignedPRsController@SignedPRIndex')->name('signed_pr');
+    Route::get('/pending_prs', 'President\PresidentHopeController@PendingPRIndex')->name('pending_prs');
+    Route::get('/pending_prs/view_pending_pr', 'President\PresidentHopeController@view_pending_pr')->name('view_pending_pr');
+    Route::post('/pending_prs/approve_or_disapprove', 'President\PresidentHopeController@approve_or_disapprove')->name('approve_or_disapprove');
+
+});
+
 Route::group(['prefix' => 'PR','middleware' => ['authuser']], function() {
     Route::get('/purchaseRequest', 'Department\PurchaseRequestController@PurchaseRequestIndex')->name('purchaseRequest');
     Route::post('/purchaseRequest/add_Items_To_PR', 'Department\PurchaseRequestController@add_Items_To_PR');
@@ -704,6 +721,7 @@ Route::group(['prefix' => 'PR','middleware' => ['authuser']], function() {
     Route::get('/purchaseRequest/createPR', 'Department\PurchaseRequestController@createPR')->name('createPR');
     Route::post('/purchaseRequest/createPR/remove_item', 'Department\PurchaseRequestController@remove_item')->name('remove_item');
     Route::get('/purchaseRequest/getEmployees', 'Department\PurchaseRequestController@getEmployees');
+    Route::get('/purchaseRequest/getApprovingOfficers', 'Department\PurchaseRequestController@getApprovingOfficers');
     Route::get('/purchaseRequest/getItems', 'Department\PurchaseRequestController@getItems');
     Route::get('/purchaseRequest/getItem', 'Department\PurchaseRequestController@getItem');
     Route::get('/purchaseRequest/editPRItem', 'Department\PurchaseRequestController@editPRItem');
@@ -715,6 +733,19 @@ Route::group(['prefix' => 'PR','middleware' => ['authuser']], function() {
     Route::get('/trackPR/view_pr', 'Department\PurchaseRequestController@view_pr')->name('view_pr');
     Route::post('/trackPR/delete_pr', 'Department\PurchaseRequestController@delete_pr')->name('delete_pr');
     Route::get('/trackPR/edit_pr', 'Department\PurchaseRequestController@editPR')->name('edit_pr');
+
+    Route::get('/signed_pr', 'Department\PurchaseRequestController@SignedPRIndex')->name('signed_pr');
+    Route::post('/signed_pr/upload_signed_pr', 'Department\PurchaseRequestController@upload_signed_pr')->name('upload_signed_pr');
+    Route::get('/signed_pr/edit_signed_pr', 'Department\PurchaseRequestController@edit_signed_pr')->name('edit_signed_pr');
+    Route::post('/signed_pr/update_signed_pr', 'Department\PurchaseRequestController@update_signed_pr')->name('update_signed_pr');
+    Route::post('/signed_pr/delete_signed_pr', 'Department\PurchaseRequestController@delete_signed_pr')->name('delete_signed_pr');
+    Route::post('/signed_pr/view_signed_pr', 'Department\PurchaseRequestController@view_signed_pr')->name('view_signed_pr');
+    Route::get('/signed_pr/download_signed_pr', 'Department\PurchaseRequestController@download_signed_pr')->name('download_signed_pr');
+
+    Route::get('/routing_slip', 'Department\PurchaseRequestController@RoutingSlipIndex')->name('routing_slip');
+    Route::get('/routing_slip/pr_routing_slip', 'Department\PurchaseRequestController@pr_routing_slip')->name('pr_routing_slip');
+    Route::post('/routing_slip/pr_routing_slip/saveChanges', 'Department\PurchaseRequestController@saveChanges')->name('saveChanges');
+    Route::get('/routing_slip/pr_routing_slip/getData', 'Department\PurchaseRequestController@getData')->name('getData');
 
     
 });
@@ -761,7 +792,7 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
             # this will show the my ppmp page based on the department id
             Route::get('/myPPMP', [DepartmentPagesController::class, 'showMyPPMP'])->name('department-showMyPPMP');
             # this will show the status of the project along with its item
-            Route::post('/project/status', [DepartmentPagesController::class, 'showProjectStatus'])->name('department-showProjectStatus');
+            Route::get('/project/status', [DepartmentPagesController::class, 'showProjectStatus'])->name('showProjectStatus');
                 # this will re-submit ppmp | revised PPMP
                 Route::post('/re-sumbit/ppmp', [DepartmentController::class, 'resubmitPPMP'])->name('department-re_submit-ppmp');
                 # this route will display the disapproved items
@@ -772,9 +803,7 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
 
             # export approved ppmp | this will generate PDF file of the Approved PPMP data
             Route::get('export-ppmp', [DepartmentController::class, 'export_approved_ppmp'])->name('export_ppmp');
-
-            # ppmp submission | request for PPMP Submission
-            Route::get('ppmp-submission', [DepartmentPagesController::class, 'show_ppmp_submission'])->name('show_ppmp_submission');
+           
 
             # upload ppmp | upload signed ppmp
             Route::get('upload-ppmp', [DepartmentPagesController::class, 'show_upload_ppmp'])->name('show_upload_ppmp');
@@ -805,8 +834,33 @@ Route::group(['prefix' => 'department','middleware' => ['authuser']], function()
             Route::get('/get-ppms', [DepartmentController::class, 'get_ppmps'])->name('get_ppmps');
             # live search item(s)
             Route::post('live-search-item', [DepartmentController::class, 'live_search_item'])->name('live_search_item');
+            //* get all unit of measurements
+            Route::get('get-measurements', [DepartmentController::class, 'get_measurements'])->name('get_measurements');
+            //* get live search unit of measure
+            Route::post('live-search-measurement', [DepartmentController::class, 'live_search_measurement'])->name('live_search_measurement');
+           
     /** END | TORREXX */
 });
+
+/**
+ * * TORREXX additionals
+ * 
+ */
+    Route::group(['prefix' => 'request-ppmp-submission', 'middleware' => ['authuser']], function() {
+         // *TODO: request to submit PPMP Submission
+            // * ppmp submission | request for PPMP Submission
+                Route::get('ppmp-submission', [DepartmentPagesController::class, 'show_ppmp_submission'])->name('show_ppmp_submission');
+            // * add item  to request details
+                Route::post('ppmp-submission-items', [DepartmentController::class, 'ppmp_response_items'])->name('ppmp_response_items');
+            // * add submit ppmp request
+                Route::post('/ppmp-request-submission', [DepartmentController::class, 'request_submission'])->name('request_submission');
+            // * get allocated budget
+                Route::post('get-allocated-budget', [DepartmentController::class, 'get_allocated_budget'])->name('get_allocated_budget');
+            // * get project based on allocated budgets
+                Route::post('get-projects', [DepartmentController::class, 'get_projects'])->name('get_projects');
+            // * get pending requests
+                Route::post('get-pending-request', [DepartmentController::class, 'get_pending_request'])->name('get_pending_request');
+    });
 
 /** TORREXX Additionals
  * ! BOR Secretary

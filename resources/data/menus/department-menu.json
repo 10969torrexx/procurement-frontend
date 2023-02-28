@@ -46,7 +46,7 @@
         
       },
       {
-        "url": "department/ppmp-submission",
+        "url": "request-ppmp-submission/ppmp-submission",
         "name": "PPMP Submission",
         "i18n": "Notebook",
         "icon": "envelope-pull"
@@ -74,6 +74,12 @@
           {
             "url": "PR/trackPR",
             "name": "Track PR",
+            "i18n": "User",
+            "icon": "shoppingcart-in"
+          },
+          {
+            "url": "PR/signed_pr",
+            "name": "Signed PR",
             "i18n": "User",
             "icon": "shoppingcart-in"
           }

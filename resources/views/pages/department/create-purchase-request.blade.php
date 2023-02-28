@@ -31,8 +31,16 @@
                     <a href = "{{ route('purchaseRequest') }}" class = "btn btn-primary mr-1 mb-1"><i class="bx bx-left-arrow"></i> Back</a>
                 </div>
 
+                <style>
+                    .danger {
+                        background-color: #ffdddd;
+                        border-left: 6px solid #f44336;
+                        height: 50px;
+                        line-height: 50px;
+                        }
+                </style>
                 <div class="card-header" >
-                    <h4 class="card-title">SELECT ITEMS FOR PURCHASE REQUEST</h4>
+                    <h4 class="card-title  text-center"><strong>CREATE PURCHASE REQUEST</strong></h4>
                     <div class="table-responsive">
                         {{-- <h4 class="card-title col-12" style=" text-align: center">Project Title: {{ $details[0]->project_title }} || Fund Source: {{ $details[0]->fund_source }}</h4> --}}
                         <table class="table">
@@ -50,7 +58,7 @@
                     </div>
                 </div>
                 
-                <div class="container">
+                 
                     <div class="row" hidden>
                         <fieldset class="form-group">
                             <input type="text" class="pr_no form-control"  placeholder="" value="<?=$aes->encrypt($pr_no)?>">
@@ -67,68 +75,80 @@
                             <input type="text" id="project_code"  class="project_code form-control" placeholder="<?=($project_code)?>" name = "project_code" value="<?=($project_code)?>">
                         </fieldset>
                     </div>
-                    @if (!empty(session("globalerror")))
-                        <div class="alert alert-danger" role="alert">
-                            {{session("globalerror")}}
+
+                @if (!empty(session("globalerror")))
+                    <div class="danger ml-4 mb-4 mr-4">
+                        <div class="ml-2">
+                            <strong>Sorry! </strong>{{session("globalerror")}}
                         </div>
-                    @else
+                    </div>
+                
+                {{-- <div class="col-sm-12">
+                    <div class="alert alert-danger" role="alert">
+                        <strong>Sorry! </strong>{{session("globalerror")}}
+                    </div>
+                </div> --}}
+                
+                @else
                     
-                    <form action="{{ route('addItem') }}" method="POST" enctype="multipart/form-data"> @csrf
-                        
-                        <div class="col-sm" hidden>
-                            <fieldset class="form-group">
-                                <label for="">project code</label>
-                                <input type="text" id="project_code"  class="project_code form-control" placeholder="<?=($project_code)?>" name = "project_code" value="<?=($project_code)?>">
-                            </fieldset>
-                        </div>
-                        <div class="row" hidden>
-                            <fieldset class="form-group">
-                                <input type="text" class="pr_no form-control"  placeholder="" name = "pr_no" value="<?=$aes->encrypt($pr_no)?>">
-                            </fieldset>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-4">
-                                <fieldset class="form-group">
-                                    <label for="SelectItem" >Item</label>
-                                    <select  id="item" name="item" class="item form-control" required autofocus>
-                                        <option value="" selected disabled>-- Select Item --</option>
-                                    </select>
-                                </fieldset>
-                            </div>
-                            <div class="col-sm-2">
-                                <fieldset class="form-group">
-                                    <label for="Quantity">Quantity</label>
-                                    <input type="number" id="quantity"  class="quantity form-control" placeholder="Enter Quantity" name = "quantity" value = "" required>
-                                </fieldset>
-                            </div>
-                            <div class="col-sm-6">
-                                <fieldset class="form-group" >
-                                        <label for="">Upload File</label>
-                                        <input type="file" name="file" class="file form-control" required> 
-                                </fieldset>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm-7">
-                                <fieldset class="form-group">
-                                    <label for="Specification">Specification</label>
-                                    <textarea id="specification"  class="specification form-control" placeholder="Enter Specification" name = "specification" value = "" required></textarea>
-                                </fieldset>
-                            </div>
+                    <div class="col-lg-12 d-flex justify-content-center" >
+                        <form id="createPR" method="POST" enctype="multipart/form-data"> @csrf
                             
-                            <div class="col-sm-5">
-                                <fieldset class="form-group" style="padding-top:5%;">
-                                    <button type="submit" class="btn btn-success text-white" id="add_item"><i class="bx bx-cart"></i> ADD TO PR</button>
-                                    {{-- <a href = "#" class = "PR_button btn btn-success mr-1 mb-1" ><i class="bx bx-cart"></i> ADD TO PR</a> --}}
-                                </fieldset>
-                            </div>
-                        </div>
+                                <div class="col-sm" hidden>
+                                    <fieldset class="form-group">
+                                        <label for="">project code</label>
+                                        <input type="text" id="project_code"  class="project_code form-control" placeholder="<?=($project_code)?>" name = "project_code" value="<?=($project_code)?>">
+                                    </fieldset>
+                                </div>
+        
+                                <div class="row" hidden>
+                                    <fieldset class="form-group">
+                                        <input type="text" class="pr_no form-control"  placeholder="" name = "pr_no" value="<?=$aes->encrypt($pr_no)?>">
+                                    </fieldset>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <fieldset class="form-group">
+                                            <label for="SelectItem" >Item</label>
+                                            <select  id="item" name="item" class="item form-control" required autofocus>
+                                                <option value="" selected disabled>-- Select Item --</option>
+                                            </select>
+                                        </fieldset>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <fieldset class="form-group">
+                                            <label for="Quantity">Quantity</label>
+                                            <input type="number" id="quantity"  class="quantity form-control" placeholder="Enter Quantity" name = "quantity" value = "" required>
+                                        </fieldset>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <fieldset class="form-group" >
+                                                <label for="">Upload File</label>
+                                                <input type="file" name="file" class="file form-control" required> 
+                                        </fieldset>
+                                    </div>
+                                </div>
+        
+                                <div class="row">
+                                    <div class="col-sm-7">
+                                        <fieldset class="form-group">
+                                            <label for="Specification">Specification</label>
+                                            <textarea id="specification"  class="specification form-control" placeholder="Enter Specification" name = "specification" value = "" required></textarea>
+                                        </fieldset>
+                                    </div>
+                                    
+                                    <div class="col-sm-5">
+                                        <fieldset class="form-group" style="padding-top:5%;">
+                                            <button type="submit" class="btn btn-success text-white" id="add_item"><i class="bx bx-cart"></i> ADD TO PR</button>
+                                            {{-- <a href = "#" class = "PR_button btn btn-success mr-1 mb-1" ><i class="bx bx-cart"></i> ADD TO PR</a> --}}
+                                        </fieldset>
+                                    </div>
+                                </div>
 
-                    </form>
-                    @endif
-
-                </div>
+                        </form>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
@@ -138,7 +158,7 @@
         {{-- <div class="col-12"> --}}
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title">DRAFT PURCHASE REQUEST</h4>
+                    <h4 class="card-title text-center"><strong>DRAFT PURCHASE REQUEST</strong></h4>
                 </div>
                 <div class="card-content">
                     <div class="card-body card-dashboard">

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Carbon;
+use App\Http\Controllers\HistoryLogController;
 
 use Illuminate\Support\Facades\DB;
 class PurchaseRequestController extends Controller
@@ -27,13 +28,27 @@ class PurchaseRequestController extends Controller
     ];
     $year = Carbon::now()->format('Y');
     $department_id = session('department_id');
-    $ppmps = DB::table("project_titles")
+    $campus = session('campus');
+    if(session('role') != null){
+      $ppmps = DB::table("project_titles")
                 ->select('project_titles.id','project_titles.project_title','project_titles.project_year','fund_sources.fund_source')
                 ->join('fund_sources', 'fund_sources.id', '=', 'project_titles.fund_source')
                 ->where('department_id',$department_id)
-                // ->where('project_year',$year+1)
+                ->where('campus',$campus)
+                // ->where('project_year',$year)
                 ->where('status',4)
+                ->orderBy('project_year','DESC')
                 ->get();
+    }else{
+      $ppmps = DB::table("project_titles")
+              ->select('project_titles.id','project_titles.project_title','project_titles.project_year','fund_sources.fund_source')
+              ->join('fund_sources', 'fund_sources.id', '=', 'project_titles.fund_source')
+              // ->where('project_year',$year)
+              ->where('status',4)
+              ->orderBy('project_year','DESC')
+              ->get();
+    }
+    
       return view('pages.department.purchase-request-index',compact('ppmps'), [
           'pageConfigs'=>$pageConfigs,
           'breadcrumbs'=>$breadcrumbs,
@@ -52,23 +67,107 @@ class PurchaseRequestController extends Controller
       ->get();
       // dd($users);
       $department_id = session('department_id');
+      $campus = session('campus');
+      if(session('role') != null){
       $pr = DB::table("purchase_request as pr")
             ->select("pr.*","fs.fund_source","u.name","d.department_name")
             ->join("departments as d", "pr.department_id", "=", "d.id")
             ->join("fund_sources as fs", "pr.fund_source_id", "=", "fs.id")
             ->join("users as u", "pr.printed_name", "=", "u.id")
             ->where("pr.department_id", $department_id)
+            ->where("pr.campus", $campus)
             ->whereNull("pr.deleted_at")
             ->orderBy('pr.created_at')
             ->get();
             // dd($pr);
-
+      }else{
+        $pr = DB::table("purchase_request as pr")
+                ->select("pr.*","fs.fund_source","u.name","d.department_name")
+                ->join("departments as d", "pr.department_id", "=", "d.id")
+                ->join("fund_sources as fs", "pr.fund_source_id", "=", "fs.id")
+                ->join("users as u", "pr.printed_name", "=", "u.id")
+                ->whereNull("pr.deleted_at")
+                ->orderBy('pr.created_at')
+                ->get();
+      }
           return view('pages.department.track-pr-index',compact('pr','hope'), [
               'pageConfigs'=>$pageConfigs,
               'breadcrumbs'=>$breadcrumbs,
               // 'error' => $error,
           ]); 
   }
+
+  public function RoutingSlipIndex(){
+    $pageConfigs = ['pageHeader' => true];
+    $breadcrumbs = [
+      ["link" => "/", "name" => "Home"],["name" => "Approved PRs "]
+    ];
+    // return view('pages.budgetofficer.allocatebudget',['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs]);
+    $hope = DB::table('users')
+    ->where('role',12)
+    ->where('campus',session('campus'))
+    ->get();
+    // dd($users);
+    $department_id = session('department_id');
+    if(session('role') != null){
+      $pr = DB::table("purchase_request as pr")
+      ->select("pr.*","fs.fund_source","u.name","d.department_name")
+      ->join("departments as d", "pr.department_id", "=", "d.id")
+      ->join("fund_sources as fs", "pr.fund_source_id", "=", "fs.id")
+      ->join("users as u", "pr.printed_name", "=", "u.id")
+      ->where("pr.department_id", $department_id)
+      ->where("pr.status", 2)
+      ->whereNull("pr.deleted_at")
+      ->orderBy('pr.created_at')
+      ->get();
+    }else{
+      $pr = DB::table("purchase_request as pr")
+      ->select("pr.*","fs.fund_source","u.name","d.department_name")
+      ->join("departments as d", "pr.department_id", "=", "d.id")
+      ->join("fund_sources as fs", "pr.fund_source_id", "=", "fs.id")
+      ->join("users as u", "pr.printed_name", "=", "u.id")
+      ->where("pr.status", 2)
+      ->whereNull("pr.deleted_at")
+      ->orderBy('pr.created_at')
+      ->get();
+    }
+   
+          // dd($pr);
+
+        return view('pages.department.pr-routing-slip-index',compact('pr','hope'), [
+            'pageConfigs'=>$pageConfigs,
+            'breadcrumbs'=>$breadcrumbs,
+            // 'error' => $error,
+        ]); 
+}
+
+  public function SignedPRIndex(){
+    $pageConfigs = ['pageHeader' => true];
+    $breadcrumbs = [
+      ["link" => "/", "name" => "Home"],["name" => "Signed PR"]
+    ];
+    if(session('role') != null){
+    $response = DB::table("signed_purchase_request as spr")
+          ->select('spr.*','u.name')
+          ->join('users as u','spr.employee_id','u.employee_id')
+          ->where("spr.department_id", session('department_id'))
+          ->where("spr.campus", session('campus'))
+          ->whereNull("spr.deleted_at")
+          ->get();
+          // dd($response);
+    }else{
+      $response = DB::table("signed_purchase_request as spr")
+                    ->select('spr.*','u.name')
+                    ->join('users as u','spr.employee_id','u.employee_id')
+                    ->whereNull("spr.deleted_at")
+                    ->get();
+    }
+        return view('pages.department.signed-pr-index',compact('response'), [
+            'pageConfigs'=>$pageConfigs,
+            'breadcrumbs'=>$breadcrumbs,
+            // 'error' => $error,
+        ]); 
+}
 
   public function viewPR(Request $request) {
 
@@ -132,6 +231,7 @@ class PurchaseRequestController extends Controller
           $itemsForPR = DB::table("purchase_request_items as pri")
                     ->select('pri.*','p.item_name','p.item_description','p.unit_price')
                     ->join("ppmps as p", "pri.item_id", "=", "p.id")
+                    // ->where('p.app_type','Non-CSE')
                     ->where('pri.project_code',$id)
                     ->where('pri.pr_no',0)
                     ->whereNull('pri.deleted_at')
@@ -140,11 +240,11 @@ class PurchaseRequestController extends Controller
           $itemsFromPRI = DB::table("purchase_request_items as pri")
                     ->select('pri.*','p.unit_of_measurement','p.item_description','p.unit_price')
                     ->join("ppmps as p", "pri.item_id", "=", "p.id")
+                    ->where('p.app_type','Non-CSE')
                     ->where('pri.project_code',$id)
                     ->where('pri.pr_no',0)
                     ->whereNull('pri.deleted_at')
                     ->get();
-                    // dd($id);
 
           $details = DB::table("project_titles as pt")
                     ->select("pt.campus","pt.project_title","pt.fund_source","d.department_name")
@@ -164,8 +264,7 @@ class PurchaseRequestController extends Controller
                     // ->select('id','item_name','quantity')
                     ->where('project_code','=',$id)
                     ->where('mode_of_procurement','!=',33)
-                    // ->where('quantity','!=',0)
-                    ->whereNull('deleted_at')
+                    ->where('app_type','Non-CSE')
                     ->orderBy('item_name')
                     ->whereNull('deleted_at')
                     ->sum('quantity');
@@ -173,9 +272,10 @@ class PurchaseRequestController extends Controller
           $pri = DB::table('purchase_request_items')
                     // ->select('item_id','quantity')
                     ->where('project_code','=',$id)
-                    ->where('quantity','!=',0)
+                    // ->where('quantity','!=',0)
                     ->whereNull('deleted_at')
                     ->sum('quantity');
+                    // dd($pri);
 
           // $quantity = 0;
           // $quantityPRI = 0;
@@ -189,10 +289,12 @@ class PurchaseRequestController extends Controller
           // }
           $purpose = "";
           $name = "";
+          $ao_name = "";
           $designation = "";
+          $ao_designation = "";
           $remaining = $items - $pri;
           if($remaining == 0){
-            session(['globalerror' => "Sorry! There are no remaining items for you to PR in this Project! "]);
+            session(['globalerror' => "There are no remaining items for you to PR in this Project."]);
           }else{
               Session::forget('globalerror');
           }
@@ -202,7 +304,7 @@ class PurchaseRequestController extends Controller
           // }else{
           //       Session::forget('globalerror');
           // }
-          return view('pages.department.create-purchase-request',compact('hope','purpose','name','designation','itemsForPR','pr_no','itemsForPRCount','itemsFromPRI','date','details','fund_source','project_code'),
+          return view('pages.department.create-purchase-request',compact('hope','purpose','name','designation','ao_name','ao_designation','itemsForPR','pr_no','itemsForPRCount','itemsFromPRI','date','details','fund_source','project_code'),
               ['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs]
               );
           # end
@@ -270,10 +372,9 @@ class PurchaseRequestController extends Controller
                   // ->select('id','item_name','quantity')
                   ->where('project_code','=',$project_code)
                   ->where('mode_of_procurement','!=',33)
-                  // ->where('quantity','!=',0)
+                  ->where('app_type','Non-CSE')
                   ->where('pr_no','!=',0)
                   ->whereNull('deleted_at')
-                  // ->orderBy('item_name')
                   ->sum('quantity');
 
         $pri = DB::table('purchase_request_items')
@@ -284,20 +385,23 @@ class PurchaseRequestController extends Controller
                   ->sum('quantity');
                   // dd($pri);
         $information = DB::table('purchase_request as pr')
-                    ->select('pr.purpose','u.name','pr.designation')
+                    ->select('pr.purpose','u.name','pr.designation','ps.name as ao_name','ps.designation as ao_designation')
                     ->join('users as u','pr.printed_name','=','u.id')
+                    ->join('pr_signatories as ps','pr.approving_officer','=','ps.id')
                     ->where('pr.id',$id)
                     ->get();
                     
           foreach($information as $data){
             $purpose = $data->purpose;
             $name = $data->name;
+            $ao_name = $data->ao_name;
             $designation = $data->designation;
+            $ao_designation = $data->ao_designation;
           }
         $remaining = $items - $pri;
         // dd($information); 
         if($remaining == 0){
-          session(['globalerror' => "Sorry! There are no remaining items for you to PR in this Project! "]);
+          session(['globalerror' => "There are no remaining items for you to PR in this Project! "]);
         }else{
             Session::forget('globalerror');
         }
@@ -310,13 +414,239 @@ class PurchaseRequestController extends Controller
         $project_code = $this->aes->encrypt($project_code);
         // dd($project_code); 
 
-        return view('pages.department.edit-purchase-request',compact('hope','purpose','name','designation','itemsForPR','pr_no','itemsForPRCount','itemsFromPRI','date','details','fund_source','project_code'),
+        return view('pages.department.edit-purchase-request',compact('hope','purpose','name','designation','ao_name','ao_designation','itemsForPR','pr_no','itemsForPRCount','itemsFromPRI','date','details','fund_source','project_code'),
             ['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs]
             );
         # end
    } catch (\Throwable $th) {
        throw $th;
    }
+  }
+
+  public function view_signed_pr(Request $request) {
+    // dd($request->all());
+    try {
+        $id = (new AESCipher)->decrypt($request->id);
+        $response = DB::table('signed_purchase_request')
+            ->where('id', $id)
+            ->whereNull('deleted_at')
+            ->get([
+                'file_name'
+            ]);
+        # this will create history_log
+            (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                $id,
+                'Viewed Uploaded Signed PR',
+                'View',
+                $request->ip(),
+            );
+        # end
+        return response ([
+            'status'    => 200,
+            'data'  => $response
+        ]);
+    } catch (\Throwable $th) {
+        return view('pages.error-500');
+        throw $th;
+    }
+  }
+
+  public function download_signed_PR(Request $request) {
+    // dd($request->all());
+    try {
+        $id = (new AESCipher)->decrypt($request->id);
+        $response = DB::table('signed_purchase_request')
+        ->where('id', $id)
+        ->whereNull('deleted_at')
+        ->get([
+            'file_name'
+        ]);
+        // dd($response );
+        # this will created history_log
+            (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                $id,
+                'Downloaded Signed PR',
+                'Download',
+                $request->ip(),
+            );
+        # end
+        $path = 'PMIS/signed_purchase_request/';
+        return Storage::download($path.$response[0]->file_name);
+    } catch (\Throwable $th) {
+        throw $th;
+        return view('pages.error-500');
+    }
+  }
+
+  public function edit_signed_pr(Request $request) {
+    try {
+      // dd($request->all());
+      $id = $this->aes->decrypt($request->id);
+
+      $response = DB::table('signed_purchase_request')
+                    ->where('id',$id)
+                    ->get();
+      foreach($response as $data){
+        $filename = $data->file_name;
+      }
+      $file_name = explode('-',$filename );
+      if($response){
+        return response()->json([
+            'status' => 200,
+            'message' => 'Success',
+            'data' => $response,
+            'file_name' => $file_name,
+        ]);
+      }else{
+        return response()->json([
+                  'status' => 400,
+                  'message' => 'Failed',
+          ]);
+      }
+   } catch (\Throwable $th) {
+       throw $th;
+   }
+  }
+
+  public function update_signed_pr(Request $request){
+    try {
+      $id = $request->signedPR_id;
+      $pr_no = $request->update_pr_no;
+      $file_name = $request->update_file_name.'-'.time();
+      $file = $request->file('update_file');
+      $extension = $request->file('update_file')->getClientOriginalExtension();
+      $is_valid = false;
+
+      $checkPRNo = DB::table('signed_purchase_request')
+          ->where('id','!=', $id)
+          ->where('pr_no',$pr_no)
+          ->whereNull('deleted_at')
+          ->get();
+      $checkFileName = DB::table('signed_purchase_request')
+          ->select('file_name')
+          ->where('id', $id)
+          ->whereNull('deleted_at')
+          ->get();
+      foreach($checkFileName as $data){
+        $oldFileName = $data->file_name;
+      }
+
+      // dd($oldFileName);
+      if(count($checkPRNo) == 1){
+        return response()->json([
+          'status' => 400, 
+          'message' => 'Signed PR for '.$pr_no.' is already uploaded!',
+        ]);
+      }
+      // dd($request->all());
+      # validate extension
+      $allowed_extensions = 'pdf';
+      if($allowed_extensions == $extension) {
+          $is_valid = true;
+      }
+      if($is_valid == false) {
+        return response()->json([
+          'status' => 400,
+          'message' => 'Please upload .pdf file!',
+        ]);
+      }
+
+      $destination_path = env('APP_NAME').'\\signed_purchase_request\\';
+      Storage::delete($destination_path.$oldFileName);
+
+      if (!Storage::exists($destination_path)) {
+        Storage::makeDirectory($destination_path);
+      }
+      $file->storeAs($destination_path, $file_name.'.'.$extension);
+      $file->move('storage/'. $destination_path, $file_name.'.'.$extension); 
+
+      (new HistoryLogController)
+      ->store(
+            session('department_id'),
+            session('employee_id'),
+            session('campus'),
+            $id,
+            'Updated the Uploaded Signed PR',
+            'Update',
+            $request->ip()
+          );
+
+      $response = DB::table('signed_purchase_request')
+                    ->where('id',$id)
+                    ->update([
+                        'pr_no' => $pr_no,
+                        'file_name' => $file_name.'.pdf',
+                        'updated_at' =>  Carbon::now()
+                    ]);
+                    
+      if($response){
+        return response()->json([
+          'status' => 200, 
+          'message' => 'Signed PR Updated Successfully!',
+        ]); 
+      }else{
+        return response()->json([
+          'status' => 400, 
+          'message' => 'Error!',
+        ]); 
+      }
+      
+    } catch (\Throwable $th) {
+      dd('add_Items_To_PR FUNCTION '+$th);
+    }
+  }
+
+  public function delete_signed_pr(Request $request){
+    // dd($request->all());
+    $id = (new AESCipher())->decrypt($request->id);
+    $checkFileName = DB::table('signed_purchase_request')
+        ->select('file_name')
+        ->where('id', $id)
+        ->get();
+    foreach($checkFileName as $data){
+      $oldFileName = $data->file_name;
+    }
+    $response = DB::table('signed_purchase_request')
+                  ->where('id',$id)
+                  ->update([
+                      'deleted_at' =>  Carbon::now()
+                  ]);
+    
+
+    $destination_path = env('APP_NAME').'\\signed_purchase_request\\';
+    Storage::delete($destination_path.$oldFileName);
+
+    if($response)
+    {
+        (new HistoryLogController)
+          ->store(
+            session('department_id'),
+            session('employee_id'),
+            session('campus'),
+            $id,
+            'Deleted Uploaded Signed PR',
+            'Delete',
+            $request->ip()
+          );
+
+        return response()->json([
+            'status'=>200,
+            'message'=>'PR Deleted Successfully!'
+        ]);
+    }
+    else
+    {
+        return response()->json([
+            'status'=>400,
+            'message'=>'Error!'
+        ]);
+    }
   }
 
   public function add_Items_To_PR(Request $request){
@@ -351,6 +681,101 @@ class PurchaseRequestController extends Controller
       }
   }
   
+  public function upload_signed_pr(Request $request){
+    try {
+      // dd($request->all());
+      $pr_no = $request->pr_no;
+      $file_name = $request->file_name.'-'.time();
+      $file = $request->file('file');
+      $extension = $request->file('file')->getClientOriginalExtension();
+      $is_valid = false;
+      # validate extension
+          $allowed_extensions = ['pdf'];
+          for ($i = 0; $i < count($allowed_extensions) ; $i++) { 
+             if($allowed_extensions[$i] == $extension) {
+                  $is_valid = true;
+             }
+          }
+          if($is_valid == false) {
+            return response()->json([
+                'status' => 400, 
+                'message' => 'Please upload .pdf file!',
+            ]);
+          }
+
+          $validatePRNo = DB::table('purchase_request')
+                          ->where('pr_no',$pr_no)
+                          ->where('status',2)
+                          ->where('department_id', session('department_id'))
+                          ->where('campus', session('campus'))
+                          ->whereNull('deleted_at')
+                          ->get();
+
+          if(count($validatePRNo)==0){
+            return response()->json([
+              'status' => 400, 
+              'message' => 'PR '.$pr_no.' is not yet approved!',
+            ]);
+          }   
+          
+          $checkPRNo = DB::table('signed_purchase_request')
+                          ->where('pr_no',$pr_no)
+                          ->where('department_id', session('department_id'))
+                          ->where('campus', session('campus'))
+                          ->whereNull('deleted_at')
+                          ->get();
+
+          if(count($checkPRNo) == 1){
+            return response()->json([
+              'status' => 400, 
+              'message' => 'Signed PR for '.$pr_no.' is already uploaded!',
+            ]);
+          }
+          // $file_name = $item_name.'-'.time();
+          $destination_path = env('APP_NAME').'\\signed_purchase_request\\';
+          if (!Storage::exists($destination_path)) {
+            Storage::makeDirectory($destination_path);
+          }
+          $file->storeAs($destination_path, $file_name.'.'.$extension);
+          $file->move('storage/'. $destination_path, $file_name.'.'.$extension); 
+
+          (new HistoryLogController)
+          ->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                null,
+                'Uploaded a File',
+                'Upload',
+                $request->ip()
+              );
+
+          $response = DB::table('signed_purchase_request')
+                              ->insert([
+                                  'pr_no' => $pr_no,
+                                  'campus' => session('campus'),
+                                  'department_id' => session('department_id'),
+                                  'employee_id' => session('employee_id'),
+                                  'file_name' => $file_name.'.'.$extension,
+                                  'created_at' =>  Carbon::now()
+                              ]);
+
+          if($response){
+            return response()->json([
+              'status' => 200, 
+              'message' => 'File uploaded succesfully!',
+          ]);
+
+            return response()->json([
+              'status' => 400, 
+              'message' => 'Error!',
+            ]);
+          }
+    } catch (\Throwable $th) {
+      dd('upload_signed_pr FUNCTION '+$th);
+    }
+  }
+
   public function addItem(Request $request){
     try {
       // dd($request->all());
@@ -367,17 +792,19 @@ class PurchaseRequestController extends Controller
              }
           }
           if($is_valid == false) {
-              return back()->with([
-                  'error' => 'Invalid file format!'
-              ]);
+            return response()->json([
+                  'status' => 400, 
+                  'message' => 'Invalid file format!',
+              ]); 
           }
 
       $id = $request->item;
       $quantityToPR = $request->quantity;
       if($quantityToPR == 0){
-        return back()->with([
-          'error' => 'Quantity cannot be zero!'
-      ]);
+        return response()->json([
+          'status' => 400, 
+          'message' => 'Quantity cannot be zero!',
+        ]); 
       }
       $specification = $request->specification;
       $project_code = $this->aes->decrypt($request->project_code);
@@ -401,9 +828,6 @@ class PurchaseRequestController extends Controller
       }
       
       if($quantityFromPPMP[0]->quantity < $quantity){
-        return back()->with([
-          'error' => 'The quantity exceeds the remaining item(s)!'
-        ]);
         return response()->json([
           'status' => 400, 
           'message' => 'The quantity exceeds the remaining item(s)!',
@@ -421,13 +845,10 @@ class PurchaseRequestController extends Controller
                         ->count();
                         // dd($itemCheck);
           if($itemCheck == 1){
-            return back()->with([
-              'error' => 'Item already exist in the draft!'
-            ]);
-            // return response()->json([
-            //     'status' => 400, 
-            //     'message' => 'Item already exist in the draft!',
-            // ]); 
+            return response()->json([
+                'status' => 400, 
+                'message' => 'Item already exist in the draft!',
+            ]); 
           }else{
               $item = DB::table('ppmps')
                     ->select('item_name')
@@ -469,21 +890,15 @@ class PurchaseRequestController extends Controller
                               ]);
               }
               if($response){
-                return back()->with([
-                  'success' => 'Item added successfully!'
-                ]);
-                // return response()->json([
-                //   'status' => 200, 
-                //   'message' => 'Item Added Successfully!',
-                // ]); 
+                return response()->json([
+                  'status' => 200, 
+                  'message' => 'Item Added Successfully!',
+                ]); 
               }else{
-                return back()->with([
-                  'error' => 'Failed!'
-                ]);
-                // return response()->json([
-                //   'status' => 400, 
-                //   'message' => 'Failed!',
-                // ]);    
+                return response()->json([
+                  'status' => 400, 
+                  'message' => 'Failed!',
+                ]);    
               }
           }
       }
@@ -509,7 +924,12 @@ class PurchaseRequestController extends Controller
                       ->where('specification',$request->updatespecification)
                       ->whereNull('deleted_at')
                       ->get();
-      
+      if($updatequantity == 0){
+        return response()->json([
+          'status' => 400, 
+          'message' => 'Quantity cannot be zero!',
+        ]); 
+      }
       if(count($checkItem) == 1){
         return response()->json([
           'status' => 400,
@@ -638,6 +1058,54 @@ class PurchaseRequestController extends Controller
       }
   }
 
+  public function getApprovingOfficers(Request $request){
+    try {
+      // dd($request->all()); 
+      $total = $request->total;
+
+      if($total > 100000){
+        $ApprovingOfficer = DB::table('pr_signatories')
+                ->where('amount','>',100000)
+                ->orderBy('name')
+                ->get();
+      }else if($total > 25000 && $total <= 100000){
+        // dd('sadfdsfg');
+        $ApprovingOfficer = DB::table('pr_signatories')
+                ->where([
+                  ['amount','>','25000'],
+                  ['amount','<=','100000'],
+                ])
+                ->orderBy('name')
+                ->get();
+      }else if($total <= 25000){
+        $ApprovingOfficer = DB::table('pr_signatories')
+                ->where('amount','<=',25000)
+                ->orderBy('name')
+                ->get();
+      }
+      // $department_id = session('department_id');
+      // $employees = DB::table('users')
+      //               ->select('users.id','users.name')
+      //               ->where('department_id','=',$department_id)
+      //               ->orderBy('users.name')
+      //               ->get();
+      // dd($ApprovingOfficer);  
+      if($ApprovingOfficer){
+        return response()->json([
+            'status' => 200,
+            'message' => 'Success',
+            'data' => $ApprovingOfficer,
+        ]);
+      }
+      return response()->json([
+          'status' => 400,
+          'message' => 'Error'
+      ]);
+    } catch (\Throwable $th) {
+      dd('add_Items_To_PR FUNCTION '+$th);
+    }
+}
+
   public function getItems(Request $request){
       try {
         // dd($request->all()); 
@@ -648,7 +1116,7 @@ class PurchaseRequestController extends Controller
                       ->select('id','item_name','quantity')
                       ->where('project_code','=',$project_code)
                       ->where('mode_of_procurement','!=',33)
-                      // ->where('quantity','!=',0)
+                      ->where('app_type','Non-CSE')
                       ->whereNull('deleted_at')
                       ->orderBy('item_name')
                       ->get();
@@ -731,6 +1199,7 @@ class PurchaseRequestController extends Controller
         $item = DB::table('ppmps')
                       ->select('quantity','item_name')
                       ->where('project_code','=',$project_code)
+                      ->where('app_type','Non-CSE')
                       ->where('id','=',$id)
                       ->whereNull('deleted_at')
                       ->get();
@@ -794,28 +1263,6 @@ class PurchaseRequestController extends Controller
                   'message' => 'failed',
           ]);
       }
-      // $department_id = session('department_id');
-      // $item = DB::table('ppmps')
-      //               ->select('quantity','item_name')
-      //               ->where('project_code','=',$project_code)
-      //               ->where('id','=',$id)
-      //               ->get();
-                    // dd($quantity);  
-      // dd($item[0]->quantity);
-      // if($quantity == $item[0]->quantity){
-      //     return response()->json([
-      //         'status' => 400,
-      //         'message' => $item[0]->item_name.' are already consumed!',
-      //     ]); 
-      // }else{
-      //     return response()->json([
-      //         'status' => 200,
-      //         'message' => 'Success',
-      //         'data' => ($item[0]->quantity)-$quantity,
-      //     ]);
-      // }
-
-
       } catch (\Throwable $th) {
         dd('getItems FUNCTION '+$th);
       }
@@ -825,7 +1272,10 @@ class PurchaseRequestController extends Controller
       try {
         // dd($request->all());  
         $has_pr_no = (new AESCipher)->decrypt($request->pr_no);
+        $approvingOfficer = $request->approvingOfficer;
+        $approving_officer = explode('*',$approvingOfficer);
         
+        // dd($approving_officer[0]);
         $current = Carbon::now();
         $department_id = session('department_id');
         $campus = session('campus');
@@ -837,39 +1287,58 @@ class PurchaseRequestController extends Controller
         $date = $current->format('Y-m');
         $pr_no_check = DB::table('purchase_request as pr')
                           ->select('pr.*')
+                          ->whereNull('deleted_at')
                           ->orderBy('pr.pr_no')
                           ->get();
 
-        #START Code For Replacing the Deleted PR                 
+        #START Code For Replacing pr_no that has been Deleted              
         $count = 1;
         foreach($pr_no_check as $data){
           $pr_no = $date.'-'.str_pad(0000+$count,4,"0",STR_PAD_LEFT);
           if($pr_no == $data->pr_no){
             $count++;}
         }
-        $pr_no = $date.'-'.str_pad(0000+$count,4,"0",STR_PAD_LEFT);
-        #END Code For Replacing the Deleted PR                 
 
-        // dd($pr_no);
+        #END Code For Replacing the Deleted PR   
+        
+        #NOTE: DON'T DELETE THIS CODE
+        #THIS Continues the sequence of PR No
+        $pr_no = $date.'-'.str_pad(0000+$count,4,"0",STR_PAD_LEFT);
+
         if($has_pr_no=="0000-00-0000"){
+          // dd($pr_no);
+
           $purchaseRequest = DB::table('purchase_request')
                               ->insert([
                                 'department_id' => $department_id,
                                 'project_code' => $project_code,
                                 'pr_no' => $pr_no,
+                                'status' => 1,
                                 'campus' => $campus,
                                 'fund_source_id' => $fund_source,
                                 'purpose' => $purpose,
                                 'printed_name' => $employee,
+                                'approving_officer' => $approving_officer[0],
                                 'designation' => $designation,
                                 'created_at' =>  Carbon::now()
                             ]);
+
           DB::table('purchase_request_items')
               ->where('project_code', $project_code)
               ->where('pr_no', 0)
               ->update([
                 'pr_no' => $pr_no
               ]);
+
+              (new HistoryLogController)->store(
+                session('department_id'),
+                session('employee_id'),
+                session('campus'),
+                null,
+                'Created Purchase Request with PR No '.$pr_no,
+                'Create',
+                $request->ip(),
+            );
 
           if($purchaseRequest){
             return response()->json([
@@ -891,9 +1360,20 @@ class PurchaseRequestController extends Controller
                                   'status' => 1,
                                   'purpose' => $purpose,
                                   'printed_name' => $employee,
+                                  'approving_officer' => $approving_officer[0],
                                   'designation' => $designation,
                                   'updated_at' =>  Carbon::now()
                                 ]);
+
+          (new HistoryLogController)->store(
+            session('department_id'),
+            session('employee_id'),
+            session('campus'),
+            null,
+            'Updated Purchase Request with PR No '.$pr_no,
+            'Update',
+            $request->ip(),
+        );
 
           if($purchaseRequest){
             return response()->json([
@@ -934,11 +1414,179 @@ class PurchaseRequestController extends Controller
                           ->where("pr.id",$id)
                           ->get();
 
+                          (new HistoryLogController)->store(
+                            session('department_id'),
+                            session('employee_id'),
+                            session('campus'),
+                            $id,
+                            'Viewed Purchase Request Status',
+                            'View',
+                            $request->ip(),
+                        );
+
       return view('pages.department.view_status_page',compact('purchase_request'),  [
                   'pageConfigs'=>$pageConfigs,
                   'breadcrumbs'=>$breadcrumbs,
                   // 'error' => $error,
               ]); 
+  }
+
+  public function pr_routing_slip(Request $request){
+    // dd($request->all());
+    // dd($id);
+    $pageConfigs = ['pageHeader' => true];
+    $breadcrumbs = [
+      ["link" => "/", "name" => "Home"],
+      ["link" => "/department/trackPR", "name" => "Approved PRs"],
+      // ["link" => "/department/purchaseRequest/createPR", "name" => "Create PR"],
+      ["name" => "Routing Slip"]
+    ];
+
+    $id = (new AESCipher())->decrypt($request->id);
+    
+    $pr_no = DB::table('purchase_request')
+                ->where('id',$id)
+                ->get(['pr_no']);
+
+    foreach($pr_no as $data){
+      $pr_no = $data->pr_no;
+    }
+
+    $purchase_request = DB::table("purchase_request as pr")
+                        ->select("pr.*","fs.fund_source","d.department_name","u.name")
+                        ->join("fund_sources as fs","pr.fund_source_id","fs.id")
+                        ->join("departments as d","pr.department_id","d.id")
+                        ->join("users as u","pr.printed_name","u.id")
+                        ->where("pr.id",$id)
+                        ->get();
+
+    $response = DB::table('routing_slip')
+                  ->where('pr_no',$pr_no)
+                  ->get();
+
+                  // dd($response);
+              
+      (new HistoryLogController)->store(
+        session('department_id'),
+        session('employee_id'),
+        session('campus'),
+        $id,
+        'Viewed Purchase Request Status',
+        'View',
+        $request->ip(),
+      );
+
+    return view('pages.department.pr-routing-slip',compact('purchase_request','response'),  [
+                'pageConfigs'=>$pageConfigs,
+                'breadcrumbs'=>$breadcrumbs,
+                // 'error' => $error,
+            ]); 
+  }
+
+  public function saveChanges(Request $request){
+    try {
+      // dd($request->all());
+      $pr_no = $request->pr_no;
+      $activityNumber = $request->activityNumber;
+      $date_received = $request->date_received;
+      $date_released = $request->date_released;      
+      $time_received = $request->time_received;
+      $time_released = $request->time_released;
+      $remark = $request->remark;
+      $role = session('role');
+      $campus = session('campus');
+      $employee_id = session('employee_id');
+
+      $checkActivity = DB::table('routing_slip')
+                        ->where('activity',$activityNumber)
+                        ->where('pr_no',$pr_no)
+                        ->where('campus',$campus)
+                        ->whereNull('deleted_at')
+                        ->count();
+
+      if($checkActivity==1){
+        $response = DB::table('routing_slip')
+        ->where('pr_no',$pr_no)
+        ->where('activity',$activityNumber)
+        ->where('campus',$campus)
+        ->update([
+          'date_received' => $date_received.' '.$time_received,
+          'date_released' => $date_released.' '.$time_released,
+          'remark' => $remark,
+          'updated_at' => Carbon::now(),
+          
+        ]);
+        (new HistoryLogController)->store(
+          session('department_id'),
+          session('employee_id'),
+          session('campus'),
+          null,
+          'Updated Purchase Status',
+          'Update',
+          $request->ip(),
+        );
+        return response()->json([
+          'status' => 200,
+          'message' => 'Updated Successfully!'
+        ]);
+
+      }else{
+        $response = DB::table('routing_slip')
+        ->insert([
+          'pr_no' => $pr_no,
+          'employee_id' => $employee_id,
+          'role' => $role,
+          'campus' => $campus,
+          'activity' => $activityNumber,
+          'date_received' => $date_received.' '.$time_received,
+          'date_released' => $date_released.' '.$time_released,
+          'remark' => $remark,
+          'created_at' => Carbon::now(),
+        ]);
+
+            (new HistoryLogController)->store(
+              session('department_id'),
+              session('employee_id'),
+              session('campus'),
+              null,
+              'Saved Purchase Status',
+              'Save',
+              $request->ip(),
+            );
+
+        return response()->json([
+          'status' => 200,
+          'message' => 'Saved Successfully!'
+        ]);
+
+      }
+      
+    } catch (\Throwable $th) {
+      throw $th;
+    }
+  }
+
+  public function getData(Request $request){
+    try {
+      // dd($request->all()); 
+      $pr_no = $request->pr_no;
+      $response = DB::table('routing_slip as rs')
+                    ->select('rs.*','u.name')
+                    ->join('users as u','rs.employee_id','u.employee_id')
+                    ->where('rs.pr_no',$pr_no)
+                    ->where('rs.campus',session('campus'))
+                    ->get();
+            //  dd($response);       
+
+      return response()->json([
+        'status' => 200,
+        'message' => 'Success',
+        'data' => $response,
+      ]);
+
+      } catch (\Throwable $th) {
+        dd('getData FUNCTION '+$th);
+      }
   }
 
   public function view_pr(Request $request){
@@ -951,37 +1599,59 @@ class PurchaseRequestController extends Controller
         // ["link" => "/department/purchaseRequest/createPR", "name" => "Create PR"],
         ["name" => "View PR"]
       ];
-      $hope = DB::table('users')
-      ->where('role',12)
-      ->where('campus',session('campus'))
-      ->get();
+      // $hope = DB::table('users')
+      // ->where('role',12)
+      // ->where('campus',session('campus'))
+      // ->get();
       $id = (new AESCipher())->decrypt($request->id);
       // $date = Carbon::now()->format('m/d/Y');
 
       $purchase_request = DB::table("purchase_request as pr")
-                            ->select("pr.*","fs.fund_source","d.department_name","u.name")
+                            ->select("pr.*","fs.fund_source","u.name","d.department_name","ps.name as ao_name","ps.designation as ao_designation","ps.title as ao_title")
                             ->join("fund_sources as fs","pr.fund_source_id","fs.id")
                             ->join("departments as d","pr.department_id","d.id")
                             ->join("users as u","pr.printed_name","u.id")
+                            ->join("pr_signatories as ps","pr.approving_officer","ps.id")
                             ->where("pr.id",$id)
                             ->get();
-
+                            
       $pr_no = '';
       foreach($purchase_request as $data){
         $pr_no = $data->pr_no;
       }
-                      // dd($pr_no);
       $itemsForPR = DB::table("purchase_request_items as pri")
                 ->select('pri.*','p.unit_of_measurement','p.item_description','p.unit_price')
                 ->join('ppmps as p','pri.item_id','p.id')
                 ->where('pri.pr_no',$pr_no)
                 ->whereNull('pri.deleted_at')
                 ->get();
-                // dd($itemsForPR);
 
-            
+      $totalcost = 0;
+      foreach($itemsForPR as $data){
+        $totalcost += $data->unit_price * $data->quantity ;
+      }
 
-      return view('pages.department.view_pr_page',compact('hope','purchase_request','itemsForPR','id'), [
+
+      // $signatory 
+                // $sum = DB::table("purchase_request_items as pri")
+                // ->select('pri.*','p.unit_of_measurement','p.item_description','p.unit_price')
+                // ->join('ppmps as p','pri.item_id','p.id')
+                // ->where('pri.pr_no',$pr_no)
+                // ->whereNull('pri.deleted_at')
+                // ->get
+                // dd($totalcost);
+
+                (new HistoryLogController)->store(
+                  session('department_id'),
+                  session('employee_id'),
+                  session('campus'),
+                  null,
+                  'Viewed Purchase Request with PR No '.$pr_no,
+                  'View',
+                  $request->ip(),
+              );
+
+      return view('pages.department.view_pr_page',compact('purchase_request','itemsForPR','id'), [
                   'pageConfigs'=>$pageConfigs,
                   'breadcrumbs'=>$breadcrumbs,
                   // 'error' => $error,
@@ -1109,19 +1779,14 @@ class PurchaseRequestController extends Controller
     $date = Carbon::now()->format('Y-m-d');
 
     $purchase_request = DB::table("purchase_request as pr")
-                          ->select("pr.*","fs.fund_source","d.department_name","u.name")
+                          ->select("pr.*","fs.fund_source","d.department_name","u.name","ps.name as ao_name","ps.designation as ao_designation","ps.title as ao_title")
                           ->join("fund_sources as fs","pr.fund_source_id","fs.id")
                           ->join("departments as d","pr.department_id","d.id")
                           ->join("users as u","pr.printed_name","u.id")
+                          ->join("pr_signatories as ps","pr.approving_officer","ps.id")
                           ->where("pr.id",$id)
                           ->get();
-    $hope = DB::table('users')
-              ->where('role',12)
-              ->where('campus',session('campus'))
-              ->get();
-    foreach($hope as $data){
-      $hope = $data->name;
-    }
+   
     $pr_no = '';
     foreach($purchase_request as $data){
       $pr_no = $data->pr_no;
@@ -1135,9 +1800,20 @@ class PurchaseRequestController extends Controller
               ->get();
               // dd($itemsForPR);
 
-          
+    // $itemCount = 150;
+    $itemCount = count($itemsForPR);
 
-    return view('pages.department.print_pr',compact('hope','purchase_request','itemsForPR','date','id'), [
+            //   (new HistoryLogController)->store(
+            //     session('department_id'),
+            //     session('employee_id'),
+            //     session('campus'),
+            //     null,
+            //     'Printed Purchase Request with PR No '.$pr_no,
+            //     'Print',
+            //     $request->ip(),
+            // );
+
+    return view('pages.department.print_pr',compact('purchase_request','itemsForPR','itemCount','date','id'), [
                 // 'pageConfigs'=>$pageConfigs,
                 // 'breadcrumbs'=>$breadcrumbs,
                 // 'error' => $error,
@@ -1174,6 +1850,16 @@ class PurchaseRequestController extends Controller
       Storage::delete($destination_path.$oldfilename);
     }
 
+    (new HistoryLogController)->store(
+      session('department_id'),
+      session('employee_id'),
+      session('campus'),
+      null,
+      'Deleted Purchase Request with PR No '.$pr_no,
+      'Delete',
+      $request->ip(),
+    );
+
     if($response)
     {
         // return back()->with([
@@ -1196,6 +1882,7 @@ class PurchaseRequestController extends Controller
     }
   }
 
+  
   // public function edit_pr(Request $request){
   //   dd('success');
   //   $id = (new AESCipher())->decrypt($request->id);

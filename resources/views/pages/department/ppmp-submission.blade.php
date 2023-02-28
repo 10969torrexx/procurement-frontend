@@ -6,11 +6,10 @@
     $aes = new AESCipher();
     $immediate_supervisor = '';
     $current_year = Carbon::now();
-    // dd((new AESCipher)->decrypt($project_type));
 @endphp
 @extends('layouts.contentLayoutMaster')
 {{-- title --}}
-@section('title','Upload PPMP')
+@section('title','PPMP Submission')
 {{-- vendor css --}}
 @section('vendor-styles')
 <link rel="stylesheet" type="text/css" href="{{asset('vendors/css/charts/apexcharts.css')}}">
@@ -21,148 +20,265 @@
 <link rel="stylesheet" type="text/css" href="{{asset('css/plugins/extensions/toastr.css')}}">
 @endsection
 @section('content')
-<!-- Zero configuration table -->
-{{-- preview uploaded ppmp --}}
-    <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" id="preview-ppmp" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Preview File:</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <div class="p-1" id="content">
-              </div>
-            </div>
-            <div class="modal-footer">
-                <button data-dismiss="modal" class="btn btn-secondary">Close</button>
-            </div>
-        </div>
-      </div>
-    </div>
-{{-- end --}}
-{{-- edit uploaded ppmp --}}
-  <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" id="edit-uploaded-ppmp" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+<style>
+  #t-table, #t-th, #t-td  {
+    border: 1px solid;
+    font-size: 11px;
+    padding: 5px;
+    text-align: center;
+  }
+  #t-table{
+    width: 100%;
+  }
+  .tbg-secondary {
+    background-color: rgba(71, 95, 123, 0.9) !important;
+  }
+</style>
+  {{-- MODALS --}}
+    {{-- reason for request | modal --}}
+    <div class="modal fade" id="reason-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Edit Uploaded PPMP</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <div class="" id="uploaded-ppmp-content">
-              <div class="row justify-content-center">
-                    <div class="col-12 col-sm-12 col-md-12 col-lg-12">
-                      <form action="{{ route('edit_ppmp') }}" method="POST" enctype="multipart/form-data"> 
-                        @csrf
-                        <div class="form-group row">
-                            <input type="text" name="id" id="default-id" class="form-control d-none">
-                            <div class="col-sm-6 col-md-6 col-lg-6 col-12">
-                                <label for="">PPMP / Project Category</label>
-                                <select name="project_category" id="project-category" class="form-control" required>
-                                  <option value="" id="default-project-category">-- Select Project Category --</option>
-                                  @for ($i = 0; $i < 3; $i++)
-                                      <option value="{{ (new AESCipher)->encrypt($i) }}">{{ (new GlobalDeclare)->project_category($i) }}</option>
-                                  @endfor
-                              </select>
-                            </div>
-                            <div class="col-sm-6 col-md-6 col-lg-6 col-12">
-                                <label for="">Year Created</label>
-                                <select name="year_created" id="year-created" class="form-control" required>
-                                  <option value="" id="default-year-created">-- Select Year --</option>
-                                  @for ($i = 5; $i > 0; $i--)
-                                      <option value="{{ (new AESCipher)->encrypt(Carbon::now()->subYears($i)->format('Y')) }}">{{ Carbon::now()->subYear($i)->format('Y') }}</option>
-                                  @endfor
-                                  @for ($i = 0; $i < 5; $i++)
-                                      <option value="{{ (new AESCipher)->encrypt(Carbon::now()->subYears($i)->format('Y')) }}">{{ Carbon::now()->addYear($i)->format('Y') }}</option>
-                                  @endfor
-                              </select>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                          <label for="">File name</label>
-                          <textarea name="file_name" id="default-file-name" class="form-control" id="" cols="30" rows="1" required></textarea>
-                        </div>
-                        <div class="form-group">
-                          <label for="">Signed PPMP File</label>
-                          <input type="file" name="signed_ppmp" id="default-signed-ppmp" class="form-control">
-                          <p class="card-text alert bg-rgba-info">Attach desired file here (.pdf, .jpeg, .jpg, .png) files</p>
-                        </div>
-                        <button type="submit" class="btn btn-success text-white" id="update-ppmp">Update PPMP</button>
-                      </form>
-                    </div>
-                </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          </div>
+          <form action="{{ route('request_submission') }}" method="post">
+              @csrf
+                  <div class="modal-header">
+                      <h5 class="modal-title" id="exampleModalLabel">Reason for Request</h5>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                      </button>
+                  </div>
+                  <div class="modal-body">
+                      <div class="form-group col-sm-12 col-md-12 col-lg-12 col-12">
+                          <p class="text-secondary"> 
+                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-info-circle-fill" viewBox="0 0 16 16">
+                               <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+                           </svg>
+                               Please describe the reason for this request! Ellaborate the direness of the request.
+                           </p>
+                       </div>
+                       <div class="form-group col-sm-12 col-12 col-lg-12 col-md-12">
+                          <textarea name="reason" id="" cols="30" rows="10" class="form-control col-12 col-md-12 col-lg-12" placeholder="Enter the reason here" required></textarea>
+                          <input type="text" class="form-control d-none" type="hidden" name="allocated_budget" id="allocated-budgets-input" value="">
+                       </div>
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      <button type="Submit" class="btn btn-success">Complete Request</button>
+                  </div>
+          </form>
+      </div>
       </div>
     </div>
-  </div>
-{{-- end --}}
-
-<section id="dropzone-examples">
-    <!-- Upload signed ppmp starts -->
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                <div class="card-header p-1">
-                    <h4 class="card-title text-primary border-bottom pb-1">
-                    <strong> Request for PPMP Submission</strong>
-                    </h4>
-                </div>
-                <div class="card-content">
-                    <div class="card-body">
-                        <div class="row justify-content-center">
-                            <div class="col-5 col-sm-5 col-md-5 col-lg-5">
-                            <form action="{{ route('upload_ppmp') }}" method="POST" enctype="multipart/form-data"> @csrf
-                                <div class="form-group row">
-                                    <div class="col-sm-6 col-md-6 col-lg-6 col-12">
-                                        <label for="">PPMP / Project Category</label>
-                                        <select name="project_category" id="project-category" class="form-control" required>
-                                        <option value="">-- Select Project Category --</option>
-                                        @for ($i = 0; $i < 3; $i++)
-                                            <option value="{{ (new AESCipher)->encrypt($i) }}">{{ (new GlobalDeclare)->project_category($i) }}</option>
-                                        @endfor
-                                    </select>
-                                    </div>
-                                    <div class="col-sm-6 col-md-6 col-lg-6 col-12">
-                                        <label for="">Year Created</label>
-                                        <select name="year_created" id="year-created" class="form-control" required>
-                                        <option value="">-- Select Year --</option>
-                                        @for ($i = 5; $i > 0; $i--)
-                                            <option value="{{ (new AESCipher)->encrypt(Carbon::now()->subYears($i)->format('Y')) }}">{{ Carbon::now()->subYear($i)->format('Y') }}</option>
-                                        @endfor
-                                        @for ($i = 0; $i < 5; $i++)
-                                            <option value="{{ (new AESCipher)->encrypt(Carbon::now()->subYears($i)->format('Y')) }}">{{ Carbon::now()->addYear($i)->format('Y') }}</option>
-                                        @endfor
-                                    </select>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                <label for="">File name</label>
-                                <textarea name="file_name" class="form-control" id="" cols="30" rows="1" required></textarea>
-                                </div>
-                                <div class="form-group">
-                                <label for="">Signed PPMP File</label>
-                                <input type="file" name="signed_ppmp" id="signed-ppmp" class="form-control" required>
-                                <p class="card-text alert bg-rgba-info">This can only process (.pdf, .jpeg, .jpg, .png) files</p>
-                                </div>
-                                <button type="submit" class="btn btn-success text-white" id="upload-signed-ppmp">Send Request</button>
-                            </form>
-                            </div>
+{{-- reason for request | modal --}}
+  {{-- MODALS --}}
+  <div class="row col-12 col-sm-12 col-md-12 col-lg-12">
+      <div class="card col-12 col-sm-12 col-md-12 col-lg-12">
+          <div class="card-header p-1">
+              <h5 class="card-title">
+                <strong>Request for Submission</strong>
+              </h5>
+              
+              <ul class="nav nav-tabs m-1" role="tablist">
+                {{-- 1st Tab | PPMP --}}
+                    <li class="nav-item">
+                        <a class="nav-link active" id="my-ppmp-tab" data-toggle="tab" href="#my-ppmp" aria-controls="regular" role="tab" aria-selected="true">
+                          <i class="fa-solid fa-box-open"></i>
+                            Make Request(s)
+                        </a>
+                    </li>
+                {{-- end --}}
+                {{-- 2nd Tab | Indicative --}}
+                    <li class="nav-item">
+                        <a class="nav-link" id="dissapproved-ppmp-tab" data-toggle="tab" href="#dissapproved" aria-controls="regular9" role="tab" aria-selected="false">
+                          <i class="fa-regular fa-clock"></i>
+                            Pending Request
+                        </a>
+                    </li>
+                {{-- end --}}
+              </ul>
+          </div>
+          <div class="card-body p-1">
+            <div class="tab-content p-1">
+              {{-- 1st Tab | Make Request --}}
+                <div class="tab-pane active" id="my-ppmp" aria-labelledby="my-ppmp-tab" role="tabpanel">
+                    {{-- allocated budgets | PPMP procurement type --}}
+                      <div class="row justify-content-center">
+                        <form action="{{ route('get_allocated_budget') }}" method="POST"  class="col-8 col-sm-8 col-md-8 col-lg-8 row">
+                          @csrf
+                          <div class="col-6 col-sm-6 col-md-6 col-md-6 col-lg-6">
+                            <select name="procurement_type" id="procurement-type" class="form-control" required>
+                                <option value="">Choose Procurement Type</option>
+                                @for ($i = 0; $i < 3; $i++)
+                                  <option value="{{ (new AESCipher)->encrypt($i) }}">{{ (new GlobalDeclare)->project_category($i) }}</option>
+                                @endfor
+                            </select>
+                          </div>
+                          <div class="col-6 col-sm-6 col-md-6 col-md-6 col-lg-6">
+                              <button type="submit" class="btn btn-success">Search</button>
+                          </div>
+                        </form>
+                      </div>
+                    {{-- allocated budgets | PPMP procurement type --}}
+                    <div class="col-12 col-md-12 col-lg-12 col-sm-12">
+                      {{-- allocated budgets | PPMP procurement type --}}
+                        @if (empty($allocated_budgets))
+                          <div class="table-responsive col-12 container">
+                            <table class="table zero-configuration item-table" id="item-table t-table">
+                                <thead>
+                                    <tr id="t-tr">
+                                        <th id="t-td">#</th>
+                                        <th id="t-td">Fund Source</th>
+                                        <th id="t-td" class="text-nowrap">Deadline of Submission</th>
+                                        <th id="t-td" class="text-nowrap">Date Created</th>
+                                        <th id="t-td">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{-- showing ppmp data based on department and user --}}
+                                    {{-- showing ppmp data based on department and user --}}
+                                </tbody>
+                            </table>
+                          </div>
+                        @endif
+                        @isset($allocated_budgets)
+                          <div class="table-responsive col-12 container">
+                            <table class="table zero-configuration item-table" id="item-table t-table">
+                                <thead>
+                                    <tr id="t-tr">
+                                      <th id="t-td">#</th>
+                                        <th id="t-td">Fund Source</th>
+                                        <th id="t-td" class="text-nowrap">Deadline of Submission</th>
+                                        <th id="t-td" class="text-nowrap">Date Created</th>
+                                        <th id="t-td">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{-- showing ppmp data based on department and user --}}
+                                        @foreach ($allocated_budgets as $item)
+                                            <tr id="t-tr">
+                                                <td id="t-td">{{ $loop->iteration }}</td>
+                                                <td id="t-td" class="text-nowrap">{{ $item->fund_source }}</td>
+                                                <td id="t-td">{{ explode('-', date('j F, Y-', strtotime($item->end_date)))[0] }}</td>
+                                                <td id="t-td">{{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0] }}</td>
+                                                <td id="t-td">
+                                                  <a href="#" class="btn text-secondary" id="reason-btn" data-id="{{ $item->id }}">
+                                                    <i class="fa-regular fa-paper-plane"></i>
+                                                  </a>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    {{-- showing ppmp data based on department and user --}}
+                                </tbody>
+                            </table>
                         </div>
+                        @endisset
                     </div>
                 </div>
+              {{-- 2nd Tab | Pending Requests --}}
+                <div class="tab-pane" id="dissapproved" aria-labelledby="dissapproved-ppmp-tab" role="tabpanel">
+                    {{-- allocated budgets | PPMP procurement type --}}
+                      <div class="row justify-content-center">
+                        <form action="{{ route('get_pending_request') }}" method="POST"  class="col-8 col-sm-8 col-md-8 col-lg-8 row">
+                          @csrf
+                          <div class="col-6 col-sm-6 col-md-6 col-md-6 col-lg-6">
+                            <select name="procurement_type" id="procurement-type" class="form-control" required>
+                                <option value="">Choose Procurement Type</option>
+                                @for ($i = 0; $i < 3; $i++)
+                                  <option value="{{ (new AESCipher)->encrypt($i) }}">{{ (new GlobalDeclare)->project_category($i) }}</option>
+                                @endfor
+                            </select>
+                          </div>
+                          <div class="col-6 col-sm-6 col-md-6 col-md-6 col-lg-6">
+                              <button type="submit" class="btn btn-success">Search</button>
+                          </div>
+                        </form>
+                      </div>
+                    {{-- allocated budgets | PPMP procurement type --}}
+                    <div class="col-12 col-md-12 col-lg-12 col-sm-12">
+                      {{-- allocated budgets | PPMP procurement type --}}
+                        @if (empty($ppmp_request_submission))
+                          <div class="table-responsive col-12 container">
+                            <table class="table zero-configuration item-table" id="item-table t-table">
+                                <thead>
+                                    <tr id="t-tr">
+                                        <th id="t-td">#</th>
+                                        <th id="t-td">Fund Source</th>
+                                        <th id="t-td">Remaining Balance</th>
+                                        <th id="t-td" class="text-nowrap">Previous Deadline of Submission</th>
+                                        <th id="t-td" class="text-nowrap">New Deadline of Submission</th>
+                                        <th id="t-td" class="">Reason</th>
+                                        <th id="t-td" class="text-nowrap">Status</th>
+                                        <th id="t-td" class="text-nowrap">Date Created</th>
+                                        <th id="t-td">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{-- showing ppmp data based on department and user --}}
+                                    {{-- showing ppmp data based on department and user --}}
+                                </tbody>
+                            </table>
+                          </div>
+                        @endif
+                        @isset($ppmp_request_submission)
+                          <div class="table-responsive col-12 container">
+                            <table class="table zero-configuration item-table" id="item-table t-table">
+                                <thead>
+                                    <tr id="t-tr">
+                                      <th id="t-td">#</th>
+                                      <th id="t-td">Fund Source</th>
+                                      <th id="t-td">Remaining Balance</th>
+                                      <th id="t-td" class="">Old Deadline of Submission</th>
+                                      <th id="t-td" class="">New Deadline of Submission</th>
+                                      <th id="t-td" class="">Reason</th>
+                                      <th id="t-td" class="text-nowrap">Status</th>
+                                      <th id="t-td" class="text-nowrap">Remark</th>
+                                      <th id="t-td" class="text-nowrap">Date Created</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{-- showing ppmp data based on department and user --}}
+                                        @foreach ($ppmp_request_submission as $item)
+                                            <tr id="t-tr">
+                                                <td id="t-td">{{ $loop->iteration }}</td>
+                                                <td id="t-td" class="text-nowrap">{{ $item->fund_source }}</td>
+                                                <td id="t-td">₱ {{ number_format($item->remaining_balance,2,'.',',') }}</td>
+                                                <td id="t-td" class="text-nowrap">{{ explode('-', date('j F, Y-', strtotime($item->end_date)))[0] }}</td>
+                                                {{-- deadline of submission --}}
+                                                  @if ($item->deadline_of_submission != null)
+                                                    <td id="t-td" class="text-nowrap">{{ explode('-', date('j F, Y-', strtotime($item->deadline_of_submission)))[0] }}</td>
+                                                  @else
+                                                    <td id="t-td">N/A</td>
+                                                  @endif
+                                                <td id="t-td">{{ $item->reason }}</td>
+                                                  {{-- status --}}
+                                                    @if($item->status == 0)
+                                                      <td id="t-td"><div class="badge badge-pill badge-light-primary mr-1">Pending</div></td>
+                                                    @elseif($item->status == 1)
+                                                      <td id="t-td"><div class="badge badge-pill badge-light-success mr-1">Approved</div></td>
+                                                    @elseif($item->status == 2)
+                                                      <td id="t-td"><div class="badge badge-pill badge-light-danger mr-1">Disapproved</div></td>
+                                                    @endif
+                                                  {{-- remark --}}
+                                                    @if (empty($item->remark))
+                                                      <td id="t-td">No remark</td>
+                                                    @else
+                                                      <td id="t-td">{{ $item->remark }}</td>
+                                                    @endif
+                                                <td id="t-td" class="text-nowrap">{{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0] }}</td>
+                                            </tr>
+                                        @endforeach
+                                    {{-- showing ppmp data based on department and user --}}
+                                </tbody>
+                            </table>
+                        </div>
+                        @endisset
+                    </div>
                 </div>
             </div>
-        </div>
-    <!-- single file upload starts -->
+          </div>
+      </div>
+  </div>
+
  
 </section>
 {{-- Torrexx | Code not mine --}}
@@ -268,6 +384,44 @@
             });
         });
       // edit uploaded ppmp
+      // search allocated budgets
+        $(document).on('change', '#procurement-type', function(e) {
+          e.preventDefault();
+          $.ajax({
+            headers: {
+              'X-CSRF-TOKEN': $("meta[name='csrf-token']").attr('content')
+            },
+            url: "{{ route('get_allocated_budget') }}",
+            method: 'GET',
+            data: {
+              'procurement_type' : $(this).val()
+            }, success: function(response) {
+                if(response['status'] == 400) {
+                  Swal.fire({
+                    title: 'Error',
+                    icon: 'error',
+                    html: response['message'],
+                  });
+                }
+
+                if(response['status'] == 200) {
+                  console.log(response['data']);
+                  response['data'].forEach(element => {
+                    $('#allocated-budgets').append(`<option value="`+ element.id +`">`+ element.fund_source +`</option>`);
+                  });
+                }
+            }
+          });
+        });
+      // search allocated budgets
+      // reason modal
+        $(document).on('click', '#reason-btn', function(e) {
+            e.preventDefault();
+            $('#reason-modal').modal('show');
+            $('#allocated-budgets-input').val($(this).data('id'));
+            console.log($(this).data('id'));
+        }); 
+      // end
     </script>
 
 {{-- end script --}}

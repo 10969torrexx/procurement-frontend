@@ -26,10 +26,36 @@
       "navheader": "procurementofficer"
     },
     {
-      "url": "users",
-      "name": "User",
+      "url": "PR/purchaseRequest",
+      "name": "Purchase Request",
+      "i18n": "Shoppingcart",
+      "icon": "shoppingcart",
+      "submenu": [
+        {
+          "url": "PR/purchaseRequest",
+          "name": "Create PR",
+          "i18n": "User",
+          "icon": "like"
+        },
+        {
+          "url": "PR/trackPR",
+          "name": "Track PR",
+          "i18n": "User",
+          "icon": "shoppingcart-in"
+        },
+        {
+          "url": "PR/signed_pr",
+          "name": "Signed PR",
+          "i18n": "User",
+          "icon": "shoppingcart-in"
+        }
+      ]
+    },
+    {
+      "url": "purchase_request/signed_pr",
+      "name": "Signed PRs",
       "i18n": "User",
-      "icon": "users"
+      "icon": "search"
     }
   ]
 }

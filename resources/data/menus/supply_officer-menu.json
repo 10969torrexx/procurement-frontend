@@ -42,8 +42,20 @@
           "name": "Track PR",
           "i18n": "User",
           "icon": "shoppingcart-in"
+        },
+        {
+          "url": "PR/signed_pr",
+          "name": "Signed PR",
+          "i18n": "User",
+          "icon": "shoppingcart-in"
         }
       ]
+    },
+    {
+      "url": "purchase_request/signed_pr",
+      "name": "Signed PRs",
+      "i18n": "User",
+      "icon": "search"
     }
   ]
 }
