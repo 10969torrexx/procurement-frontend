@@ -577,4 +577,26 @@ class BACCommitteeController extends Controller
         throw $th;
     }
   }
+
+  /**
+   * ! Torrexx Additionals
+   * * Generate Request For Quotation & Notice (RFQ)
+   * TODO 1: Enable generate RFQ
+   */
+  public function show_generate_rfq() {
+    try {
+       /** This will return table and page configs */
+       $pageConfigs = ['pageHeader' => true];
+       $breadcrumbs = [
+       ["link" => "/", "name" => "Home"],
+       ["name" => "Generate RFQ"]
+       ];
+       return view('pages.BACCommitte.generate-rfq',
+          ['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs],
+        );
+    } catch (\Throwable $th) {
+        throw $th;
+        return view('pages.error-500');
+    }          
+  }
 }
