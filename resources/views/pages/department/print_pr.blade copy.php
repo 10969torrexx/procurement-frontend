@@ -59,7 +59,7 @@
                         }
                         .blank{
                           /* border-left: 1px solid black; */
-                          height:20px;
+                          height:25px;
                         }
                         .purpose{
                           border-left: 1px solid black;
@@ -76,15 +76,48 @@
                           /* page-break-inside: avoid; */
                           /* page-break-after:always */
                         }
+                        header{
+                          position: fixed;
+                          top: 10cm;
+                          left: 0cm;
+                          right: 0cm;
+                          height: 10cm;
+                        }
+                        footer{
+                          position: fixed;
+                          bottom: 5cm;
+                          left: 0cm;
+                          right: 1cm;
+                          height: 1cm;
+                        }
+                        body{
+                          /* margin-top: 1cm;
+                          margin-left: 1cm;
+                          margin-right: 1cm;
+                          margin-bottom: 1.5cm; */
+                        }
+                        table { page-break-inside:auto }
+                        .page-break    { page-break-after:auto }
+                        thead { display:table-header-group }
+                        tfoot { display:table-footer-group }
                       </style>
+                      
+                      
+                        {{-- <body>
+                          
+                        <header><div>sdfgsdfg</div></header>
+                        <footer><div>sdfdsfsd</div></footer> --}}
 
                         <div class="table-responsive" >
                           <table class="PR">
                             <thead class="head1" >
-                              <tr class="blank" style="border-right: none; height:30px">
-                            </tr>
-                            <tr>
-                              <td class="text-right" colspan="6" style="border: none;font-style: italic;">Appendix 60</td>
+                              <tr class="blank" style="border-right: none">
+                                {{-- <td class="first"></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td> --}}
                             </tr>
                               <tr>
                                 <td class="title" colspan="6" style="border-bottom : none;font-weight:bold;padding-bottom:20px;font-size: 25px;">PURCHASE REQUEST</td>
@@ -100,21 +133,30 @@
                               <tr>
                                 <td style="font-weight:bold;border-left:1px solid black;border-bottom : none;border-top : none;border-right : none;text-align:left;padding-left:10px"> Office/Section:</td>
                                 <td colspan="4" style="border-bottom : none;border-top : none;text-align:left;">
+                                  {{-- <div class="col-sm-12" > --}}
                                     <div style="float:left;height:100%;width:50%;text-align:left;padding-left:10px">{{ $data->department_name }}</div>
-                                    <div style="width:20%;float:left;font-weight:bold;padding-left:10px" >PR No.</div>
-                                    <div style="width:30%;float:left;border-bottom:1px solid black">{{ $data->pr_no }}</div>
+                                    {{-- <div style="float:right;width:50%"> --}}
+                                        <div style="width:20%;float:left;font-weight:bold;padding-left:10px" >PR No.</div>
+                                        <div style="width:30%;float:left;border-bottom:1px solid black">{{ $data->pr_no }}</div>
+                                    {{-- </div> --}}
+                                  {{-- </div> --}}
                                 </td>
                                 <td style="border-bottom: none">
-                                    <div style="width:30%;float:left;font-weight:bold;" >Date:</div>
-                                    <div style="width:70%;float:left;border-bottom:1px solid black">{{ date('m/d/Y', strtotime($data->created_at))}}</div>
+                                  <div style="width:30%;float:left;font-weight:bold;" >Date:</div>
+                                  
+                                  <div style="width:70%;float:left;border-bottom:1px solid black">{{ date('m/d/Y', strtotime($data->created_at))}}</div>
                                 </td>
                               </tr>
                               <tr>
                                 <td style="font-weight:bold;border-left:1px solid black;border-bottom : none;border-top : none;border-right : none;text-align:left;"></td>
                                 <td colspan="4" style="border-bottom : none;border-top : none;text-align:left;">
+                                  {{-- <div class="col-sm-12" > --}}
                                     <div style="float:left;width:50%;border-bottom:1px solid black;height:17px;"></div>
-                                    <div style="width:40%;float:left;font-weight:bold;border-left : 1px solid black;padding-left:10px;padding-bottom:5px" >Responsibility Center Code: </div>
-                                    <div style="width:10%;float:left;border-bottom:1px solid black;padding-top:17px"> </div>
+                                    {{-- <div style="float:right;width:50%"> --}}
+                                        <div style="width:40%;float:left;font-weight:bold;border-left : 1px solid black;padding-left:10px;padding-bottom:5px" >Responsibility Center Code: </div>
+                                        <div style="width:10%;float:left;border-bottom:1px solid black;padding-top:17px"> </div>
+                                    {{-- </div> --}}
+                                  {{-- </div> --}}
                                 </td>
                                 <td style="border-top: none"></td>
                               </tr>
@@ -159,77 +201,124 @@
                               <tr><td colspan="6" style="border-left: 1px solid black;height:20px;" ></td></tr>
                               
                             </tfoot>
-                                 
-                            <?php $i=0; $counter = $itemCount; $total = 0;  $pagebreaker = 41 ?>
-
+                            <?php $i=0; $counter=130; $total = 0;?>
                             @foreach($itemsForPR as $itemsForPR)
-                              
-                              <tbody>
-                                @for($loop = 0; $loop < 150; $loop++)
-                              <?php $i++; $counter--;?>
-                                
-                                @if($pagebreaker == $i)
-                                <?php $pagebreaker += 40?>
-                                  <tr style="page-break-before: always">
-                                    <td class="first" style="text-align: right;font-style: italic;padding-right:10px">{{ $i }}</td>
-                                    <td style="text-align: center">{{ $itemsForPR->unit_of_measurement }}</td>
-                                    <td style="text-align: left;padding-left:10px">{{ $itemsForPR->item_description }}</td>
-                                    <td style="text-align: center">{{ $itemsForPR->quantity  }}</td>
-                                    <?php $estimated_price =  $itemsForPR->unit_price * $itemsForPR->quantity; 
-                                    $total += $estimated_price?>
-                                    <td style="text-align: right;padding-right:10px">{{number_format($itemsForPR->unit_price,2,'.',',')}}</td>
-                                    <td style="text-align: right;padding-right:10px">{{number_format($estimated_price,2,'.',',')}}</td>
-                                  </tr>
-                                  @else
-                                  <tr>
-                                    <td class="first" style="text-align: right;font-style: italic;padding-right:10px">{{ $i }}</td>
-                                    <td style="text-align: center">{{ $itemsForPR->unit_of_measurement }}</td>
-                                    <td style="text-align: left;padding-left:10px">{{ $itemsForPR->item_description }}</td>
-                                    <td style="text-align: center">{{ $itemsForPR->quantity  }}</td>
-                                    <?php $estimated_price =  $itemsForPR->unit_price * $itemsForPR->quantity; 
-                                    $total += $estimated_price?>
-                                    <td style="text-align: right;padding-right:10px">{{number_format($itemsForPR->unit_price,2,'.',',')}}</td>
-                                    <td style="text-align: right;padding-right:10px">{{number_format($estimated_price,2,'.',',')}}</td>
-                                  </tr>
-                                @endif
-                                @endfor
-                            @endforeach
+                            <?php $i++; $counter--;?>
+                            <tbody>
+                              <tr class="{{ $counter }}">
+                                <td class="first" style="text-align: right;font-style: italic;padding-right:10px">{{ $i }}</td>
+                                <td style="text-align: center">{{ $itemsForPR->unit_of_measurement }}</td>
+                                <td style="text-align: left;padding-left:10px">{{ $itemsForPR->item_description }}</td>
+                                <td style="text-align: center">{{ $itemsForPR->quantity  }}</td>
+                                <?php $estimated_price =  $itemsForPR->unit_price * $itemsForPR->quantity; 
+                                $total += $estimated_price?>
+                                <td style="text-align: right;padding-right:10px">{{number_format($itemsForPR->unit_price,2,'.',',')}}</td>
+                                <td style="text-align: right;padding-right:10px">{{number_format($estimated_price,2,'.',',')}}</td>
+                              </tr>
+                              @endforeach
 
                               @php
-                                  $quot = (int)($i / 40);
-                                  $prod = $quot * 40;
-                                  if($i > $prod && $prod != 0){
-                                    $addRow = 40 - ($i - $prod);
-                                  }else{
-                                    $addRow = 40 - $i;
+                                  $modu = (int)(150 / 40);
+                                  $prod = $modu * 40;
+                                  if($counter > $prod){
+                                    $addRow = 39 - ($counter - $prod);
                                   }
+                                  // echo $addRow;
                               @endphp
 
-                              @for($count = 0; $count < $addRow; $count++)
-                              <tr class="blank" style=" height:22px">
+                              @for($a = 1; $a < $counter; $a++)
+                              @if($a+$i == 40)
+                              {{-- <tr>
+                                <td class="purpose" style="height:30px;border-right:none;border-bottom:none;text-align:left;text-align:left;font-weight:bold;padding-left:10px;padding-top:10px">Purpose: </td>
+                                <td colspan="5" style="padding-top:10px">{{ $data->purpose }}</td>
+                              </tr>
+                              <tr>
+                                <td class="purpose" style="border-right:none;border-top:none;text-align:left;text-align:left;font-weight:bold;padding-left:10px;height:20px"></td>
+                                <td colspan="5"  style="border-bottom:1px solid black;"></td>
+                              </tr>
+                              <tr >
+                                <td style="border-left:1px solid black; border-right: none;border-bottom: none;"></td>
+                                <td colspan="2" style="border-right: none;border-bottom: none; ;padding-bottom:1%">Requested by:</td>
+                                <td colspan="3" style="border-bottom: none;padding-bottom:1%">Approved by:</td>
+                              </tr>
+                              <tr>
+                                <td style="border-left:1px solid black; border-bottom: none;border-right: none;border-top: none;font-weight:bold;padding-left:10px">Signature:</td>
+                                <td colspan="2" style="border-bottom: none;border-right: none;border-top: none;"><div class="" style="margin-left:5%;margin-top:2%;;width:90%;border-bottom:1px solid black;"></div></td>
+                                <td colspan="3" style="border-bottom: none;border-top: none;"><div class="" style="margin-left:5%;margin-top:2%;width:90%;border-bottom:1px solid black;"></div></td>
+                              </tr>
+                              <tr>
+                                <td style="border-left:1px solid black; border-bottom: none;border-right: none;border-top: none;font-weight:bold;padding-left:10px">Printed Name:</td>
+                                <td colspan="2" style="border-right: none;border-top: none;text-align:center;font-weight:bold;">{{ strtoupper($data->name) }}</td>
+                                <td colspan="3" style="border-top: none;text-align:center;font-weight:bold;">{{ strtoupper($data->ao_name).', '.$data->ao_title }}</td>
+                              </tr>
+                              <tr>
+                                <td style="border-left:1px solid black; border-top: none;border-right: none;font-weight:bold;padding-left:10px">Designation:</td>
+                                <td colspan="2" style="border-right: none;text-align:center;">{{ $data->designation }}</td>
+                                <td colspan="3" style="text-align:center;">{{ $data->ao_designation }}</td>
+                              </tr>
+                              <tr><td colspan="6" style="border-left: 1px solid black;height:20px;" ></td></tr> --}}
+                              <tr class="page-break" style="page-break-before: always">
+                                  {{-- <td></td>
+                                  <td>xcvbs fd</td>
+                                  <td>zdfvxc</td>
+                                  <td>zxcvxc</td>
+                                  <td>xcvzx</td>
+                                  <td>zxcvzxgfd </td> --}}
+                              </tr>
+                              @else
+                              <tr class="blank">
+                                  <td class="first">{{ $i+$a }}</td>
+                                  <td></td>
+                                  <td></td>
+                                  <td></td>
+                                  <td></td>
+                                  <td></td>
+                              </tr>
+                              @endif
+                              @endfor
+                              @for($count = 1; $count < $addRow; $count++)
+                              <tr class="blank">
                                 <td class="first"></td>
                                 <td></td>
                                 <td></td>
                                 <td></td>
                                 <td></td>
                                 <td></td>
-                              </tr>
+                            </tr>
                               @endfor
-                             
+                              @if ($a==$counter)
                                 <td class="first"></td>
                                 <td></td>
                                 <td></td>
                                 <td></td>
                                 <td></td>                
                                 <td  style="text-align: right;font-weight:bold;padding-right:10px">{{number_format($total,2,'.',',')}}</td>
+                                @endif
                             </tbody>
   
                            
                           </table>
                   </div>
+                      {{-- <div style="padding-top:50px"></div> --}}
                       
             </div>
+        {{-- </div>
+    </div>
+  </div> --}}
 </section>
+{{-- @include('pages.department.preview-PR-modal') --}}
+{{-- @include('pages.department.view-pr') --}}
+
+
+{{-- ADD MODAL --}}
+
+{{-- END ADD MODAL --}}
+
+
+
+<!--/ Scroll - horizontal and vertical table -->
+{{-- @endsection --}}
+{{-- vendor scripts --}}
 @section('vendor-scripts')
 
 <script src="{{asset('vendors/js/tables/datatable/datatables.min.js')}}"></script>
