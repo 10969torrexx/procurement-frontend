@@ -239,22 +239,17 @@
     <!-- Greetings Content Starts -->
     <section id="basic-datatable">
       <div class="card-content" >
-        <?php $campuscount = count($campusCheck); $camp = 0; $endorse = 0; $president_stat= ""; $bac_committee_stat = ""; $campusload = "";$project_category=""; $appType="";?>
+        <?php $campuscount = count($campusCheck); $camp = 0; $endorse = 0; $president_stat= ""; $proj_year= "";$campusload = "";$project_category=""; $appType="";?>
             @foreach($campusCheck as $campusload)
               <?php $project_category = $campusload->project_category; 
                     $appType = $campusload->app_type; 
-                    $bac_committee_stat = $campusload->bac_committee_status;
-                    $president_stat = $campusload->pres_status;
+                    $proj_year = $campusload->project_year; 
+                    $president_stat = $campusload->per_campus_status;
+                    $president_uwide_stat = $campusload->univ_wide_status;
                     $endorse = $campusload->endorse;?>
                 @if($campusload->campus == 1)
                     <?php $camp++;?>
                 @endif
-                {{-- @if($campusload->pres_status == 1)
-                    <?php /* $submitpres++; */?>
-                @endif --}}
-                {{-- @if($campusload->endorse == 1)
-                    <?php/*  $endorse++; */?>
-                @endif --}}
             @endforeach
             
           <div class="card-header" >
@@ -270,39 +265,24 @@
                 <button  type="submit" class="btn btn-primary form-control col-sm-1 mt-1 print" disabled><i class="fa-solid fa-print"></i> &nbsp; Print</button>
               @endif
 
-              @if(count($campusCheck) == 1)
-                {{-- @if(session('role') == 10)
-                  @if($endorse == 0)
-                    <button  type="button" class="btn btn-primary form-control col-sm-1 mt-1 endorse" value="1">ENDORSE</button>
+              <div class="dropdown" style="float: right">
+                @if (session('campus') != 1 )
+                  @if (count($campusCheck) > 0)
+                    @if ($president_uwide_stat != 3)
+                      <span
+                        class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu">
+                      </span>
+                    @endif
                   @endif
-                  @if($endorse > 0)
-                    <button  type="button" class="btn btn-primary form-control col-sm-1 mt-1 endorse" value="0"><i class="fa-solid fa-rotate-left"></i></button>
-                  @endif
-                @endif --}}
-                @php
-                    $pres_status = "";
-                @endphp
-                @foreach ($approved_by as $presStatus)
-                    @php
-                        $pres_status = $presStatus->status;
-                    @endphp
-                @endforeach
-                
-                @if(session('role') == 10)
-                  @if($pres_status == 0)
-                    <button  type="button" class="btn btn-primary form-control col-sm-1 mt-1 submittopresident " value="4" data-id="{{ $project_category}}">SUBMIT</button>
-                  @elseif($pres_status == 4)
-                    <button  type="button" class="btn btn-primary form-control col-sm-1 mt-1 submittopresident " value="0" data-id="{{ $project_category}}"><i class="fa-solid fa-rotate-left"></i></button>
-                  @else
-                      <input type="hidden" name="project_category" id="project_category" value="{{ $project_category}}">
+                @else
+                  @if (count($campusCheck) > 0)
+                    <span
+                      class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
+                      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu">
+                    </span>
                   @endif
                 @endif
-              @endif
-
-              <div class="dropdown" style="float: right">
-                <span
-                  class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
-                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu"></span>
                 <div class="dropdown-menu dropdown-menu-left">
                     @if($camp > 0)
                       <form action="{{ route('show-all') }}" method="post">
@@ -329,22 +309,61 @@
                       @endif
 
                     @endif
+
+
                   @if($scope == 'campus')
-                  {{-- @if(count($campusCheck) == 1) --}}
-                    @if(session('role') == 10)
-                      @if($endorse == 0)
-                        <input type="hidden" class="endorse" value="1">
+
+                    @php
+                        $pres_status = "";
+                    @endphp
+                    @foreach ($approved_by as $presStatus)
+                        @php
+                            $pres_status = $presStatus->status;
+                        @endphp
+                    @endforeach
+
+                    <input type="hidden" name="scope" id="scope" class="scope" value="{{ $scope}}">
+
+                    @if($endorse == 0)
+                      <input type="hidden" class="endorseval" value="1">
+                      <input type="hidden" class="president_stat" value="{{ $president_stat }}">
+                      <a class="dropdown-item {{-- endorse --}}" value="1" data-toggle = "modal" data-target = "#endorseModal">ENDORSE</a>
+                    @endif
+                    @if($endorse > 0)
+                      @if ($president_uwide_stat != 3)
+                        <input type="hidden" class="endorseval" value="0">
                         <input type="hidden" class="president_stat" value="{{ $president_stat }}">
-                        <input type="hidden" class="bac_committee_stat" value="{{ $bac_committee_stat }}">
-                        <a class="dropdown-item endorse" value="1">ENDORSE</a>
-                      @endif
-                      @if($endorse > 0)
-                        <input type="hidden" class="endorse" value="0">
-                        <input type="hidden" class="president_stat" value="{{ $president_stat }}">
-                        <input type="hidden" class="bac_committee_stat" value="{{ $bac_committee_stat }}">
                         <a class="dropdown-item endorse" value="0">DISALLOW</a>
                       @endif
                     @endif
+
+                    {{-- @if ($president_stat == "--") --}}
+                      @if($president_stat == "--")
+                        <input type="hidden" class="submittopresident" value="0">
+                        <a class="dropdown-item submittopresident " value="0" data-id="{{ $project_category}}">SUBMIT TO PRESIDENT</a>
+                      @endif
+
+                  @else
+                    <input type="hidden" name="scope" id="scope" class="scope" value="{{ $scope}}">
+                    @if ($president_uwide_stat == "--")
+                      @if($president_uwide_stat == "--")
+                        <input type="hidden" class="submittopresident" value="0">
+                        <a class="dropdown-item submittopresident" value="0" data-id="{{ $project_category}}">SUBMIT TO PRESIDENT</a>
+                      @elseif($president_uwide_stat != "--")
+                        <input type="hidden" class="submittopresident" value="--">
+                        <a class="dropdown-item submittopresident " data-id="{{ $project_category}}" ><i class="fa-solid fa-rotate-left"></i></a>
+                      @endif
+                    @endif
+
+                    @if ($endorse > 0)
+                    <form action="/bac/endorsed-app-non-cse" method="post">
+                      @csrf
+                      <input type="hidden" name="project_category" value="{{ $project_category}}">
+                      <input type="hidden" name="scope" value="{{ $scope}}">
+                      <button class="dropdown-item" type="submit" title="View Document of Endorsed APP NON CSE" value="{{ $proj_year }}" name="year">View</button>
+                    </form>
+                    @endif
+
                   @endif
                 </div>
               </div> 
@@ -390,29 +409,20 @@
                       </div>
                       <div class="header2" style="margin-top:2%;">
                         <div class="Title" >
-                          University Annual Procurement Plan for FY 
+                          @if ($scope == "Uwide")
+                            University
+                          @endif  
+                          
+                          Annual Procurement Plan for FY 
                           <?php 
                             $val = []; 
                           ?>
                           @foreach($Project_title as $Project_title)
-                            {{-- {{ $Project_title->project_year 
-                            }} --}}
                             <?php 
                             array_push($val, $Project_title->project_year); 
                             ?>
                           @endforeach
                           {{ reset($val) }}
-                          {{-- <?php
-                          // if($Project_title[0]->project_year != null){
-                          ?>
-                            {{ $Project_title[0]->project_year }}
-                          <?php
-                          // }else{
-                          ?>
-                          (Year)
-                          <?php
-                          // }
-                          ?> --}}
                         </div>
                       </div>
                     </td>
@@ -431,21 +441,28 @@
                           <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                             @foreach ($Project as $Project)
                             <form action="{{ route('app-non-cse-year') }}">
+                              <input type="hidden" name="project_category" class="project_category" id="project_category" value="{{ $project_category}}">
+                              <input type="hidden" name="scope" {{-- class="project_category" id="project_category" --}} value="{{ $scope}}">
                               <button class="dropdown-item year" type="submit" value="{{ $Project->project_year }}" name="year">{{ $Project->project_year }}</button>
                             </form>
                             {{-- <option value="{{ $Project->project_year }}" >{{ $Project->project_year }}</option> --}}
                             @endforeach
                           </div>
                         </div>
-                        {{-- @if(count($campusCheck) == 1) --}}
-                        @if($scope == 'campus')
-                          <div class="col-sm-7" style="float: left;">
+
+                        <div class="col-sm-7" style="float: left;">
+                          @if ($scope == "campus")
                             <label style="float: left;padding-top:10px;" > Status: </label>
-                            {{-- <label class="ml-1" style="font-size:15px;float: left;padding-top:6px;text-transform: capitalize;color:{{ (new GlobalDeclare)->pres_status_color($pres_status) }}" > {{ (new GlobalDeclare)->pres_status($pres_status) }} </label>
-                            <label class="ml-1"  style="font-size:15px;float: left;padding-top:6px;text-transform: capitalize;color:black;">|</label> --}}
-                            <label class="ml-1" style="font-size:15px;float: left;padding-top:6px;text-transform: capitalize;color:{{ (new GlobalDeclare)->endorse_color($endorse) }}" >{{ (new GlobalDeclare)->endorse($endorse) }} </label>
-                          </div>
-                        @endif
+                            <label class="ml-1" style="font-size:15px;float: left;padding-top:6px;text-transform: capitalize;color:{{ (new GlobalDeclare)->endorse_color($endorse,"html") }}" >{{ (new GlobalDeclare)->endorse($endorse) }} </label>
+                          {{-- @else
+                            @if ($approvedBystat != "--")
+                              <label style="float: left;padding-top:10px;" > Status: </label>
+                              <label class="ml-1 text-{{ (new GlobalDeclare)->pres_status_color($approvedBystat) }}" style="font-size:15px;float: left;padding-top:6px;text-transform: capitalize;" >{{ (new GlobalDeclare)->pres_status($approvedBystat) }} </label>
+                            @endif --}}
+
+                          @endif
+                        </div>
+
                       </div>
                     {{-- </div> --}}</td>
                   </tr>
@@ -679,7 +696,7 @@
                     ?>
                       <tr>
                         <td colspan="2" class="last" style="border-bottom : none;"><div class="child">Prepared by:</div></td>
-                        <td colspan="8" class="last" style="border-bottom : none;"><div class="child">Recommending Approval: {{-- &nbsp;<span style="color: {{ (new GlobalDeclare)->bac_committee_status_color($bac_committee_status) }};text-transform: uppercase;">{{ (new GlobalDeclare)->bac_committee_status($bac_committee_status) }}</span> --}}</div></td>
+                        <td colspan="8" class="last" style="border-bottom : none;"><div class="child">Recommending Approval: </div></td>
                         <td colspan="4" class="last" style="border-bottom : none; border-right:1px solid black;"><div class="child" style="height:10px">Approved by: &nbsp;{{-- <span style="color: {{ (new GlobalDeclare)->pres_status_color($pres_status) }};text-transform: uppercase;">{{ (new GlobalDeclare)->pres_status($pres_status) }}</span> --}}</div></td>
                       </tr>
                       <tr >
@@ -705,12 +722,20 @@
                                     echo ", $title";
                                   }
                                 ?>
-                                {{-- <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($prepared_by[0]->id)?>" style="margin-left:5px;"></i> --}}
                                 @if($prepared_by[0]->status == 0)
-                                  <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($prepared_by[0]->id)?>" style="margin-left:5px;"></i>
-                                @else
-                                  <i class="fa-solid fa-circle-check" value="<?=$aes->encrypt($prepared_by[0]->id)?>" style="margin-left:5px;color:green"></i>
-                              @endif
+                                  @if ($scope == "campus")
+                                    @if ($president_stat == 3)
+                                      <i class="fa-solid fa-circle-check" value="<?=$aes->encrypt($prepared_by[0]->id)?>" style="margin-left:5px;color:green"></i>
+                                    @else
+                                      <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($prepared_by[0]->id)?>" style="margin-left:5px;"></i>  
+                                    @endif
+                                  @endif
+                                  @if ($scope == "Uwide" )
+                                    @if ($president_uwide_stat == 3)
+                                      <i class="fa-solid fa-circle-check" value="<?=$aes->encrypt($prepared_by[0]->id)?>" style="margin-left:5px;color:green"></i>  
+                                    @endif
+                                  @endif
+                                @endif
                               </div>
                               <div class="profession">
                                 <?php
@@ -846,7 +871,9 @@
                                       }
                                     ?>
                                     @if($Rstat == 0)
-                                      <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                      @if ($scope == "campus")
+                                        <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                      @endif
                                     @else
                                       <i class="fa-solid fa-circle-check" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;color:green"></i>
                                     @endif
@@ -906,7 +933,9 @@
                                       }
                                     ?>
                                     @if($Rstat == 0)
-                                      <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                      @if ($scope == "campus")
+                                        <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                      @endif
                                     @else
                                       <i class="fa-solid fa-circle-check signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;color:green"></i>
                                     @endif
@@ -966,7 +995,9 @@
                                       }
                                     ?>
                                     @if($Rstat == 0)
-                                      <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                      @if ($scope == "campus")
+                                        <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                      @endif
                                     @else
                                       <i class="fa-solid fa-circle-check signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;color:green"></i>
                                     @endif
@@ -1029,7 +1060,9 @@
                                       }
                                     ?>
                                     @if($Rstat == 0)
-                                      <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                      @if ($scope == "campus")
+                                        <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                      @endif
                                     @else
                                       <i class="fa-solid fa-circle-check" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;color:green"></i>
                                     @endif
@@ -1089,7 +1122,9 @@
                                       }
                                     ?>
                                     @if($Rstat == 0)
-                                      <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                      @if ($scope == "campus")
+                                        <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                      @endif
                                     @else
                                       <i class="fa-solid fa-circle-check" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;color:green"></i>
                                     @endif
@@ -1149,7 +1184,9 @@
                                       }
                                     ?>
                                     @if($Rstat == 0)
-                                      <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                      @if ($scope == "campus")
+                                        <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                      @endif
                                     @else
                                       <i class="fa-solid fa-circle-check" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;color:green"></i>
                                     @endif
@@ -1212,7 +1249,9 @@
                                       }
                                     ?>
                                     @if($Rstat == 0)
-                                      <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                      @if ($scope == "campus")
+                                        <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                      @endif
                                     @else
                                       <i class="fa-solid fa-circle-check" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;color:green"></i>
                                     @endif
@@ -1272,7 +1311,9 @@
                                       }
                                     ?>
                                     @if($Rstat == 0)
-                                      <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                      @if ($scope == "campus")
+                                        <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;"></i>
+                                      @endif
                                     @else
                                       <i class="fa-solid fa-circle-check" value="<?=$aes->encrypt($id)?>" style="margin-left:5px;color:green"></i>
                                     @endif
@@ -1331,9 +1372,11 @@
                                 }
                               ?>
                               @if($approved_by[0]->status == 0)
-                                <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($approved_by[0]->id)?>" style="margin-left:5px;"></i>
+                                @if ($scope == "campus")
+                                  <i class="fa-solid fa-pen-to-square signaturiesEdit" value="<?=$aes->encrypt($approved_by[0]->id)?>" style="margin-left:5px;"></i>
+                                @endif
                               @else
-                                <i class="fa-solid fa-circle-check" value="<?=$aes->encrypt($approved_by[0]->id)?>" style="margin-left:5px;color:green"></i>
+                                  <i class="fa-solid fa-circle-check" value="<?=$aes->encrypt($approved_by[0]->id)?>" style="margin-left:5px;color:green"></i>
                               @endif
                             </div>
                             <div class="profession">
@@ -1370,6 +1413,7 @@
 
   </div>
 @include('pages.bac.generate-app-non-cse.edit-campusinfo-modal')
+@include('pages.bac.generate-app-non-cse.endorse-modal')
 @include('pages.bac.generate-app-non-cse.edit-signatories-modal')
 @include('pages.bac.generate-app-non-cse.edit-newprepared-modal')
 @include('pages.bac.generate-app-non-cse.edit-newrecommendingapproval-modal')

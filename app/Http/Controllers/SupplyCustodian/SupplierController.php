@@ -151,7 +151,7 @@ class SupplierController extends Controller
                                 'Address' => $request->Address,
                                 'ContactNo' => $request->ContactNumber,
                                 'Description' => $request->Description,
-                                'update_at' => Carbon::now(),
+                                'updated_at' => Carbon::now(),
                             ]);
 
                             # this will created history_log
@@ -178,7 +178,7 @@ class SupplierController extends Controller
                                 'Address' => $request->Address,
                                 'ContactNo' => $request->ContactNumber,
                                 'Description' => $request->Description,
-                                'update_at' => Carbon::now(),
+                                'updated_at' => Carbon::now(),
                             ]);
 
                             # this will created history_log
@@ -206,7 +206,7 @@ class SupplierController extends Controller
             }
         }catch (\Throwable $th) {
             return response()->json([
-                'status' => 400,
+                'status' => 600,
                 'message'   => $th
             ]);
         }

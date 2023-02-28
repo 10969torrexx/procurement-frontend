@@ -35,7 +35,7 @@ $(document).on('click', '.view', function (e) {
                $('.tbody').append(
                '<tr >\
                   <td style=" font-size: 11px" class="text-dark text-bold-600 ">'+e+'</td>\
-                  <td style="; text-align:left;" class="item"><br></bvr>'+ response['data'][i]['item_name']+'<br><br>Description:<br> '+ response['data'][i]['item_description'] +' </td>\
+                  <td style="; text-align:left;" class="item"><br></br>'+ response['data'][i]['item_name']+'<br><br>Description:<br> '+ response['data'][i]['item_description'] +' </td>\
                   <td  class="quantity " style="width: 40px;">'+ response['data'][i]['quantity'] +'</td>\
                   <td  class="unit" >'+ response['data'][i]['unit_of_measurement'] +'</td>\
                   <td  class="budget" >Php '+ priceformat +'</td>\

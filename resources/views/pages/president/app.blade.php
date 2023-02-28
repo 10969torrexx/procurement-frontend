@@ -243,7 +243,7 @@
             @foreach($campusCheck as $campusload)
               <?php $project_category = $campusload->project_category; 
                     $appType = $campusload->app_type; 
-                    $pres_status = $campusload->pres_status;
+                    $pres_status = $campusload->per_campus_status;
                     $endorse = $campusload->endorse;
                     $project_year = $campusload->project_year;?>
                 @if($campusload->campus == 1)
@@ -251,33 +251,48 @@
                 @endif
             @endforeach
 
-            <?php $bac_stat = "";?>
+            <?php 
+              $pres_stat = "";
+              $pres_univ_wide_stat = "";
+            ?>
             @foreach($signatories as $sign)
-              <?php $bac_stat = $sign->status?>
+              <?php 
+                $pres_stat = $sign->status;
+                $pres_univ_wide_stat = $sign->univ_wide_status;
+              ?>
             @endforeach
 
 
           <div class="card-header" >
-            @if(count($blocked) ==  0 || $blocked == null)
-              <div class="row col-sm-4" >
-                  @if($bac_stat == 0 || $bac_stat == 2)
+            @if ($scope == 1)
+              @if($pres_stat == "--")
+
+                <div class="row col-sm-4" >
+                  @if($pres_stat == "--" )
                     <button type="button" class="btn btn-success form-control col-sm-4  approve" value="1" active>Approve</button>
                   @else
-                    @if(count($expired) > 0)
-                      <button type="button" class="btn btn-success form-control col-sm-4  approve" value="0" active><i class="fa-solid fa-rotate-left"></i></button>
-                    @else
-                      <div class="col-sm-12 p-1 bg-info text-white"><i class="fa-solid fa-circle-info"></i> &nbsp; Status can be changed after a day !</div>
-                    @endif
+                      <button type="button" class="btn btn-success form-control col-sm-4  approve" value="--" active><i class="fa-solid fa-rotate-left"></i></button>
                   @endif
-              </div>
-              <hr>
-              <div class="row col-sm-4">
-                <p>Status: <span class="text-{{ (new GlobalDeclare)->pres_status_color($bac_stat) }}" style="color: ;text-transform: uppercase;">{{ (new GlobalDeclare)->pres_status($bac_stat) }}</span></p> 
-              </div>
-            
+                </div>
+              @else
+                <div class="col-sm-4 p-1 bg-{{ (new GlobalDeclare)->app_status_color($pres_stat,"app") }} text-white"><i class="fa-solid fa-circle-info"></i> &nbsp; {{ (new GlobalDeclare)->app_status($pres_stat,"app") }} !</div>
+                <hr>
+              @endif
+
             @else
-              <div class="col-sm-4 p-1 bg-{{ (new GlobalDeclare)->pres_status_color($pres_status) }} text-white"><i class="fa-solid fa-circle-info"></i> &nbsp; {{ (new GlobalDeclare)->pres_status($pres_status) }} !</div>
-              <hr>
+              @if($pres_univ_wide_stat == "--")
+                <div class="row col-sm-4" >
+                  @if($pres_univ_wide_stat == "--" )
+                    <button type="button" class="btn btn-success form-control col-sm-4  approve" value="1" active>Approve</button>
+                  @else
+                    <button type="button" class="btn btn-success form-control col-sm-4  approve" value="--" active><i class="fa-solid fa-rotate-left"></i></button>
+                  @endif
+                </div>
+
+              @else
+                <div class="col-sm-4 p-1 bg-{{ (new GlobalDeclare)->app_status_color($pres_univ_wide_stat,"app") }} text-white"><i class="fa-solid fa-circle-info"></i> &nbsp; {{ (new GlobalDeclare)->app_status($pres_univ_wide_stat,"app") }} !</div>
+                <hr>
+              @endif
             @endif
             
             {{-- @if ($pres_status == 0)
@@ -288,15 +303,10 @@
                     class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu"></span>
                   <div class="dropdown-menu dropdown-menu-left">
-                      @if(session('campus') == 1)
-                        {{-- <a class="dropdown-item univ_wide" id="univ_wide" href = "{{ route('show-all') }}"> University Wide</a>
-                        <a class="dropdown-item main" href = "/bac/app-non-cse">
-                          Main Campus Only
-                        </a> --}}
-                      @endif
                     <form action="{{ route('pres_generatepdf') }}" method="POST">
                     @csrf
                       <input type="hidden" name="project_category" class="project_category" value="{{ $project_category }}">
+                      <input type="hidden" name="scope" class="scope" value="{{ $scope }}">
                       <input type="hidden" name="app_type" class="app_type" value="{{ $appType }}">
                       <input type="hidden" class="Year" name="year" value="{{ $project_year }}">
                       <input type="hidden" class="campusCheck" name="campusCheck" value="{{ $campuscount }}">
@@ -343,7 +353,10 @@
                     </div>
                     <div class="header2" style="margin-top:2%;">
                       <div class="Title" >
-                        University Annual Procurement Plan for FY {{ $project_year }}
+                        @if ($scope == 0)
+                            University
+                        @endif 
+                         Annual Procurement Plan for FY {{ $project_year }}
                       </div>
                     </div>
                   </td>
@@ -988,9 +1001,9 @@
                                   echo ", $title";
                             }
                           ?>
-                            @if ($approved_by[0]->status == 1)
-                              <i class="fa-solid fa-circle-check" value="<?=$aes->encrypt($approved_by[0]->id)?>" style="margin-left:5px;color:green"></i>
-                            @endif
+                              @if ($approved_by[0]->status == 1)
+                                <i class="fa-solid fa-circle-check" value="<?=$aes->encrypt($approved_by[0]->id)?>" style="margin-left:5px;color:green"></i>
+                              @endif
                         </div>
                         <div class="profession">
                           <?php
