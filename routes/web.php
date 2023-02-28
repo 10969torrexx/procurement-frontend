@@ -532,6 +532,21 @@ Route::group(['prefix' => 'bac','middleware' => ['authuser']], function() {
     Route::post('/update-signatories', 'BAC\APPNONCSEController@update_signatories')->name('update-signatories');
     Route::get('/app-non-cse-year', 'BAC\APPNONCSEController@app_non_cse_year')->name('app-non-cse-year');
     Route::post('/app-non-cse-print', 'President\PresidentHopeController@print')->name('app-non-cse-print');
+
+    Route::get('/signed-app-non-cse', 'BAC\APPNONCSEController@signed_app_non_cse_index')->name('signed-app-non-cse');
+     # upload PPMP
+     Route::post('upload-app', 'BAC\APPNONCSEController@upload_app')->name('upload_app');
+     Route::post('get-upload-app', 'BAC\APPNONCSEController@get_upload_app')->name('get_upload_app');
+     # delete uploaded app
+     Route::get('delete-uploaded-app', 'BAC\APPNONCSEController@delete_uploaded_app')->name('delete_app');
+     # download uploaded app
+     Route::get('download-uploaded-app', 'BAC\APPNONCSEController@download_uploaded_app')->name('download_app');
+     # previw uploaded app
+     Route::get('view-uploaded-app', 'BAC\APPNONCSEController@view_uploaded_app')->name('view_app');
+     # edit upload
+     Route::get('get-uploaded-app', 'BAC\APPNONCSEController@get_edit_app')->name('get_edit_app');
+     Route::post('edit-uploaded-app', 'BAC\APPNONCSEController@edit_uploaded_app')->name('edit_app');
+
     
     Route::post('/show-campusinfo', 'BAC\APPNONCSEController@show_campusinfo')->name('show-campusinfo');
     Route::post('/update-campusinfo', 'BAC\APPNONCSEController@update_campusinfo')->name('update-campusinfo');
