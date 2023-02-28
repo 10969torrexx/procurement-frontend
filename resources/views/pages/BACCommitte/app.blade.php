@@ -243,7 +243,7 @@
             @foreach($campusCheck as $campusload)
               <?php $project_category = $campusload->project_category; 
                     $appType = $campusload->app_type; 
-                    $bac_committee_status = $campusload->bac_committee_status;
+                    $bac_committee_status = $campusload->per_campus_status;
                     $endorse = $campusload->endorse;
                     $project_year = $campusload->project_year;?>
                 @if($campusload->campus == 1)
@@ -251,30 +251,52 @@
                 @endif
             @endforeach
 
-            <?php $bac_stat = "";?>
+            <?php 
+            $bac_stat = "";
+            $bac_uwide_stat = "";
+            ?>
             @foreach($signatories as $sign)
-              <?php $bac_stat = $sign->status?>
+              <?php 
+              $bac_uwide_stat = $sign->univ_wide_status;
+              $bac_stat = $sign->status;
+              ?>
             @endforeach
 
           <div class="card-header" >
             @if (session('role') == 14)
-              @if ($bac_committee_status == 0)
-                <div class="row col-sm-4" >
-                    @if($bac_stat == 0 || $bac_stat == 2)
-                      <button type="button" class="btn btn-success form-control col-sm-4  approve" value="1" active>Recommend</button>
-                    @else
-                      @if(count($expired) > 0)
-                        <button type="button" class="btn btn-success form-control col-sm-4  approve" value="0" active><i class="fa-solid fa-rotate-left"></i></button>
+              @if ($scope == 1)
+                @if ($bac_stat == "--")
+                  <div class="row col-sm-4" >
+                      @if($bac_stat == "--")
+                        <button type="button" class="btn btn-success form-control col-sm-4  approve" value="1" active>Recommend</button>
                       @else
-                        <div class="col-sm-12 p-1 bg-info text-white"><i class="fa-solid fa-circle-info"></i> &nbsp; Status can be changed after a day !</div>
+                          <button type="button" class="btn btn-success form-control col-sm-4  approve" value="--" active><i class="fa-solid fa-rotate-left"></i></button>
                       @endif
+                  </div>
+                @else
+                  <div class="col-sm-4 p-1 bg-{{ (new GlobalDeclare)->app_status_color($bac_stat,"app") }} text-white"><i class="fa-solid fa-circle-info"></i> &nbsp; {{ (new GlobalDeclare)->app_status($bac_stat,"app") }} !</div>
+                  <hr>
+                @endif
+
+              @else
+
+                @if($bac_uwide_stat == "--")
+
+                  <div class="row col-sm-4" >
+                    @if($bac_uwide_stat == "--" )
+                      <button type="button" class="btn btn-success form-control col-sm-4  approve" value="1" active>Approve</button>
+                    @else
+                      <button type="button" class="btn btn-success form-control col-sm-4  approve" value="--" active><i class="fa-solid fa-rotate-left"></i></button>
                     @endif
-                </div>
-                <hr>
+                  </div>
+
+                @else
+                  <div class="col-sm-4 p-1 bg-{{ (new GlobalDeclare)->app_status_color($bac_uwide_stat,"app") }} text-white"><i class="fa-solid fa-circle-info"></i> &nbsp; {{ (new GlobalDeclare)->app_status($bac_uwide_stat,"app") }} !</div>
+                  <hr>
+                @endif
+
               @endif
-              <div class="row col-sm-4">
-                <p>Status: <span class="{{ (new GlobalDeclare)->bac_committee_status_color($bac_stat) }}" style="text-transform: uppercase;">{{ (new GlobalDeclare)->bac_committee_status($bac_stat) }}</span></p> 
-              </div>
+
             @endif
             <div class="generate" {{-- style="background-color: #bf5279" --}}>
                 <div class="dropdown" style="float: right">
@@ -291,6 +313,7 @@
                     <form action="{{ route('pres_generatepdf') }}" method="POST">
                     @csrf
                       <input type="hidden" name="project_category" class="project_category" value="{{ $project_category }}">
+                      <input type="hidden" name="scope" class="scope" value="{{ $scope }}">
                       <input type="hidden" name="app_type" class="app_type" value="{{ $appType }}">
                       <input type="hidden" class="Year" name="year" value="{{ $project_year }}">
                       <input type="hidden" class="campusCheck" name="campusCheck" value="{{ $campuscount }}">
@@ -338,7 +361,10 @@
                     </div>
                     <div class="header2" style="margin-top:2%;">
                       <div class="Title" >
-                        University Annual Procurement Plan for FY {{ $project_year }}
+                        @if ($scope == "0")
+                            University 
+                        @endif
+                        Annual Procurement Plan for FY {{ $project_year }}
                       </div>
                     </div>
                   </td>

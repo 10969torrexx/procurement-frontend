@@ -531,10 +531,12 @@ Route::group(['prefix' => 'bac','middleware' => ['authuser']], function() {
     Route::post('/add_recommendingapproval_modal', 'BAC\APPNONCSEController@add_recommendingapproval_modal')->name('add_recommendingapproval_modal');
     Route::post('/update-signatories', 'BAC\APPNONCSEController@update_signatories')->name('update-signatories');
     Route::get('/app-non-cse-year', 'BAC\APPNONCSEController@app_non_cse_year')->name('app-non-cse-year');
-    Route::post('/app-non-cse-print', 'President\PresidentHopeController@print')->name('app-non-cse-print');
+    Route::post('/app-non-cse-print', 'BAC\APPNONCSEController@print')->name('app-non-cse-print');
 
     Route::get('/signed-app-non-cse', 'BAC\APPNONCSEController@signed_app_non_cse_index')->name('signed-app-non-cse');
-     # upload PPMP
+    Route::post('/endorsed-app-non-cse', 'BAC\APPNONCSEController@endorsed_app_non_cse_index')->name('endorsed-app-non-cse');
+    Route::get('/signed-app-non-cse-uwide', 'BAC\APPNONCSEController@signed_app_non_cse_index_univ_wide')->name('signed-app-non-cse-uwide');
+     # upload app
      Route::post('upload-app', 'BAC\APPNONCSEController@upload_app')->name('upload_app');
      Route::post('get-upload-app', 'BAC\APPNONCSEController@get_upload_app')->name('get_upload_app');
      # delete uploaded app
@@ -542,29 +544,35 @@ Route::group(['prefix' => 'bac','middleware' => ['authuser']], function() {
      # download uploaded app
      Route::get('download-uploaded-app', 'BAC\APPNONCSEController@download_uploaded_app')->name('download_app');
      # previw uploaded app
-     Route::get('view-uploaded-app', 'BAC\APPNONCSEController@view_uploaded_app')->name('view_app');
+     Route::get('view-uploaded-app', 'BAC\APPNONCSEController@view_uploaded_app')->name('view-uploaded-app');
      # edit upload
      Route::get('get-uploaded-app', 'BAC\APPNONCSEController@get_edit_app')->name('get_edit_app');
      Route::post('edit-uploaded-app', 'BAC\APPNONCSEController@edit_uploaded_app')->name('edit_app');
 
-    
+    #all About APP CSE
+        Route::get('/app_cse','BAC\APPCSE@app_cse_index');
+        Route::get('/app_cse_uwide','BAC\APPCSE@app_cse_uwide_index');
+        # endorse uploaded app
+        Route::get('endorse-uploaded-app-cse', 'BAC\APPCSE@endorse_uploaded_app_cse')->name('endorse_appcse');
+        # download uploaded app
+        Route::get('download-uploaded-app-cse', 'SupplyCustodian\APP_CSE@download_uploaded_app_cse')->name('download_appcse');
+        # previw uploaded app
+        Route::get('view-uploaded-app-cse', 'SupplyCustodian\APP_CSE@view_uploaded_app_cse')->name('view_appcse');
+
+    #fpr the Campus Information
     Route::post('/show-campusinfo', 'BAC\APPNONCSEController@show_campusinfo')->name('show-campusinfo');
     Route::post('/update-campusinfo', 'BAC\APPNONCSEController@update_campusinfo')->name('update-campusinfo');
-    // Route::post('/show-campuslogo', 'BAC\APPNONCSEController@show_campuslogo')->name('show-campusinfo');
     Route::post('/update-campuslogo', 'BAC\APPNONCSEController@update_campuslogo')->name('update-campuslogo');
     Route::post('/update-logo', 'BAC\APPNONCSEController@update_logo')->name('update-logo');
 
-    // Route::post('/supervisor-ppmp-done', 'Supervisor\SupervisorControllerTraditional@done')->name('supervisor-ppmp-done');
+    #For BAC Resolutions
+    Route::get('/generate_resolution','BAC\BACResolutionController@generate');
 
     
     
     
     //Ammendments
     Route::get('/request-for-amendments', 'BAC\RequestforAmendmentsController@index');
-    // Route::post('/app-non-cse-view', 'BAC\APPNONCSEController@view')->name('app-non-cse-view');
-    //jrald end
-    // Route::get('/adduser','Admin\AdminController@adduser');
-    
 });
 
 Route::group(['prefix' => 'supervisor','middleware' => ['authuser']], function() {
@@ -606,6 +614,8 @@ Route::group(['prefix' => 'president','middleware' => ['authuser']], function() 
     Route::post('/pres_decision', 'President\PresidentHopeController@pres_decision')->name('pres_decision');
     Route::get('/supplemental', 'President\PresidentHopeController@Supplemental_index');
     Route::get('/indicative', 'President\PresidentHopeController@indicative_index');
+    Route::get('/app-non-cse', 'BAC\APPNONCSEController@signed_app_non_cse_index');
+    Route::get('/app-cse','BAC\APPCSE@app_cse_index');
 });
 
 Route::group(['prefix' => 'baccommittee','middleware' => ['authuser']], function() {
@@ -618,6 +628,8 @@ Route::group(['prefix' => 'baccommittee','middleware' => ['authuser']], function
     Route::post('/bac_committee_decision', 'BACCommittee\BACCommitteeController@bac_committee_decision')->name('bac_committee_decision');
     Route::get('/supplemental', 'BACCommittee\BACCommitteeController@Supplemental_index');
     Route::get('/indicative', 'BACCommittee\BACCommitteeController@indicative_index');
+    Route::get('/app-non-cse', 'BAC\APPNONCSEController@signed_app_non_cse_index');
+    Route::get('/app-cse','BAC\APPCSE@app_cse_index');
 });
 
 Route::group(['prefix' => 'supply_custodian','middleware' => ['authuser']], function() {
@@ -661,6 +673,25 @@ Route::group(['prefix' => 'supply_custodian','middleware' => ['authuser']], func
     Route::post('/edit-supplier','SupplyCustodian\SupplierController@edit_supplier')->name('edit-supplier');
     Route::post('/submitedit-supplier','SupplyCustodian\SupplierController@submitedit_supplier')->name('submitedit-supplier');
     Route::post('/delete-supplier','SupplyCustodian\SupplierController@delete_supplier')->name('delete-supplier');
+
+    Route::get('/app_cse','SupplyCustodian\APP_CSE@app_cse_index');
+    Route::get('/submitted_app_cse','SupplyCustodian\APP_CSE@submitted_app_cse_index');
+    # upload app
+    Route::post('upload-app-cse', 'SupplyCustodian\APP_CSE@upload_app_cse')->name('upload_app_cse');
+    Route::post('get-upload-app-cse', 'SupplyCustodian\APP_CSE@get_upload_app_cse')->name('get_upload_app_cse');
+    Route::post('filter-upload-app-cse', 'SupplyCustodian\APP_CSE@filter_upload_app_cse')->name('filter_upload_app_cse');
+    # delete uploaded app
+    Route::get('delete-uploaded-app-cse', 'SupplyCustodian\APP_CSE@delete_uploaded_app_cse')->name('delete_app_cse');
+    # download uploaded app
+    Route::get('download-uploaded-app-cse', 'SupplyCustodian\APP_CSE@download_uploaded_app_cse')->name('download_app_cse');
+    # previw uploaded app
+    Route::get('view-uploaded-app-cse', 'SupplyCustodian\APP_CSE@view_uploaded_app_cse')->name('view_app_cse');
+    # edit upload
+    Route::get('get-uploaded-app-cse', 'SupplyCustodian\APP_CSE@get_edit_app_cse')->name('get_edit_app_cse');
+    Route::post('edit-uploaded-app-cse', 'SupplyCustodian\APP_CSE@edit_uploaded_app_cse')->name('edit_app_cse');
+    # Submit uploaded app
+    Route::get('submit-uploaded-app-cse', 'SupplyCustodian\APP_CSE@submit_uploaded_app_cse')->name('submit_app_cse');
+
 // });
 
 });

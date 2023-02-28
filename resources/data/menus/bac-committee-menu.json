@@ -61,131 +61,36 @@
       "icon": "users",
       "submenu": [
         {
-          "url": "#",
+          "url": "baccommittee/list/Indicative",
           "name": "Indicative",
           "i18n": "User",
-          "icon": "shoppingcart-in",
-          "submenu": [
-            {
-              "url": "baccommittee/list/Indicative",
-              "name": "View",
-              "i18n": "User",
-              "icon": "shoppingcart-in"
-            },
-            {
-              "url": "#",
-              "name": "Signed APP",
-              "i18n": "User",
-              "icon": "shoppingcart-in"
-            }]
-            
+          "icon": "shoppingcart-in"
         },
         {
-          "url": "#",
+          "url": "baccommittee/list/PPMP",
           "name": "Traditional",
           "i18n": "User",
-          "icon": "shoppingcart-in",
-          "submenu": [
-            {
-              "url": "baccommittee/list/PPMP",
-              "name": "View",
-              "i18n": "User",
-              "icon": "shoppingcart-in"
-            },
-            {
-              "url": "#",
-              "name": "Signed APP",
-              "i18n": "User",
-              "icon": "shoppingcart-in"
-            }]
+          "icon": "shoppingcart-in"
         },
         {
-          "url": "#",
+          "url": "baccommittee/list/Supplemental",
           "name": "Supplemental",
           "i18n": "User",
-          "icon": "shoppingcart-in",
-          "submenu": [
-            {
-              "url": "baccommittee/list/Supplemental",
-              "name": "View",
-              "i18n": "User",
-              "icon": "shoppingcart-in"
-            },
-            {
-              "url": "#",
-              "name": "Signed APP",
-              "i18n": "User",
-              "icon": "shoppingcart-in"
-            }]
+          "icon": "shoppingcart-in"
+        },
+        {
+          "url": "baccommittee/app-non-cse",
+          "name": "Signed APP",
+          "i18n": "User",
+          "icon": "shoppingcart-in"
         }
       ]
     },
     {
-      "url": "#",
+      "url": "baccommittee/app-cse",
       "name": "APP CSE",
       "i18n": "User",
-      "icon": "users",
-      "submenu": [
-        {
-          "url": "#",
-          "name": "Indicative",
-          "i18n": "User",
-          "icon": "shoppingcart-in",
-          "submenu": [
-            {
-              "url": "#",
-              "name": "View",
-              "i18n": "User",
-              "icon": "shoppingcart-in"
-            },
-            {
-              "url": "#",
-              "name": "Signed APP",
-              "i18n": "User",
-              "icon": "shoppingcart-in"
-            }]
-            
-        },
-        {
-          "url": "#",
-          "name": "Traditional",
-          "i18n": "User",
-          "icon": "shoppingcart-in",
-          "submenu": [
-            {
-              "url": "#",
-              "name": "View",
-              "i18n": "User",
-              "icon": "shoppingcart-in"
-            },
-            {
-              "url": "#",
-              "name": "Signed APP",
-              "i18n": "User",
-              "icon": "shoppingcart-in"
-            }]
-        },
-        {
-          "url": "#",
-          "name": "Supplemental",
-          "i18n": "User",
-          "icon": "shoppingcart-in",
-          "submenu": [
-            {
-              "url": "#",
-              "name": "View",
-              "i18n": "User",
-              "icon": "shoppingcart-in"
-            },
-            {
-              "url": "#",
-              "name": "Signed APP",
-              "i18n": "User",
-              "icon": "shoppingcart-in"
-            }]
-        }
-      ]
-      
+      "icon": "users"
     }
   ]
 }

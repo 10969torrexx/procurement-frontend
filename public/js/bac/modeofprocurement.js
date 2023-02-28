@@ -12,83 +12,83 @@
 
 
 //Save
-var input = document.getElementById("mode-of-procurement");
-input.addEventListener("keypress", function(event) {
-  if (event.key === "Enter") {
-    event.preventDefault();
-    var data = {
-        // 'item id': $('.item-id').val(),
-        'modeofprocurement': $('.mode-of-procurement').val(),
-        'abbreviation': $('.mode-of-procurement-abv').val(),
-    }
-    console,log(data);
-    if( data.modeofprocurement == "" || data.abbreviation == "")
-    {
-      Swal.fire('Complete the needed data', '', 'info')
-    }
-    else{
-      $(this).text('Saving..');
-      $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-      });
+// var input = document.getElementById("mode-of-procurement");
+// input.addEventListener("keypress", function(event) {
+//   if (event.key === "Enter") {
+//     event.preventDefault();
+//     var data = {
+//         // 'item id': $('.item-id').val(),
+//         'modeofprocurement': $('.mode-of-procurement').val(),
+//         'abbreviation': $('.mode-of-procurement-abv').val(),
+//     }
+//     console,log(data);
+//     if( data.modeofprocurement == "" || data.abbreviation == "")
+//     {
+//       Swal.fire('Complete the needed data', '', 'info')
+//     }
+//     else{
+//       $(this).text('Saving..');
+//       $.ajaxSetup({
+//         headers: {
+//             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+//         }
+//       });
 
-      $.ajax({
-        type: "POST",
-        url: "add-procurement",
-        data: data,
-        dataType: "json",
-        success: function (response) {
-          // console.log(response);
-            if (response.status == 200) {
+//       $.ajax({
+//         type: "POST",
+//         url: "add-procurement",
+//         data: data,
+//         dataType: "json",
+//         success: function (response) {
+//           // console.log(response);
+//             if (response.status == 200) {
               
-                    // console.log(response);
-                    Swal.fire({
-                      title: 'Saved',
-                      html: 'Saved Successfully!',
-                      icon: 'success',
-                      timer: 2000,
-                      timerProgressBar: true,
-                      didOpen: () => {
-                        Swal.showLoading()
-                        const b = Swal.getHtmlContainer().querySelector('b')
-                        timerInterval = setInterval(() => {
-                          b.textContent = Swal.getTimerLeft()
-                        }, 100)
-                      },
-                      willClose: () => {
-                        clearInterval(timerInterval)
-                      }
-                    }).then((result) => {
-                      /* Read more about handling dismissals below */
-                      if (result.dismiss === Swal.DismissReason.timer) {
-                        $('.add-procurement').text('Add');
-                        $('.mode-of-procurement').val('');
-                        // $('#item-table').DataTable().ajax.reload();
-                        location.reload();
-                        console.log('I was closed by the timer')
-                      }
-                    })
+//                     // console.log(response);
+//                     Swal.fire({
+//                       title: 'Saved',
+//                       html: 'Saved Successfully!',
+//                       icon: 'success',
+//                       timer: 2000,
+//                       timerProgressBar: true,
+//                       didOpen: () => {
+//                         Swal.showLoading()
+//                         const b = Swal.getHtmlContainer().querySelector('b')
+//                         timerInterval = setInterval(() => {
+//                           b.textContent = Swal.getTimerLeft()
+//                         }, 100)
+//                       },
+//                       willClose: () => {
+//                         clearInterval(timerInterval)
+//                       }
+//                     }).then((result) => {
+//                       /* Read more about handling dismissals below */
+//                       if (result.dismiss === Swal.DismissReason.timer) {
+//                         $('.add-procurement').text('Add');
+//                         $('.mode-of-procurement').val('');
+//                         // $('#item-table').DataTable().ajax.reload();
+//                         location.reload();
+//                         console.log('I was closed by the timer')
+//                       }
+//                     })
                 
-            } else {
+//             } else {
               
-              $('.add-procurement').text('Add');
-              Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'Already Exist',
-              })
-              $('.add-procurement').text('Add');
-              $('.mode-of-procurement').val('');
-            }
-        }
-      });
-    }
-           console.log(data);
+//               $('.add-procurement').text('Add');
+//               Swal.fire({
+//                 icon: 'error',
+//                 title: 'Oops...',
+//                 text: 'Already Exist',
+//               })
+//               $('.add-procurement').text('Add');
+//               $('.mode-of-procurement').val('');
+//             }
+//         }
+//       });
+//     }
+//            console.log(data);
    
-  }
-});
+//   }
+// });
 
 $(document).on('click', '.add-procurement', function (e) {
     e.preventDefault();
@@ -276,74 +276,74 @@ $(document).on('click', '.edit', function (e) {
 
 //update
 
-var input = document.getElementById("update");
-input.addEventListener("keypress", function(event) {
-  if (event.key === "Enter") {
-    event.preventDefault();
+// var input = document.getElementById("update");
+// input.addEventListener("keypress", function(event) {
+//   if (event.key === "Enter") {
+//     event.preventDefault();
 
-    var data = {
-      'mode_of_procurement': $('.update').val(),
-      'abbreviation': $('.abv').val(),
-      'id': $('.update-id').val(),
-  }
+//     var data = {
+//       'mode_of_procurement': $('.update').val(),
+//       'abbreviation': $('.abv').val(),
+//       'id': $('.update-id').val(),
+//   }
 
-  if( data.mode_of_procurement == "" || data.abbreviation=="")
-  {
-    Swal.fire('Complete the needed data', '', 'info')
-  }
-  else{
-    // $(this).text('Saving..');
-    $.ajaxSetup({
-      headers: {
-          'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-      }
-    });
-    $.ajax({
-      type: "POST",
-      url: "update-procurement",
-      data: data,
-      dataType: "json",
-      success: function (response) {
-        // console.log(response);
-        if(response['status'] == 200) {
+//   if( data.mode_of_procurement == "" || data.abbreviation=="")
+//   {
+//     Swal.fire('Complete the needed data', '', 'info')
+//   }
+//   else{
+//     // $(this).text('Saving..');
+//     $.ajaxSetup({
+//       headers: {
+//           'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+//       }
+//     });
+//     $.ajax({
+//       type: "POST",
+//       url: "update-procurement",
+//       data: data,
+//       dataType: "json",
+//       success: function (response) {
+//         // console.log(response);
+//         if(response['status'] == 200) {
           
-          $("#editmodal").modal('hide');
-          Swal.fire({
-            title: 'Updated!!!',
-            html: 'Update Successfully!',
-            icon: 'success',
-            timer: 1000,
-            timerProgressBar: true,
-            didOpen: () => {
-              Swal.showLoading()
-              const b = Swal.getHtmlContainer().querySelector('b')
-              timerInterval = setInterval(() => {
-                b.textContent = Swal.getTimerLeft()
-              }, 100)
-            },
-            willClose: () => {
-              clearInterval(timerInterval)
-            }
-            }).then((result) => {
-              /* Read more about handling dismissals below */
-              if (result.dismiss === Swal.DismissReason.timer) {
-                location.reload();
-                console.log('I was closed by the timer')
-              }
-            })
-          }else{
-            Swal.fire({
-              icon: 'error',
-              title: 'Oops...',
-              text: 'Already Exist',
-            })
-            $(this).text('Update');
-          }
-      }
-    }) 
-    }   
-  }
-});
+//           $("#editmodal").modal('hide');
+//           Swal.fire({
+//             title: 'Updated!!!',
+//             html: 'Update Successfully!',
+//             icon: 'success',
+//             timer: 1000,
+//             timerProgressBar: true,
+//             didOpen: () => {
+//               Swal.showLoading()
+//               const b = Swal.getHtmlContainer().querySelector('b')
+//               timerInterval = setInterval(() => {
+//                 b.textContent = Swal.getTimerLeft()
+//               }, 100)
+//             },
+//             willClose: () => {
+//               clearInterval(timerInterval)
+//             }
+//             }).then((result) => {
+//               /* Read more about handling dismissals below */
+//               if (result.dismiss === Swal.DismissReason.timer) {
+//                 location.reload();
+//                 console.log('I was closed by the timer')
+//               }
+//             })
+//           }else{
+//             Swal.fire({
+//               icon: 'error',
+//               title: 'Oops...',
+//               text: 'Already Exist',
+//             })
+//             $(this).text('Update');
+//           }
+//       }
+//     }) 
+//     }   
+//   }
+// });
 
 $(document).on('click', '.update-btn', function (e) {
   e.preventDefault();

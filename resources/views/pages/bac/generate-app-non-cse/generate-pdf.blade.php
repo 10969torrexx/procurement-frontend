@@ -159,7 +159,10 @@
     </div>
     <div class="header2">
       <div class="Title">
-        University Annual Procurement Plan for FY {{ $signatures[0]->Year }}
+        @if ($scope == "Uwide")
+             University 
+        @endif
+        Annual Procurement Plan for FY {{ $signatures[0]->Year }}
       </div>
     </div>
     <div class="table-div">
@@ -347,8 +350,8 @@
             <td colspan="8">
               <div class="" style="height:260px;width:100%;">
                 <div class="" style="height:10%;width:100% ">Recommending Approval:</div>
-                <div class="" style="height:10%;width:100%;text-align:center;font-size: 25px;font-family: Edwardian Script ITC;color:blue">Bids & Awards Committee</div>
-                <div class="" style="height:79%;width:100%;text-align:center;margin-top:1%">
+                <div class="" style="height:10%;width:100%;text-align:center;font-size: 23px; font-family: Edwardian Script ITC;color:blue;margin-bottom:2%">Bids & Awards Committee</div>
+                <div class="" style="height:79%;width:100%;text-align:center;margin-top:2%">
                   <div class="" style="height:30%;width:100%;text-align:center;  ">
                     <div class="person" style="width:32%; height:100%;float:left; margin-left:1%">
                       <?php

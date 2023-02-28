@@ -5,7 +5,8 @@ $(document).on('click', '.generatepdf', function (e) {
     var data = {
       'year' :  $(".Year").val(),
       'campusCheck' : $(".campusCheck").val(),
-      'category' : $(".project_category").val()
+      'category' : $(".project_category").val(),
+      'scope' : $(".scope").val()
     }
   
     console.log(data);
@@ -58,10 +59,10 @@ $(document).on('click', '.generatepdf', function (e) {
 $(document).on('click', '.approve', function (e) {
     var data = {
         'year' :  $(".Year").val(),
-        // 'campusCheck' : $(".campusCheck").val(),
         'category' : $(".project_category").val(),
         'app_type' : $(".app_type").val(),
-        'value' : $(this).val()
+        'value' : $(this).val(),
+        'scope' : $(".scope").val()
     }
     
     console.log(data);
@@ -201,7 +202,7 @@ $(document).on('click', '.print', function (e) {
         'campusCheck' : $(".campusCheck").val(),
         'category' : $(".project_category").val(),
         'app_type' : $(".app_type").val(),
-        // 'value' : $(this).val()
+        'scope' : $(".scope").val()
     };
 console.log(data);
 $.ajax({

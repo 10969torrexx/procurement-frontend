@@ -98,10 +98,29 @@
                               </select>
                             </div>
                         </div>
-                        <div class="form-group">
-                          <label for="">File name</label>
-                          <textarea name="file_name" id="default-file-name" class="form-control" id="" cols="30" rows="1" required></textarea>
-                        </div>
+                        @if (session('campus') == 1)
+                          <div class="row">
+                            <div class="form-group col-sm-6 col-md-6 col-lg-6 col-12">
+                              <label for="">File name</label>
+                              <textarea name="file_name" id="default-file-name" class="form-control" id="" cols="30" rows="1" required></textarea>
+                            </div>
+                            
+                            <div class="col-sm-6 col-md-6 col-lg-6 col-12">
+                              <label for="">APP / UAPP: </label>
+                              <select name="type" id="type" class="form-control" required>
+                                <option value="">-- Select Year --</option>
+                                <option value="1">University Wide APP</option>
+                                <option value="2">Main Campus APP</option>
+                              </select>
+                            </div>
+                          </div>
+                        @else
+                          <input type="hidden" name="type" id="type" class="form-control" value="2" required>
+                          <div class="form-group ">
+                            <label for="">File name</label>
+                            <textarea name="file_name" id="default-file-name" class="form-control" id="" cols="30" rows="1" required></textarea>
+                          </div>
+                        @endif
                         <div class="form-group">
                           <label for="">Signed app File</label>
                           <input type="file" name="signed_app" id="default-signed-app" class="form-control">
@@ -123,109 +142,179 @@
 
 <section id="dropzone-examples">
   <!-- Upload signed app starts -->
-      <div class="row">
-        <div class="col-12">
-          <div class="card">
-            <div class="card-header p-1">
-              <h4 class="card-title text-primary border-bottom pb-1">
-                <strong> Upload Signed app</strong>
-              </h4>
-            </div>
-            <div class="card-content">
-              <div class="card-body">
-                  <div class="row justify-content-center">
-                      <div class="col-5 col-sm-5 col-md-5 col-lg-5">
-                        <form action="{{ route('upload_app') }}" method="POST" enctype="multipart/form-data"> @csrf
-                          <div class="form-group row">
-                              <div class="col-sm-6 col-md-6 col-lg-6 col-12">
-                                  <label for="">app / Project Category</label>
-                                  <select name="project_category" id="project-category" class="form-control" required>
-                                    <option value="">-- Select Project Category --</option>
-                                    @for ($i = 0; $i < 3; $i++)
-                                        <option value="{{ (new AESCipher)->encrypt($i) }}">{{ (new GlobalDeclare)->project_category($i) }}</option>
-                                    @endfor
-                                </select>
-                              </div>
-                              <div class="col-sm-6 col-md-6 col-lg-6 col-12">
-                                  <label for="">Year Created</label>
-                                  <select name="year_created" id="year-created" class="form-control" required>
-                                    <option value="">-- Select Year --</option>
-                                    @for ($i = 5; $i > 0; $i--)
-                                        <option value="{{ (new AESCipher)->encrypt(Carbon::now()->subYears($i)->format('Y')) }}">{{ Carbon::now()->subYear($i)->format('Y') }}</option>
-                                    @endfor
-                                    @for ($i = 0; $i < 5; $i++)
-                                        <option value="{{ (new AESCipher)->encrypt(Carbon::now()->subYears($i)->format('Y')) }}">{{ Carbon::now()->addYear($i)->format('Y') }}</option>
-                                    @endfor
-                                </select>
-                              </div>
-                          </div>
-                          <div class="form-group">
-                            <label for="">File name</label>
-                            <textarea name="file_name" class="form-control" id="" cols="30" rows="1" required></textarea>
-                          </div>
-                          <div class="form-group">
-                            <label for="">Signed app File</label>
-                            <input type="file" name="signed_app" id="signed-app" class="form-control" required>
-                            <p class="card-text alert bg-rgba-info">This can only process (.pdf, .jpeg, .jpg, .png) files</p>
-                          </div>
-                          <button type="submit" class="btn btn-success text-white" id="upload-signed-app">Upload Signed app</button>
-                        </form>
-                      </div>
-                  </div>
+    @if (session('role') == 10 ||  session('role') == 2)
+      @if ($campus == 0 || $campus == 1 )
+        <div class="row">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header p-1">
+                <h4 class="card-title text-primary border-bottom pb-1">
+                  <strong> Upload Signed app</strong>
+                </h4>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-  <!-- single file upload starts -->
-  <div class="row">
-    <div class="col-12">
-      <div class="card">
-        <div class="card-header p-1">
-          <h4 class="card-title text-primary border-bottom pb-1">
-             <strong> Signed app</strong>
-          </h4>
-        </div>
-        <div class="card-content">
-          <div class="card-body">
-              {{-- search uploaded app --}}
-                <form action="{{ route('get_upload_app') }}" method="post">
-                  @csrf
-                    <div class="row justify-content-center">
-                      <div class="col-8 col-md-8 col-sm-8 col-lg-8 p-1 row">
-                        <div class="col-3 col-md-3 col-sm-3">
-                            <select name="project_category" id="project-category" class="form-control" required>
+              <div class="card-content">
+                <div class="card-body">
+                  <div class="row justify-content-center">
+                    <div class="col-5 col-sm-5 col-md-5 col-lg-5">
+                      <form action="{{ route('upload_app') }}" method="POST" enctype="multipart/form-data"> @csrf
+                        <div class="form-group row">
+                          <div class="col-sm-6 col-md-6 col-lg-6 col-12">
+                              <label for="">app / Project Category</label>
+                              <select name="project_category" id="project-category" class="form-control" required>
                                 <option value="">-- Select Project Category --</option>
                                 @for ($i = 0; $i < 3; $i++)
                                     <option value="{{ (new AESCipher)->encrypt($i) }}">{{ (new GlobalDeclare)->project_category($i) }}</option>
                                 @endfor
                             </select>
                           </div>
-                        <div class="col-3 col-md-3 col-sm-3">
-                            <select name="year_created" id="year-created" class="form-control" required>
-                              <option value="">-- Select Year --</option>
-                              @for ($i = 5; $i > 0; $i--)
-                                  <option value="{{ (new AESCipher)->encrypt(Carbon::now()->subYears($i)->format('Y')) }}">{{ Carbon::now()->subYear($i)->format('Y') }}</option>
-                              @endfor
-                              @for ($i = 0; $i < 5; $i++)
-                                  <option value="{{ (new AESCipher)->encrypt(Carbon::now()->subYears($i)->format('Y')) }}">{{ Carbon::now()->addYear($i)->format('Y') }}</option>
-                              @endfor
-                          </select>
+                          <div class="col-sm-6 col-md-6 col-lg-6 col-12">
+                              <label for="">Year Created</label>
+                              <select name="year_created" id="year-created" class="form-control" required>
+                                <option value="">-- Select Year --</option>
+                                @for ($i = 5; $i > 0; $i--)
+                                    <option value="{{ (new AESCipher)->encrypt(Carbon::now()->subYears($i)->format('Y')) }}">{{ Carbon::now()->subYear($i)->format('Y') }}</option>
+                                @endfor
+                                @for ($i = 0; $i < 5; $i++)
+                                    <option value="{{ (new AESCipher)->encrypt(Carbon::now()->subYears($i)->format('Y')) }}">{{ Carbon::now()->addYear($i)->format('Y') }}</option>
+                                @endfor
+                            </select>
+                          </div>
                         </div>
-                        <div class="col-3 col-md-3 col-sm-3">
-                          <textarea name="file_name" class="form-control" id="" cols="30" rows="1" placeholder="File Name"></textarea>
-                        </div>
-                        <div class="col-3 col-md-3 col-sm-3">
-                          <button type="submit" class="btn btn-success text-white" id="upload-signed-app">Search</button>
-                        </div>
-                      </div>
+                        @if (session('campus') == 1)
+                          <div class="row">
+                            <div class="form-group col-sm-6 col-md-6 col-lg-6 col-12">
+                              <label for="">File name</label>
+                              <textarea name="file_name" class="form-control" id="" cols="30" rows="1" required></textarea>
+                            </div>
+                            
+                            <div class="col-sm-6 col-md-6 col-lg-6 col-12">
+                              <label for="">APP / UAPP: </label>
+                              <select name="type" id="type" class="form-control" required>
+                                <option value="">-- Select Year --</option>
+                                <option value="1">University Wide APP</option>
+                                <option value="2">Main Campus APP</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="form-group col-12 col-sm-12 col-md-12 col-lg-12">
+                            <div class="form-group">
+                              <label for="">Signed app File</label>
+                              <input type="file" name="signed_app" id="signed-app" class="form-control" required>
+                              <p class="card-text alert bg-rgba-info">This can only process (.pdf, .jpeg, .jpg, .png) files</p>
+                            </div>
+                            <button type="submit" class="btn btn-success text-white" id="upload-signed-app">Upload Signed app</button>
+                          </div>
+
+                        @else
+                          <input type="hidden" name="type" id="type" class="form-control" value="1" required>
+                          <div class="form-group">
+                            <label for="">File name</label>
+                            <textarea name="file_name" class="form-control" id="" cols="30" rows="2" required></textarea>
+                          </div>
+                          
+                          <div class="form-group">
+                            <label for="">Signed app File</label>
+                            <input type="file" name="signed_app" id="signed-app" class="form-control" required>
+                            <p class="card-text alert bg-rgba-info">This can only process (.pdf, .jpeg, .jpg, .png) files</p>
+                          </div>
+                          <button type="submit" class="btn btn-success text-white" id="upload-signed-app">Upload Signed app</button>
+                        @endif
+                      </form>
                     </div>
-                </form>
-              {{-- search uploaded app --}}
-              {{-- list of uploaded app --}}
-                    <div class="table-responsive col-12 container">
-                      <table class="table zero-configuration item-table" id="item-table t-table">
-                          <thead>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      @endif
+    @endif
+  <!-- single file upload starts -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header p-1 ">
+          @if ($campus == 3)
+            <form action="/bac/app-non-cse-year" >
+              @csrf
+              <input type="hidden" name="project_category" value="{{ $project_category}}">
+              <input type="hidden" name="scope" value="{{ $scope}}">
+              <button class="btn btn-primary mb-1" type="submit" title="View Document of Endorsed APP NON CSE" value="{{ $year }}" name="year">Back</button>
+            </form>
+          @endif
+          <h4 class="card-title text-primary border-bottom pb-1">
+             <strong> Signed app</strong>
+          </h4>
+        </div>
+        <div class="card-content">
+          <div class="card-body">
+            <div class="card-header p-1">
+              <h5 class="card-title">
+                <strong>Project Category</strong>
+              </h5>
+              
+              <ul class="nav nav-tabs m-1" role="tablist">
+
+                {{-- 1st Tab | PPMP --}}
+                    <li class="nav-item">
+                        <a class="nav-link active" id="my-ppmp-tab" data-toggle="tab" href="#my-ppmp" aria-controls="regular" role="tab" aria-selected="true">
+                          <i class="fa-solid fa-box-open"></i>
+                            {{ (new GlobalDeclare)->project_category(1) }}
+                        </a>
+                    </li>
+                {{-- end --}}
+                {{-- 2nd Tab | Indicative --}}
+                    <li class="nav-item">
+                        <a class="nav-link" id="dissapproved-ppmp-tab" data-toggle="tab" href="#dissapproved" aria-controls="regular9" role="tab" aria-selected="false">
+                          <i class="fa-regular fa-clock"></i>
+                            {{ (new GlobalDeclare)->project_category(0) }} &nbsp; <strong></strong>
+                        </a>
+                    </li>
+                {{-- end --}}
+                {{-- 3rd Tab | Supplemental --}}
+                    <li class="nav-item">
+                        <a class="nav-link" id="approved-ppmp-tab" data-toggle="tab" href="#approved" aria-controls="regular9" role="tab" aria-selected="false">
+                          <i class="fa-sharp fa-solid fa-cart-shopping"></i>
+                            {{ (new GlobalDeclare)->project_category(2) }} &nbsp; <strong></strong>
+                        </a>
+                    </li>
+                {{-- end --}}
+              </ul>
+              
+              @if ($campus != 3 )
+                @if (session('campus') == 1 )
+                  <div class="row mr-1" >
+                    <label for="campus" class="m-1 ">Campus:</label>
+                    <div class="dropdown">
+                      <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-expanded="false">
+                        @if($response->isEmpty())
+                          -- Select -- 
+                        @else
+                          @if ($campus == 1)
+                            Main Campus
+                          @else
+                            University Wide
+                          @endif
+                        @endif
+                      </a>
+                    
+                      <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                        <li><a class="dropdown-item" href="/bac/signed-app-non-cse">Main Campus</a></li>
+                        <li><a class="dropdown-item" href="/bac/signed-app-non-cse-uwide">University Wide</a></li>
+                      </ul>
+                    </div>
+                  </div> 
+                @endif
+              @endif
+          </div>
+          <div class="card-body p-1">
+              <div class="tab-content p-1">
+                {{-- 1st Tab--}}
+                  <div class="tab-pane active" id="my-ppmp" aria-labelledby="my-ppmp-tab" role="tabpanel">
+                    {{-- list of uploaded app --}}
+                      <div class="table-responsive col-12 container">
+                        <table class="table zero-configuration item-table" id="item-table t-table">
+                            <thead>
                               <tr id="t-tr">
                                   <th id="t-td">#</th>
                                   <th id="t-td">Project Category</th>
@@ -234,12 +323,19 @@
                                   <th id="t-td">Date Created</th>
                                   <th id="t-td">Action</th>
                               </tr>
-                          </thead>
-                          <tbody>
-                              {{-- showing app data based on department and user --}}
-                                 @foreach ($response as $item)
-                                     <tr id="t-tr">
-                                        <td id="t-td">{{ $loop->iteration }}</td>
+                            </thead>
+                            <tbody class="app_cse_body">
+                                {{-- showing app data based on department and user --}}
+                                    @php
+                                      $count = 0;
+                                    @endphp
+                                    @foreach ($response as $item)
+                                      @if ($item->project_category == 1)
+                                        @php
+                                          $count += 1;
+                                        @endphp
+                                      <tr id="t-tr">
+                                        <td id="t-td">{{ $count }}</td>
                                         <td id="t-td" class="text-nowrap">{{ (new GlobalDeclare)->project_category($item->project_category) }}</td>
                                         <td id="t-td">{{ $item->year_created }}</td>
                                         <td id="t-td">{{ $item->file_name }}</td>
@@ -250,13 +346,17 @@
                                                   class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
                                                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu">
                                               </span>
-                                              <div class="btn dropdown-menu dropdown-menu-left ">
-                                                  <a href = "" id="edit-uploaded-app-btn" data-id="{{ (new AESCipher)->encrypt($item->id) }}" class="dropdown-item">
-                                                    <i class="bx bx-edit-alt mr-1"></i>Edit
-                                                  </a>
-                                                  <a href = "{{ route('delete_app', ['id' => (new AESCipher)->encrypt($item->id) ]) }}" data-id="" class="dropdown-item">
-                                                    <i class="fa-solid fa-trash mr-1"></i>delete
-                                                  </a>
+                                              <div class="btn dropdown-menu dropdown-menu-left ">   
+                                                @if (session('role') == 10 || session('role') == 2 )
+                                                  @if ($campus != 3 )
+                                                    <a href = "" id="edit-uploaded-app-btn" data-id="{{ (new AESCipher)->encrypt($item->id) }}" class="dropdown-item">
+                                                      <i class="bx bx-edit-alt mr-1"></i>Edit
+                                                    </a>
+                                                    <a href = "{{ route('delete_app', ['id' => (new AESCipher)->encrypt($item->id) ]) }}" data-id="" class="dropdown-item">
+                                                      <i class="fa-solid fa-trash mr-1"></i>delete
+                                                    </a>
+                                                  @endif
+                                                @endif
                                                   <a href = "" data-id="{{ (new AESCipher)->encrypt($item->id) }}" id="preview-app-btn"  class="dropdown-item">
                                                     <i class="fa-solid fa-eye mr-1"></i>View
                                                   </a>
@@ -268,12 +368,151 @@
                                           </div> 
                                         </td>
                                       </tr>
-                                 @endforeach
-                              {{-- showing app data based on department and user --}}
-                          </tbody>
-                      </table>
-                    </div>
-              {{-- list of uploaded app --}}
+                                      @endif
+                                    @endforeach
+                                {{-- showing app data based on department and user --}}
+                            </tbody>
+                        </table>
+                        <div class="" style="padding: 40px"></div>
+                      </div>
+                  </div>
+                {{-- 2nd Tab--}}
+                  <div class="tab-pane" id="dissapproved" aria-labelledby="dissapproved-ppmp-tab" role="tabpanel">
+                    {{-- list of uploaded app --}}
+                      <div class="table-responsive col-12 container">
+                        <table class="table zero-configuration item-table" id="item-table t-table">
+                            <thead>
+                              <tr id="t-tr">
+                                  <th id="t-td">#</th>
+                                  <th id="t-td">Project Category</th>
+                                  <th id="t-td">Year Created</th>
+                                  <th id="t-td">File Name</th>
+                                  <th id="t-td">Date Created</th>
+                                  <th id="t-td">Action</th>
+                              </tr>
+                            </thead>
+                            <tbody class="app_cse_body">
+                                {{-- showing app data based on department and user --}}
+                                
+                                @php
+                                  $count = 0;
+                                @endphp
+                                    @foreach ($response as $item)
+                                      @if ($item->project_category == 0)
+                                        @php
+                                          $count += 1;
+                                        @endphp
+                                      <tr id="t-tr">
+                                        <td id="t-td">{{ $count }}</td>
+                                        <td id="t-td" class="text-nowrap">{{ (new GlobalDeclare)->project_category($item->project_category) }}</td>
+                                        <td id="t-td">{{ $item->year_created }}</td>
+                                        <td id="t-td">{{ $item->file_name }}</td>
+                                        <td id="t-td" class="text-nowrap">{{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0]  }}</td>
+                                        <td id="t-td">
+                                          <div class="dropdown">
+                                              <span
+                                                  class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
+                                                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu">
+                                              </span>
+                                              <div class="btn dropdown-menu dropdown-menu-left ">
+                                                @if (session('role') == 10 || session('role') == 2 )
+                                                  @if ($campus != 3 )
+                                                    <a href = "" id="edit-uploaded-app-btn" data-id="{{ (new AESCipher)->encrypt($item->id) }}" class="dropdown-item">
+                                                      <i class="bx bx-edit-alt mr-1"></i>Edit
+                                                    </a>
+                                                    <a href = "{{ route('delete_app', ['id' => (new AESCipher)->encrypt($item->id) ]) }}" data-id="" class="dropdown-item">
+                                                      <i class="fa-solid fa-trash mr-1"></i>delete
+                                                    </a>
+                                                  @endif
+                                                @endif
+                                                  <a href = "" data-id="{{ (new AESCipher)->encrypt($item->id) }}" id="preview-app-btn"  class="dropdown-item">
+                                                    <i class="fa-solid fa-eye mr-1"></i>View
+                                                  </a>
+                                                 
+                                                  <a href= "{{ route('download_app', ['id' => (new AESCipher)->encrypt($item->id) ]) }}" class="dropdown-item">
+                                                    <i class="fa-solid fa-file-arrow-down mr-1"></i>Download
+                                                  </a>
+                                              </div>
+                                          </div> 
+                                        </td>
+                                      </tr>
+                                      @endif
+                                    @endforeach
+                                {{-- showing app data based on department and user --}}
+                            </tbody>
+                        </table>
+                        <div class="" style="padding: 40px"></div>
+                      </div>
+                  </div>
+                {{-- 3rd Tab--}}
+                  <div class="tab-pane" id="approved" aria-labelledby="approved-ppmp-tab" role="tabpanel">
+                    {{-- list of uploaded app --}}
+                      <div class="table-responsive col-12 container">
+                        <table class="table zero-configuration item-table" id="item-table t-table">
+                            <thead>
+                              <tr id="t-tr">
+                                  <th id="t-td">#</th>
+                                  <th id="t-td">Project Category</th>
+                                  <th id="t-td">Year Created</th>
+                                  <th id="t-td">File Name</th>
+                                  <th id="t-td">Date Created</th>
+                                  <th id="t-td">Action</th>
+                              </tr>
+                            </thead>
+                            <tbody class="app_cse_body">
+                                {{-- showing app data based on department and user --}}
+                                    @php
+                                      $count = 0;
+                                    @endphp
+                                    @foreach ($response as $item)
+                                      @if ($item->project_category == 2)
+                                        @php
+                                          $count += 1;
+                                        @endphp
+                                      <tr id="t-tr">
+                                        <td id="t-td">{{ $count }}</td>
+                                        <td id="t-td" class="text-nowrap">{{ (new GlobalDeclare)->project_category($item->project_category) }}</td>
+                                        <td id="t-td">{{ $item->year_created }}</td>
+                                        <td id="t-td">{{ $item->file_name }}</td>
+                                        <td id="t-td" class="text-nowrap">{{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0]  }}</td>
+                                        <td id="t-td">
+                                          <div class="dropdown">
+                                              <span
+                                                  class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
+                                                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" role="menu">
+                                              </span>
+                                              <div class="btn dropdown-menu dropdown-menu-left ">
+                                                @if (session('role') == 10 || session('role') == 2 )
+                                                  @if ($campus != 3 )
+                                                    <a href = "" id="edit-uploaded-app-btn" data-id="{{ (new AESCipher)->encrypt($item->id) }}" class="dropdown-item">
+                                                      <i class="bx bx-edit-alt mr-1"></i>Edit
+                                                    </a>
+                                                    <a href = "{{ route('delete_app', ['id' => (new AESCipher)->encrypt($item->id) ]) }}" data-id="" class="dropdown-item">
+                                                      <i class="fa-solid fa-trash mr-1"></i>delete
+                                                    </a>
+                                                  @endif
+                                                @endif
+                                                  <a href = "" data-id="{{ (new AESCipher)->encrypt($item->id) }}" id="preview-app-btn"  class="dropdown-item">
+                                                    <i class="fa-solid fa-eye mr-1"></i>View
+                                                  </a>
+                                                 
+                                                  <a href= "{{ route('download_app', ['id' => (new AESCipher)->encrypt($item->id) ]) }}" class="dropdown-item">
+                                                    <i class="fa-solid fa-file-arrow-down mr-1"></i>Download
+                                                  </a>
+                                              </div>
+                                          </div> 
+                                        </td>
+                                      </tr>
+                                      @endif
+                                    @endforeach
+                                {{-- showing app data based on department and user --}}
+                            </tbody>
+                        </table>
+                        <div class="" style="padding: 40px"></div>
+                      </div>
+                  </div>
+              </div>
+          </div>
           </div>
         </div>
       </div>
@@ -337,7 +576,7 @@
             headers: {
               'X-CSRF-TOKEN': $("meta[name='csrf-token']").attr('content')
             },
-            url: "{{ route('view_app') }}",
+            url: "bac/view-uploaded-app",
             method: 'GET',
             data: {
               'id' : $(this).data('id')
