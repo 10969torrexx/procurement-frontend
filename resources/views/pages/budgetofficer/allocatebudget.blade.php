@@ -140,7 +140,7 @@
 <script src="{{asset('vendors/js/extensions/toastr.min.js')}}"></script>
 {{-- employee JS --}}
 
-<script src="{{asset('js/budgetofficer/allocatebudget.js?id=5')}}"></script>
+<script src="{{asset('js/budgetofficer/allocatebudget.js?id=12')}}"></script>
 
 @endsection
 {{-- page scripts --}}
