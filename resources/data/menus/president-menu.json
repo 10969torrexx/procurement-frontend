@@ -46,6 +46,46 @@
       
     },
     {
+      "url": "department/ppmp-submission",
+      "name": "PPMP Submission",
+      "i18n": "Notebook",
+      "icon": "envelope-pull"
+      
+    },
+    {
+      "url": "department/upload-ppmp",
+      "name": "Upload PPMP",
+      "i18n": "Notebook",
+      "icon": "briefcase"
+      
+    },
+    {
+      "url": "PR/purchaseRequest",
+      "name": "Purchase Request",
+      "i18n": "Shoppingcart",
+      "icon": "shoppingcart",
+      "submenu": [
+        {
+          "url": "PR/purchaseRequest",
+          "name": "Create PR",
+          "i18n": "User",
+          "icon": "like"
+        },
+        {
+          "url": "PR/trackPR",
+          "name": "Track PR",
+          "i18n": "User",
+          "icon": "shoppingcart-in"
+        },
+        {
+          "url": "PR/signed_pr",
+          "name": "Signed PR",
+          "i18n": "User",
+          "icon": "shoppingcart-in"
+        }
+      ]
+    },
+    {
       "navheader": "Supervisor"
     },
     {
@@ -90,67 +130,33 @@
       "icon": "users",
       "submenu": [
         {
-          "url": "#",
+          "url": "president/list/Indicative",
           "name": "Indicative",
           "i18n": "User",
-          "icon": "shoppingcart-in",
-          "submenu": [
-            {
-              "url": "president/list/Indicative",
-              "name": "View",
-              "i18n": "User",
-              "icon": "shoppingcart-in"
-            },
-            {
-              "url": "#",
-              "name": "Signed APP",
-              "i18n": "User",
-              "icon": "shoppingcart-in"
-            }]
-            
+          "icon": "shoppingcart-in"
         },
         {
-          "url": "#",
+          "url": "president/list/PPMP",
           "name": "Traditional",
           "i18n": "User",
-          "icon": "shoppingcart-in",
-          "submenu": [
-            {
-              "url": "president/list/PPMP",
-              "name": "View",
-              "i18n": "User",
-              "icon": "shoppingcart-in"
-            },
-            {
-              "url": "#",
-              "name": "Signed APP",
-              "i18n": "User",
-              "icon": "shoppingcart-in"
-            }]
+          "icon": "shoppingcart-in"
         },
         {
-          "url": "#",
+          "url": "president/list/Supplemental",
           "name": "Supplemental",
           "i18n": "User",
-          "icon": "shoppingcart-in",
-          "submenu": [
-            {
-              "url": "president/list/Supplemental",
-              "name": "View",
-              "i18n": "User",
-              "icon": "shoppingcart-in"
-            },
-            {
-              "url": "#",
-              "name": "Signed APP",
-              "i18n": "User",
-              "icon": "shoppingcart-in"
-            }]
+          "icon": "shoppingcart-in"
+        },
+        {
+          "url": "president/app-non-cse",
+          "name": "Signed APP",
+          "i18n": "User",
+          "icon": "shoppingcart-in"
         }
       ]
     },
     {
-      "url": "#",
+      "url": "president/app-cse",
       "name": "APP CSE",
       "i18n": "User",
       "icon": "users",
@@ -214,7 +220,18 @@
             }]
         }
       ]
-      
+    },
+    {
+      "url": "purchase_request/pending_prs",
+      "name": "Pending PRs",
+      "i18n": "User",
+      "icon": "list"
+    },
+    {
+      "url": "purchase_request/signed_pr",
+      "name": "Signed PRs",
+      "i18n": "User",
+      "icon": "search"
     }
   ]
 }

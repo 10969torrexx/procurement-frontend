@@ -162,7 +162,10 @@
     </div>
     <div class="header2">
       <div class="Title">
-        University Annual Procurement Plan for FY {{ $signatures[0]->Year }}
+        @if ($scope == 0)
+            University
+        @endif  
+        Annual Procurement Plan for FY {{ $signatures[0]->Year }}
       </div>
     </div>
     <div class="table-div">

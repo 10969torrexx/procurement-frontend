@@ -23,7 +23,19 @@
 @endsection
 @section('content')
 <style>
-   
+    #t-table, #t-th, #t-td  {
+        border: 1px solid;
+        font-size: 11px;
+        padding: 5px;
+        text-align: center;
+    }
+    #t-table{
+        width: 100%;
+    }
+
+    .tbg-secondary {
+        background-color: rgba(71, 95, 123, 0.9) !important;
+    }
 </style>
 <!-- Zero configuration table -->
 <section id="horizontal-vertical">
@@ -162,35 +174,35 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive col-12 container">
-                        <table class="table zero-configuration item-table" id="item-table">
+                        <table class="table zero-configuration item-table" id="item-table t-table">
                             <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Item name</th>
-                                    <th>Item Category</th>
-                                    <th>Item Description</th>
-                                    <th>quantity</th>
-                                    <th>unit price</th>
-                                    <th>estimated price</th>
-                                    <th>mode procurement</th>
-                                    <th>status</th>
-                                    <th>expected date</th>
+                                <tr id="t-tr">
+                                    <th id="t-td">#</th>
+                                    <th id="t-td">Item name</th>
+                                    <th id="t-td">Item Category</th>
+                                    <th id="t-td">Item Description</th>
+                                    <th id="t-td">quantity</th>
+                                    <th id="t-td">unit price</th>
+                                    <th id="t-td">estimated price</th>
+                                    <th id="t-td">mode procurement</th>
+                                    <th id="t-td">status</th>
+                                    <th id="t-td">expected date</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {{-- showing ppmp data based on department and user --}}
                                 @for ($i = 0; $i < count($ppmp_response); $i++)
-                                    <tr>
-                                        <td>{{ ($i) + 1 }}</td>
-                                        <td>{{ $ppmp_response[$i]->item_name }}</td>
-                                        <td>{{ $ppmp_response[$i]->item_category }}</td>
-                                        <td>{{ $ppmp_response[$i]->item_description }}</td>
-                                        <td>{{ $ppmp_response[$i]->quantity }}</td>
-                                        <td>₱{{ number_format($ppmp_response[$i]->unit_price,2,'.',',')  }}</td>
-                                        <td>₱{{ number_format($ppmp_response[$i]->estimated_price,2,'.',',')  }}</td>
-                                        <td>{{ $ppmp_response[$i]->mode_of_procurement }}</td>
-                                        <td>{{ (new GlobalDeclare)->status($ppmp_response[$i]->status) }}</td>
-                                        <td>{{ (new GlobalDeclare)->Month($ppmp_response[$i]->expected_month) }}</td>
+                                    <tr id="t-tr">
+                                        <td id="t-td">{{ ($i) + 1 }}</td>
+                                        <td id="t-td">{{ $ppmp_response[$i]->item_name }}</td>
+                                        <td id="t-td">{{ $ppmp_response[$i]->item_category }}</td>
+                                        <td id="t-td">{{ $ppmp_response[$i]->item_description }}</td>
+                                        <td id="t-td">{{ $ppmp_response[$i]->quantity }}</td>
+                                        <td id="t-td">₱{{ number_format($ppmp_response[$i]->unit_price,2,'.',',')  }}</td>
+                                        <td id="t-td">₱{{ number_format($ppmp_response[$i]->estimated_price,2,'.',',')  }}</td>
+                                        <td id="t-td">{{ $ppmp_response[$i]->mode_of_procurement }}</td>
+                                        <td id="t-td">{{ (new GlobalDeclare)->status($ppmp_response[$i]->status) }}</td>
+                                        <td id="t-td">{{ (new GlobalDeclare)->Month($ppmp_response[$i]->expected_month) }}</td>
                                     </tr>
                                 @endfor
                                 {{-- showing ppmp data based on department and user --}}

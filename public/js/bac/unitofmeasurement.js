@@ -13,83 +13,83 @@
 
 //Save
 
-var input = document.getElementById("unit-of-measurement");
-input.addEventListener("keypress", function(event) {
-  if (event.key === "Enter") {
-    event.preventDefault();
+// var input = document.getElementById("unit-of-measurement");
+// input.addEventListener("keypress", function(event) {
+//   if (event.key === "Enter") {
+//     event.preventDefault();
     
-    var data = {
-        'unitofmeasurement': $('.unit-of-measurement').val(),
-    }
-    if(data.unitofmeasurement=="")
-    {
-      Swal.fire('Input Unit of Measurement!', '', 'info')
-    }
-    else
-    {
-      $(this).text('Saving..');
-      $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-      });
+//     var data = {
+//         'unitofmeasurement': $('.unit-of-measurement').val(),
+//     }
+//     if(data.unitofmeasurement=="")
+//     {
+//       Swal.fire('Input Unit of Measurement!', '', 'info')
+//     }
+//     else
+//     {
+//       $(this).text('Saving..');
+//       $.ajaxSetup({
+//         headers: {
+//             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+//         }
+//       });
 
-      $.ajax({
-        type: "POST",
-        url: "add-unit",
-        data: data,
-        dataType: "json",
-        success: function (response) {
-          // console.log(response);
-            if (response.status == 200) {
+//       $.ajax({
+//         type: "POST",
+//         url: "add-unit",
+//         data: data,
+//         dataType: "json",
+//         success: function (response) {
+//           // console.log(response);
+//             if (response.status == 200) {
               
-                    // console.log(response);
-                    Swal.fire({
-                      title: 'Saved',
-                      html: 'Saved Successfully!',
-                      icon: 'success',
-                      timer: 2000,
-                      timerProgressBar: true,
-                      didOpen: () => {
-                        Swal.showLoading()
-                        const b = Swal.getHtmlContainer().querySelector('b')
-                        timerInterval = setInterval(() => {
-                          b.textContent = Swal.getTimerLeft()
-                        }, 100)
-                      },
-                      willClose: () => {
-                        clearInterval(timerInterval)
-                      }
-                    }).then((result) => {
-                      /* Read more about handling dismissals below */
-                      if (result.dismiss === Swal.DismissReason.timer) {
-                        $('.add-unit').text('Add');
-                        $('.unit-of-measurement').val('');
-                        // $('#item-table').DataTable().ajax.reload();
-                        location.reload();
-                        console.log('I was closed by the timer')
-                      }
-                    })
+//                     // console.log(response);
+//                     Swal.fire({
+//                       title: 'Saved',
+//                       html: 'Saved Successfully!',
+//                       icon: 'success',
+//                       timer: 2000,
+//                       timerProgressBar: true,
+//                       didOpen: () => {
+//                         Swal.showLoading()
+//                         const b = Swal.getHtmlContainer().querySelector('b')
+//                         timerInterval = setInterval(() => {
+//                           b.textContent = Swal.getTimerLeft()
+//                         }, 100)
+//                       },
+//                       willClose: () => {
+//                         clearInterval(timerInterval)
+//                       }
+//                     }).then((result) => {
+//                       /* Read more about handling dismissals below */
+//                       if (result.dismiss === Swal.DismissReason.timer) {
+//                         $('.add-unit').text('Add');
+//                         $('.unit-of-measurement').val('');
+//                         // $('#item-table').DataTable().ajax.reload();
+//                         location.reload();
+//                         console.log('I was closed by the timer')
+//                       }
+//                     })
                 
-            } else {
+//             } else {
               
-              $('.add-item').text('Add');
-              Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'Already Exist!!',
-              })
-              $('.add-unit').text('Add');
-              $('.unit-of-measurement').val('');
-            }
-        }
-      })
-    }
-           console.log(data);
+//               $('.add-item').text('Add');
+//               Swal.fire({
+//                 icon: 'error',
+//                 title: 'Oops...',
+//                 text: 'Already Exist!!',
+//               })
+//               $('.add-unit').text('Add');
+//               $('.unit-of-measurement').val('');
+//             }
+//         }
+//       })
+//     }
+//            console.log(data);
 
-    ;
-  }
-});
+//     ;
+//   }
+// });
 
 
 $(document).on('click', '.add-unit', function (e) {
@@ -272,76 +272,76 @@ $(document).on('click', '.edit', function (e) {
 
 //update
 
-var input = document.getElementById("update");
-input.addEventListener("keypress", function(event) {
-  if (event.key === "Enter") {
-    event.preventDefault();
+// var input = document.getElementById("update");
+// input.addEventListener("keypress", function(event) {
+//   if (event.key === "Enter") {
+//     event.preventDefault();
     
-    var data = {
-      'unit_of_measurement': $('.update').val(),
-      'id': $('.update-id').val(),
-     }
+//     var data = {
+//       'unit_of_measurement': $('.update').val(),
+//       'id': $('.update-id').val(),
+//      }
 
-  // console.log(data);
-    if(data.unit_of_measurement=="")
-    {
-      Swal.fire('Input Unit of Measurement!', '', 'info')
-    }
-    else
-    {
-      $(this).text('Saving..');
-      $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-      });
+//   // console.log(data);
+//     if(data.unit_of_measurement=="")
+//     {
+//       Swal.fire('Input Unit of Measurement!', '', 'info')
+//     }
+//     else
+//     {
+//       $(this).text('Saving..');
+//       $.ajaxSetup({
+//         headers: {
+//             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+//         }
+//       });
 
-      $.ajax({
-        type: "POST",
-        url: "update-unit",
-        data: data,
-        dataType: "json",
-        success: function (response) {
-          // console.log(response);
-          if(response['status'] == 200) {
+//       $.ajax({
+//         type: "POST",
+//         url: "update-unit",
+//         data: data,
+//         dataType: "json",
+//         success: function (response) {
+//           // console.log(response);
+//           if(response['status'] == 200) {
             
-            $("#editmodal").modal('hide');
-            Swal.fire({
-              title: 'Updated!!!',
-              html: 'Update Successfully!',
-              icon: 'success',
-              timer: 1000,
-              timerProgressBar: true,
-              didOpen: () => {
-                Swal.showLoading()
-                const b = Swal.getHtmlContainer().querySelector('b')
-                timerInterval = setInterval(() => {
-                  b.textContent = Swal.getTimerLeft()
-                }, 100)
-              },
-              willClose: () => {
-                clearInterval(timerInterval)
-              }
-              }).then((result) => {
-                /* Read more about handling dismissals below */
-                if (result.dismiss === Swal.DismissReason.timer) {
-                  location.reload();
-                  console.log('I was closed by the timer')
-                }
-              })
-            }else{
-              Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'Already Exist',
-              })
-              $(this).text('Update');
-            }
-        }
-      })
-    }
-  }
-});
+//             $("#editmodal").modal('hide');
+//             Swal.fire({
+//               title: 'Updated!!!',
+//               html: 'Update Successfully!',
+//               icon: 'success',
+//               timer: 1000,
+//               timerProgressBar: true,
+//               didOpen: () => {
+//                 Swal.showLoading()
+//                 const b = Swal.getHtmlContainer().querySelector('b')
+//                 timerInterval = setInterval(() => {
+//                   b.textContent = Swal.getTimerLeft()
+//                 }, 100)
+//               },
+//               willClose: () => {
+//                 clearInterval(timerInterval)
+//               }
+//               }).then((result) => {
+//                 /* Read more about handling dismissals below */
+//                 if (result.dismiss === Swal.DismissReason.timer) {
+//                   location.reload();
+//                   console.log('I was closed by the timer')
+//                 }
+//               })
+//             }else{
+//               Swal.fire({
+//                 icon: 'error',
+//                 title: 'Oops...',
+//                 text: 'Already Exist',
+//               })
+//               $(this).text('Update');
+//             }
+//         }
+//       })
+//     }
+//   }
+// });
 
 
 $(document).on('click', '.update-btn', function (e) {

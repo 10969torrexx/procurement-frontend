@@ -58,7 +58,10 @@
           input{
             border: none;
           }
-          .selectEmployee {
+          .selectEmployee{
+            text-transform: uppercase;
+          }
+          .selectApprovingOfficer {
             text-transform: uppercase;
           }
         </style>
@@ -143,7 +146,9 @@
                 <td></td>
                 <td></td>
                 <td></td>                
-                <td  style="text-align: right;font-weight:bold;">{{number_format($total,2,'.',',')}}</td>
+                <td  style="text-align: right;font-weight:bold;" >{{number_format($total,2,'.',',')}}</td>
+                {{-- <div class="total" value="{{$total}}" hidden></div> --}}
+                <input type="text" name="add1" value="{{ $total }}" class="total border-none" style="width: 100%;" hidden>
                 @endif
             </tbody>
             <tfoot>
@@ -173,13 +178,17 @@
                     <option value="{{ $name }}" selected disabled>-- Select Employee --</option>
                   </select>
                 </td>
-
+                <td colspan="3" style="border-top: none;text-align:center;font-weight:bold;"  value="">
+                  <select style="border: none;text-align:center;font-weight:bold;"   id="selectApprovingOfficer" class="selectApprovingOfficer form-control" required>
+                    <option value="{{ $ao_name }}" selected disabled>-- Select Approving Officer --</option>
+                  </select>
+                </td>
                 {{-- <td colspan="2" style="border-right: none;border-top: none;text-align:center;font-weight:bold;"  class="selectEmployee" id="selectEmployee" value="">-- Select Employee --<i class="fa-solid fa-pen-to-square employeeEdit" value="" style="margin-left:5px;"></i></td> --}}
-                @if($total >= 25000)
-                  <td colspan="3" style="border-top: none;text-align:center;font-weight:bold;"> {{ strtoupper($hope) }}</td>
-                @elseif($total >= 0 && $total < 25000)
+                {{-- @if($total > 25000)
                   <td colspan="3" style="border-top: none;text-align:center;font-weight:bold;"> {{ strtoupper('Susana B. Ceniza') }}</td>
-                @endif
+                @elseif($total >= 1 && $total <= 25000)
+                  <td colspan="3" style="border-top: none;text-align:center;font-weight:bold;"> {{ strtoupper('Susana B. Ceniza') }}</td>
+                @endif --}}
               </tr>
               <tr>
                 <td style="border-left:1px solid black; border-top: none;border-right: none;font-weight:bold;">Designation:</td>
@@ -187,11 +196,7 @@
                   <div style="border-bottom:1px solid black">
                   <input type="text" name="add1" value="{{ $designation }}" placeholder="Enter designation here" class="designation_input border-none" style="width: 100%;text-align:center;">
                 </div></td>
-                @if($total >= 25000)
-                <td colspan="3" style="text-align:center;">University President</td>
-                @elseif($total >= 0 && $total < 25000)
-                <td colspan="3" style="text-align:center;">Alternate</td>
-                @endif
+                <td colspan="3" style="text-align:center;" class="designationApprovingOfficer"></td>
               </tr>
               <tr><td colspan="6" style="border-left: 1px solid black;height:20px"></td></tr>
             {{-- @endforeach --}}

@@ -73,7 +73,7 @@
                                                         </div>
                                                     </div>   
                                                 </td>
-                                                <td>{{ $data->procurement_type}}</td>
+                                                <td>{{ (new GlobalDeclare())->project_category($data->procurement_type) }}</td>
                                                 <td>{{ $data->year}}</td>
                                                 <td>{{ date('M. j, Y', strtotime($data->start_date))}}</td>
                                                 <td>{{ date('M. j, Y', strtotime($data->end_date))}}</td>

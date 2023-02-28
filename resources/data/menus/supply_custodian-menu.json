@@ -1,7 +1,7 @@
 {
   "menu": [
     {
-      "url": "/dashboard",
+      "url": "/",
       "name": "Dashboard",
       "i18n": "Dashboard",
       "slug": "dashboard",
@@ -54,6 +54,26 @@
         {
           "url": "supply_custodian/supplier",
           "name": "Supplier",
+          "i18n": "Supplier",
+          "icon": "box"
+        }
+      ]
+    },
+    {
+      "url": "#",
+      "name": "APP CSE",
+      "i18n": "Supplier",
+      "icon": "box",
+      "submenu": [
+        {
+          "url": "supply_custodian/app_cse",
+          "name": "Upload",
+          "i18n": "Supplier",
+          "icon": "box"
+        },
+        {
+          "url": "supply_custodian/submitted_app_cse",
+          "name": "Submitted",
           "i18n": "Supplier",
           "icon": "box"
         }

@@ -129,8 +129,6 @@
               // console.log(data);
       // alert([data);
 
-      
-
 
       $.ajax({
           type: "POST",

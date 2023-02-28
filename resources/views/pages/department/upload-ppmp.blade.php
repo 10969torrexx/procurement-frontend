@@ -21,6 +21,21 @@
 <link rel="stylesheet" type="text/css" href="{{asset('css/plugins/extensions/toastr.css')}}">
 @endsection
 @section('content')
+<style>
+  #t-table, #t-th, #t-td  {
+      border: 1px solid;
+      font-size: 11px;
+      padding: 5px;
+      text-align: center;
+  }
+  #t-table{
+      width: 100%;
+  }
+
+  .tbg-secondary {
+      background-color: rgba(71, 95, 123, 0.9) !important;
+  }
+</style>
 <!-- Zero configuration table -->
 {{-- preview uploaded ppmp --}}
     <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" id="preview-ppmp" aria-labelledby="myLargeModalLabel" aria-hidden="true">
@@ -112,7 +127,7 @@
         <div class="col-12">
           <div class="card">
             <div class="card-header p-1">
-              <h4 class="card-title text-primary border-bottom pb-1">
+              <h4 class="card-title border-bottom pb-1">
                 <strong> Upload Signed PPMP</strong>
               </h4>
             </div>
@@ -145,7 +160,7 @@
                               </div>
                           </div>
                           <div class="form-group">
-                            <label for="">File name</label>
+                            <label for="">Project Title</label>
                             <textarea name="file_name" class="form-control" id="" cols="30" rows="1" required></textarea>
                           </div>
                           <div class="form-group">
@@ -167,69 +182,37 @@
     <div class="col-12">
       <div class="card">
         <div class="card-header p-1">
-          <h4 class="card-title text-primary border-bottom pb-1">
+          <h4 class="card-title border-bottom pb-1">
              <strong> Signed PPMP</strong>
           </h4>
         </div>
         <div class="card-content">
           <div class="card-body">
               {{-- search uploaded ppmp --}}
-                <form action="{{ route('get_upload_ppmp') }}" method="post">
-                  @csrf
-                    <div class="row justify-content-center">
-                      <div class="col-8 col-md-8 col-sm-8 col-lg-8 p-1 row">
-                        <div class="col-3 col-md-3 col-sm-3">
-                            <select name="project_category" id="project-category" class="form-control" required>
-                                <option value="">-- Select Project Category --</option>
-                                @for ($i = 0; $i < 3; $i++)
-                                    <option value="{{ (new AESCipher)->encrypt($i) }}">{{ (new GlobalDeclare)->project_category($i) }}</option>
-                                @endfor
-                            </select>
-                          </div>
-                        <div class="col-3 col-md-3 col-sm-3">
-                            <select name="year_created" id="year-created" class="form-control" required>
-                              <option value="">-- Select Year --</option>
-                              @for ($i = 5; $i > 0; $i--)
-                                  <option value="{{ (new AESCipher)->encrypt(Carbon::now()->subYears($i)->format('Y')) }}">{{ Carbon::now()->subYear($i)->format('Y') }}</option>
-                              @endfor
-                              @for ($i = 0; $i < 5; $i++)
-                                  <option value="{{ (new AESCipher)->encrypt(Carbon::now()->subYears($i)->format('Y')) }}">{{ Carbon::now()->addYear($i)->format('Y') }}</option>
-                              @endfor
-                          </select>
-                        </div>
-                        <div class="col-3 col-md-3 col-sm-3">
-                          <textarea name="file_name" class="form-control" id="" cols="30" rows="1" placeholder="File Name"></textarea>
-                        </div>
-                        <div class="col-3 col-md-3 col-sm-3">
-                          <button type="submit" class="btn btn-success text-white" id="upload-signed-ppmp">Search</button>
-                        </div>
-                      </div>
-                    </div>
-                </form>
               {{-- search uploaded ppmp --}}
               {{-- list of uploaded ppmp --}}
                     <div class="table-responsive col-12 container">
-                      <table class="table zero-configuration item-table" id="item-table">
+                      <table class="table zero-configuration item-table" id="item-table t-table">
                           <thead>
-                              <tr>
-                                  <th>#</th>
-                                  <th>Project Category</th>
-                                  <th>Year Created</th>
-                                  <th>File Name</th>
-                                  <th>Date Created</th>
-                                  <th>Action</th>
+                              <tr id="t-tr">
+                                  <th id="t-td">#</th>
+                                  <th id="t-td">Project Category</th>
+                                  <th id="t-td">Year Created</th>
+                                  <th id="t-td">Project Title</th>
+                                  <th id="t-td">Date Created</th>
+                                  <th id="t-td">Action</th>
                               </tr>
                           </thead>
                           <tbody>
                               {{-- showing ppmp data based on department and user --}}
                                  @foreach ($response as $item)
-                                     <tr>
-                                        <td>{{ $loop->iteration }}</td>
-                                        <td class="text-nowrap">{{ (new GlobalDeclare)->project_category($item->project_category) }}</td>
-                                        <td>{{ $item->year_created }}</td>
-                                        <td><a class="btn btn-link" >{{ $item->file_name }}</a></td>
-                                        <td  class="text-nowrap">{{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0]  }}</td>
-                                        <td>
+                                     <tr id="t-tr">
+                                        <td id="t-td">{{ $loop->iteration }}</td>
+                                        <td id="t-td" class="text-nowrap">{{ (new GlobalDeclare)->project_category($item->project_category) }}</td>
+                                        <td id="t-td">{{ $item->year_created }}</td>
+                                        <td id="t-td">{{ $item->file_name }}</td>
+                                        <td id="t-td" class="text-nowrap">{{ explode('-', date('j F, Y-', strtotime($item->updated_at)))[0]  }}</td>
+                                        <td id="t-td">
                                           <div class="dropdown">
                                               <span
                                                   class="bx bx-dots-vertical-rounded font-medium-3 dropdown-toggle nav-hide-arrow cursor-pointer"
@@ -327,8 +310,9 @@
             data: {
               'id' : $(this).data('id')
             }, success: function(response) {
+                console.log(response);
                 response['data'].forEach(element => {
-                    $('#content').append(`<iframe src="{{asset("storage/department_upload/signed_ppmp/`+ element.signed_ppmp +`")}}" style="width:100% !important;" height="600" frameborder="0"></iframe>`);
+                    $('#content').append(`<iframe src="{{asset("storage/`+ element.file_directory +`")}}" style="width:100% !important;" height="600" frameborder="0"></iframe>`);
                 });
             }
           });
@@ -351,13 +335,15 @@
               }, success: function(response) {
                   console.log(response);
                   response['data'].forEach(element => {
-                    // console.log(element.id);
+                    console.log(element.project_category);
+                      var procurementy_type = [
+                        'Indicative', 'PPMP', 'Supplemental'
+                      ];
                     // response id
                       $('#default-id').val(element.id);
-                      // $('#default-id').val(`{{ (new AESCipher)->encrypt(`+ element.id +`) }}`);
                     // project category
-                      $('#default-project-category').text(`{{ (new GlobalDeclare)->project_category(`+ element.project_category +`) }}`);
-                      $('#default-project-category').val(`{{ (new AESCipher)->encrypt(`+ element.project_category +`) }}`);
+                      $('#default-project-category').text(procurementy_type[element.project_category]);
+                      $('#default-project-category').val(element.project_category);
                     // year created
                       $('#default-year-created').text(element.year_created);
                       $('#default-year-created').val(`{{ (new AESCipher)->encrypt(`+ element.year_created +`) }}`);
