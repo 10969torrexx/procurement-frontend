@@ -155,24 +155,31 @@ class DepartmentPagesController extends Controller
                     // TODO 1
                         $project_titles = \DB::table('project_titles')
                             ->join('users', 'users.id', 'project_titles.immediate_supervisor')
+                            ->join('users AS author', 'author.employee_id', 'project_titles.employee_id')
                             ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
                             ->join('allocated__budgets', 'allocated__budgets.id', 'project_titles.allocated_budget')
                             ->join('ppmp_deadline', 'ppmp_deadline.year', 'allocated__budgets.year')
                             ->where('project_titles.project_category', (new AESCipher)->decrypt($request->project_category))
                             ->where('ppmp_deadline.procurement_type', (new AESCipher)->decrypt($request->project_category))
-                            // ->where('allocated__budgets.procurement_type', (new AESCipher)->decrypt($request->project_category))
+                            ->where('allocated__budgets.procurement_type', (new AESCipher)->decrypt($request->project_category))
                             ->where('project_titles.status', 0) // * check if project is draft
                             ->whereNull('project_titles.deleted_at')
                             ->whereNull('users.deleted_at')
+                            ->where('project_titles.campus', session('campus'))
+                            ->where('allocated__budgets.campus', session('campus'))
+                            ->where('ppmp_deadline.campus', session('campus'))
+                            ->where('project_titles.department_id', session('department_id'))
                             ->get([
                                 'project_titles.*',
                                 'users.name as immediate_supervisor',
+                                'author.name as author',
                                 'fund_sources.fund_source',
                                 'allocated__budgets.id as allocated_budget',
                                 'allocated__budgets.deadline_of_submission',
                                 'ppmp_deadline.end_date',
                                 'ppmp_deadline.start_date',
                             ]);
+                        
                     // TODO 2
                         $fund_sources = \DB::table('allocated__budgets')
                             ->join('fund_sources', 'fund_sources.id', 'allocated__budgets.fund_source_id')
@@ -260,6 +267,7 @@ class DepartmentPagesController extends Controller
         * TODO 4: Get all mode of procurements
         * TODO 5: Get all unit of measurements
         * TODO 6: Get all items
+        * TODO 7: Determine if project belongs the current login user
         * ? --------------------------
         * ? KEY 1: join allocated budgets and ppmp deadline tables
         * ? KEY 2: Get deadline of submission thru pppmp deadline end date
@@ -273,6 +281,20 @@ class DepartmentPagesController extends Controller
         public function showAddItem(Request $request) {
             $id = (new AESCipher)->decrypt($request->id);
             try {
+                // TODO 7
+                    $whos_project = \DB::table('project_titles')
+                        ->where('id', ( new AESCipher)->decrypt($request->id))
+                        ->where('campus', session('campus'))
+                        ->where('department_id', session('department_id'))
+                        ->whereNull('deleted_at')
+                        ->get([
+                            'employee_id'
+                        ]);
+                    if($whos_project[0]->employee_id != session('employee_id')) {
+                        return back()->with([
+                            'failed' => 'You\'re not authorized to make changes to this project. Please contact the rightful author.'
+                        ]);
+                    }
                 // TODO 1
                     $project_titles = \DB::table('project_titles')
                         ->join('users', 'users.id', 'project_titles.immediate_supervisor')

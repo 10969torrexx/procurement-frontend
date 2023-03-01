@@ -105,16 +105,32 @@ class DepartmentController extends Controller
 
    /**
     * ! Delete created project title
-    * TODO: 1 get the ppmps or added items from that project title
-    * TODO: 2 get total estimated price
-    * TODO: 3 get allocated budget of the project
-    * TODO: 4 return the estimated price from the project to the remaning balance
-    * TODO: 5 delete project title & ppmps based on project id
+    * TODO 1: get the ppmps or added items from that project title
+    * TODO 2: get total estimated price
+    * TODO 3: get allocated budget of the project
+    * TODO 4: return the estimated price from the project to the remaning balance
+    * TODO 5: delete project title & ppmps based on project id
+    * TODO 6: Determine if project belongs the current login user
     * ? KEY: project id | id
     */
    public function destoryProjectTitle(Request $request)
    {
         try {
+            // TODO 6
+                $whos_project = \DB::table('project_titles')
+                    ->where('id', ( new AESCipher)->decrypt($request->id))
+                    ->where('campus', session('campus'))
+                    ->where('department_id', session('department_id'))
+                    ->whereNull('deleted_at')
+                    ->get([
+                        'employee_id'
+                    ]);
+                if($whos_project[0]->employee_id != session('employee_id')) {
+                    return back()->with([
+                        'failed' => 'You\'re not authorized to make changes to this project. Please contact the rightful author.'
+                    ]);
+                }
+            
             // TODO: 1
                 $ppmps = \DB::table('ppmps')
                     ->where('project_code', (new AESCipher)->decrypt($request->id))
@@ -194,42 +210,61 @@ class DepartmentController extends Controller
         }
    }
 
-   /* Updates a resource in storage for the Project Titles Table.
-    *
-    * @param  \Illuminate\Http\Request  $request
-    * @return \Illuminate\Http\Response
+   /**
+    * * Update Project title
+    * TODO 1: Determine if project belongs the current login user
+    * TODO 2: Enable project update
+    * TODO 3: Store history log
     */
     public function updateProjectTitle(Request $request)
     {
-        # Updating project title details
-            $project_titles = \DB::table('project_titles')
-                ->where('id', $request->id)
-                ->where('campus', session('campus'))
-                ->where('employee_id', session('employee_id'))
-                ->where('department_id', session('department_id'))
-                ->whereNull('deleted_at')
-                ->update([
-                    'project_title' => $request->project_title,
-                    'project_type' => $request->project_type,
-                    'project_year' => $request->project_year,
-                    'fund_source' => explode('**', $request->fund_source)[1],
-                    'allocated_budget' => explode('**', $request->fund_source)[0],
+        try {
+            // TODO 1
+                $whos_project = \DB::table('project_titles')
+                    ->where('id',  $request->id)
+                    ->where('campus', session('campus'))
+                    ->where('department_id', session('department_id'))
+                    ->whereNull('deleted_at')
+                    ->get([
+                        'employee_id'
+                    ]);
+                if($whos_project[0]->employee_id != session('employee_id')) {
+                    return back()->with([
+                        'failed' => 'You\'re not authorized to make changes to this project. Please contact the rightful author.'
+                    ]);
+                }
+            // TODO 2
+                $project_titles = \DB::table('project_titles')
+                    ->where('id', $request->id)
+                    ->where('campus', session('campus'))
+                    ->where('employee_id', session('employee_id'))
+                    ->where('department_id', session('department_id'))
+                    ->whereNull('deleted_at')
+                    ->update([
+                        'project_title' => $request->project_title,
+                        'project_type' => $request->project_type,
+                        'project_year' =>explode('**', $request->fund_source)[1],
+                        'fund_source' => explode('**', $request->fund_source)[0],
+                        'allocated_budget' => explode('**', $request->fund_source)[2],
+                    ]);
+            # this will created history_log
+                (new HistoryLogController)->store(
+                    session('department_id'),
+                    session('employee_id'),
+                    session('campus'),
+                    $request->id,
+                    'Updated Project project title',
+                    'update',
+                    $request->ip(),
+                );
+            # end
+            # return positive response
+                return back()->with([
+                    'success'   => 'Project Updated Successfully!'
                 ]);
-        # this will created history_log
-            (new HistoryLogController)->store(
-                session('department_id'),
-                session('employee_id'),
-                session('campus'),
-                $request->id,
-                'Updated Project project title',
-                'update',
-                $request->ip(),
-            );
-        # end
-        # return positive response
-            return back()->with([
-                'success'   => 'Project Updated Successfully!'
-            ]);
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
     }
     /**
      * * Submit PPMP | add item to project
