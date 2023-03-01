@@ -573,7 +573,7 @@ class GlobalDeclare extends Controller
         } catch (\Throwable $th) {
             throw $th;
         }
-
+    }
     # this will determine the statuses of the ppmp, Project title
     public function ppmp_status($id) {
         $out = '';

@@ -48,8 +48,23 @@
         font-family: 'Times New Roman' !important;
     }
     .bg-gray {
-        background-color: rgb(186, 186, 186) !important;
+        background-color: rgb(221, 221, 221) !important;
     }
+
+    #t-table, #t-th, #t-td  {
+        border: 1px solid black;
+        font-size: 11px;
+        padding: 5px;
+        text-align: center;
+    }
+    #t-table{
+        width: 100%;
+    }
+
+    .tbg-secondary {
+        background-color: rgba(71, 95, 123, 0.9) !important;
+    }
+
 </style>
 @section('content')
 <!-- Dashboard Ecommerce Starts -->
@@ -138,6 +153,60 @@
                         <p class="text-black text-italic">
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Devliver within 5 working days upon reciept of approved Purchase Order (PO).
                         </p>
+                    </div>
+
+                    <div class="row text-black">
+                        <table class="table" id="item-table t-table">
+                            <thead>
+                                <tr class="bg-gray" id="t-tr">
+                                    <th id="t-td">Item #</th>
+                                    <th id="t-td" class="text-nowrap">QTY</th>
+                                    <th id="t-td">UNIT</th>
+                                    <th id="t-td">ITEM/DESCRIPTION</th>
+                                    <th id="t-td" class="text-nowrap">APPROVED BUDGET</th>
+                                    <th id="t-td">UNIT COST</th>
+                                    <th id="t-td">TOTAL COST</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{-- showing ppmp data based on department and user --}}
+                                <tr id="t-tr">
+                                    <td id="t-td"></td>
+                                    <td id="t-td"></td>
+                                    <td id="t-td"></td>
+                                    <td id="t-td"></td>
+                                    <td id="t-td"></td>
+                                    <td id="t-td"></td>
+                                    <td id="t-td"></td>
+                                </tr>
+
+
+                                <tr id="t-tr">
+                                    <td id="t-td"></td>
+                                    <td id="t-td"></td>
+                                    <td id="t-td"></td>
+                                    <td id="t-td" class="text-right">TOTAL</td>
+                                    <td id="t-td"></td>
+                                    <td id="t-td"></td>
+                                    <td id="t-td"></td>
+                                </tr>
+
+                                <tr id="t-tr">
+                                    <td id="t-td" colspan="2">Delivery Term</td>
+                                    <td id="t-td" colspan="5"></td>
+                                </tr>
+                                <tr id="t-tr">
+                                    <td id="t-td" colspan="2">Payment Term</td>
+                                    <td id="t-td" colspan="2"></td>
+                                    <td id="t-td" colspan="2"></td>
+                                    <td id="t-td" colspan="2"></td>
+                                </tr>
+                                <tr id="t-tr">
+                                    <td id="t-td" colspan="7"></td>
+                                </tr>
+                                {{-- showing ppmp data based on department and user --}}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
