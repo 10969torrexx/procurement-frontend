@@ -684,7 +684,6 @@ class BudgetOfficerController extends Controller
                 }
     }
 
-
     public function mandatory_expenditures_index(){
         $pageConfigs = ['pageHeader' => true];
         $breadcrumbs = [
@@ -1245,6 +1244,34 @@ class BudgetOfficerController extends Controller
         } catch (\Throwable $th) {
             //throw $th;
             return view('pages.error-500');
+        }
+    }
+
+    public function pending_ppmp_request(){
+        $pageConfigs = ['pageHeader' => true];
+        $breadcrumbs = [
+          ["link" => "/", "name" => "Home"],["name" => "Pending PPMP Request"]
+        ];
+
+        try {
+            $response = DB::table('ppmp_request_submission as prs')
+                            ->select('prs.id','prs.remark','prs.reason','prs.created_at','prs.status','u.name','d.department_name','ab.deadline_of_submission')
+                            ->join('users as u','prs.employee_id','u.employee_id')
+                            ->join('departments as d','prs.department_id','d.id')
+                            ->join('allocated__budgets as ab','prs.allocated_budget','ab.id')
+                            ->where('prs.campus', session('campus'))
+                            ->whereNull('prs.deleted_at')
+                            ->get();
+            $countPending = count($response);
+                // dd($countPending);
+            return view('pages.budgetofficer.ppmp-request-index', compact('response','countPending'), [
+                'pageConfigs'=>$pageConfigs,
+                'breadcrumbs'=>$breadcrumbs,
+            ]);
+           
+        } catch (\Throwable $th) {
+            throw $th;
+            // return view('pages.error-500');
         }
     }
 
