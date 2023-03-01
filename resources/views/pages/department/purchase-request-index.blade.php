@@ -26,7 +26,9 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title">APPROVED PPMPs</h4>
+                    <h4 class="card-title text-center mt-2">
+                        <strong>APPROVED PPMPs</strong>
+                    </h4>
                 </div>
                 <div class="card-content">
                     <div class="card-body card-dashboard">
@@ -53,7 +55,7 @@
                                         @foreach($ppmps as $data)
                                             <tr id = "{{$ctr}}">
                                                 <td>
-                                                    <a class = "btn btn-success mr-1 mb-1" ctr = "<?=$ctr?>" href = "{{ route('createPR', ['id' => $aes->encrypt($data->id)]) }}">
+                                                    <a class = "btn btn-outline-success mr-1 mb-1" ctr = "<?=$ctr?>" href = "{{ route('createPR', ['id' => $aes->encrypt($data->id)]) }}">
                                                         {{-- <i class="fa fa-plus mr-2"></i>Create PR</a> --}}
                                                         <i class="bx bx-plus"></i> Create PR</a>
                                                     {{-- <div class="dropdown">

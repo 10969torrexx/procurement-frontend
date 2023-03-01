@@ -553,10 +553,10 @@ class BudgetOfficerController extends Controller
         // dd($request->all());
         $id = (new AESCipher())->decrypt($request->id);
 
-        $department_ids = DB::table('departments')->select('id')->where('campus',session('campus'))->whereNull('deleted_at')->get();
-        $fund_source_ids = DB::table('fund_sources')->select('id')->whereNull('deleted_at')->get();
-        $years = DB::table('ppmp_deadline')->select('year','id')->where('campus',session('campus'))->whereNull('deleted_at')->get();
-        $expenditure_ids = DB::table('mandatory_expenditures_list')->select('id')->whereNull('deleted_at')->get();
+        $department_ids = DB::table('departments')->select('id')->where('campus',session('campus'))->whereNull('deleted_at')->orderBy('department_name')->get();
+        $fund_source_ids = DB::table('fund_sources')->select('id')->whereNull('deleted_at')->orderBy('fund_source')->get();
+        $years = DB::table('ppmp_deadline')->select('year','id')->where('campus',session('campus'))->whereNull('deleted_at')->orderBy('year')->get();
+        $expenditure_ids = DB::table('mandatory_expenditures_list')->select('id')->whereNull('deleted_at')->orderBy('expenditure')->get();
 
         $response = DB::table("mandatory_expenditures as me")
                         ->select("me.department_id","me.fund_source_id","me.expenditure_id","me.price","me.year","mel.expenditure")
@@ -565,7 +565,7 @@ class BudgetOfficerController extends Controller
                         ->where('campus',session('campus'))
                         ->whereNull('me.deleted_at')
                         ->get();
-                //         $data = DB::
+                        // $data = DB::
 
             return response()->json([
                 'status'=>200,
@@ -781,7 +781,7 @@ class BudgetOfficerController extends Controller
                             ->where("allocated__budgets.campus", session("campus"))
                             ->orderBy("departments.department_name")
                             ->get();
-        $ppmp_deadline = DB::table('ppmp_deadline')->where('campus',session('campus'))->where('year',$date+1)->whereNull('deleted_at')->get();
+        $ppmp_deadline = DB::table('ppmp_deadline')->where('campus',session('campus'))->where('year',$date)->whereNull('deleted_at')->get();
         // $ppmp_deadlines = DB::table('ppmp_deadline')->where('campus',session('campus'))->whereNull('deleted_at')->get();
         if(count($ppmp_deadline)==0){
             session(['globalerror' => "Please set deadline first"]);
@@ -917,6 +917,7 @@ class BudgetOfficerController extends Controller
                     ->where('campus',session('campus'))
                     ->whereNull('deleted_at')
                     ->groupBy('year')
+                    ->orderBy('year')
                     ->get();
         // $type = DB::table('ppmp_deadline')->select('year','id')->whereNull('deleted_at')->get();
         // dd($years);
@@ -1226,10 +1227,11 @@ class BudgetOfficerController extends Controller
         ];
         /** Torrexx Additionals
          * ! show upload ppmp from DepartmentPagesController
+         * ? TODO enable access to DepartmentPagesController@show_upload_ppmp()
          * ? KEY import department pages controller
          */
 
-        try {
+         try {
             # get uplpaded ppmp
             $response = \DB::table('signed_ppmp')
                 ->where('employee_id', session('employee_id'))

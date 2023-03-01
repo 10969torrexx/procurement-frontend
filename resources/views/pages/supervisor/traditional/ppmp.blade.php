@@ -67,72 +67,25 @@
 
                                                 Php {{ number_format($total) }}
                                         </td>
-                                        <?php
-                                        if($data->status == 1)
-                                        {
-                                            ?>
-                                        <td style="text-align: left; color:blue;">Pending</td>
-                                        <?php
-                                        }
-                                        elseif ($data->status == 2) {
-                                        ?>
-                                        <td style="text-align: left; color:green;">Approved</td>
-                                        <?php
-                                        }elseif($data->status == 3){
-                                        ?>
-                                        <td style="text-align: left; color:red;">Need Revision</td>
-                                        <?php
-                                        }elseif($data->status == 6){
-                                        ?>
-                                        <td style="text-align: left; color:coral;">Revised</td>
-                                        <?php
-                                        }elseif($data->status == 4){
-                                        ?>
-                                        <td style="text-align: left; color:green;">Accepted by Budget Officer</td>
-                                        <?php
-                                        }elseif($data->status == 5){
-                                        ?>
-                                        <td style="text-align: left; color:red;">Rejected by Budget Officer</td>
-                                        <?php
-                                        }
-                                        ?>
+                                        <td> 
+                                            <div class="badge badge-pill badge-light-{{ (new GlobalDeclare)->ppmp_status_color($data->status) }} mr-1">{{ (new GlobalDeclare)->ppmp_status($data->status) }}</div>
+                                        </td>
                                         <td>
                                             <form action="{{ route('show-traditional-ppmp') }}" method="post">
                                                 @csrf
                                                 <input type="text" id="project_code12" class=" form-control d-none" name="project_code" value="<?=$aes->encrypt($data->id)?>">
-                                                {{-- <input type="text" class="form-control d-none" name="employee_id" value="<?=$aes->encrypt($data->employee_id)?>">
-                                                <input type="text" class="form-control d-none" name="department_id" value="<?=$aes->encrypt($data->department_id)?>">
-                                                <input type="text" class="form-control d-none" name="item_status" value="<?=$aes->encrypt(0)?>"> --}}
                                                 <button type="submit" class="btn btn-outline-secondary view"  >view</button>
                                             </form>
                                         </td>
-                                        {{-- <td>{{ $data->project_code }}</td>
-                                        <td>{{ $data->project_title }}</td> --}}
-                                        {{-- <td>
-                                            <a href="" class="view" style="background-color: aquamarine"><i class="fa-regular fa-eye"  title="View" href=""></i> </a> --}}
-                                            {{-- <button type="button" class="btn btn-outline-secondary view"  href="<?=$aes->encrypt($data->id)?>" data-toggle = "modal" id="view_modal">view</button> --}}
-                                            {{-- <button class="btn-success view" data-toggle = "modal" id="view_modal"></button> 
-                                        </td>--}}
-                                        
                                     </tr>
-                                    {{-- @include('pages.bac.edit-item-modal') --}}
                                 </tbody>
                                 @endforeach
-                                        {{-- @endfor --}}
-                                {{-- <tfoot>
-                                    <tr>
-                                        <th>Project Code</th>
-                                        <th>Project Procurement</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </tfoot> --}}
                                 </table>
                             </div>
                         </div>
                     </div>
             </section>
         </div>
-                            {{-- @include('pages.supervisor.supervisor_ppmp_modal') --}}
     </div>
 </section>
 <!-- Dashboard Ecommerce ends -->

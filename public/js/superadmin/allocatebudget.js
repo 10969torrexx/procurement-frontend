@@ -440,7 +440,7 @@ $(document).on('click', '.editbutton', function (e) {
   // $('#UpdateAllocateBudgetModal').modal('show');
 
   var id = $(this).attr("href");
-  // alert(id);
+  alert(id);
    $.ajaxSetup({
           headers: {
               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

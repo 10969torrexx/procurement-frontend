@@ -36,8 +36,8 @@ class AllocateBudgetController extends Controller
                 // 'year' => $ppmp_deadline['year'],
             ]); 
     }
-    public function get_years(Request $request)
-    {
+
+    public function get_years(Request $request){
         try {
             // $department = $request->department;
         // $response = Http::withToken(env('Auth_HRMIS_Token'))->post(env('APP_HRMIS_API'). "/api/auth/employeelist", [
@@ -52,8 +52,8 @@ class AllocateBudgetController extends Controller
         }
         
     }
-    public function get_DeadlineByYear(Request $request)
-    {
+
+    public function get_DeadlineByYear(Request $request){
         try {
         //   dd($request->all());
 
@@ -72,8 +72,8 @@ class AllocateBudgetController extends Controller
         }
         
     }
-    public function getDepartments(Request $request)
-    {
+
+    public function getDepartments(Request $request){
         try {
             $departments =  Http::withToken(session('token'))->get(env('APP_API'). "/api/department/getDepartments")->json();
         //   dd($departments);
@@ -82,8 +82,8 @@ class AllocateBudgetController extends Controller
             dd($th);
         }
     }
-    public function getFundSources(Request $request)
-    {
+
+    public function getFundSources(Request $request){
         try {
             $fundsources =  Http::withToken(session('token'))->get(env('APP_API'). "/api/fundsource/getFundSources")->json();
         //   dd($departments);
@@ -92,8 +92,8 @@ class AllocateBudgetController extends Controller
             dd($th);
         }
     }
-    public function getMandatoryExpenditures(Request $request)
-    {
+
+    public function getMandatoryExpenditures(Request $request){
         try {
             $expenditures =  Http::withToken(session('token'))->get(env('APP_API'). "/api/expenditures/getMandatoryExpenditures")->json();
         //   dd($expenditures);
@@ -102,6 +102,7 @@ class AllocateBudgetController extends Controller
             dd($th);
         }
     }
+
     public function allocate_budget(Request $request){
     //   dd($request->all());
     
@@ -127,7 +128,7 @@ class AllocateBudgetController extends Controller
           'type' => $type,
           'year' => $year,
           'total_expenditures' => $total_expenditures,
-          'deadline_of_submission' => $deadline_of_submission,
+          'deadline_of_submission' => null,
           'department_id' => $department,
           'fund_source_id' => $fund_source,
           'allocated_budget' => $budget,
