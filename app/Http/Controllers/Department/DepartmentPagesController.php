@@ -404,7 +404,7 @@ class DepartmentPagesController extends Controller
 
         /**
          * * View PPMP Status | My PPMP Tab
-         * TODO 1: Get all projects that been created by end-user
+         * TODO 1: Get all projects that been created in the department with corresponding authors
          * TODO 2: Get all project that has been declined or disapproved
          * TODO 3: Get all project that been accepted or approved
          * ? ----------------------------
@@ -412,6 +412,7 @@ class DepartmentPagesController extends Controller
          */
         public function showMyPPMP() {
             try {
+             
                 # this is for affixing header links above the card directoryyy
                     $pageConfigs = ['pageHeader' => true];
                     $breadcrumbs = [
@@ -442,15 +443,17 @@ class DepartmentPagesController extends Controller
                 $project_titles = \DB::table('project_titles')
                     ->join('fund_sources', 'fund_sources.id', 'project_titles.fund_source')
                     ->join('users', 'users.id', 'project_titles.immediate_supervisor')
+                    ->join('users AS author', 'author.employee_id', 'project_titles.employee_id')
                     ->join('allocated__budgets', 'allocated__budgets.id', 'project_titles.allocated_budget')
                     ->join('ppmp_deadline', 'ppmp_deadline.year', 'allocated__budgets.year')
                     //* project_titlles
                     ->where('project_titles.campus', session('campus'))
-                    ->where('project_titles.employee_id', session('employee_id'))
+                    // ->where('project_titles.employee_id', session('employee_id'))
                     ->where('project_titles.department_id', session('department_id'))
                     ->whereNull('project_titles.deleted_at')
                     //* allocated__budgets
                     ->where('allocated__budgets.campus', session('campus'))
+                    ->where('ppmp_deadline.campus', session('campus'))
                     ->whereNull('allocated__budgets.deleted_at')
                     //? KEYS
                     ->where('project_titles.project_year', $request->year_created)
@@ -466,6 +469,7 @@ class DepartmentPagesController extends Controller
                         'ppmp_deadline.start_date',
                         'ppmp_deadline.end_date',
                         'users.name as immediate_supervisor',
+                        'author.name as author',
                         'fund_sources.fund_source'
                     ]);
 
@@ -536,17 +540,18 @@ class DepartmentPagesController extends Controller
                     ->where('ppmps.project_code', (new AESCipher)->decrypt($request->id))
                     ->whereNull('ppmps.deleted_at')
                     ->get();
-
-                $project_timeline = \DB::table('project_timeline')
-                    ->where('project_id', (new AESCipher)->decrypt($request->id))
-                    ->get();
                 # this will check if all required data is not null 
-                    if((count($ppmp_response) <= 0) || $ppmp_response == null) {
+                    if((count($ppmp_response) <= 0)) {
                         # if there are null data this will retur na page maintenance page
-                        return back()->with([
+                        return redirect(route('department-showMyPPMP'))->with([
                             'failed'    => 'This Project doesn\' contain any items. Please add items using the Create PPMP Tab.'
                         ]);
                     } 
+                //* get from project timeline
+                    $project_timeline = \DB::table('project_timeline')
+                    ->where('project_id', (new AESCipher)->decrypt($request->id))
+                    ->get();
+                
                 # this is for affixing header links above the card directoryyy
                 $pageConfigs = ['pageHeader' => true];
                 $breadcrumbs = [
@@ -564,7 +569,7 @@ class DepartmentPagesController extends Controller
                     ]
                 );
             } catch (\Throwable $th) {
-                // throw $th;
+                throw $th;
                 return view('pages.error-500');
             }
         }
