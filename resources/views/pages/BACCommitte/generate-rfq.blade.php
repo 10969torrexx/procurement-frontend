@@ -179,8 +179,6 @@
                                     <td id="t-td"></td>
                                     <td id="t-td"></td>
                                 </tr>
-
-
                                 <tr id="t-tr">
                                     <td id="t-td"></td>
                                     <td id="t-td"></td>
@@ -190,7 +188,6 @@
                                     <td id="t-td"></td>
                                     <td id="t-td"></td>
                                 </tr>
-
                                 <tr id="t-tr">
                                     <td id="t-td" colspan="2">Delivery Term</td>
                                     <td id="t-td" colspan="5"></td>
