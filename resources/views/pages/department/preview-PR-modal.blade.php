@@ -6,7 +6,7 @@
     $global = new GlobalDeclare();
 ?>
 <div class="modal fade text-left " id="PreviewPRModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel160" style="display: none;" aria-hidden="true">
-  <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered " role="document" >
+  <div class="modal-dialog modal-xl modal-dialog-centered " role="document" >
       
     <div class="modal-content">
       <div class="modal-header text-center" id = "headModal">
@@ -19,8 +19,13 @@
       
       <form action="/" method = "post">
       {{-- <div class="modal-body" id="bodyModalCreate"> --}}
-      <div class="modal-body">
+      <div class="modal-body" style=" height: 80vh;overflow-y: auto;">
         <style>
+          /* .modal-body{
+              height: 80vh;
+              overflow-y: auto;
+          } */
+
           table.PR{
             width: 100%;
             border-collapse: collapse;
@@ -69,7 +74,7 @@
           <table class="PR">
             <thead class="head1">
               <tr>
-                <td class="title" colspan="6" style="border-bottom : none;font-weight:bold;padding-bottom:1%">PURCHASE REQUEST</td>
+                <td class="title" colspan="6" style="border-bottom : none;font-weight:bold;padding-bottom:1%;font-size: 25px;">PURCHASE REQUEST</td>
               </tr>
               <tr>
                 <td  style="font-weight:bold;border-left:1px solid black;border-bottom : none;border-top : none;border-right : none;text-align:left;">Entity Name:</td>
@@ -116,7 +121,7 @@
               </tr>
             </thead>
             <tbody>
-              <?php $i=0; $counter=10; $total = 0;?>
+              <?php $i=0; $counter=20; $total = 0;?>
               @foreach($itemsFromPRI as $data)
               <?php $i++; $counter--;?>
               <tr>

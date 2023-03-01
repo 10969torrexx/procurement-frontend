@@ -165,7 +165,7 @@
                             @foreach($itemsForPR as $itemsForPR)
                               
                               <tbody>
-                                @for($loop = 0; $loop < 150; $loop++)
+                                {{-- @for($loop = 0; $loop < 150; $loop++) --}}
                               <?php $i++; $counter--;?>
                                 
                                 @if($pagebreaker == $i)
@@ -192,7 +192,7 @@
                                     <td style="text-align: right;padding-right:10px">{{number_format($estimated_price,2,'.',',')}}</td>
                                   </tr>
                                 @endif
-                                @endfor
+                                {{-- @endfor --}}
                             @endforeach
 
                               @php
