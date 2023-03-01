@@ -75,7 +75,7 @@
                       </tr>
                   </thead>
                   <tbody>
-                      @foreach ($allocated_budgets as $item)
+                      @foreach ($mandatory_expeditures as $item)
                         <tr id="t-tr">
                           <td id="t-td">{{ $loop->iteration }}</td>
                           <td id="t-td">{{ $item->fund_source }}</td>

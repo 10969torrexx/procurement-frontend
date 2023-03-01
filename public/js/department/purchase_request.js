@@ -61,7 +61,7 @@ $(document).ready(function() {
         $('.selectEmployee').html('<option class="spinner-border spinner-border-sm">Please wait... </option>');
       },
       success: function (response) {
-        console.log(response)
+        // console.log(response)
         $('.selectEmployee').empty()
         $('.selectEmployee').append('<option value="" style="border: none;text-align:center;font-weight:bold;" selected disabled>-- Select Employee --</option>')
         for(var i = 0; i < response['data'].length; i++) {
@@ -90,7 +90,7 @@ $(document).ready(function() {
         $('.selectApprovingOfficer').html('<option class="spinner-border spinner-border-sm">Please wait... </option>');
       },
       success: function (response) {
-        console.log(response)
+        // console.log(response)
         $('.selectApprovingOfficer').empty()
         $('.selectApprovingOfficer').append('<option value="" style="border: none;text-align:center;font-weight:bold;" selected disabled>-- Select Approving Officer --</option>')
         for(var i = 0; i < response['data'].length; i++) {
@@ -793,7 +793,7 @@ $(document).on('click', '.edit_SignedPR_button', function (e) {
       data: data,
       success: function (response) {
         if (response.status == 200) {
-          console.log(response)
+          // console.log(response)
           response['data'].forEach(element => {
             $('#signedPR_id').val(element.id);
             $('#update_pr_no').val(element.pr_no);

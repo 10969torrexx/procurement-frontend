@@ -221,17 +221,11 @@ class PurchaseRequestController extends Controller
             ["link" => "/PR/purchaseRequest", "name" => "Approve PPMPs"],
             ["name" => "Create PR"]
         ];
-          $hope = DB::table('users')
-                    ->where('role',12)
-                    ->where('campus',session('campus'))
-                    ->get();
-          foreach($hope as $data){
-            $hope = $data->name;
-          }
           $itemsForPR = DB::table("purchase_request_items as pri")
                     ->select('pri.*','p.item_name','p.item_description','p.unit_price')
                     ->join("ppmps as p", "pri.item_id", "=", "p.id")
                     // ->where('p.app_type','Non-CSE')
+                    ->where('pri.campus',session('campus'))
                     ->where('pri.project_code',$id)
                     ->where('pri.pr_no',0)
                     ->whereNull('pri.deleted_at')
@@ -241,6 +235,7 @@ class PurchaseRequestController extends Controller
                     ->select('pri.*','p.unit_of_measurement','p.item_description','p.unit_price')
                     ->join("ppmps as p", "pri.item_id", "=", "p.id")
                     ->where('p.app_type','Non-CSE')
+                    ->where('pri.campus',session('campus'))
                     ->where('pri.project_code',$id)
                     ->where('pri.pr_no',0)
                     ->whereNull('pri.deleted_at')
@@ -250,12 +245,14 @@ class PurchaseRequestController extends Controller
                     ->select("pt.campus","pt.project_title","pt.fund_source","d.department_name")
                     ->join("departments as d", "pt.department_id", "=", "d.id")
                     ->join("fund_sources as fs", "pt.fund_source", "=", "fs.id")
+                    ->where('pt.campus',session('campus'))
                     ->where("pt.id", $id)
                     ->whereNull('pt.deleted_at')
                     ->get();
           $fund_source = DB::table("project_titles as pt")
                     ->select("fs.fund_source")
                     ->join("fund_sources as fs", "pt.fund_source", "=", "fs.id")
+                    ->where('pt.campus',session('campus'))
                     ->where("pt.id", $id)
                     ->whereNull('pt.deleted_at')
                     ->get();  
@@ -265,6 +262,7 @@ class PurchaseRequestController extends Controller
                     ->where('project_code','=',$id)
                     ->where('mode_of_procurement','!=',33)
                     ->where('app_type','Non-CSE')
+                    ->where('campus',session('campus'))
                     ->orderBy('item_name')
                     ->whereNull('deleted_at')
                     ->sum('quantity');
@@ -304,7 +302,7 @@ class PurchaseRequestController extends Controller
           // }else{
           //       Session::forget('globalerror');
           // }
-          return view('pages.department.create-purchase-request',compact('hope','purpose','name','designation','ao_name','ao_designation','itemsForPR','pr_no','itemsForPRCount','itemsFromPRI','date','details','fund_source','project_code'),
+          return view('pages.department.create-purchase-request',compact('purpose','name','designation','ao_name','ao_designation','itemsForPR','pr_no','itemsForPRCount','itemsFromPRI','date','details','fund_source','project_code'),
               ['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs]
               );
           # end
@@ -326,30 +324,27 @@ class PurchaseRequestController extends Controller
           ["link" => "/PR/trackPR", "name" => "Track PR"],
           ["name" => "Edit PR"]
       ];
-     
-        $hope = DB::table('users')
-                  ->where('role',12)
-                  ->where('campus',session('campus'))
-                  ->get();
-        foreach($hope as $data){
-          $hope = $data->name;
-        }
         $itemsForPR = DB::table("purchase_request_items as pri")
                   ->select('pri.*','p.item_name','p.item_description','p.unit_price')
                   ->join("ppmps as p", "pri.item_id", "=", "p.id")
                   ->where('pri.pr_no',$pr_no)
+                  ->where('pri.campus',session('campus'))
                   ->whereNull('pri.deleted_at')
                   ->get();
+
         $itemsForPRCount = count($itemsForPR);
         $itemsFromPRI = DB::table("purchase_request_items as pri")
                   ->select('pri.*','p.unit_of_measurement','p.item_description','p.unit_price')
                   ->join("ppmps as p", "pri.item_id", "=", "p.id")
                   ->where('pri.pr_no',$pr_no)
+                  ->where('pri.campus',session('campus'))
                   ->whereNull('pri.deleted_at')
-                  ->get();;
+                  ->get();
+
         $pc = DB::table('purchase_request')
                           ->select('project_code')
                           ->where('pr_no',$pr_no)
+                          ->where('campus',session('campus'))
                           ->whereNull('deleted_at')
                           ->first();
         $project_code = $pc->project_code;
@@ -357,6 +352,7 @@ class PurchaseRequestController extends Controller
                   ->select("pt.campus","pt.project_title","pt.fund_source","d.department_name")
                   ->join("departments as d", "pt.department_id", "=", "d.id")
                   ->join("fund_sources as fs", "pt.fund_source", "=", "fs.id")
+                  ->where('pt.campus',session('campus'))
                   ->where("pt.id", $project_code)
                   ->whereNull('pt.deleted_at')
                   ->get();
@@ -365,6 +361,7 @@ class PurchaseRequestController extends Controller
                   ->select("fs.fund_source")
                   ->join("fund_sources as fs", "pt.fund_source", "=", "fs.id")
                   ->where("pt.id", $project_code)
+                  ->where('pt.campus',session('campus'))
                   ->whereNull('pt.deleted_at')
                   ->get();
 
@@ -373,7 +370,7 @@ class PurchaseRequestController extends Controller
                   ->where('project_code','=',$project_code)
                   ->where('mode_of_procurement','!=',33)
                   ->where('app_type','Non-CSE')
-                  ->where('pr_no','!=',0)
+                  ->where('campus',session('campus'))
                   ->whereNull('deleted_at')
                   ->sum('quantity');
 
@@ -381,13 +378,15 @@ class PurchaseRequestController extends Controller
                   // ->select('item_id','quantity')
                   ->where('project_code','=',$project_code)
                   // ->where('pr_no','!=',0)
+                  ->where('campus',session('campus'))
                   ->whereNull('deleted_at')
                   ->sum('quantity');
-                  // dd($pri);
+                  // dd($items);
         $information = DB::table('purchase_request as pr')
                     ->select('pr.purpose','u.name','pr.designation','ps.name as ao_name','ps.designation as ao_designation')
                     ->join('users as u','pr.printed_name','=','u.id')
                     ->join('pr_signatories as ps','pr.approving_officer','=','ps.id')
+                    ->where('pr.campus',session('campus'))
                     ->where('pr.id',$id)
                     ->get();
                     
@@ -412,9 +411,8 @@ class PurchaseRequestController extends Controller
         //       Session::forget('globalerror');
         // }
         $project_code = $this->aes->encrypt($project_code);
-        // dd($project_code); 
 
-        return view('pages.department.edit-purchase-request',compact('hope','purpose','name','designation','ao_name','ao_designation','itemsForPR','pr_no','itemsForPRCount','itemsFromPRI','date','details','fund_source','project_code'),
+        return view('pages.department.edit-purchase-request',compact('purpose','name','designation','ao_name','ao_designation','itemsForPR','pr_no','itemsForPRCount','itemsFromPRI','date','details','fund_source','project_code'),
             ['pageConfigs'=>$pageConfigs,'breadcrumbs'=>$breadcrumbs]
             );
         # end
@@ -812,6 +810,7 @@ class PurchaseRequestController extends Controller
       $quantityFromPPMP = DB::table("ppmps")
                 ->select('quantity')
                 ->where('project_code',$project_code)
+                ->where('campus',session('campus'))
                 ->where('id',$id)
                 ->whereNull('deleted_at')
                 ->get();
@@ -819,6 +818,7 @@ class PurchaseRequestController extends Controller
                 ->select('quantity')
                 ->where('project_code',$project_code)
                 ->where('item_id',$id)
+                ->where('campus',session('campus'))
                 ->whereNull('deleted_at')
                 ->get();
       
@@ -840,6 +840,7 @@ class PurchaseRequestController extends Controller
                         ->select('*')
                         ->where('project_code',$project_code)
                         ->where('item_id',$id)
+                        ->where('campus',session('campus'))
                         ->where('pr_no', $pr_no)
                         ->whereNull('deleted_at')
                         ->count();
@@ -853,6 +854,7 @@ class PurchaseRequestController extends Controller
               $item = DB::table('ppmps')
                     ->select('item_name')
                     ->where('id',$id)
+                    ->where('campus',session('campus'))
                     ->get();
               $item_name = '';
               foreach($item as $data){
@@ -870,6 +872,7 @@ class PurchaseRequestController extends Controller
               if($pr_no == "0000-00-0000"){
                 $response = DB::table('purchase_request_items')
                               ->insert([
+                                  'campus' => session('campus'),
                                   'project_code' => $project_code,
                                   'item_id' => $id,
                                   'quantity' => $quantityToPR,
@@ -880,6 +883,7 @@ class PurchaseRequestController extends Controller
               }else{
                 $response = DB::table('purchase_request_items')
                               ->insert([
+                                  'campus' => session('campus'),
                                   'pr_no' => $pr_no,
                                   'project_code' => $project_code,
                                   'item_id' => $id,
@@ -1287,7 +1291,8 @@ class PurchaseRequestController extends Controller
         $date = $current->format('Y-m');
         $pr_no_check = DB::table('purchase_request as pr')
                           ->select('pr.*')
-                          ->whereNull('deleted_at')
+                          ->whereNull('pr.deleted_at')
+                          ->where('pr.campus',session('campus'))
                           ->orderBy('pr.pr_no')
                           ->get();
 
