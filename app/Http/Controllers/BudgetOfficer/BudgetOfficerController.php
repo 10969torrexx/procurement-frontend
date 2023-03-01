@@ -1274,7 +1274,7 @@ class BudgetOfficerController extends Controller
             // return view('pages.error-500');
         }
     }
-    
+
     public function my_par(){
         return view('pages.page-maintenance');
     }

@@ -198,7 +198,7 @@ $(document).on('click', '.editbutton', function (e) {
 
           if (response.status == 200) {
 
-              var array_type = ['Indicative','Supplemental','PPMP'];
+              var array_type = [0,1,2];
 
               var type = response['deadline'][0]['procurement_type'];
               var year = response['deadline'][0]['year'];
@@ -207,7 +207,7 @@ $(document).on('click', '.editbutton', function (e) {
               // alert(type);
               var current_year = 2023;
               var array_year = [];
-              var array_type = ['Indicative','Supplemental','PPMP'];
+
                   for (let i = 0; i < 20; i++) {
                     array_year.push(current_year++);
                   }
