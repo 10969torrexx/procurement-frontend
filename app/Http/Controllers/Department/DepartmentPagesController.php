@@ -178,6 +178,7 @@ class DepartmentPagesController extends Controller
                             ->join('fund_sources', 'fund_sources.id', 'allocated__budgets.fund_source_id')
                             ->join('ppmp_deadline', 'ppmp_deadline.year', 'allocated__budgets.year')
                             ->where('allocated__budgets.campus', session('campus')) 
+                            ->where('ppmp_deadline.campus', session('campus')) 
                             ->where('department_id', session('department_id'))
                             ->where('ppmp_deadline.procurement_type', (new AESCipher)->decrypt($request->project_category)) // ? KEY 3
                             ->where('allocated__budgets.procurement_type', (new AESCipher)->decrypt($request->project_category)) // ? KEY 3
