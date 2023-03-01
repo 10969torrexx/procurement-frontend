@@ -58,15 +58,9 @@
                                         <input type="text" class="form-control d-none" name="id" id="project-id">
                                         <div class="modal-body">
                                             <div class="row col-12">
-                                                <div class="form-group col-6">
+                                                <div class="form-group col-12">
                                                     <label for="">Project Title</label>
-                                                    <input type="text" class="form-control" name="project_title" id="project-title">
-                                                </div>
-                                                <div class="form-group col-6">
-                                                    <label for="">For what year</label>
-                                                    <select id="" class="form-control" name="project_year">
-                                                        <option value="" id="default-year" selected></option>
-                                                    </select>
+                                                    <textarea name="project_title" class="form-control" id="project-title" cols="30" rows="1"></textarea>
                                                 </div>
                                             </div>
                                             <div class="row col-12">
@@ -84,12 +78,12 @@
                                                     </select>
                                                 </div>
                                                 <div class="form-group col-6">
-                                                    <label for="">Found Source</label>
+                                                    <label for="">Budget Allocation</label>
                                                     <select id="" class="form-control" name="fund_source">
                                                         <option value="" id="default-fund-source" selected></option>
-                                                    @foreach ($fund_sources as $item)
-                                                        <option value="{{ $item->id }}**{{ $item->fund_source_id }}">{{ $item->fund_source }}</option>
-                                                    @endforeach
+                                                        @foreach ($fund_sources as $item)
+                                                            <option value="{{ $item->fund_source_id }}**{{$item->year }}**{{ $item->allocated_id }}"> {{ $item->year }} | {{ $item->fund_source }} </option>
+                                                        @endforeach
                                                     </select>
                                                 </div>
                                             </div>
@@ -204,6 +198,7 @@
                                                 <th id="t-td">Project Title</th>
                                                 <th id="t-td">Project Year</th>
                                                 <th id="t-td">Status</th>
+                                                <th id="t-td">Author</th>
                                                 <th id="t-td">Immediate SUPERVISOR</th>
                                                 <th id="t-td">Project Type</th>
                                                 <th id="t-td">Fund Source</th>
@@ -223,6 +218,7 @@
                                                         <td id="t-td">{{ $item->project_title }}</td>
                                                         <td id="t-td">{{ $item->project_year }}</td>
                                                         <td id="t-td">{{ Str::ucfirst((new GlobalDeclare)->status($item->status)) }}</td>
+                                                        <td id="t-td">{{ $item->author }}</td>
                                                         <td id="t-td">{{ $item->immediate_supervisor }}</td>
                                                         <td id="t-td">{{ $item->project_type }}</td>
                                                         <td id="t-td">{{ $item->fund_source }}</td>
@@ -315,8 +311,8 @@
                     $('#default-project-type').text(response[0]['project_type']);
                     $('#default-year').val(response[0]['project_year']);
                     $('#default-year').text(response[0]['project_year']);
-                    $('#default-fund-source').val(response[0]['allocated_budget']+'**'+response[0]['fund_source_id']);
-                    $('#default-fund-source').text(response[0]['fund_source']);
+                    $('#default-fund-source').val(response[0]['fund_source_id'] +'**'+ response[0]['project_year'] +'**'+ response[0]['allocated_budget']);
+                    $('#default-fund-source').text(response[0]['project_year'] +' | '+ response[0]['fund_source']);
                 } 
             });
         });
