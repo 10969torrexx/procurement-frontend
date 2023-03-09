@@ -265,7 +265,7 @@ Route::group(['prefix' => 'superadmin','middleware' => ['authuser']], function()
             # this will show the my ppmp page based on the department id
             Route::get('/myPPMP', [DepartmentPagesController::class, 'showMyPPMP'])->name('department-showMyPPMP');
             # this will show the status of the project along with its item
-            Route::post('/project/status', [DepartmentPagesController::class, 'showProjectStatus'])->name('department-showProjectStatus');
+            Route::get('/project/status', [DepartmentPagesController::class, 'showProjectStatus'])->name('department-showProjectStatus');
         /** Gettin data from the database */
             # this will get the databa by unit of measure per item fron the unit measure from the dabase
             Route::post('/UnitOfMeasure', 'Department\UnitOfMeasurementController@show')->name('UnitOfMeasure');

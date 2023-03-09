@@ -123,6 +123,7 @@
                                     <th id="t-td">Project Title</th>
                                     <th id="t-td">Project Year</th>
                                     <th id="t-td">Status</th>
+                                    <th id="t-td">Author</th>
                                     <th id="t-td">Immediate SUPERVISOR</th>
                                     <th id="t-td">Project Type</th>
                                     <th id="t-td">Fund Source</th>
@@ -142,6 +143,7 @@
                                             <td id="t-td">{{ $item->project_title }}</td>
                                             <td id="t-td">{{ $item->project_year }}</td>
                                             <td id="t-td">{{ Str::ucfirst((new GlobalDeclare)->status($item->status)) }}</td>
+                                            <td id="t-td">{{ $item->author }}</td>
                                             <td id="t-td">{{ $item->immediate_supervisor }}</td>
                                             <td id="t-td">{{ $item->project_type }}</td>
                                             <td id="t-td">{{ $item->fund_source }}</td>
